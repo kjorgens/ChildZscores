@@ -1,0 +1,100 @@
+{
+  "AWSEBDockerrunVersion": 2,
+  "volumes": [
+    {
+      "name": "zscoreKids",
+      "host": {
+        "sourcePath": "/var/app/current/zscoreKids"
+      }
+    },
+    {
+      "name": "couchdb",
+      "host": {
+        "sourcePath": "/usr/local/var/lib/couchdb"
+      }
+    },
+    {
+      "name": "mongodb",
+      "host": {
+        "sourcePath": "/data/db"
+      }
+    }
+  ],
+  "containerDefinitions": [
+    {
+      "name": "mongo-db",
+      "image": "mongo",
+      "environment": [
+        {
+          "name": "Container",
+          "value": "mongodb"
+        }
+      ],
+      "essential": true,
+      "memory": 128,
+      "portMappings": [
+        {
+          "hostPort": 27017,
+          "containerPort": 27017
+        }
+      ]
+    },
+    {
+      "name": "couch-db",
+      "image": "klaemo/couchdb",
+      "environment": [
+        {
+          "name": "Container",
+          "value": "couchdb"
+        }
+      ],
+      "essential": true,
+      "memory": 128,
+      "portMappings": [
+        {
+          "hostPort": 5984,
+          "containerPort": 5984
+        }
+      ]
+    },
+    {
+      "name": "zscoreKids",
+      "image": "maccam912/meanjs",
+      "environment": [
+        {
+          "name": "Container",
+          "value": "WebServer"
+        }
+      ],
+      "essential": true,
+      "memory": 248,
+      "portMappings": [
+        {
+          "hostPort": 3000,
+          "containerPort": 3000
+        }
+      ],
+      "links": [
+        "mongo-db",
+        "couch-db"
+      ],
+      "mountPoints": [
+        {
+          "sourceVolume": "zscoreKids",
+          "containerPath": "/var/app/current",
+          "readOnly": true
+        },
+        {
+          "sourceVolume": "couchdb",
+          "containerPath": "/usr/local/var/lib/couchdb",
+          "readOnly": true
+        },
+        {
+          "sourceVolume": "mongodb",
+          "containerPath": "/data/db",
+          "readOnly": true
+        }
+      ]
+    }
+  ]
+}

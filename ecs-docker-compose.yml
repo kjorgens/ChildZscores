@@ -1,0 +1,23 @@
+web:
+  image: kjorgensen454/zscorekids
+  cpu_shares: 100
+  mem_limit: 262144000
+  links:
+    - db
+    - couch
+  ports:
+    - "3000:80"
+  environment:
+    NODE_ENV: production
+db:
+  image: mongo
+  cpu_shares: 100
+  mem_limit: 262144000
+  ports:
+    - "27017:27017"
+couch:
+  image: klaemo/couchdb
+  cpu_shares: 100
+  mem_limit: 262144000
+  ports:
+    - "5984:5984"
