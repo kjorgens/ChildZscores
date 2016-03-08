@@ -1,0 +1,89 @@
+<section>
+    <div class="page-header">
+        <div class='btn-toolbar pull-right'>
+            <div class="btn-group">
+                <a class="btn btn-primary" ui-sref="children.view({childId: vm.child._id})">Cancel</a>
+            </div>
+        </div>
+        <h1>{{vm.survey._id ? 'Edit Survey' : 'Add New Survey'}}</h1>
+        <h3 class="list-group-item-heading">
+            <h2><span ng-bind="vm.child.firstName"></span>
+            <span ng-bind="vm.child.lastName"></span>
+            <span ng-bind="vm.child.birthDate | date:'mediumDate'"></span></h2>
+            Created on
+            <span ng-bind="vm.rightNow | date:'mediumDate'"></span>
+            by
+            <span ng-bind="vm.child.interviewer"></span>
+        </h3>
+    </div>
+    <div class="col-md-12">
+        <form name="vm.form.surveyForm" class="form-horizontal"
+              ng-submit="vm.addSurvey(vm.form.surveyForm.$valid)" novalidate>
+            <fieldset>
+                <div class="row">
+                    <div class="form-group">
+                        <label for="vm.surveyDate" class="col-sm-3 control-label">Survey date</label>
+                        <div class="col-sm-3">
+                            <input type="date" id="vm.surveyDate"  class="form-control" ng-blur="vm.checkMonthAgeIsValid()"
+                                   uib-datepicker-popup
+                                   ng-model="vm.surveyDate"
+                                   is-open="status.opened" required>
+                            <!--<div class="validationMessage" ng-if="!birthdateIsValid"><p>Please select a valid birthdate</p></div>-->
+                        </div>
+                        <div ng-class="{'has-error':(!heightIsValid)}">
+                            <label for="vm.survey.height" class="col-sm-2 control-label">Height</label>
+                            <div class="col-sm-4">
+                                <input type="input" class="form-control" ng-blur="vm.checkHeightIsValid()"
+                                       ng-model="vm.survey.height" id="vm.survey.height"
+                                       placeholder="Height" required>
+                                <div class="validationMessage" ng-if="!vm.heightIsValid"><p>Please enter a valid height (45-110)
+                                </p></div>
+                            </div>
+                        </div>
+                        <div ng-class="{'has-error':(!weightIsValid)}">
+                            <label for="vm.survey.weight" class="col-sm-2 control-label">Weight</label>
+                            <div class="col-sm-4">
+                                <input type="input" class="form-control" ng-blur="vm.checkWeightIsValid()"
+                                       ng-model="vm.survey.weight" id="vm.survey.weight"
+                                       placeholder="Weight" required>
+                                <div class="validationMessage" ng-if="!vm.weightIsValid"><p>Please enter a valid
+                                    weight (3-18)</p></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="vm.survey.comments" class="col-sm-2 control-label">Comments</label>
+                        <div class="col-sm-4">
+                                <textarea class="form-control" ng-model="vm.survey.comments" id="vm.survey.comments"
+                                          placeholder="Comments" ></textarea>
+                        </div>
+                        <!--<label for="vm.survey.comments" class="col-sm-2 control-label"></label>-->
+                        <div class="col-sm-4" style="text-align: center">
+                            <div style="margin-top:4%;">
+                                <button type="submit" class="btn btn-primary">{{vm.survey._id ? 'Update' : 'Create'}}
+                                </button>
+                            </div>
+                            <!--<div class='btn-toolbar pull-right'>-->
+                                <!--<div class="btn-group">-->
+                                    <!--<a type="submit" class="btn btn-primary">{{vm.survey._id ? 'Update' : 'Create'}}</a>-->
+                                <!--</div>-->
+                                <!--&lt;!&ndash;<button type="submit" class="btn btn-default">{{vm.child._id ? 'Update' : 'Create'}}&ndash;&gt;-->
+                                <!--&lt;!&ndash;</button>&ndash;&gt;-->
+                            <!--</div>-->
+                        </div>
+                    </div>
+                    <!--<video id="video" width="640" height="480" autoplay></video>-->
+                    <!--<button id="snap">Snap Photo</button>-->
+                    <!--<canvas id="canvas" width="640" height="480"></canvas>-->
+                </div>
+            </fieldset>
+        </form>
+    </div>
+    <!--<div class="col-sm-4" style="text-align: center">-->
+        <!--<div style="margin-top:4%;">-->
+            <!--<button type="syncDB" ng-click="vm.syncUpstream()" class="btn btn-default">-->
+                <!--Sync DB-->
+            <!--</button>-->
+        <!--</div>-->
+    <!--</div>-->
+</section>

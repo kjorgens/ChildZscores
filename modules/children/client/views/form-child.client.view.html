@@ -1,0 +1,201 @@
+<section>
+    <div class="page-header">
+        <div class='btn-toolbar pull-right'>
+            <div class="btn-group">
+                <a class="btn btn-primary" ui-sref="children.list()">Cancel</a>
+            </div>
+        </div>
+        <h1>{{vm.child._id ? 'Edit Existing Child' : 'Add New Child'}}</h1>
+        <!--<div class="validationMessage"  ng-if="vm.zscoreString"><div><h1>{{vm.zscoreString}}</h1></div>-->
+        </div>
+    </div>
+    <div class="col-md-12">
+        <form name="vm.form.childForm" class="form-horizontal" ng-submit="vm.create(vm.form.childForm.$valid)" novalidate>
+            <fieldset>
+                <div class="row">
+                    <div class="form-group float-left">
+                        <div ng-class="{'has-error':(!vm.firstNameIsValid)}">
+
+                            <label for="vm.child.firstName" class="col-sm-2 control-label">First Name</label>
+                            <div class="col-sm-4">
+                                <input class="form-control" type="text" ng-change="vm.checkFirstNameIsValid()"
+                                       ng-model="vm.child.firstName" id="vm.child.firstName" placeholder="First Name"
+                                       required>
+                                <div class="validationMessage" ng-if="!vm.firstNameIsValid"><p>Please enter a valid
+                                    name</p></div>
+                            </div>
+                        </div>
+                        <div ng-class="{'has-error':(!vm.lastNameIsValid)}">
+                            <label for="vm.child.lastName" class="col-sm-2 control-label">Last Name</label>
+                            <div class="col-sm-4">
+                                <input type="input" class="form-control" ng-change="vm.checkLastNameIsValid()"
+                                       ng-model="vm.child.lastName"
+                                       id="vm.child.lastName"
+                                       placeholder="Last Name"
+                                       required>
+                                <div class="validationMessage" ng-if="!vm.lastNameIsValid"><p>Please enter a valid
+                                    name</p></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-12">
+                            <div ng-class="{'has-error':(!monthAgeIsValid)}">
+                                <label for="vm.child.monthAge" class="col-sm-3 control-label">Age in Months</label>
+                                <div class="col-sm-2">
+                                    <input type="input" class="form-control" ng-blur="vm.checkMonthAgeIsValid()"
+                                           ng-model="vm.child.monthAge" id="vm.child.monthAge"
+                                           placeholder="Months" required>
+                                    <div class="validationMessage" ng-if="!vm.monthAgeIsValid"><p>Please enter a valid age (1-60)
+                                    </p></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div ng-class="{'has-error':(!vm.genderIsValid)}">
+                            <label for="vm.child.gender" class="col-sm-3 control-label">Gender</label>
+                            <div class="col-sm-3">
+                                <div>
+                                    <select type="input" ng-blur="vm.checkGenderIsValid()" class="form-control"
+                                            ng-model="vm.child.gender"
+                                            id="vm.child.gender"
+                                            required>
+                                        <option>Girl</option>
+                                        <option>Boy</option>
+                                    </select>
+                                    <div class="validationMessage" ng-if="!vm.genderIsValid"><p>Please select a
+                                        gender</p></div>
+                                </div>
+                            </div>
+                        </div>
+                        <label for="vm.birthDate" class="col-sm-3 control-label">Birthdate</label>
+                        <div class="col-sm-3">
+                            <input type="date" id="vm.birthDate" ng-blur="vm.setMonthCount()" class="form-control"
+                                   uib-datepicker-popup
+                                   ng-model="vm.birthDate" ng-model-options="{debounce: 2500}"
+                                   is-open="status.opened" required>
+                            <!--<div class="validationMessage" ng-if="!birthdateIsValid"><p>Please select a valid birthdate</p></div>-->
+                        </div>
+
+                    </div>
+                    <!--<div class="form-group">-->
+                        <!--<div ng-class="{'has-error':(!heightIsValid)}">-->
+                            <!--<label for="vm.child.height" class="col-sm-2 control-label">Height</label>-->
+                            <!--<div class="col-sm-4">-->
+                                <!--<input type="input" class="form-control" ng-blur="vm.checkHeightIsValid()"-->
+                                       <!--ng-model="vm.child.height" id="vm.child.height"-->
+                                       <!--placeholder="Height" required>-->
+                                <!--<div class="validationMessage" ng-if="!vm.heightIsValid"><p>Please enter a valid height (45-110)-->
+                                <!--</p></div>-->
+                            <!--</div>-->
+                        <!--</div>-->
+                        <!--<div ng-class="{'has-error':(!weightIsValid)}">-->
+                            <!--<label for="vm.child.weight" class="col-sm-2 control-label">Weight</label>-->
+                            <!--<div class="col-sm-4">-->
+                                <!--<input type="input" class="form-control" ng-blur="vm.checkWeightIsValid()"-->
+                                       <!--ng-model="vm.child.weight" id="vm.child.weight"-->
+                                       <!--placeholder="Weight" required>-->
+                                <!--<div class="validationMessage" ng-if="!vm.weightIsValid"><p>Please enter a valid-->
+                                    <!--weight (3-18)</p></div>-->
+                            <!--</div>-->
+                        <!--</div>-->
+                    <!--</div>-->
+                    <div class="form-group">
+                        <div ng-class="{'has-error':(!vm.motherIsValid)}">
+                            <label for="vm.child.mother" class="col-sm-2 control-label">Mother</label>
+                            <div class="col-sm-4">
+                                <input type="input" class="form-control" ng-change="vm.checkMotherIsValid()"
+                                       ng-model="vm.child.mother" id="vm.child.mother"
+                                       placeholder="Mother" required>
+                                <div class="validationMessage" ng-if="!vm.motherIsValid"><p>Please enter a valid
+                                    name</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div ng-class="{'has-error':(!vm.fatherIsValid)}">
+                            <label for="vm.child.father" class="col-sm-2 control-label">Father</label>
+                            <div class="col-sm-4">
+                                <input type="input" class="form-control" ng-change="vm.checkFatherIsValid()"
+                                       ng-model="vm.child.father" id="vm.child.father"
+                                       placeholder="Father" required>
+                                <div class="validationMessage" ng-if="!vm.fatherIsValid"><p>Please enter a valid
+                                    name</p></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div ng-class="{'has-error':(!vm.streetAddressIsValid)}">
+                            <label for="vm.child.address" class="col-sm-2 control-label">Street Address</label>
+                            <div class="col-sm-4">
+                                <input type="input" class="form-control" ng-change="vm.checkStreetAddressIsValid()"
+                                       ng-model="vm.child.address" id="vm.child.address"
+                                       placeholder="Street Address" required>
+                                <div class="validationMessage" ng-if="!vm.streetAddressIsValid"><p>Please enter a valid
+                                    street address</p></div>
+                            </div>
+                        </div>
+                        <div ng-class="{'has-error':(!vm.cityIsValid)}">
+                            <label for="vm.child.city" class="col-sm-2 control-label">City</label>
+                            <div class="col-sm-4">
+                                <input type="input" class="form-control" ng-change="vm.checkCityIsValid()"
+                                       ng-model="vm.child.city" id="vm.child.city"
+                                       placeholder="City" required>
+                                <div class="validationMessage" ng-if="!vm.cityIsValid"><p>Please enter a valid
+                                    city</p></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div ng-class="{'has-error':(!vm.stakeIsValid)}">
+                            <label for="vm.child.stake" class="col-sm-2 control-label">Stake</label>
+                            <div class="col-sm-4">
+                                <input type="input" class="form-control" ng-change="vm.checkStakeIsValid()"
+                                       ng-model="vm.child.stake" id="vm.child.stake"
+                                       placeholder="Stake" required>
+                                <div class="validationMessage" ng-if="!vm.stakeIsValid"><p>Please enter a valid
+                                    stake</p></div>
+                            </div>
+                        </div>
+                        <div ng-class="{'has-error':(!vm.wardIsValid)}">
+                            <label for="vm.child.ward" class="col-sm-2 control-label">Ward</label>
+                            <div class="col-sm-4">
+                                <input type="input" class="form-control" ng-change="vm.checkWardIsValid()"
+                                       ng-model="vm.child.ward" id="vm.child.ward"
+                                       placeholder="Ward" required>
+                                <div class="validationMessage" ng-if="!vm.wardIsValid"><p>Please enter a valid
+                                    ward</p></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="vm.child.comments" class="col-sm-2 control-label">Comments</label>
+                        <div class="col-sm-4">
+                                <textarea class="form-control" ng-model="vm.child.comments" id="vm.child.comments"
+                                          placeholder="Comments"></textarea>
+                        </div>
+                        <!--<label for="vm.child.comments" class="col-sm-2 control-label"></label>-->
+                        <div class="col-sm-4" style="text-align: center">
+                            <div style="margin-top:4%;">
+                                <!--<div class='btn-toolbar pull-right'>-->
+                                <!--<div class="btn-group">-->
+                                    <!--<a type="submit" class="btn btn-primary">{{vm.child._id ? 'Update' : 'Create'}}</a>-->
+                                <!--</div>-->
+                                <button type="submit" class="btn btn-primary">{{vm.child._id ? 'Update' : 'Create'}}
+                                <!--</button>-->
+                                <!--</div>-->
+                            </div>
+                        </div>
+                    </div>
+                    <!--<div class="col-sm-4" style="text-align: center">-->
+                        <!--<div style="margin-top:4%;">-->
+                            <!--<button type="syncDB" ng-click="vm.syncUpstream()" class="btn btn-default">-->
+                                <!--Sync DB-->
+                            <!--</button>-->
+                        <!--</div>-->
+                    <!--&lt;!&ndash;<video id="video" width="640" height="480" autoplay></video>&ndash;&gt;-->
+                    <!--&lt;!&ndash;<button id="snap">Snap Photo</button>&ndash;&gt;-->
+                    <!--&lt;!&ndash;<canvas id="canvas" width="640" height="480"></canvas>&ndash;&gt;-->
+                <!--</div>-->
+            </fieldset>
+        </form>
+    </div>
+</section>
