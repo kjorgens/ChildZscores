@@ -12,7 +12,7 @@
     <div class="col-md-12">
         <form name="vm.form.childForm" class="form-horizontal" ng-submit="vm.create(vm.form.childForm.$valid)" novalidate>
             <fieldset>
-                <div class="row">
+                <div class="CreateChildFormContainer">
                     <div class="form-group float-left">
                         <div ng-class="{'has-error':(!vm.firstNameIsValid)}">
 
@@ -38,67 +38,29 @@
                             </div>
                         </div>
                     </div>
-                    <div class="form-group">
-                        <div class="col-sm-12">
-                            <div ng-class="{'has-error':(!monthAgeIsValid)}">
-                                <label for="vm.enteredMonthAge" class="col-sm-3 control-label">Age in Months</label>
-                                <div class="col-sm-2">
-                                    <input type="input" class="form-control" ng-blur="vm.checkMonthAgeIsValid()"
-                                           ng-model="vm.enteredMonthAge" id="vm.enteredMonthAge"
-                                           placeholder="Months" required>
-                                    <div class="validationMessage" ng-if="!vm.monthAgeIsValid"><p>Please enter a valid age (1-60)
-                                    </p></div>
-                                </div>
-                            </div>
-                        </div>
-                        <div ng-class="{'has-error':(!vm.genderIsValid)}">
-                            <label for="vm.child.gender" class="col-sm-3 control-label">Gender</label>
-                            <div class="col-sm-3">
-                                <div>
-                                    <select type="input" ng-blur="vm.checkGenderIsValid()" class="form-control"
-                                            ng-model="vm.child.gender"
-                                            id="vm.child.gender"
-                                            required>
-                                        <option>Girl</option>
-                                        <option>Boy</option>
-                                    </select>
-                                    <div class="validationMessage" ng-if="!vm.genderIsValid"><p>Please select a
-                                        gender</p></div>
-                                </div>
-                            </div>
-                        </div>
-                        <label for="vm.birthDate" class="col-sm-3 control-label">Birthdate</label>
-                        <div class="col-sm-3">
-                            <input type="date" id="vm.birthDate" ng-blur="vm.setMonthCount()" class="form-control"
-                                   uib-datepicker-popup
-                                   ng-model="vm.birthDate" ng-model-options="{debounce: 2500}"
-                                   is-open="status.opened" required>
-                            <!--<div class="validationMessage" ng-if="!birthdateIsValid"><p>Please select a valid birthdate</p></div>-->
-                        </div>
+                    <div class="form-group float-left">
+                        <div ng-class="{'has-error':(!vm.monthAgeIsValid)}">
 
+                            <label for="vm.enteredMonthAge" class="col-sm-2 control-label">Age in Months</label>
+                            <div class="col-sm-4">
+                                <input class="form-control" type="text" ng-change="vm.checkMonthAgeIsValid()"
+                                       ng-model="vm.enteredMonthAge" id="vm.enteredMonthAge" required>
+                                <div class="validationMessage" ng-if="!vm.monthAgeIsValid"><p>Please enter a valid age (1-60)
+                                </p></div>
+                            </div>
+                        </div>
+                        <div ng-class="{'has-error':(!vm.birthdateIsValid)}">
+                            <label for="vm.birthDate" class="col-sm-2 control-label">Birthdate</label>
+                            <div class="col-sm-4">
+                                <input type="date" id="vm.birthDate" ng-blur="vm.birthDate()" class="form-control"
+
+                                    ng-model="vm.birthDate" ng-model-options="{debounce: 2500}"
+                                    is-open="status.opened" required>
+                                <div class="validationMessage" ng-if="!vm.birthdateIsValid"><p>Please select a
+                                valid birthdate</p></div>
+                            </div>
+                        </div>
                     </div>
-                    <!--<div class="form-group">-->
-                        <!--<div ng-class="{'has-error':(!heightIsValid)}">-->
-                            <!--<label for="vm.child.height" class="col-sm-2 control-label">Height</label>-->
-                            <!--<div class="col-sm-4">-->
-                                <!--<input type="input" class="form-control" ng-blur="vm.checkHeightIsValid()"-->
-                                       <!--ng-model="vm.child.height" id="vm.child.height"-->
-                                       <!--placeholder="Height" required>-->
-                                <!--<div class="validationMessage" ng-if="!vm.heightIsValid"><p>Please enter a valid height (45-110)-->
-                                <!--</p></div>-->
-                            <!--</div>-->
-                        <!--</div>-->
-                        <!--<div ng-class="{'has-error':(!weightIsValid)}">-->
-                            <!--<label for="vm.child.weight" class="col-sm-2 control-label">Weight</label>-->
-                            <!--<div class="col-sm-4">-->
-                                <!--<input type="input" class="form-control" ng-blur="vm.checkWeightIsValid()"-->
-                                       <!--ng-model="vm.child.weight" id="vm.child.weight"-->
-                                       <!--placeholder="Weight" required>-->
-                                <!--<div class="validationMessage" ng-if="!vm.weightIsValid"><p>Please enter a valid-->
-                                    <!--weight (3-18)</p></div>-->
-                            <!--</div>-->
-                        <!--</div>-->
-                    <!--</div>-->
                     <div class="form-group">
                         <div ng-class="{'has-error':(!vm.motherIsValid)}">
                             <label for="vm.child.mother" class="col-sm-2 control-label">Mother</label>
@@ -171,8 +133,21 @@
                         <div class="col-sm-4">
                                 <textarea class="form-control" ng-model="vm.child.comments" id="vm.child.comments"
                                           placeholder="Comments"></textarea>
+                        </div><div ng-class="{'has-error':(!vm.wardIsValid)}">
+                        <label for="vm.child.gender" class="col-sm-2 control-label">Gender</label>
+                        <div class="col-sm-4">
+                            <select type="input" ng-blur="vm.checkGenderIsValid()" class="form-control"
+                            ng-model="vm.child.gender"
+                            id="vm.child.gender"
+                            required>
+                            <option>Girl</option>
+                            <option>Boy</option>
+                            </select>
+                            <div class="validationMessage" ng-if="!vm.wardIsValid"><p>Please select a
+                                gender</p></div>
                         </div>
-                        <!--<label for="vm.child.comments" class="col-sm-2 control-label"></label>-->
+                    </div>
+
                         <div class="col-sm-4" style="text-align: center">
                             <div style="margin-top:4%;">
                                 <!--<div class='btn-toolbar pull-right'>-->
@@ -180,21 +155,18 @@
                                     <!--<a type="submit" class="btn btn-primary">{{vm.child._id ? 'Update' : 'Create'}}</a>-->
                                 <!--</div>-->
                                 <button type="submit" class="btn btn-primary">{{vm.child._id ? 'Update' : 'Create'}}
-                                <!--</button>-->
+                                </button>
                                 <!--</div>-->
                             </div>
                         </div>
                     </div>
-                    <!--<div class="col-sm-4" style="text-align: center">-->
-                        <!--<div style="margin-top:4%;">-->
-                            <!--<button type="syncDB" ng-click="vm.syncUpstream()" class="btn btn-default">-->
-                                <!--Sync DB-->
-                            <!--</button>-->
-                        <!--</div>-->
-                    <!--&lt;!&ndash;<video id="video" width="640" height="480" autoplay></video>&ndash;&gt;-->
+
+
                     <!--&lt;!&ndash;<button id="snap">Snap Photo</button>&ndash;&gt;-->
                     <!--&lt;!&ndash;<canvas id="canvas" width="640" height="480"></canvas>&ndash;&gt;-->
                 <!--</div>-->
+
+                    </div>
             </fieldset>
         </form>
     </div>
