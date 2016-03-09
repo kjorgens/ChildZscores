@@ -21,7 +21,9 @@ module.exports = {
         'public/lib/pouchdb-find/dist/pouchdb.find.js',
         'public/lib/angular-pouchdb/angular-pouchdb.js',
         'public/lib/angular-uuid/uuid.js',
-        'public/lib/angular-ui-router-uib-modal/angular-ui-router-uib-modal'
+        'public/lib/angular-ui-router-uib-modal/angular-ui-router-uib-modal.js',
+        'public/lib/moment/moment.js',
+        'public/lib/angular-moment/angular-moment.js'
       ],
       tests: ['public/lib/angular-mocks/angular-mocks.js']
     },

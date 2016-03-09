@@ -5,9 +5,9 @@
       .module ('children')
       .controller('SurveyController', SurveyController);
 
-  SurveyController.$inject = ['$scope','$state', '$timeout', 'surveyResolve', 'Authentication', 'ZScores','PouchService'];
+  SurveyController.$inject = ['$scope','$state', '$timeout', 'moment', 'surveyResolve', 'Authentication', 'ZScores','PouchService'];
 
-  function SurveyController($scope, $state, $timeout, survey, Authentication, ZScores, PouchService) {
+  function SurveyController($scope, $state, $timeout, moment, survey, Authentication, ZScores, PouchService) {
     var vm = this;
     vm.survey = survey;
 
@@ -121,13 +121,14 @@
 
     function checkMonthAgeIsValid() {
       var bday = new Date (vm.child.birthDate);
-      var birthDay = bday.getDate ();
-      var birthYear = bday.getFullYear ();
-      var birthMonth = bday.getMonth ();
+ ///     var birthDay = bday.getDate ();
+ //     var birthYear = bday.getFullYear ();
+ //    var birthMonth = bday.getMonth ();
 
-      var y1 = ((vm.surveyDate.getFullYear () - 2001) * 365) + (vm.surveyDate.getMonth () * 30.5) + vm.surveyDate.getDay ();
-      var y2 = (birthYear - 2001) * 365 + ((birthMonth - 1) * 30.5) + birthDay;
-      vm.ageInMonths = (y1 - y2) / 30.5;
+//      var y1 = ((vm.surveyDate.getFullYear () - 2001) * 365) + (vm.surveyDate.getMonth () * 30.5) + vm.surveyDate.getDay ();
+//      var y2 = (birthYear - 2001) * 365 + ((birthMonth - 1) * 30.5) + birthDay;
+//      vm.ageInMonths = (y1 - y2) / 30.5;
+      vm.ageInMonths = moment(vm.surveyDate).diff(moment(bday), 'months');
       if (vm.ageInMonths > 60){
         vm.ageIsValid = false;
       } else {
@@ -157,6 +158,14 @@
       vm.newChildError = error;
     }
 
+    function monthDiff(d1, d2) {
+      var months;
+      months = (d2.getFullYear() - d1.getFullYear()) * 12;
+      months -= d1.getMonth() + 1;
+      months += d2.getMonth();
+      return months <= 0 ? 0 : months;
+    }
+
     function addSurvey(isValid) {
       commentOverride();
       if (vm.survey._id){
@@ -167,17 +176,18 @@
         PouchService.insert (vm.survey, surveyUpdated, addedError);
       } else {
         var bday = new Date (vm.child.birthDate);
-        var birthDay = bday.getDate ();
-        var birthYear = bday.getFullYear ();
-        var birthMonth = bday.getMonth ();
+  //      var birthDay = bday.getDate ();
+   //     var birthYear = bday.getFullYear ();
+  //      var birthMonth = bday.getMonth ();
 
         var rightNow = new Date ();
-        var y1 = ((rightNow.getFullYear () - 2001) * 365) + (rightNow.getMonth () * 30.5) + rightNow.getDay ();
-        var y2 = (birthYear - 2001) * 365 + ((birthMonth - 1) * 30.5) + birthDay;
-        var ageInMonths = (y1 - y2) / 30.5;
-
+ //       var y1 = ((rightNow.getFullYear () - 2001) * 365) + (rightNow.getMonth () * 30.5) + rightNow.getDay ();
+ //       var y2 = (birthYear - 2001) * 365 + ((birthMonth - 1) * 30.5) + birthDay;
+ //       var ageInMonths = (y1 - y2) / 30.5;
+  //      var ageInMonthsdiff = monthDiff(bday,rightNow);
+        var ageMoments = moment(rightNow).diff(moment(bday), 'months');
         var zScore = {};
-        vm.zScoreGetter (vm.child.gender, vm.ageOverride || ageInMonths, vm.survey.height, vm.survey.weight, function (zscore) {
+        vm.zScoreGetter (vm.child.gender, vm.ageOverride || ageMoments, vm.survey.height, vm.survey.weight, function (zscore) {
           vm.zScore = zscore;
         });
 
@@ -188,7 +198,7 @@
           gender: vm.child.gender,
           weight: vm.survey.weight,
           height: vm.survey.height,
-          monthAge: vm.ageOverride || vm.child.monthAge,
+          monthAge: vm.ageOverride || ageMoments,
           comments: vm.child.comments
       //    interviewer: vm.authentication.user.displayName
         };

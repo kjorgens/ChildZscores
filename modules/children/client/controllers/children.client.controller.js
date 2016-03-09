@@ -21,6 +21,7 @@
     vm.authentication = Authentication;
     vm.error = null;
     vm.form = {};
+    vm.enteredMonthAge = undefined;
     vm.remove = remove;
     vm.create = create;
 //    vm.addSurvey = addSurvey;
@@ -99,7 +100,7 @@
       checkCityIsValid ();
       checkStakeIsValid ();
       checkWardIsValid ();
-      checkMonthAgeIsValid ();
+//      checkMonthAgeIsValid ();
 
       if (vm.firstNameIsValid === true && vm.lastNameIsValid === true && vm.genderIsValid === true) {
         vm.allFieldsValid = true;
@@ -133,7 +134,7 @@
       }
       else {
         vm.ageIsValid = true;
-        vm.child.monthAge = vm.monthAge.toFixed(2);
+        vm.child.monthAge = vm.enteredMonthAge || vm.monthAge.toFixed(2);
         //if (vm.childHeightIsValid && vm.childWeightIsValid) {
         //  vm.zScoreGetter (vm.child.gender, vm.child.monthAge, vm.child.height, vm.child.weight, function (zscore) {
         //    vm.child.zScore = zscore;
@@ -328,14 +329,15 @@
     vm.minStartDate = new Date (year - 5, month, day);
 
     function checkMonthAgeIsValid() {
-      if (vm.child.monthAge) {
-        if (vm.child.monthAge.length < 1 || vm.child.monthAge.length > 60) {
+      if (vm.enteredMonthAge) {
+        if (vm.enteredMonthAge.length < 1 || vm.enteredMonthAge.length > 60) {
           vm.monthAgeIsValid = false;
         }
         else {
           vm.monthAgeIsValid = true;
-          vm.birthDate = new Date (year, month - vm.child.monthAge, day);
+          vm.birthDate = new Date (year, month - vm.enteredMonthAge, day);
           vm.ageIsValid = true;
+          vm.child.monthAge = vm.enteredMonthAge;
         }
       }
       else {
@@ -455,15 +457,15 @@
 
           return false;
         }
-        var birthDay = vm.birthDate.getDate ();
-        var birthYear = vm.birthDate.getFullYear ();
-        var birthMonth = vm.birthDate.getMonth ();
-
-        var rightNow = new Date ();
-        var y1 = ((rightNow.getFullYear () - 2001) * 365) + (rightNow.getMonth () * 30.5) + rightNow.getDay ();
-        var y2 = (birthYear - 2001) * 365 + ((birthMonth - 1) * 30.5) + birthDay;
-        var ageInMonths = Math.round((y1 - y2) / 30.5);
-        var zScore = {};
+        //var birthDay = vm.birthDate.getDate ();
+        //var birthYear = vm.birthDate.getFullYear ();
+        //var birthMonth = vm.birthDate.getMonth ();
+        //
+        //var rightNow = new Date ();
+        //var y1 = ((rightNow.getFullYear () - 2001) * 365) + (rightNow.getMonth () * 30.5) + rightNow.getDay ();
+        //var y2 = (birthYear - 2001) * 365 + ((birthMonth - 1) * 30.5) + birthDay;
+        //var ageInMonths = Math.round((y1 - y2) / 30.5);
+        //var zScore = {};
         //vm.zScoreGetter(this.gender,ageInMonths,this.height,this.weight, function(zscore){
         //  vm.zScore = zscore;
         //});
@@ -479,7 +481,7 @@
 
         var childObject = {
           created: vm.dt,
-          monthAge: Number(vm.child.monthAge).toFixed(2) || ageInMonths.toFixed(2),
+          monthAge: vm.child.monthAge || vm.enteredMonthAge,
           gender: vm.child.gender,
           birthDate: vm.birthDate,
           firstName: vm.child.firstName,

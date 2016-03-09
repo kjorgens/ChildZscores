@@ -61,7 +61,7 @@
     };
     var replicateIn = function (input) {
  //     vm.dismiss();
-      console.log("couchdb sync complete");
+      console.log('couchdb sync complete');
       vm.repInData = input;
     };
 
