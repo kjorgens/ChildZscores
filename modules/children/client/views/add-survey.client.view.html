@@ -5,12 +5,12 @@
                 <a class="btn btn-primary" ui-sref="children.view({childId: vm.child._id})">Cancel</a>
             </div>
         </div>
-        <h1>{{vm.survey._id ? 'Edit Survey' : 'Add New Survey'}}</h1>
+        <h1>{{vm.survey._id ? 'Edit Screening' : 'Add New Screening'}}</h1>
         <h3 class="list-group-item-heading">
             <h2><span ng-bind="vm.child.firstName"></span>
             <span ng-bind="vm.child.lastName"></span>
             <span ng-bind="vm.child.birthDate | date:'mediumDate'"></span></h2>
-            Created on
+            Screened on
             <span ng-bind="vm.rightNow | date:'mediumDate'"></span>
             by
             <span ng-bind="vm.child.interviewer"></span>
@@ -22,7 +22,7 @@
             <fieldset>
                 <div class="row">
                     <div class="form-group">
-                        <label for="vm.surveyDate" class="col-sm-3 control-label">Survey date</label>
+                        <label for="vm.surveyDate" class="col-sm-3 control-label">Screening date</label>
                         <div class="col-sm-3">
                             <input type="date" id="vm.surveyDate"  class="form-control" ng-blur="vm.checkMonthAgeIsValid()"
                                    uib-datepicker-popup

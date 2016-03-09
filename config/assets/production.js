@@ -20,7 +20,10 @@ module.exports = {
         'public/lib/pouchdb/dist/pouchdb.min.js',
         'public/lib/pouchdb-find/dist/pouchdb.find.min.js',
         'public/lib/angular-pouchdb/angular-pouchdb.min.js',
-        'public/lib/angular-uuid/uuid.min.js'
+        'public/lib/angular-uuid/uuid.min.js',
+        'public/lib/angular-ui-router-uib-modal/angular-ui-router-uib-modal.js',
+        'public/lib/moment/min/moment.min.js',
+        'public/lib/angular-moment/angular-moment.min.js'
       ]
     },
     css: 'public/dist/application.min.css',

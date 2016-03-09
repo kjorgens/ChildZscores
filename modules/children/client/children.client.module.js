@@ -2,7 +2,8 @@
 
   'use strict';
 
-  app.registerModule('children');
+ // app.registerModule('children', ['core']);
+  app.registerModule('children', ['angularMoment']);
   app.registerModule('children.services');
   app.registerModule('children.modalService');
   app.registerModule('children.pouchService', ['pouchdb','uuid']);
