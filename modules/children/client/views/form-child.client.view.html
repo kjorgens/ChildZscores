@@ -18,7 +18,7 @@
 
                             <label for="vm.child.firstName" class="col-sm-2 control-label">First Name</label>
                             <div class="col-sm-4">
-                                <input class="form-control" type="text" ng-change="vm.checkFirstNameIsValid()"
+                                <input class="form-control" type="text" ng-blur="vm.checkFirstNameIsValid()"
                                        ng-model="vm.child.firstName" id="vm.child.firstName" placeholder="First Name"
                                        required>
                                 <div class="validationMessage" ng-if="!vm.firstNameIsValid"><p>Please enter a valid
@@ -28,7 +28,7 @@
                         <div ng-class="{'has-error':(!vm.lastNameIsValid)}">
                             <label for="vm.child.lastName" class="col-sm-2 control-label">Last Name</label>
                             <div class="col-sm-4">
-                                <input type="input" class="form-control" ng-change="vm.checkLastNameIsValid()"
+                                <input type="input" class="form-control" ng-blur="vm.checkLastNameIsValid()"
                                        ng-model="vm.child.lastName"
                                        id="vm.child.lastName"
                                        placeholder="Last Name"
@@ -43,7 +43,7 @@
 
                             <label for="vm.enteredMonthAge" class="col-sm-2 control-label">Age in Months</label>
                             <div class="col-sm-4">
-                                <input class="form-control" type="text" ng-change="vm.checkMonthAgeIsValid()"
+                                <input class="form-control" type="text" ng-blur="vm.checkMonthAgeIsValid()"
                                        ng-model="vm.enteredMonthAge" id="vm.enteredMonthAge" required>
                                 <div class="validationMessage" ng-if="!vm.monthAgeIsValid"><p>Please enter a valid age (1-60)
                                 </p></div>
@@ -65,7 +65,7 @@
                         <div ng-class="{'has-error':(!vm.motherIsValid)}">
                             <label for="vm.child.mother" class="col-sm-2 control-label">Mother</label>
                             <div class="col-sm-4">
-                                <input type="input" class="form-control" ng-change="vm.checkMotherIsValid()"
+                                <input type="input" class="form-control" ng-blur="vm.checkMotherIsValid()"
                                        ng-model="vm.child.mother" id="vm.child.mother"
                                        placeholder="Mother" required>
                                 <div class="validationMessage" ng-if="!vm.motherIsValid"><p>Please enter a valid
@@ -76,7 +76,7 @@
                         <div ng-class="{'has-error':(!vm.fatherIsValid)}">
                             <label for="vm.child.father" class="col-sm-2 control-label">Father</label>
                             <div class="col-sm-4">
-                                <input type="input" class="form-control" ng-change="vm.checkFatherIsValid()"
+                                <input type="input" class="form-control" ng-blur="vm.checkFatherIsValid()"
                                        ng-model="vm.child.father" id="vm.child.father"
                                        placeholder="Father" required>
                                 <div class="validationMessage" ng-if="!vm.fatherIsValid"><p>Please enter a valid
@@ -88,7 +88,7 @@
                         <div ng-class="{'has-error':(!vm.streetAddressIsValid)}">
                             <label for="vm.child.address" class="col-sm-2 control-label">Street Address</label>
                             <div class="col-sm-4">
-                                <input type="input" class="form-control" ng-change="vm.checkStreetAddressIsValid()"
+                                <input type="input" class="form-control" ng-blur="vm.checkStreetAddressIsValid()"
                                        ng-model="vm.child.address" id="vm.child.address"
                                        placeholder="Street Address" required>
                                 <div class="validationMessage" ng-if="!vm.streetAddressIsValid"><p>Please enter a valid
@@ -98,7 +98,7 @@
                         <div ng-class="{'has-error':(!vm.cityIsValid)}">
                             <label for="vm.child.city" class="col-sm-2 control-label">City</label>
                             <div class="col-sm-4">
-                                <input type="input" class="form-control" ng-change="vm.checkCityIsValid()"
+                                <input type="input" class="form-control" ng-blur="vm.checkCityIsValid()"
                                        ng-model="vm.child.city" id="vm.child.city"
                                        placeholder="City" required>
                                 <div class="validationMessage" ng-if="!vm.cityIsValid"><p>Please enter a valid
@@ -110,7 +110,7 @@
                         <div ng-class="{'has-error':(!vm.stakeIsValid)}">
                             <label for="vm.child.stake" class="col-sm-2 control-label">Stake</label>
                             <div class="col-sm-4">
-                                <input type="input" class="form-control" ng-change="vm.checkStakeIsValid()"
+                                <input type="input" class="form-control" ng-blur="vm.checkStakeIsValid()"
                                        ng-model="vm.child.stake" id="vm.child.stake"
                                        placeholder="Stake" required>
                                 <div class="validationMessage" ng-if="!vm.stakeIsValid"><p>Please enter a valid
@@ -120,7 +120,7 @@
                         <div ng-class="{'has-error':(!vm.wardIsValid)}">
                             <label for="vm.child.ward" class="col-sm-2 control-label">Ward</label>
                             <div class="col-sm-4">
-                                <input type="input" class="form-control" ng-change="vm.checkWardIsValid()"
+                                <input type="input" class="form-control" ng-blur="vm.checkWardIsValid()"
                                        ng-model="vm.child.ward" id="vm.child.ward"
                                        placeholder="Ward" required>
                                 <div class="validationMessage" ng-if="!vm.wardIsValid"><p>Please enter a valid
