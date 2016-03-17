@@ -67,3 +67,5 @@ a:hover .header-profile-image {
   color: #a94442;
 }
 
+.required input:after { content:"*"; }
+

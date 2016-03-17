@@ -4,10 +4,13 @@ module.exports = {
   client: {
     lib: {
       css: [
+        // bower:css
         'public/lib/bootstrap/dist/css/bootstrap.min.css',
         'public/lib/bootstrap/dist/css/bootstrap-theme.min.css',
+        // endbower
       ],
       js: [
+        // bower:js
         'public/lib/angular/angular.min.js',
         'public/lib/angular-resource/angular-resource.min.js',
         'public/lib/angular-animate/angular-animate.min.js',
@@ -23,7 +26,9 @@ module.exports = {
         'public/lib/angular-uuid/uuid.min.js',
         'public/lib/angular-ui-router-uib-modal/angular-ui-router-uib-modal.js',
         'public/lib/moment/min/moment.min.js',
-        'public/lib/angular-moment/angular-moment.min.js'
+        'public/lib/angular-moment/angular-moment.min.js',
+        'public/lib/angular-spinner/angular-spinner.min.js',
+        'public/lib/spin.js/spin.min.js'
       ]
     },
     css: 'public/dist/application.min.css',

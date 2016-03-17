@@ -8,9 +8,9 @@
       .module('children')
       .controller('ChildrenListController', ChildrenListController);
 
-  ChildrenListController.$inject = ['$rootScope', '$scope', '$state', 'ModalService', 'ChildrenService', 'PouchService'];
+  ChildrenListController.$inject = ['$rootScope', '$scope', '$state', 'usSpinnerService', 'ModalService', 'ChildrenService', 'PouchService'];
 
-  function ChildrenListController($rootScope, $scope, $state, ModalService, ChildrenService, PouchService) {
+  function ChildrenListController($rootScope, $scope, $state, usSpinnerService, ModalService, ChildrenService, PouchService) {
     var vm = this;
     vm.childInfoString = childInfoString;
     vm.findOne = findOne;
@@ -20,6 +20,30 @@
     vm.syncUpstream = syncUpstream;
     vm.online = $rootScope.appOnline;
     vm.find();
+    var savedName;
+    var blinkVar;
+
+    vm.startSpin = function() {
+      if (!vm.spinneractive) {
+        usSpinnerService.spin('spinner-sync');
+
+      }
+    };
+
+    vm.stopSpin = function() {
+      if (vm.spinneractive) {
+        usSpinnerService.stop('spinner-sync');
+      }
+    };
+    vm.spinneractive = false;
+
+    $rootScope.$on('us-spinner:spin', function(event, key) {
+      vm.spinneractive = true;
+    });
+
+    $rootScope.$on('us-spinner:stop', function(event, key) {
+      vm.spinneractive = false;
+    });
 
     function childInfoString(child) {
       return child.doc.firstName + ' ' + child.doc.lastName + ' --- Birth age: ' + child.doc.monthAge.toFixed (2) + ' months,' +
@@ -58,10 +82,11 @@
     }
     var whenDone = function(){
       find();
+      vm.stopSpin();
+      $rootScope.selectedCountry = savedName;
+      console.log('couchdb sync complete');
     };
     var replicateIn = function (input) {
- //     vm.dismiss();
-      console.log('couchdb sync complete');
       vm.repInData = input;
     };
 
@@ -70,9 +95,10 @@
     };
 
     function syncUpstream() {
- //     ModalService.progressModal('Synching data to server');
-
-      PouchService.sync ('https://syncuser:mZ7K3AldcIzO@database.liahonakids.org:5984/child_survey', replicateIn, replicateError, whenDone);
+      savedName = $rootScope.selectedCountry;
+      $rootScope.selectedCountry = 'Data Sync in Progress';
+      vm.startSpin();
+      PouchService.sync ('https://syncuser:mZ7K3AldcIzO@database.liahonakids.org:5984/ecuador', replicateIn, replicateError, whenDone);
     }
   }
-})();
+}());

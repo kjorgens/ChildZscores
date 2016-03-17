@@ -2,19 +2,19 @@
   'use strict';
 
   angular
-      .module ('children.routes')
-      .config (routeConfig);
+    .module('children.routes')
+    .config(routeConfig);
 
   routeConfig.$inject = ['$stateProvider'];
 
   function routeConfig($stateProvider) {
     $stateProvider
-        .state ('children', {
+        .state('children', {
           abstract: true,
           url: '/children',
           template: '<ui-view/>'
         })
-        .state ('children.list', {
+        .state('children.list', {
           url: '/children',
           templateUrl: 'modules/children/client/views/list-children.client.view.html',
           controller: 'ChildrenListController',
@@ -23,7 +23,19 @@
             childResolve: listChildren
           }
         })
-        .state ('children.create', {
+        .state('children.newsurvey', {
+          url: '/:childId/survey',
+          templateUrl: 'modules/children/client/views/add-survey.client.view.html',
+          controller: 'SurveyController',
+          controllerAs: 'vm',
+          resolve: {
+            surveyResolve: getSurvey
+          },
+          data: {
+            roles: ['user', 'admin']
+          }
+        })
+        .state('children.create', {
           url: '/create',
           templateUrl: 'modules/children/client/views/form-child.client.view.html',
           controller: 'ChildrenController',
@@ -35,7 +47,7 @@
             roles: ['user', 'admin']
           }
         })
-        .state ('children.edit', {
+        .state('children.edit', {
           url: '/:childId/edit',
           templateUrl: 'modules/children/client/views/form-child.client.view.html',
           controller: 'ChildrenController',
@@ -47,7 +59,7 @@
             roles: ['user', 'admin']
           }
         })
-        .state ('children.survey', {
+        .state('children.editsurvey', {
           url: '/:childId/survey/:surveyId',
           templateUrl: 'modules/children/client/views/add-survey.client.view.html',
           controller: 'SurveyController',
@@ -59,7 +71,7 @@
             roles: ['user', 'admin']
           }
         })
-        .state ('children.view', {
+        .state('children.view', {
           url: '/:childId',
           templateUrl: 'modules/children/client/views/view-child.client.view.html',
           controller: 'ChildrenController',
@@ -75,29 +87,29 @@
 
   listChildren.$inject = ['PouchService'];
 
-  function listChildren(PouchService){
-    return PouchService.queryChildPromise ();
+  function listChildren(PouchService) {
+    return PouchService.queryChildPromise();
   }
 
   getChild.$inject = ['$stateParams', 'PouchService'];
 
   function getChild($stateParams, PouchService) {
-    if ($stateParams.childId === ''){
+    if ($stateParams.childId === '') {
       return PouchService;
     } else {
-      return PouchService.getOnePromise ({
+      return PouchService.getOnePromise({
         childId: $stateParams.childId
-      });     //.$promise;
+      });     // .$promise;
     }
   }
 
   getSurvey.$inject = ['$stateParams', 'PouchService'];
 
   function getSurvey($stateParams, PouchService) {
-    if ($stateParams.surveyId === ''){
+    if ($stateParams.surveyId === undefined) {
       return PouchService;
     } else {
-      return PouchService.getOnePromise ({
+      return PouchService.getOnePromise({
         childId: $stateParams.surveyId
       });     //.$promise;
     }
@@ -107,8 +119,17 @@
 
   function newChild(PouchService) {
     return PouchService;
+    // return PouchService.addNew({
+    //  child: $stateParams.child
+    // }).$promise;
+  }
+
+  listDataBases.$inject = ['PouchService'];
+
+  function listDataBases(PouchService) {
+    return PouchService;
     //return PouchService.addNew({
     //  child: $stateParams.child
     //}).$promise;
   }
-}) ();
+}());

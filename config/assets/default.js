@@ -4,10 +4,13 @@ module.exports = {
   client: {
     lib: {
       css: [
+        // bower:css
         'public/lib/bootstrap/dist/css/bootstrap.css',
         'public/lib/bootstrap/dist/css/bootstrap-theme.css'
+        // endbower
       ],
       js: [
+        // bower:js
         'public/lib/angular/angular.js',
         'public/lib/angular-resource/angular-resource.js',
         'public/lib/angular-animate/angular-animate.js',
@@ -23,7 +26,9 @@ module.exports = {
         'public/lib/angular-uuid/uuid.js',
         'public/lib/angular-ui-router-uib-modal/angular-ui-router-uib-modal.js',
         'public/lib/moment/moment.js',
-        'public/lib/angular-moment/angular-moment.js'
+        'public/lib/angular-moment/angular-moment.js',
+        'public/lib/spin.js/spin.js',
+        'public/lib/angular-spinner/angular-spinner.js'
       ],
       tests: ['public/lib/angular-mocks/angular-mocks.js']
     },
