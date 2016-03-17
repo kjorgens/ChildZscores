@@ -10,8 +10,7 @@ var path = require('path'),
   User = mongoose.model('User'),
   nodemailer = require('nodemailer'),
   async = require('async'),
-  crypto = require('crypto'),
-  authentication = require(path.resolve('./config/lib/jwtAuthentication'));
+  crypto = require('crypto');
 
 var smtpTransport = nodemailer.createTransport(config.mailer.options);
 
@@ -33,7 +32,7 @@ exports.forgot = function (req, res, next) {
         User.findOne({
           username: req.body.username.toLowerCase()
         }, '-salt -password', function (err, user) {
-          if (!user) {
+          if (err || !user) {
             return res.status(400).send({
               message: 'No account with that username has been found'
             });
@@ -109,7 +108,7 @@ exports.validateResetToken = function (req, res) {
       $gt: Date.now()
     }
   }, function (err, user) {
-    if (!user) {
+    if (err || !user) {
       return res.redirect('/password/reset/invalid');
     }
 
@@ -145,14 +144,19 @@ exports.reset = function (req, res, next) {
                   message: errorHandler.getErrorMessage(err)
                 });
               } else {
-                // Remove sensitive data before return authenticated user
-                user.password = undefined;
-                user.salt = undefined;
+                req.login(user, function (err) {
+                  if (err) {
+                    res.status(400).send(err);
+                  } else {
+                    // Remove sensitive data before return authenticated user
+                    user.password = undefined;
+                    user.salt = undefined;
 
-                var jwtToken = authentication.signToken(user);
-                res.json({ user: user, token: jwtToken });
+                    res.json(user);
 
-                done(err, user);
+                    done(err, user);
+                  }
+                });
               }
             });
           } else {
@@ -201,7 +205,6 @@ exports.reset = function (req, res, next) {
 exports.changePassword = function (req, res, next) {
   // Init Variables
   var passwordDetails = req.body;
-  var message = null;
 
   if (req.user) {
     if (passwordDetails.newPassword) {
@@ -217,8 +220,14 @@ exports.changePassword = function (req, res, next) {
                     message: errorHandler.getErrorMessage(err)
                   });
                 } else {
-                  res.send({
-                    message: 'Password changed successfully'
+                  req.login(user, function (err) {
+                    if (err) {
+                      res.status(400).send(err);
+                    } else {
+                      res.send({
+                        message: 'Password changed successfully'
+                      });
+                    }
                   });
                 }
               });

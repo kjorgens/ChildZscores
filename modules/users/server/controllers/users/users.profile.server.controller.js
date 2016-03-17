@@ -34,7 +34,13 @@ exports.update = function (req, res) {
           message: errorHandler.getErrorMessage(err)
         });
       } else {
-        res.json(user);
+        req.login(user, function (err) {
+          if (err) {
+            res.status(400).send(err);
+          } else {
+            res.json(user);
+          }
+        });
       }
     });
   } else {
@@ -57,7 +63,7 @@ exports.changeProfilePicture = function (req, res) {
 
   if (user) {
     upload(req, res, function (uploadError) {
-      if(uploadError) {
+      if (uploadError) {
         return res.status(400).send({
           message: 'Error occurred while uploading profile picture'
         });
@@ -70,7 +76,13 @@ exports.changeProfilePicture = function (req, res) {
               message: errorHandler.getErrorMessage(saveError)
             });
           } else {
-            res.json(user);
+            req.login(user, function (err) {
+              if (err) {
+                res.status(400).send(err);
+              } else {
+                res.json(user);
+              }
+            });
           }
         });
       }

@@ -17,7 +17,11 @@ var _ = require('lodash'),
 /**
  * Globals
  */
-var user1, admin1, userFromSeedConfig, adminFromSeedConfig, originalLogConfig;
+var user1,
+  admin1,
+  userFromSeedConfig,
+  adminFromSeedConfig,
+  originalLogConfig;
 
 describe('Configuration Tests:', function () {
 
@@ -568,7 +572,7 @@ describe('Configuration Tests:', function () {
       var _dir = process.cwd() + '/temp-rotating-logs';
       var _filename = 'unit-test-rotating-access-%DATE%.log';
 
-      // enable rotating logs      
+      // enable rotating logs
       config.log = {
         format: 'combined',
         options: {

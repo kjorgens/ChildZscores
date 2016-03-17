@@ -11,8 +11,8 @@ module.exports = function (config) {
 
   var opts = {};
   opts.secretOrKey = config.jwt.secret;
-  //opts.issuer = "accounts.examplesoft.com";
-  //opts.audience = "yoursite.net";
+  // opts.issuer = "accounts.examplesoft.com";
+  // opts.audience = "yoursite.net";
   passport.use(new JwtStrategy(opts, function(jwt_payload, done) {
     User.findById({ _id: jwt_payload.user }, '-salt -password', function(err, user) {
       if (err) {
