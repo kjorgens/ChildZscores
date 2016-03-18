@@ -9,24 +9,24 @@ var passport = require('passport'),
 
 module.exports = function () {
   // Use local strategy
-  passport.use (new LocalStrategy ({
+  passport.use(new LocalStrategy({
     usernameField: 'username',
     passwordField: 'password'
   },
-      function (username, password, done) {
-        User.findOne ({
-          username: username.toLowerCase ()
-        }, function (err, user) {
-          if (err) {
-            return done (err);
-          }
-          if (!user || !user.authenticate (password)) {
-            return done ({
-              message: 'Invalid username or password'
-            }, false);
-          }
-
-          return done (null, user);
+  function (username, password, done) {
+    User.findOne({
+      username: username.toLowerCase()
+    }, function (err, user) {
+      if (err) {
+        return done(err);
+      }
+      if (!user || !user.authenticate(password)) {
+        return done(null, false, {
+          message: 'Invalid username or password'
         });
-      }));
+      }
+
+      return done(null, user);
+    });
+  }));
 };

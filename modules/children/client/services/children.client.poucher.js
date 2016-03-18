@@ -22,15 +22,15 @@
         index: {
           fields: [indexName]
         }
-      }).then(function (result){
+      }).then(function (result) {
         var theResult = result;
-      }).catch(function (err){
+      }).catch(function (err) {
         var error = err;
       });
     };
 
     factory.queryChildPromise = function () {
-      return database.find ({
+      return database.find({
         selector: { firstName: { $gt: null } },
         //       selector: { firstName: 'Berty' }
         //       fields: ['_id', 'lastName']
@@ -39,83 +39,83 @@
     };
 
     factory.queryChildren = function (callback, callbackError) {
-      return database.find ({
+      return database.find({
         selector: { firstName: { $gt: null } },
-        //selector: { firstName: 'Bobby' },
+        // selector: { firstName: 'Bobby' },
  //       fields: ['_id', 'lastName']
         sort: ['firstName']
       })
-      .then (function (response) {
+      .then(function (response) {
             // Do something with the response
         callback(response);
       })
-      .catch (function (error) {
+      .catch(function (error) {
             // Do something with the error
         callbackError(error);
       });
     };
 
     factory.getSurveys = function (childId, callback, callbackError) {
-      return database.find ({
+      return database.find({
         selector: {
           owner: { $eq: childId },
           surveyDate: { $gt: null }
         },
-        sort: [{ surveyDate:'desc' }]
+        sort: [{ surveyDate: 'desc' }]
       })
-      .then (function (response) {
+      .then(function (response) {
             // Do something with the response
         callback(response);
       })
-      .catch (function (error) {
+      .catch(function (error) {
           // Do something with the error
         callbackError(error);
       });
     };
 
     factory.destroyDatabase = function (dbName) {
-      database.destroy (dbName);
+      database.destroy(dbName);
     };
 
     factory.getAll = function (callback, errCallback) {
-      database.allDocs ({ include_docs: true, attachments: true })
-          .then (function (response) {
-            callback (response.rows);
+      database.allDocs({ include_docs: true, attachments: true })
+          .then(function (response) {
+            callback(response.rows);
           })
-          .catch (function (error) {
-            errCallback (error);
+          .catch(function (error) {
+            errCallback(error);
           })
-          .finally (function () {
+          .finally(function () {
             // Do something when everything is done
           });
     };
 
     factory.remove = function (doc, callBack, errorCallback) {
-      database.remove (doc)
-          .then (function (response) {
+      database.remove(doc)
+          .then(function (response) {
             // Do something with the response
-            callBack (response);
+            callBack(response);
           })
-          .catch (function (error) {
+          .catch(function (error) {
             // Do something with the error
-            errorCallback (error);
+            errorCallback(error);
           })
-          .finally (function () {
+          .finally(function () {
             // Do something when everything is done
           });
     };
 
     factory.get = function (doc, callBack, errCallback) {
-      database.get (doc.childId)
-          .then (function (response) {
+      database.get(doc.childId)
+          .then(function (response) {
             // Do something with the response
-            callBack (response);
+            callBack(response);
           })
-          .catch (function (error) {
+          .catch(function (error) {
             // Do something with the error
-            errCallback (error);
+            errCallback(error);
           })
-          .finally (function () {
+          .finally(function () {
             // Do something when everything is done
           });
     };
@@ -125,85 +125,85 @@
     };
 
     factory.getOne = function (doc) {
-      database.get (doc.childId)
-          .then (function (response) {
+      database.get(doc.childId)
+          .then(function (response) {
             // Do something with the response
             return response;
           })
-          .catch (function (error) {
+          .catch(function (error) {
             // Do something with the error
           })
-          .finally (function () {
+          .finally(function () {
             // Do something when everything is done
           });
     };
 
     factory.query = function (qFunction, callback, errorCallback) {
-      database.query (qFunction)
-          .then (function (response) {
+      database.query(qFunction)
+          .then(function (response) {
             // Do something with the response
-            callback (response.doc);
+            callback(response.doc);
           })
-          .catch (function (error) {
+          .catch(function (error) {
             // Do something with the error
-            errorCallback (error);
+            errorCallback(error);
           })
-          .finally (function () {
+          .finally(function () {
             // Do something when everything is done
           });
     };
 
     factory.insertSurvey = function (childInfo, callback, errorCallback) {
-      database.put (childInfo)
-          .then (function (response) {
+      database.put(childInfo)
+          .then(function (response) {
             // Do something with the response
-            callback (response);
+            callback(response);
           })
-          .catch (function (error) {
+          .catch(function (error) {
             // Do something with the error
-            errorCallback (error);
+            errorCallback(error);
           })
-          .finally (function () {
+          .finally(function () {
             // Do something when everything is done
           });
     };
 
     factory.insert = function (childInfo, callback, errorCallback) {
-      childInfo._id = childInfo._id || uuid4.generate ();
-      if(childInfo._rev) {
+      childInfo._id = childInfo._id || uuid4.generate();
+      if (childInfo._rev) {
         childInfo._rev = childInfo._rev;
       }
-      database.put (childInfo)
-          .then (function (response) {
+      database.put(childInfo)
+          .then(function (response) {
             // Do something with the response
-            callback (response);
+            callback(response);
           })
-          .catch (function (error) {
+          .catch(function (error) {
             // Do something with the error
-            errorCallback (error);
+            errorCallback(error);
           })
-          .finally (function () {
+          .finally(function () {
             // Do something when everything is done
           });
     };
 
     factory.updateChild = function (childInfo) {
  //     childInfo._id = uuid4.generate ();
-      database.put (childInfo)
-          .then (function (response) {
+      database.put(childInfo)
+          .then(function (response) {
             // Do something with the response
             return response;
           })
-          .catch (function (error) {
+          .catch(function (error) {
             // Do something with the error
           })
-          .finally (function () {
+          .finally(function () {
             // Do something when everything is done
           });
     };
 
     factory.sync = function (upStreamDb, callback, errorCallback, nextState) {
-      database.sync (upStreamDb).$promise
+      database.sync(upStreamDb).$promise
       .then(function (response) {
         // Do something with the response
         callback(response);
@@ -219,20 +219,20 @@
     };
 
     factory.replicate = function (upStreamDb, callback, errorCallback, whenDone) {
-      database.replicate.to (upStreamDb)
-          .then (function (response) {
+      database.replicate.to(upStreamDb)
+          .then(function (response) {
             // Do something with the response
-            callback (response);
+            callback(response);
           })
-          .catch (function (error) {
+          .catch(function (error) {
             // Do something with the error
-            errorCallback (error);
+            errorCallback(error);
           })
-          .finally (function () {
+          .finally(function () {
             whenDone();
           });
     };
-
     return factory;
   }
-})();
+}());
+

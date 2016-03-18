@@ -29,6 +29,18 @@ exports.invokeRolesPolicies = function () {
     }, {
       resources: '/:childId',
       permissions: ['get']
+    }, {
+      resources: '/children',
+      permissions: ['get', 'post']
+    }, {
+      resources: '/create',
+      permissions: ['get', 'post']
+    }, {
+      resources: '/:childId/edit',
+      permissions: ['get', 'post']
+    }, {
+      resources: '/:childId/survey/:surveyId',
+      permissions: ['get', 'post']
     }]
   }, {
     roles: ['guest'],

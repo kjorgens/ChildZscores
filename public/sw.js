@@ -57,11 +57,11 @@ self.addEventListener('install', function (event) {
       '/public/lib/pouchdb-find/dist/pouchdb.find.min.js',
       '/public/lib/angular-pouchdb/angular-pouchdb.min.js',
       '/public/lib/angular-uuid/uuid.min.js',
+      '/public/lib/angular-spinner/angular-spinner.min.js',
+      '/public/lib/spin/spin.min.js',
       '/public/lib/bootstrap/dist/css/bootstrap.min.css',
       '/public/lib/bootstrap/dist/css/bootstrap-theme.min.css',
       '/modules/children/client/views/add-survey.client.view.html',
-      '/modules/children/client/views/create-child.client.view.html',
-      '/modules/children/client/views/edit-child.client.view.html',
       '/modules/children/client/views/form-child.client.view.html',
       '/modules/children/client/views/list-children.client.view.html',
       '/modules/children/client/views/view-child.client.view.html',
@@ -112,34 +112,34 @@ self.addEventListener('fetch', function (event) {
 
 
     // Poke a hole and allow certain routes to go over the network
-    for(key in whitelist) {
-      if(whitelist.hasOwnProperty(key)) {
-        value = whitelist[key];
-        if(requestURL.pathname.indexOf(value) !== -1) {
-          result = value;
-          break;
-        }
+  for (key in whitelist) {
+    if (whitelist.hasOwnProperty(key)) {
+      value = whitelist[key];
+      if (requestURL.pathname.indexOf(value) !== -1) {
+        result = value;
+        break;
       }
     }
-    if (!result) {
-      return event.respondWith(
-          fetch(event.request)
-              .then(function(response){
-                console.log('responding with latest');
-                var cacheCopy = response.clone();
-                caches.open(CACHE_LIST['dynamic-cache'])
-                    .then(function(cache){
-                      if(event.request.method !== 'POST'){
-                        cache.put(event.request, cacheCopy);
-                      }
-                    });
-                return response;
-              })
-              .catch(function(){
-                console.log('responding from cache');
-                return caches.match(event.request);
-              })
-      );
-    }
+  }
+  if (!result) {
+    return event.respondWith(
+        fetch(event.request)
+            .then(function (response) {
+              console.log('responding with latest');
+              var cacheCopy = response.clone();
+              caches.open(CACHE_LIST['dynamic-cache'])
+                .then(function (cache) {
+                  if (event.request.method !== 'POST'){
+                    cache.put(event.request, cacheCopy);
+                  }
+                });
+              return response;
+            })
+            .catch(function () {
+              console.log('responding from cache');
+              return caches.match(event.request);
+            })
+    );
+  }
 });
 

@@ -62,11 +62,11 @@ var ChildSchema = new Schema({
     default: '',
     trim: true
   },
-  //branch: {
+  // branch: {
   //  type: String,
   //  default: '',
   //  trim: true
-  //},
+  // },
   user: {
     type: Schema.ObjectId,
     ref: 'User'

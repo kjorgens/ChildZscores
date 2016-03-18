@@ -1,45 +1,44 @@
-<section >
-  <div class="page-header" >
-    <div class='btn-toolbar pull-right'>
-
-    <div class="btn-group">
-      <a class="btn btn-primary" ui-sref="children.survey({childId:vm.child._id,surveyId:''})">
-        New Survey
-        <i class="glyphicon glyphicon-plus"></i>
-      </a>
-      <a class="btn btn-primary" ui-sref="children.edit({childId: vm.child._id,surveyId:''})">
-        Edit
-        <i class="glyphicon glyphicon-edit"></i>
-      </a>
-      <a class="btn btn-primary" ng-click="vm.remove(vm.child);">
-        Remove
-        <i class="glyphicon glyphicon-trash"></i>
-      </a>
+<section>
+    <div class="page-header">
+        <div class='btn-toolbar pull-right'>
+            <div class="btn-group">
+                <a class="btn btn-primary" ui-sref="children.create" ng-if="vm.userHasUserRole">
+                    New Child
+                    <i class="glyphicon glyphicon-plus"></i>
+                </a>
+                <a class="btn btn-primary" ui-sref="children.newsurvey({childId:vm.child._id})">
+                    New Screening
+                    <i class="glyphicon glyphicon-plus"></i>
+                </a>
+                <a class="btn btn-primary" ui-sref="children.edit({childId: vm.child._id,surveyId:''})">
+                    Edit
+                    <i class="glyphicon glyphicon-edit"></i>
+                </a>
+                <a class="btn btn-primary" ng-click="vm.remove(vm.child)" ng-if="vm.userHasAdminRole">
+                    Remove
+                    <i class="glyphicon glyphicon-trash"></i>
+                </a>
+            </div>
+        </div>
+        <h2><span ng-bind="vm.child.firstName"></span>
+            <span ng-bind="vm.child.lastName"></span></h2>Birth Date:
+        <span ng-bind="vm.child.birthDate | date:'mediumDate'"></span>
     </div>
-    </div>
-    <h2><span ng-bind="vm.child.firstName"></span>
-    <span ng-bind="vm.child.lastName"></span></h2>Birth Date:
-    <span ng-bind="vm.child.birthDate | date:'mediumDate'"></span>
-  </div>
-  <small>
-      <a ng-repeat="survey in vm.surveys.docs"
-         ui-sref="children.survey({ surveyId:survey._id, childId:vm.child._id})" class="list-group-item clearfix">
-        <small class="list-group-item-text">
-          <h4>Survey date: <span ng-bind="survey.surveyDate | date:'mediumDate'"></span>
-            <!--, Age-->
-            <!--<span ng-bind="survey.age | number:2 "></span>, -->
-            , Height
-            <span ng-bind="survey.height | number:2 "></span>, Weight
-            <span ng-bind="survey.weight | number:2 "></span></h4>
-
-            <h4>Z Scores:
-              <span ng-bind="survey.zScore.zscoreString"></span>
-            </h4>
-
-          Screening by
-          <span ng-bind="vm.child.interviewer"></span>
-        </small>
-      </a>
-    </div>
-  </small>
+    <small>
+        <a ng-repeat="survey in vm.surveys.docs"
+           ui-sref="children.editsurvey({ surveyId:survey._id, childId:vm.child._id})" class="list-group-item clearfix">
+            <small class="list-group-item-text ZscoreListContainer">
+                <h4>Survey date: <span ng-bind="survey.surveyDate | date:'mediumDate'"></span>
+                    , Height
+                    <span ng-bind="survey.height | number:2 "></span>, Weight
+                    <span ng-bind="survey.weight | number:2 "></span></h4>
+                <h4>Z Scores:
+                    <span ng-bind="survey.zScore.zscoreString"></span>
+                </h4>
+                Screening done by
+                <span ng-bind="vm.child.interviewer"></span>
+            </small>
+        </a>
+        </div>
+    </small>
 </section>

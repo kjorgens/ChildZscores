@@ -1,7 +1,8 @@
 (function (app) {
   'use strict';
 
-//  app.registerModule('chat', ['core']);
-  app.registerModule('chat');
+  app.registerModule('chat', ['core']);
+//  app.registerModule('chat');
   app.registerModule('chat.routes', ['ui.router']);
-})(ApplicationConfiguration);
+}(ApplicationConfiguration));
+

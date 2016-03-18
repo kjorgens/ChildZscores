@@ -4,8 +4,6 @@ var config = require('../config'),
   jwt = require('jsonwebtoken'),
   lodash = require('lodash');
 
-
-
 // export the token auth service
 exports.signToken = function (user, options) {
   var payload,

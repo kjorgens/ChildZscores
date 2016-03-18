@@ -8,10 +8,7 @@ module.exports = function (app) {
   // Create Router
   var router = express.Router();
 
-  //Set JWT Auth for all user Routes
-  router.all('*', passport.authenticate('jwt', { session: false }));
-
-  //Set JWT Auth for all user Routes
+  // Set JWT Auth for all user Routes
   router.all('*', passport.authenticate('jwt', { session: false }));
 
   // Setting up the users profile api

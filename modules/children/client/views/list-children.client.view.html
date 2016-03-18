@@ -1,5 +1,5 @@
 <section>
-  <div class="page-header" >
+  <div class="page-header">
     <div class='btn-toolbar pull-right'>
       <div class="btn-group">
         <a class="btn btn-primary" ui-sref="children.create">New Child
@@ -10,26 +10,23 @@
         </a>
       </div>
     </div>
-    <h1>Children</h1>
+    <h1>Children in {{selectedCountry}}</h1>
   </div>
-
   <div class="list-group">
     <a ng-repeat="child in vm.childList.docs" ui-sref="children.view({childId: child._id})" class="list-group-item">
       <small class="list-group-item-text">
         <h2><span ng-bind="child.firstName"></span>
-        <span ng-bind="child.lastName"></span></h2>
+          <span ng-bind="child.lastName"></span></h2>
         <span ng-bind="child.gender"></span>, born
         <span ng-bind="child.birthDate | date:'mediumDate'"></span>,
         First Screening:
         <span ng-bind="child.created | date:'mediumDate'"></span>
         by
         <span ng-bind="child.interviewer"></span>
-
       </small>
-
     </a>
   </div>
-
+  <span us-spinner="{radius:30, width:8, length: 16}" spinner-key="spinner-sync" spinner-theme="bigBlue"></span>
   <div class="alert alert-warning text-center" ng-if="!vm.childList.docs.length">
     No children yet, why don't you <a ui-sref="children.create">create one</a>?
   </div>

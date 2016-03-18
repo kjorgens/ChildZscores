@@ -50,6 +50,18 @@ gulp.task('nodemon', function () {
   });
 });
 
+// Nodemon debug task
+gulp.task('nodemon-debug', function () {
+  return plugins.nodemon({
+    exec: 'node_modules/node-inspector/bin/inspector.js --save-live-edit --preload=false --web-port 1337 & node --debug',
+    script: 'server.js',
+    nodeArgs: ['--debug'],
+    ext: 'js,html',
+    verbose: true,
+    watch: _.union(defaultAssets.server.views, defaultAssets.server.allJS, defaultAssets.server.config)
+  });
+});
+
 // Watch Files For Changes
 gulp.task('watch', function () {
   // Start livereload
@@ -57,24 +69,24 @@ gulp.task('watch', function () {
 
   // Add watch rules
   gulp.watch(defaultAssets.server.views).on('change', plugins.livereload.changed);
-  gulp.watch(defaultAssets.server.allJS, ['jshint']).on('change', plugins.livereload.changed);
-  gulp.watch(defaultAssets.client.js, ['jshint']).on('change', plugins.livereload.changed);
+  gulp.watch(defaultAssets.server.allJS, ['eslint']).on('change', plugins.livereload.changed);
+  gulp.watch(defaultAssets.client.js, ['eslint']).on('change', plugins.livereload.changed);
   gulp.watch(defaultAssets.client.css, ['csslint']).on('change', plugins.livereload.changed);
   gulp.watch(defaultAssets.client.sass, ['sass', 'csslint']).on('change', plugins.livereload.changed);
   gulp.watch(defaultAssets.client.less, ['less', 'csslint']).on('change', plugins.livereload.changed);
 
   if (process.env.NODE_ENV === 'production') {
-    gulp.watch(defaultAssets.server.gulpConfig, ['templatecache', 'jshint']);
-    gulp.watch(defaultAssets.client.views, ['templatecache', 'jshint']).on('change', plugins.livereload.changed);
+    gulp.watch(defaultAssets.server.gulpConfig, ['templatecache', 'eslint']);
+    gulp.watch(defaultAssets.client.views, ['templatecache']).on('change', plugins.livereload.changed);
   } else {
-    gulp.watch(defaultAssets.server.gulpConfig, ['jshint']);
+    gulp.watch(defaultAssets.server.gulpConfig, ['eslint']);
     gulp.watch(defaultAssets.client.views).on('change', plugins.livereload.changed);
   }
 
   if (process.env.NODE_ENV === 'test') {
     // Add Server Test file rules
     gulp.watch([testAssets.tests.server, defaultAssets.server.allJS], ['test:server']).on('change', function (file) {
-      var runOnlyChangedTestFile = argv.onlyChanged ? true : false;
+      var runOnlyChangedTestFile = !!argv.onlyChanged;
 
       // check if we should only run a changed test file
       if (runOnlyChangedTestFile) {
@@ -111,23 +123,6 @@ gulp.task('csslint', function (done) {
         done();
       }
     }));
-});
-
-// JS linting task
-gulp.task('jshint', function () {
-  var assets = _.union(
-    defaultAssets.server.gulpConfig,
-    defaultAssets.server.allJS,
-    defaultAssets.client.js,
-    testAssets.tests.server,
-    testAssets.tests.client,
-    testAssets.tests.e2e
-  );
-
-  return gulp.src(assets)
-    .pipe(plugins.jshint())
-    .pipe(plugins.jshint.reporter('default'))
-    .pipe(plugins.jshint.reporter('fail'));
 });
 
 // ESLint JS linting task
@@ -203,18 +198,46 @@ gulp.task('imagemin', function () {
     .pipe(gulp.dest('public/dist/img'));
 });
 
-// node-inspector task
-gulp.task('node-inspector', function () {
-  return gulp.src([])
-    .pipe(plugins.nodeInspector({
-      debugPort: 5858,
-      webHost: 'localhost',
-      webPort: 1337,
-      saveLiveEdit: true,
-      preload: false,
-      hidden: [],
-      stackTraceLimit: 50,
-    }));
+// wiredep task to default
+gulp.task('wiredep', function () {
+  return gulp.src('config/assets/default.js')
+    .pipe(plugins.wiredep({
+      ignorePath: '../../'
+    }))
+    .pipe(gulp.dest('config/assets/'));
+});
+
+// wiredep task to production
+gulp.task('wiredep:prod', function () {
+  return gulp.src('config/assets/production.js')
+    .pipe(plugins.wiredep({
+      ignorePath: '../../',
+      fileTypes: {
+        js: {
+          replace: {
+            css: function (filePath) {
+              var minFilePath = filePath.replace('.css', '.min.css');
+              var fullPath = path.join(process.cwd(), minFilePath);
+              if (!fs.existsSync(fullPath)) {
+                return '\'' + filePath + '\',';
+              } else {
+                return '\'' + minFilePath + '\',';
+              }
+            },
+            js: function (filePath) {
+              var minFilePath = filePath.replace('.js', '.min.js');
+              var fullPath = path.join(process.cwd(), minFilePath);
+              if (!fs.existsSync(fullPath)) {
+                return '\'' + filePath + '\',';
+              } else {
+                return '\'' + minFilePath + '\',';
+              }
+            }
+          }
+        }
+      }
+    }))
+    .pipe(gulp.dest('config/assets/'));
 });
 
 // Copy local development environment config example
@@ -299,7 +322,7 @@ gulp.task('dropdb', function (done) {
 
   mongoose.connect(function (db) {
     db.connection.db.dropDatabase(function (err) {
-      if(err) {
+      if (err) {
         console.log(err);
       } else {
         console.log('Successfully dropped db: ', db.connection.db.databaseName);
@@ -336,12 +359,12 @@ gulp.task('protractor', ['webdriver_update'], function () {
 
 // Lint CSS and JavaScript files.
 gulp.task('lint', function (done) {
-  runSequence('less', 'sass', ['csslint', 'eslint', 'jshint'], done);
+  runSequence('less', 'sass', ['csslint', 'eslint'], done);
 });
 
 // Lint project files and minify them into two production files.
 gulp.task('build', function (done) {
-  runSequence('env:dev', 'lint', ['uglify', 'cssmin'], done);
+  runSequence('env:dev', 'wiredep:prod', 'lint', ['uglify', 'cssmin'], done);
 });
 
 // Run the project tests
@@ -354,7 +377,7 @@ gulp.task('test:server', function (done) {
 });
 
 // Watch all server files for changes & run server tests (test:server) task on changes
-// optional arguments: 
+// optional arguments:
 //    --onlyChanged - optional argument for specifying that only the tests in a changed Server Test file will be run
 // example usage: gulp test:server:watch --onlyChanged
 gulp.task('test:server:watch', function (done) {
@@ -376,7 +399,7 @@ gulp.task('default', function (done) {
 
 // Run the project in debug mode
 gulp.task('debug', function (done) {
-  runSequence('env:dev', ['copyLocalEnvConfig', 'makeUploadsDir'], 'lint', ['nodemon', 'watch', 'node-inspector'], done);
+  runSequence('env:dev', ['copyLocalEnvConfig', 'makeUploadsDir'], 'lint', ['nodemon-debug', 'watch'], done);
 });
 
 // Run the project in production mode

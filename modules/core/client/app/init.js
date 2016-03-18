@@ -1,6 +1,6 @@
 'use strict';
 
-//Start by defining the main module and adding the module dependencies
+// Start by defining the main module and adding the module dependencies
 angular.module(ApplicationConfiguration.applicationModuleName, ApplicationConfiguration.applicationModuleVendorDependencies);
 
 // Setting HTML5 Location Mode
@@ -13,7 +13,7 @@ angular.module(ApplicationConfiguration.applicationModuleName).config(['$locatio
 ]);
 
 angular.module(ApplicationConfiguration.applicationModuleName).run(function ($window, $rootScope, $state, Authentication) {
-  $rootScope.appOnline =navigator.onLine;
+  $rootScope.appOnline = navigator.onLine;
   console.log('App is ' + ($rootScope.appOnline ? 'online' : 'offline'));
   $window.addEventListener('offline', function () {
     console.log('navigatorOffline');
@@ -35,7 +35,6 @@ angular.module(ApplicationConfiguration.applicationModuleName).run(function ($wi
                 return true;
               }
             });
-
             if (!allowed) {
               event.preventDefault();
               if (Authentication.user !== undefined && typeof Authentication.user === 'object') {
@@ -69,9 +68,9 @@ angular.module(ApplicationConfiguration.applicationModuleName).run(function ($wi
   }
 });
 
-//Then define the init function for starting up the application
+// Then define the init function for starting up the application
 angular.element(document).ready(function () {
-  //Fixing facebook bug with redirect
+  // Fixing facebook bug with redirect
   if (window.location.hash && window.location.hash === '#_=_') {
     if (window.history && history.pushState) {
       window.history.pushState('', document.title, window.location.pathname);
@@ -88,6 +87,6 @@ angular.element(document).ready(function () {
     }
   }
 
-  //Then init the app
+  // Then init the app
   angular.bootstrap(document, [ApplicationConfiguration.applicationModuleName]);
 });

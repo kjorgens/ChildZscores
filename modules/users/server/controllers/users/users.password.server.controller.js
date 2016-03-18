@@ -33,7 +33,7 @@ exports.forgot = function (req, res, next) {
         User.findOne({
           username: req.body.username.toLowerCase()
         }, '-salt -password', function (err, user) {
-          if (!user) {
+          if (err || !user) {
             return res.status(400).send({
               message: 'No account with that username has been found'
             });
@@ -109,7 +109,7 @@ exports.validateResetToken = function (req, res) {
       $gt: Date.now()
     }
   }, function (err, user) {
-    if (!user) {
+    if (err || !user) {
       return res.redirect('/password/reset/invalid');
     }
 
