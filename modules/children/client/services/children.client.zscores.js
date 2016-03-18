@@ -561,14 +561,15 @@
         }
       }
       heightForAge = (Number(height) - ha.M) / (ha.S * ha.M);
-      weightForAge = (Math.pow ((Number(weight) / wa.M), wa.L) - 1) / (wa.S * wa.L);
-      weightForLength = (Math.pow ((Number(weight) / wl.M), wl.L) - 1) / (wl.S * wl.L);
-      var zscoreString = 'Age: ' + Number(age).toFixed (2) + ' months,' +
-      '  Z scores: h/a: ' + Number(heightForAge).toFixed (2) + '  w/a: ' +
+      weightForAge = (Math.pow((Number(weight) / wa.M), wa.L) - 1) / (wa.S * wa.L);
+      weightForLength = (Math.pow((Number(weight) / wl.M), wl.L) - 1) / (wl.S * wl.L);
+      var zscoreString = 'Age: ' + Number(age).toFixed(2) + ' months,' +
+      '  Z scores: h/a: ' + Number(heightForAge).toFixed(2) + '  w/a: ' +
       Number(weightForAge).toFixed(2) + '  w/h: ' +
       Number(weightForLength).toFixed(2);
-      callback ({ ha: heightForAge, wa: weightForAge, wl: weightForLength, zscoreString: zscoreString });
+      callback({ ha: heightForAge, wa: weightForAge, wl: weightForLength, zscoreString: zscoreString });
     };
     return { getMethod: getMethod };
   }
 }());
+

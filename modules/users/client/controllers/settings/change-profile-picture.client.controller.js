@@ -19,9 +19,9 @@
     vm.uploader = new FileUploader({
       url: 'api/users/picture',
       alias: 'newProfilePicture',
-      onAfterAddingFile: onAfterAddingFile,
-      onSuccessItem: onSuccessItem,
-      onErrorItem: onErrorItem
+      headers: {
+        Authorization: 'JWT ' + Authentication.token
+      }
     });
 
     // Set file uploader image filter

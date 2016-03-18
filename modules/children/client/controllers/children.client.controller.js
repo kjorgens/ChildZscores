@@ -2,10 +2,10 @@
   'use strict';
 
   angular
-    .module ('children')
+    .module('children')
     .controller('ChildrenController', ChildrenController);
 
-  ChildrenController.$inject = ['$rootScope', '$scope','$state', '$timeout', 'moment', 'childResolve', 'ModalService', 'Authentication', 'ZScores','PouchService'];
+  ChildrenController.$inject = ['$rootScope', '$scope', '$state', '$timeout', 'moment', 'childResolve', 'ModalService', 'Authentication', 'ZScores', 'PouchService'];
 
   function ChildrenController($rootScope, $scope, $state, $timeout, moment, child, ModalService, Authentication, ZScores, PouchService) {
     var vm = this;
@@ -24,8 +24,6 @@
       vm.entermonthAge = child.monthAge;
       vm.birthDate = new Date(child.birthDate);
       PouchService.getSurveys(vm.child._id, setSurveyList, surveyErrors);
-//      vm.birthDate = new Date (vm.child.birthDate) || new Date();
-//      vm.surveyDate = new Date ();
     } else {
       vm.ageIsValid = false;
 
@@ -41,10 +39,6 @@
 
     vm.userHasAdminRole = false;
     vm.userHasUserRole = false;
-
-    //if(vm.child.firstName){
-    //  checkAllFieldsValid();
-    //}checkAllFieldsValid
 
     vm.authentication = Authentication;
     if (vm.authentication.user.roles !== undefined && vm.authentication.user.roles !== null) {
@@ -65,15 +59,13 @@
     vm.update = update;
     vm.find = find;
     vm.findOne = findOne;
-//    vm.fileToPouch = fileToPouch;
     vm.setMonthCount = setMonthCount;
     vm.today = today;
 
     vm.checkFirstNameIsValid = checkFirstNameIsValid;
     vm.checkLastNameIsValid = checkLastNameIsValid;
     vm.checkGenderIsValid = checkGenderIsValid;
-    //vm.checkHeightIsValid = checkHeightIsValid;
-    //vm.checkWeightIsValid = checkWeightIsValid;
+
  //   vm.checkMotherIsValid = checkMotherIsValid;
  //   vm.checkFatherIsValid = checkLastNameIsValid;
  //   vm.checkStreetAddressIsValid = checkStreetAddressIsValid;
@@ -81,45 +73,27 @@
     vm.checkStakeIsValid = checkStakeIsValid;
  //   vm.checkWardIsValid = checkWardIsValid;
     vm.checkAgeIsValid = checkAgeIsValid;
-    vm.checkEnteredAgeIsValid =checkEnteredAgeIsValid;
+    vm.checkEnteredAgeIsValid = checkEnteredAgeIsValid;
     vm.checkAllFieldsValid = checkAllFieldsValid;
 //    vm.childInfoString = childInfoString;
 //    vm.syncUpstream = syncUpstream;
 
-    //vm.survey = {};
-    //vm.surveys = [];
-    //vm.newChild = {};
-
     // Put event listeners into place
-
-    //function fileToPouch(file, dbToCreate) {
-    //  PouchService.createDatabase (dbToCreate);
-    //}
-
-    //function createDB(dbToCreate){
-    //  PouchService.createDatabase (dbToCreate);
-    //}
 
     function setSurveyList(surveys) {
       $scope.$apply(function() {
         vm.surveys = surveys;
-        //vm.surveys.forEach(function(survey){
+        // vm.surveys.forEach(function(survey){
         //  if(Math.abs(survey.zscore.ha) > 2 || Math.abs(survey.zscore.wa) > 2 || Math.abs(survey.zscore.wl) > 2){
         //    vm.screeningColor = 'orange';
         //  }
-        //});
+        // });
       });
     }
 
     function surveyErrors(error) {
       vm.surveyError = error;
     }
-
-    //if($state.current.name !== 'children.edit'){
-    //  PouchService.getSurveys(vm.child._id, setSurveyList, surveyErrors);
-    //}
-
-    //   vm.db = new pouchDB('testDB');
 
     function checkAllFieldsValid() {
       checkFirstNameIsValid();
@@ -131,18 +105,17 @@
 //      checkCityIsValid ();
       checkStakeIsValid();
 //      checkWardIsValid ();
-      checkAgeIsValid ();
+      checkAgeIsValid();
 
       if (vm.firstNameIsValid === true && vm.lastNameIsValid === true &&
           vm.genderIsalid === true && vm.ageIsValid === true) {
         vm.allFieldsValid = true;
-      }
-      else {
+      } else {
         vm.allFieldsValid = false;
       }
     }
 
-    function setMonthAge(){
+    function setMonthAge() {
 
     }
 
@@ -343,18 +316,18 @@
         vm.child.city = '';
         vm.child.stake = '';
         vm.child.ward = '';
-        //vm.created = Date.now;
-        //vm.birthdate = '';
-        //vm.monthAge = 0;
-        //vm.firstName = '';
-        //vm.lastName = '';
-        //vm.comments = '';
-        //vm.father = '';
-        //vm.mother = '';
-        //vm.address = '';
-        //vm.city = '';
-        //vm.stake = '';
-        //vm.ward = '';
+        // vm.created = Date.now;
+        // vm.birthdate = '';
+        // vm.monthAge = 0;
+        // vm.firstName = '';
+        // vm.lastName = '';
+        // vm.comments = '';
+        // vm.father = '';
+        // vm.mother = '';
+        // vm.address = '';
+        // vm.city = '';
+        // vm.stake = '';
+        // vm.ward = '';
       }
     }
 

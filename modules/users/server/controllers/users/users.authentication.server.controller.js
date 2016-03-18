@@ -7,7 +7,8 @@ var path = require('path'),
   errorHandler = require(path.resolve('./modules/core/server/controllers/errors.server.controller')),
   mongoose = require('mongoose'),
   passport = require('passport'),
-  User = mongoose.model('User');
+  User = mongoose.model('User'),
+  authentication = require(path.resolve('./config/lib/jwtAuthentication'));
 
 // URLs for which user can't be redirected on signin
 var noReturnUrls = [
@@ -38,13 +39,8 @@ exports.signup = function (req, res) {
       user.password = undefined;
       user.salt = undefined;
 
-      req.login(user, function (err) {
-        if (err) {
-          res.status(400).send(err);
-        } else {
-          res.json(user);
-        }
-      });
+      var jwtToken = authentication.signToken(user);
+      res.json({ user: user, token: jwtToken });
     }
   });
 };
@@ -61,16 +57,11 @@ exports.signin = function (req, res, next) {
       user.password = undefined;
       user.salt = undefined;
 
-      req.login(user, function (err) {
-        if (err) {
-          res.status(400).send(err);
-        } else {
-          res.json(user);
-        }
-      });
+      var jwtToken = authentication.signToken(user);
+      res.json({ user: user, token: jwtToken });
     }
   })(req, res, next);
-};
+}
 
 /**
  * Signout
@@ -78,7 +69,7 @@ exports.signin = function (req, res, next) {
 exports.signout = function (req, res) {
   req.logout();
   res.redirect('/');
-};
+}
 
 /**
  * OAuth provider call
@@ -93,7 +84,7 @@ exports.oauthCall = function (strategy, scope) {
     // Authenticate
     passport.authenticate(strategy, scope)(req, res, next);
   };
-};
+}
 
 /**
  * OAuth callback
@@ -111,16 +102,13 @@ exports.oauthCallback = function (strategy) {
       if (!user) {
         return res.redirect('/authentication/signin');
       }
-      req.login(user, function (err) {
-        if (err) {
-          return res.redirect('/authentication/signin');
-        }
 
-        return res.redirect(redirectURL || sessionRedirectURL || '/');
-      });
+      var jwtToken = authentication.signToken(user);
+      return res.redirect((redirectURL || sessionRedirectURL || '/') + '?token=' + jwtToken);
+
     })(req, res, next);
   };
-};
+}
 
 /**
  * Helper function to save or update a OAuth user profile
@@ -229,13 +217,7 @@ exports.removeOAuthProvider = function (req, res, next) {
         message: errorHandler.getErrorMessage(err)
       });
     } else {
-      req.login(user, function (err) {
-        if (err) {
-          return res.status(400).send(err);
-        } else {
-          return res.json(user);
-        }
-      });
+      return res.json(user);
     }
   });
 };

@@ -10,7 +10,7 @@
 
   function menuConfig($rootScope, Menus, PouchService) {
     // Add the children dropdown item
-    PouchService.createDatabase ('Ecuador');
+    PouchService.createDatabase('Ecuador');
     //
     PouchService.createIndex('firstName');
     PouchService.createIndex('lastName');
@@ -24,7 +24,7 @@
  //     type: 'dropdown',
       roles: ['*']
     });
-    //Menus.addMenuItem('topbar', {
+    // Menus.addMenuItem('topbar', {
     //  title: 'Country',
     //  state: 'children.country',
     //  type: 'dropdown',

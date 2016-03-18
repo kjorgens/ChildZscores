@@ -10,15 +10,13 @@
   function ChildrenModalController($scope, $uibModalInstance) {
     var vm = this;
 
-    vm.dismiss = function (){
+    vm.dismiss = function () {
       $uibModalInstance.dismiss();
     };
 
-    vm.close = function (){
+    vm.close = function () {
       $uibModalInstance.close();
     };
-
-
-
   }
 }());
+

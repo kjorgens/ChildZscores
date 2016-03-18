@@ -16,6 +16,8 @@ module.exports = {
         'public/lib/angular-animate/angular-animate.min.js',
         'public/lib/angular-messages/angular-messages.min.js',
         'public/lib/angular-ui-router/release/angular-ui-router.min.js',
+        'public/lib/spin.js/spin.min.js',
+        'public/lib/angular-spinner/angular-spinner.min.js',
         'public/lib/angular-ui-utils/ui-utils.min.js',
         'public/lib/angular-bootstrap/ui-bootstrap-tpls.min.js',
         'public/lib/angular-file-upload/dist/angular-file-upload.min.js',
@@ -26,9 +28,8 @@ module.exports = {
         'public/lib/angular-uuid/uuid.min.js',
         'public/lib/angular-ui-router-uib-modal/angular-ui-router-uib-modal.js',
         'public/lib/moment/min/moment.min.js',
-        'public/lib/angular-moment/angular-moment.min.js',
-        'public/lib/angular-spinner/angular-spinner.min.js',
-        'public/lib/spin.js/spin.min.js'
+        'public/lib/angular-moment/angular-moment.min.js'
+        // end bower:js
       ]
     },
     css: 'public/dist/application.min.css',

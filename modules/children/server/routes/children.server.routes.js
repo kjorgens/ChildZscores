@@ -10,19 +10,19 @@ var passport = require('passport'),
 
 
 module.exports = function (app) {
-  var router = express.Router ();
+  var router = express.Router();
 
 
   // children collection routes
   router.route('/')
-      .get(children.list)
-      .post( childrenPolicy.isAllowed, children.create);
+      .get(childrenPolicy.isAllowed, children.list)
+      .post(passport.authenticate('jwt', { session: false }), childrenPolicy.isAllowed, children.create);
 
   // Single child routes
   router.route('/:childId')
       .get(childrenPolicy.isAllowed, children.read)
-      .put(childrenPolicy.isAllowed, children.update)
-      .delete( childrenPolicy.isAllowed, children.delete);
+      .put(passport.authenticate('jwt', { session: false }), childrenPolicy.isAllowed, children.update)
+      .delete(passport.authenticate('jwt', { session: false }), childrenPolicy.isAllowed, children.delete);
 
   // Finish by binding the child middleware
   router.param('childId', children.childByID);

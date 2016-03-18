@@ -34,13 +34,7 @@ exports.update = function (req, res) {
           message: errorHandler.getErrorMessage(err)
         });
       } else {
-        req.login(user, function (err) {
-          if (err) {
-            res.status(400).send(err);
-          } else {
-            res.json(user);
-          }
-        });
+        res.json(user);
       }
     });
   } else {
@@ -76,13 +70,7 @@ exports.changeProfilePicture = function (req, res) {
               message: errorHandler.getErrorMessage(saveError)
             });
           } else {
-            req.login(user, function (err) {
-              if (err) {
-                res.status(400).send(err);
-              } else {
-                res.json(user);
-              }
-            });
+            res.json(user);
           }
         });
       }

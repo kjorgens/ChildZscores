@@ -112,34 +112,34 @@ self.addEventListener('fetch', function (event) {
 
 
     // Poke a hole and allow certain routes to go over the network
-    for(key in whitelist) {
-      if(whitelist.hasOwnProperty(key)) {
-        value = whitelist[key];
-        if(requestURL.pathname.indexOf(value) !== -1) {
-          result = value;
-          break;
-        }
+  for (key in whitelist) {
+    if (whitelist.hasOwnProperty(key)) {
+      value = whitelist[key];
+      if (requestURL.pathname.indexOf(value) !== -1) {
+        result = value;
+        break;
       }
     }
-    if (!result) {
-      return event.respondWith(
-          fetch(event.request)
-              .then(function(response){
-                console.log('responding with latest');
-                var cacheCopy = response.clone();
-                caches.open(CACHE_LIST['dynamic-cache'])
-                    .then(function(cache){
-                      if(event.request.method !== 'POST'){
-                        cache.put(event.request, cacheCopy);
-                      }
-                    });
-                return response;
-              })
-              .catch(function(){
-                console.log('responding from cache');
-                return caches.match(event.request);
-              })
-      );
-    }
+  }
+  if (!result) {
+    return event.respondWith(
+        fetch(event.request)
+            .then(function (response) {
+              console.log('responding with latest');
+              var cacheCopy = response.clone();
+              caches.open(CACHE_LIST['dynamic-cache'])
+                .then(function (cache) {
+                  if (event.request.method !== 'POST'){
+                    cache.put(event.request, cacheCopy);
+                  }
+                });
+              return response;
+            })
+            .catch(function () {
+              console.log('responding from cache');
+              return caches.match(event.request);
+            })
+    );
+  }
 });
 
