@@ -22,7 +22,7 @@ module.exports = {
     options: {
       // Stream defaults to process.stdout
       // Uncomment/comment to toggle the logging to a log on the file system
-      //stream: {
+      // stream: {
       //  directoryPath: process.cwd(),
       //  fileName: 'access.log',
       //  rotatingLogs: { // for more info on rotating logs - https://github.com/holidayextras/file-stream-rotator#usage
@@ -31,7 +31,7 @@ module.exports = {
       //    frequency: 'daily',
       //    verbose: false
       //  }
-      //}
+      // }
     }
   },
   app: {

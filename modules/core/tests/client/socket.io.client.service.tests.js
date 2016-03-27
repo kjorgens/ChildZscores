@@ -1,4 +1,4 @@
-(function(window) {
+(function() {
   'use strict';
 
   /* Creates a mock of socket.io for the browser.

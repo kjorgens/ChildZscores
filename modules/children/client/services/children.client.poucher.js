@@ -1,23 +1,21 @@
 (function () {
   'use strict';
 
-/*jshint newcap: false*/
+/* jshint newcap: false*/
   angular
     .module('children.pouchService')
     .factory('PouchService', PouchService);
 
   PouchService.$inject = ['pouchDB', 'uuid4'];
 
-  function PouchService(pouchDB, uuid4){
-
-    //ee6ff1235a84083cd285d4705ac61ea2
+  function PouchService(pouchDB, uuid4) {
     var factory = {};
     var database;
     factory.createDatabase = function (dbName) {
       database = new pouchDB (dbName);
     };
 
-    factory.createIndex = function (indexName){
+    factory.createIndex = function (indexName) {
       database.createIndex({
         index: {
           fields: [indexName]

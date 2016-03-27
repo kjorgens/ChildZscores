@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('children.pouchConfig',[]).config(function(pouchDBProvider, POUCHDB_METHODS){
+angular.module('children.pouchConfig', []).config(function(pouchDBProvider, POUCHDB_METHODS) {
   var authMethods = {
     login: 'qify',
     logout: 'qify',

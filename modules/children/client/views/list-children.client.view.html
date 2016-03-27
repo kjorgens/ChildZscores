@@ -1,16 +1,16 @@
 <section>
   <div class="page-header">
-    <div class='btn-toolbar pull-right'>
-      <div class="btn-group">
-        <a class="btn btn-primary" ui-sref="children.create">New Child
-          <i class="glyphicon glyphicon-plus"></i>
-        </a>
-        <a class="btn btn-primary" ng-click="vm.syncUpstream()" ng-if="vm.online">Sync DB
-          <i class="glyphicon glyphicon-refresh"></i>
-        </a>
-      </div>
+      <div class='btn-toolbar pull-right'>
+        <div class="btn-group" >
+          <a class="btn btn-primary" ui-sref="children.create">New Child
+            <i class="glyphicon glyphicon-plus"></i>
+          </a>
+          <a class="btn btn-primary" ng-click="vm.syncUpstream()" ng-if="vm.online">Sync DB
+            <i class="glyphicon glyphicon-refresh"></i>
+          </a>
+        </div>
     </div>
-    <h1>Children in {{selectedCountry}}</h1>
+    <h1 style="margin-top: 2em">Children in {{selectedCountry}}</h1>
   </div>
   <div class="list-group">
     <a ng-repeat="child in vm.childList.docs" ui-sref="children.view({childId: child._id})" class="list-group-item">

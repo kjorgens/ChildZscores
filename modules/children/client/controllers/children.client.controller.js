@@ -342,7 +342,7 @@
     // Remove existing Child
     function remove(child) {
       if (child) {
-        vm.surveys.docs.forEach(function(toRemove){
+        vm.surveys.docs.forEach(function(toRemove) {
           PouchService.remove(toRemove, removeResponse, removeError);
         });
         PouchService.remove(child, removeResponse, removeError);

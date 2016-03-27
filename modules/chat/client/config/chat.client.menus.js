@@ -2,18 +2,16 @@
   'use strict';
 
   angular
-    .module('core.admin')
-    .run(menuConfig);
+      .module('chat')
+      .run(menuConfig);
 
   menuConfig.$inject = ['menuService'];
 
   function menuConfig(menuService) {
+    // Set top bar menu items
     menuService.addMenuItem('topbar', {
-      title: 'Admin',
-      state: 'admin',
-      type: 'dropdown',
-      roles: ['admin']
+      title: 'Chat',
+      state: 'chat'
     });
   }
 }());
-
