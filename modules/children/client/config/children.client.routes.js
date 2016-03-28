@@ -111,7 +111,7 @@
     } else {
       return PouchService.getOnePromise({
         childId: $stateParams.surveyId
-      });     //.$promise;
+      });
     }
   }
 
@@ -119,17 +119,11 @@
 
   function newChild(PouchService) {
     return PouchService;
-    // return PouchService.addNew({
-    //  child: $stateParams.child
-    // }).$promise;
   }
 
   listDataBases.$inject = ['PouchService'];
 
   function listDataBases(PouchService) {
     return PouchService;
-    //return PouchService.addNew({
-    //  child: $stateParams.child
-    //}).$promise;
   }
 }());

@@ -59,6 +59,13 @@ var UserSchema = new Schema({
     lowercase: true,
     trim: true
   },
+  dataBases: {
+    type: [{
+      type: String
+    }],
+    default: 'testScreenings',
+    required: 'A user must be assigned a database'
+  },
   password: {
     type: String,
     default: ''

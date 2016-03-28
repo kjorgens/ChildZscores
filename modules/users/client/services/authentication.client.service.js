@@ -7,9 +7,9 @@
     .module('users.services')
     .factory('Authentication', Authentication);
 
-  Authentication.$inject = ['$q', '$resource', '$http', '$location', '$window'];
+  Authentication.$inject = ['$state', '$q', '$resource', '$http', '$location', '$window'];
 
-  function Authentication($q, $resource, $http, $location, $window) {
+  function Authentication($state, $q, $resource, $http, $location, $window) {
     var readyPromise = $q.defer();
 
     var service = {

@@ -117,14 +117,14 @@
       }
     }
 
-    //function checkGenderIsValid() {
+    // function checkGenderIsValid() {
     //  if (vm.survey.gender) {
     //    vm.genderIsValid = true;
     //  }
     //  else {
     //    vm.genderIsValid = false;
     //  }
-    //}
+    // }
 
     function checkMonthAgeIsValid() {
       var bday = new Date(vm.child.birthDate);

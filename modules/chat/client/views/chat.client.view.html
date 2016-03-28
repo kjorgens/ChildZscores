@@ -1,13 +1,13 @@
 <!-- The chat view -->
 <section class="container">
   <div class="page-header">
-    <h1>Chat Example</h1>
+    <h1 style="margin-top: 2em">Group Chat </h1>
   </div>
   <!-- The message form -->
   <form class="col-xs-12 col-md-offset-4 col-md-4" ng-submit="vm.sendMessage();">
     <fieldset class="row">
       <div class="input-group">
-        <input type="text" id="messageText" name="messageText" class="form-control" ng-model="vm.messageText" placeholder="Enter new message">
+        <input type="text" id="messageText" name="messageText" class="form-control" ng-model="vm.messageText" placeholder="Type message here">
         <span class="input-group-btn">
           <button type="submit" class="btn btn-primary" ng-disabled="!vm.messageText.length">Submit</button>
         </span>

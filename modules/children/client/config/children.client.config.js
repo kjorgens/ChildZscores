@@ -29,20 +29,19 @@
     //  state: 'children.country',
     //  type: 'dropdown',
     //  roles: ['*']
-    //});
+    // });
     //
-    //// Add the dropdown create item
-    //Menus.addSubMenuItem('topbar', 'children.country', {
+    // Add the dropdown create item
+    // Menus.addSubMenuItem('topbar', 'children.country', {
     //  title: 'Add Country',
     //  state: 'children.country',
     //  roles: ['*']
-    //});
-    //// Add the dropdown create item
-    //Menus.addSubMenuItem('topbar', 'children.country', {
+    // });
+    // Add the dropdown create item
+    // Menus.addSubMenuItem('topbar', 'children.country', {
     //  title: 'Select Country',
     //  state: 'children.country',
     //  roles: ['*']
-    //});
-
+    // });
   }
 })();

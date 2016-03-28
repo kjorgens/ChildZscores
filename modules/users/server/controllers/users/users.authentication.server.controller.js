@@ -61,7 +61,7 @@ exports.signin = function (req, res, next) {
       res.json({ user: user, token: jwtToken });
     }
   })(req, res, next);
-}
+};
 
 /**
  * Signout
@@ -69,7 +69,7 @@ exports.signin = function (req, res, next) {
 exports.signout = function (req, res) {
   req.logout();
   res.redirect('/');
-}
+};
 
 /**
  * OAuth provider call
@@ -84,7 +84,7 @@ exports.oauthCall = function (strategy, scope) {
     // Authenticate
     passport.authenticate(strategy, scope)(req, res, next);
   };
-}
+};
 
 /**
  * OAuth callback
@@ -108,7 +108,7 @@ exports.oauthCallback = function (strategy) {
 
     })(req, res, next);
   };
-}
+};
 
 /**
  * Helper function to save or update a OAuth user profile

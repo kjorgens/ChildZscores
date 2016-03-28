@@ -543,18 +543,17 @@
         wa = weightForAgeGirls[Math.round(age)];
         wl = null;
         for (var i = 0; i < weightForLengthGirls.length; i++) {
-          if (weightForLengthGirls[i].y === (Math.round(Number (height) * 2) / 2)) {
+          if (weightForLengthGirls[i].y === (Math.round(Number(height) * 2) / 2)) {
             wl = weightForLengthGirls[i];
             break;
           }
         }
-      }
-      else {
+      } else {
         ha = heightForAgeBoys[Math.round(age)];
         wa = weightForAgeBoys[Math.round(age)];
         wl = null;
         for (var j = 0; j < weightForLengthBoys.length; j++) {
-          if (weightForLengthBoys[j].y === (Math.round(Number (height) * 2) / 2)) {
+          if (weightForLengthBoys[j].y === (Math.round(Number(height) * 2) / 2)) {
             wl = weightForLengthBoys[j];
             break;
           }
