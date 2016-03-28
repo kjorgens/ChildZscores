@@ -41,7 +41,7 @@
                         <div ng-class="{'has-error':(!vm.ageIsValid)}">
                             <label for="vm.enteredMonthAge" class="col-sm-2 control-label">Age in Months</label>
                             <div class="col-sm-4">
-                                <input class="form-control" type="text" ng-blur="vm.checkEnteredAgeIsValid()"
+                                <input class="form-control" type="number" ng-blur="vm.checkEnteredAgeIsValid()"
                                        ng-model="vm.enteredMonthAge" id="vm.enteredMonthAge" required>
                                 <div class="validationMessage" ng-if="!vm.ageIsValid"><p>Please enter a valid age (1-60)
                                 </p></div>

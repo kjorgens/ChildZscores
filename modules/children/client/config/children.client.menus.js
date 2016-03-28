@@ -17,15 +17,15 @@
     
     menuService.addMenuItem('topbar', {
       title: 'Children',
-      state: 'children',
-      type: 'dropdown',
+      state: 'children.list',
+//      type: 'dropdown',
       roles: ['*']
     });
 
     // Add the dropdown list item
-    menuService.addSubMenuItem('topbar', 'children', {
-      title: 'List Children',
-      state: 'children.list'
-    });
+    // menuService.addSubMenuItem('topbar', 'children', {
+    //   title: 'List Children',
+    //   state: 'children.list'
+    // });
   }
 }());

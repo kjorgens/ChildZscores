@@ -36,7 +36,7 @@
                         <div ng-class="{'has-error':(!vm.childHeightIsValid)}">
                             <label for="vm.survey.height" class="col-sm-2 control-label">Height</label>
                             <div class="col-sm-4">
-                                <input type="input" class="form-control" ng-blur="vm.checkHeightIsValid()"
+                                <input type="number" class="form-control" ng-blur="vm.checkHeightIsValid()"
                                        ng-model="vm.survey.height" id="vm.survey.height"
                                        placeholder="Height" required>
                                 <div class="validationMessage" ng-if="!vm.childHeightIsValid"><p>Please enter a valid height (45-110)
@@ -46,7 +46,7 @@
                         <div ng-class="{'has-error':(!vm.childweightIsValid)}">
                             <label for="vm.survey.weight" class="col-sm-2 control-label">Weight</label>
                             <div class="col-sm-4">
-                                <input type="input" class="form-control" ng-blur="vm.checkWeightIsValid()"
+                                <input type="number" class="form-control" ng-blur="vm.checkWeightIsValid()"
                                        ng-model="vm.survey.weight" id="vm.survey.weight"
                                        placeholder="Weight" required>
                                 <div class="validationMessage" ng-if="!vm.childweightIsValid"><p>Please enter a valid
