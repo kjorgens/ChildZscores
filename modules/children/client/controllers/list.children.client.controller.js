@@ -41,7 +41,7 @@
     vm.syncUpstream = syncUpstream;
     vm.online = $rootScope.appOnline;
     vm.find();
-    var savedName;
+//    var savedName;
     var blinkVar;
 //    vm.stakeSelect;
     vm.selectedStake = $rootScope.selectedStake;
@@ -136,7 +136,7 @@
  //     $rootScope.selectedStake = 'Data Sync in Progress';
       vm.startSpin();
       PouchService.sync('https://syncuser:mZ7K3AldcIzO@database.liahonakids.org:5984/' +
-          savedName, replicateIn, replicateError, whenDone);
+          vm.selectedStake, replicateIn, replicateError, whenDone);
     }
   }
 }());
