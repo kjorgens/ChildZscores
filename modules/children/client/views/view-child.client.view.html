@@ -33,13 +33,16 @@
                     <span ng-bind="survey.height | number:2 "></span>, Weight
                     <span ng-bind="survey.weight | number:2 "></span></h4>
                 <h4>Z Scores:
-                    <li ng-class="{normalZscore: 'normalZscore', dangerZscore: 'dangerZscore', marginalZscore: 'marginalZscore'}[ vm.haStatus ]">
+                    <li ng-class="{normalZscore: 'normalZscore', dangerZscore: 'dangerZscore',
+                    marginalZscore: 'marginalZscore', redZoneZscore: 'redZoneZscore'}[ survey.zScore.haStatus ]">
                         height/age: <span   ng-bind="survey.zScore.ha | number:2"></span>
                     </li>
-                    <li ng-class="{normalZscore: 'normalZscore', dangerZscore: 'dangerZscore', marginalZscore: 'marginalZscore'}[ vm.waStatus ]">
+                    <li ng-class="{normalZscore: 'normalZscore', dangerZscore: 'dangerZscore',
+                    marginalZscore: 'marginalZscore', redZoneZscore: 'redZoneZscore'}[ survey.zScore.waStatus ]">
                         weight/age:  <span  ng-bind="survey.zScore.wa | number:2"></span>
                     </li>
-                    <li ng-class="{normalZscore: 'normalZscore', dangerZscore: 'dangerZscore', marginalZscore: 'marginalZscore'}[ vm.wlStatus ]">
+                    <li ng-class="{normalZscore: 'normalZscore', dangerZscore: 'dangerZscore',
+                    marginalZscore: 'marginalZscore', redZoneZscore: 'redZoneZscore'}[ survey.zScore.wlStatus ]">
                         weight/height:  <span  ng-bind="survey.zScore.wl | number:2"></span>
                     </li>
                     <!--<span ng-bind="survey.zScore.zscoreString"></span>-->

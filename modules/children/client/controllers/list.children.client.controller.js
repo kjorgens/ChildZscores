@@ -25,9 +25,9 @@
       vm.selectedStake = 'test';
       $rootScope.selectedStake = vm.selectedStake;
     }
-    vm.doctored = [{}];
+    vm.doctored = [];
     vm.stakeList.forEach(function(dbName) {
-      if (!dbName.startsWith("_")) {
+      if (!dbName.startsWith("_") ) {
         // var parts = dbName.split('_');
         // var accum = '';
         // var i = 0;
