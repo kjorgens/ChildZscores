@@ -8,12 +8,12 @@
   menuConfig.$inject = ['menuService', 'PouchService'];
 
   function menuConfig(menuService, PouchService) {
-    PouchService.createDatabase('Ecuador');
+    // PouchService.createDatabase('test');
     //
-    PouchService.createIndex('firstName');
-    PouchService.createIndex('lastName');
-    PouchService.createIndex('owner');
-    PouchService.createIndex('surveyDate');
+    // PouchService.createIndex('firstName');
+    // PouchService.createIndex('lastName');
+    // PouchService.createIndex('owner');
+    // PouchService.createIndex('surveyDate');
     
     menuService.addMenuItem('topbar', {
       title: 'Children',
@@ -21,6 +21,13 @@
 //      type: 'dropdown',
       roles: ['*']
     });
+
+//     menuService.addMenuItem('topbar', {
+//       title: 'Country',
+//       state: 'children.Country',
+// //      type: 'dropdown',
+//       roles: ['*']
+//     });
 
     // Add the dropdown list item
     // menuService.addSubMenuItem('topbar', 'children', {

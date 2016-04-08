@@ -23,6 +23,15 @@
             childResolve: listChildren
           }
         })
+        // .state('children.country', {
+        //   url: '/children/countries',
+        //   templateUrl: 'modules/children/client/views/country.client.view.html',
+        //   controller: 'ChildrenCountryController',
+        //   controllerAs: 'vm',
+        //   data: {
+        //     roles: ['user', 'admin']
+        //   }
+        // })
         .state('children.newsurvey', {
           url: '/:childId/survey',
           templateUrl: 'modules/children/client/views/add-survey.client.view.html',
@@ -85,14 +94,12 @@
         });
   }
 
-  listChildren.$inject = ['PouchService'];
-
-  function listChildren(PouchService) {
+  listChildren.$inject = ['$stateParams', 'PouchService'];
+  function listChildren($stateParams, PouchService) {
     return PouchService.queryChildPromise();
   }
 
   getChild.$inject = ['$stateParams', 'PouchService'];
-
   function getChild($stateParams, PouchService) {
     if ($stateParams.childId === '') {
       return PouchService;
@@ -104,7 +111,6 @@
   }
 
   getSurvey.$inject = ['$stateParams', 'PouchService'];
-
   function getSurvey($stateParams, PouchService) {
     if ($stateParams.surveyId === undefined) {
       return PouchService;
@@ -116,13 +122,11 @@
   }
 
   newChild.$inject = ['PouchService'];
-
   function newChild(PouchService) {
     return PouchService;
   }
 
   listDataBases.$inject = ['PouchService'];
-
   function listDataBases(PouchService) {
     return PouchService;
   }

@@ -48,6 +48,9 @@ exports.invokeRolesPolicies = function () {
       resources: '/',
       permissions: ['get']
     }, {
+      resources: '/stakes',
+      permissions: ['get']
+    }, {
       resources: '/:childId',
       permissions: ['get']
     }]

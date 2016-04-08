@@ -15,6 +15,15 @@
       database = new pouchDB (dbName);
     };
 
+    factory.getAllDbsLocal = function(callback) {
+      PouchDB.allDbs(function(err, dbs) {
+        if (err) {
+          var error = err;
+        }
+        callback(dbs);
+      });
+    };
+
     factory.createIndex = function (indexName) {
       database.createIndex({
         index: {
@@ -72,7 +81,8 @@
     };
 
     factory.destroyDatabase = function (dbName) {
-      database.destroy(dbName);
+      database = new pouchDB (dbName);
+      database.destroy();
     };
 
     factory.getAll = function (callback, errCallback) {

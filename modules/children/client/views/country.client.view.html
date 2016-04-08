@@ -1,0 +1,16 @@
+<section>
+    <!--<div class="page-header">-->
+        <!--<img src="modules/children/client/img/octocat.png">-->
+        <!--<h1>Vivint Solar Repositories</h1>-->
+    <!--</div>-->
+    <div class="list-group">
+        <a ng-repeat="stake in vm.remoteDbInfo" ui-sref="promotions.buildBranchList({repo:repo, branch:'master'})" class="list-group-item">
+            <small class="list-group-item-text">
+                <h2>
+                    <span ng-bind="stake.stake"></span>
+                    <span ng-bind="stake.country"></span>
+                </h2>
+            </small>
+        </a>
+    </div>
+</section>

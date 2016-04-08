@@ -13,6 +13,7 @@
     if ($state.params.childId) {
       editChild = true;
       vm.child = child;
+      // vm.child.stake = $rootScope.selectedStake;
       vm.ageIsValid = true;
       vm.firstNameIsValid = true;
       vm.lastNameIsValid = true;
@@ -26,12 +27,12 @@
       PouchService.getSurveys(vm.child._id, setSurveyList, surveyErrors);
     } else {
       vm.ageIsValid = false;
-
+      vm.stake = $rootScope.selectedStake;
       vm.firstNameIsValid = false;
       vm.lastNameIsValid = false;
       vm.genderIsValid = false;
       vm.birthdateIsValid = false;
-      vm.stakeIsValid = false;
+ //     vm.stakeIsValid = false;
       vm.surveyDate = new Date();
     }
 
@@ -65,29 +66,61 @@
     vm.checkFirstNameIsValid = checkFirstNameIsValid;
     vm.checkLastNameIsValid = checkLastNameIsValid;
     vm.checkGenderIsValid = checkGenderIsValid;
-
- //   vm.checkMotherIsValid = checkMotherIsValid;
- //   vm.checkFatherIsValid = checkLastNameIsValid;
- //   vm.checkStreetAddressIsValid = checkStreetAddressIsValid;
- //   vm.checkCityIsValid = checkCityIsValid;
     vm.checkStakeIsValid = checkStakeIsValid;
- //   vm.checkWardIsValid = checkWardIsValid;
     vm.checkAgeIsValid = checkAgeIsValid;
     vm.checkEnteredAgeIsValid = checkEnteredAgeIsValid;
     vm.checkAllFieldsValid = checkAllFieldsValid;
-//    vm.childInfoString = childInfoString;
-//    vm.syncUpstream = syncUpstream;
 
-    // Put event listeners into place
+    function gradeZScores(survey) {
+      if (survey.zScore.ha < -3) {
+        vm.haStatus = 'dangerZscore';
+        vm.child.screeningStatus = 'dangerZscore';
+      } else {
+        if (survey.zScore.ha < -2) {
+          if (vm.child.screeningStatus !== 'dangerZscore') {
+            vm.child.screeningStatus = 'marginalZscore';
+          }
+          vm.haStatus = 'marginalZscore';
+        } else {
+          vm.haStatus = 'normalZscore';
+        }
+      }
+      if (survey.zScore.wa < -3) {
+        vm.waStatus = 'dangerZscore';
+        vm.child.screeningStatus = 'dangerZscore';
+      } else {
+        if (survey.zScore.wa < -2) {
+          if (vm.child.screeningStatus !== 'dangerZscore') {
+            vm.child.screeningStatus = 'marginalZscore';
+          }
+          vm.waStatus = 'marginalZscore';
+        } else {
+          vm.waStatus = 'normalZscore';
+        }
+      }
+      if (survey.zScore.wl < -3) {
+        vm.wlStatus = 'dangerZscore';
+        vm.child.screeningStatus = 'dangerZscore';
+      } else {
+        if (survey.zScore.wl < -2) {
+          if (vm.child.screeningStatus !== 'dangerZscore') {
+            vm.child.screeningStatus = 'marginalZscore';
+          }
+          vm.wlStatus = 'marginalZscore';
+        } else {
+          vm.wlStatus = 'normalZscore';
+        }
+      }
+    }
 
     function setSurveyList(surveys) {
       $scope.$apply(function() {
-        vm.surveys = surveys;
-        // vm.surveys.forEach(function(survey){
-        //  if(Math.abs(survey.zscore.ha) > 2 || Math.abs(survey.zscore.wa) > 2 || Math.abs(survey.zscore.wl) > 2){
-        //    vm.screeningColor = 'orange';
-        //  }
-        // });
+        vm.surveys = surveys.docs;
+ //       vm.surveys.forEach(function(survey) {
+        if (vm.surveys.length > 0) {
+          gradeZScores(vm.surveys[0]);
+        }
+ //       });
       });
     }
 
@@ -99,12 +132,7 @@
       checkFirstNameIsValid();
       checkLastNameIsValid();
       checkGenderIsValid();
- //     checkMotherIsValid ();
- //     checkFatherIsValid ();
-//      checkStreetAddressIsValid ();
-//      checkCityIsValid ();
       checkStakeIsValid();
-//      checkWardIsValid ();
       checkAgeIsValid();
 
       if (vm.firstNameIsValid === true && vm.lastNameIsValid === true &&
@@ -120,9 +148,7 @@
     }
 
     function setMonthCount() {
-
       var months;
-
       var rightNow = new Date();
       vm.monthAge = moment(rightNow).diff(moment(vm.birthDate), 'months');
       if (vm.monthAge > 60) {
@@ -301,6 +327,7 @@
           city: vm.child.city,
           stake: vm.child.stake,
           ward: vm.child.ward,
+          screeningStatus: vm.screeningStatus,
           interviewer: vm.authentication.user.displayName
         };
 
@@ -342,7 +369,7 @@
     // Remove existing Child
     function remove(child) {
       if (child) {
-        vm.surveys.docs.forEach(function(toRemove) {
+        vm.surveys.forEach(function(toRemove) {
           PouchService.remove(toRemove, removeResponse, removeError);
         });
         PouchService.remove(child, removeResponse, removeError);
