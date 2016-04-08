@@ -12,6 +12,10 @@ var passport = require('passport'),
 module.exports = function (app) {
   var router = express.Router();
 
+  // children collection routes
+  router.route('/stakes')
+      .get(childrenPolicy.isAllowed, children.listDbs);
+
 
   // children collection routes
   router.route('/')

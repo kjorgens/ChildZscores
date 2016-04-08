@@ -1,22 +1,40 @@
 <section>
   <div class="page-header">
-      <div class='btn-toolbar pull-right'>
-        <div class="btn-group" >
-          <a class="btn btn-primary" ui-sref="children.create">New Child
-            <i class="glyphicon glyphicon-plus"></i>
-          </a>
-          <a class="btn btn-primary" ng-click="vm.syncUpstream()" ng-if="vm.online">Sync DB
-            <i class="glyphicon glyphicon-refresh"></i>
-          </a>
-        </div>
+  <div class='btn-toolbar pull-right'>
+    <div class="btn-group" style="margin-top: 2em">
+      <a class="btn btn-primary" ui-sref="children.create">
+        <i class="glyphicon glyphicon-plus"></i>
+      </a>
+      <a class="btn btn-primary" ng-click="vm.syncUpstream()" ng-if="vm.online">
+        <i class="glyphicon glyphicon-refresh"></i>
+      </a>
     </div>
-    <h1 style="margin-top: 2em">Children in {{selectedCountry}}</h1>
+  </div>
+
+    <div class="row">
+      <!--<div class="col-md-4">-->
+        <!--<h1  style="margin-top: 2em">{{vm.selectedStake}}</h1>-->
+      <!--</div>-->
+ <!--    <form class="col-md-4" style="margin-top: 2em" ng-submit="vm.changeStake()">-->
+        <!--<input class="form-control col-md-4 " type="text" ng-model="vm.selectedStake" placeholder="Change Stake"  />-->
+        <h3>
+        <label for="selectedStake"> Select Stake </label><br>
+        <select class="col-md-4  input-lg" name="selectedStake" id="selectedStake" ng-model="vm.selectedStake" ng-change="vm.changeStake()">
+          <option ng-repeat="stake in vm.doctored" value="{{stake}}">{{stake}}</option>
+
+        </select><br>
+        </h3>
+      <!--</form>-->
+    </div>
+  </div>
+
   </div>
   <div class="list-group">
     <a ng-repeat="child in vm.childList.docs" ui-sref="children.view({childId: child._id})" class="list-group-item">
       <small class="list-group-item-text">
         <h2><span ng-bind="child.firstName"></span>
           <span ng-bind="child.lastName"></span></h2>
+
         <span ng-bind="child.gender"></span>, born
         <span ng-bind="child.birthDate | date:'mediumDate'"></span>,
         First Screening:

@@ -42,6 +42,9 @@ a:hover .header-profile-image {
 .has-error .help-inline.error-text {
   display: inline;
 }
+.selectStake {
+  font-size: 25px;
+}
 
 .CreateChildFormContainer {
   color: black;
@@ -68,3 +71,19 @@ a:hover .header-profile-image {
 
 .required input:after { content:"*"; }
 
+.normalZscore {
+  color: green;
+}
+
+.marginalZscore {
+  color: orange;
+}
+
+.dangerZscore {
+  background-color: black;
+  color: white;
+}
+
+.lower {
+  text-transform: lowercase;
+}

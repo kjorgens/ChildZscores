@@ -16,17 +16,54 @@
     vm.findOne = findOne;
     vm.find = find;
     vm.appIsOffline = !$rootScope.appOnline;
-
+    if (vm.appIsOffline) {
+      vm.stakeList = $rootScope.localDbs;
+    } else if ($rootScope.remoteDbs) {
+      vm.stakeList = $rootScope.remoteDbs;
+    } else {
+      // vm.stakeList = 'test';
+      vm.selectedStake = 'test';
+      $rootScope.selectedStake = vm.selectedStake;
+    }
+    vm.doctored = [{}];
+    vm.stakeList.forEach(function(dbName) {
+      if (!dbName.startsWith("_")) {
+        // var parts = dbName.split('_');
+        // var accum = '';
+        // var i = 0;
+        // for (i; i < parts.length - 1; i++) {
+        //   accum = accum + ' ' + parts[i].charAt(0).toUpperCase() + parts[i].slice(1);
+        // }
+        // vm.doctored.push({ stake: accum, country: parts[i] });
+        vm.doctored.push(dbName);
+      }
+    });
     vm.syncUpstream = syncUpstream;
     vm.online = $rootScope.appOnline;
     vm.find();
     var savedName;
     var blinkVar;
+//    vm.stakeSelect;
+    vm.selectedStake = $rootScope.selectedStake;
+    vm.changeStake = changeStake;
+
+    function changeStake() {
+      $rootScope.selectedStake = vm.selectedStake;
+      vm.selectedStake = vm.selectedStake;
+      PouchService.createDatabase(vm.selectedStake);
+      PouchService.createIndex('firstName');
+      PouchService.createIndex('lastName');
+      PouchService.createIndex('owner');
+      PouchService.createIndex('surveyDate');
+      vm.childList = [];
+      vm.find();
+      
+      $state.go('children.list');
+    }
 
     vm.startSpin = function() {
       if (!vm.spinneractive) {
         usSpinnerService.spin('spinner-sync');
-
       }
     };
 
@@ -83,7 +120,7 @@
     var whenDone = function() {
       find();
       vm.stopSpin();
-      $rootScope.selectedCountry = savedName;
+//      $rootScope.selectedStake = savedName;
       console.log('couchdb sync complete');
     };
     var replicateIn = function (input) {
@@ -95,10 +132,11 @@
     };
 
     function syncUpstream() {
-      savedName = $rootScope.selectedCountry;
-      $rootScope.selectedCountry = 'Data Sync in Progress';
+ //     savedName = $rootScope.selectedStake;
+ //     $rootScope.selectedStake = 'Data Sync in Progress';
       vm.startSpin();
-      PouchService.sync('https://syncuser:mZ7K3AldcIzO@database.liahonakids.org:5984/ecuador', replicateIn, replicateError, whenDone);
+      PouchService.sync('https://syncuser:mZ7K3AldcIzO@database.liahonakids.org:5984/' +
+          savedName, replicateIn, replicateError, whenDone);
     }
   }
 }());

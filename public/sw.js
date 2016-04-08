@@ -55,6 +55,7 @@ self.addEventListener('install', function (event) {
       '/public/lib/owasp-password-strength-test/owasp-password-strength-test.js',
       '/public/lib/pouchdb/dist/pouchdb.min.js',
       '/public/lib/pouchdb-find/dist/pouchdb.find.min.js',
+      '/public/lib/pouchdb-all-dbs/dist/pouchdb.all-dbs.min.js',
       '/public/lib/angular-pouchdb/angular-pouchdb.min.js',
       '/public/lib/angular-uuid/uuid.min.js',
       '/public/lib/angular-spinner/angular-spinner.min.js',
@@ -94,7 +95,7 @@ var whitelist = [
 
 ];
 
-self.onmessage = function(msg){
+self.onmessage = function(msg) {
   console.log('MESSAGE RECEIVED IN SERVICE WORKER ', msg);
 };
 

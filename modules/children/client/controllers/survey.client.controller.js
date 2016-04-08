@@ -2,8 +2,8 @@
   'use strict';
 
   angular
-      .module('children')
-      .controller('SurveyController', SurveyController);
+    .module('children')
+    .controller('SurveyController', SurveyController);
 
   SurveyController.$inject = ['$scope', '$state', '$timeout', 'moment', 'surveyResolve', 'Authentication', 'ZScores', 'PouchService'];
 
