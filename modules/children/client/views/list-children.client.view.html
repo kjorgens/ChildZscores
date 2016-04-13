@@ -1,29 +1,36 @@
 <section>
-  <div class="page-header">
+  <div class="page-header" style="margin-top: 4em">
+    <div class="row">
+      <div class="col-md-4" class="pull-left">
+        <img src={{vm.selectedCountryImage}}>
+        <h2> {{vm.selectedStake}}</h2>
+      </div>
+
   <div class='btn-toolbar pull-right'>
     <div class="btn-group" style="margin-top: 2em">
       <a class="btn btn-primary" ui-sref="children.create">
+        Add Child
         <i class="glyphicon glyphicon-plus"></i>
       </a>
       <a class="btn btn-primary" ng-click="vm.syncUpstream()" ng-if="vm.online">
         <i class="glyphicon glyphicon-refresh"></i>
       </a>
+
+    </div>
     </div>
   </div>
 
     <div class="row">
-      <!--<div class="col-md-4">-->
-        <!--<h1  style="margin-top: 2em">{{vm.selectedStake}}</h1>-->
-      <!--</div>-->
- <!--    <form class="col-md-4" style="margin-top: 2em" ng-submit="vm.changeStake()">-->
-        <!--<input class="form-control col-md-4 " type="text" ng-model="vm.selectedStake" placeholder="Change Stake"  />-->
-        <h3>
-        <label for="selectedStake"> Select Stake </label><br>
-        <select class="col-md-4  input-lg" name="selectedStake" id="selectedStake" ng-model="vm.selectedStake" ng-change="vm.changeStake()">
-          <option ng-repeat="stake in vm.doctored" value="{{stake}}">{{stake}}</option>
+
+      <div ng-if="vm.selectedCountryObject">
+      <h3>
+        <label for="selectedStake">Stake </label><br>
+        <select class="col-md-4  input-lg" name="selectedStake" id="selectedStake" ng-model="vm.selectedCountryObject" ng-change="vm.changeStake()">
+          <option ng-repeat="stake in vm.selectedCountryObject" value="{{stake.stakeName}}">{{stake.stakeName}}</option>
 
         </select><br>
-        </h3>
+      </h3>
+        </div>
       <!--</form>-->
     </div>
   </div>
@@ -46,6 +53,6 @@
   </div>
   <span us-spinner="{radius:30, width:8, length: 16}" spinner-key="spinner-sync" spinner-theme="bigBlue"></span>
   <div class="alert alert-warning text-center" ng-if="!vm.childList.docs.length">
-    No children yet, why don't you <a ui-sref="children.create">create one</a>?
+    No children? Sync or <a ui-sref="children.create">create new</a>?
   </div>
 </section>

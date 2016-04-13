@@ -3,7 +3,7 @@
 // Init the application configuration module for AngularJS application
 var ApplicationConfiguration = (function () {
   // Init module configuration options
-  var applicationModuleName = 'mean';
+  var applicationModuleName = 'liahona';
   var applicationModuleVendorDependencies = ['ngResource', 'ngAnimate', 'ngMessages', 'ui.router', 'ui.bootstrap', 'angularFileUpload'];
 
   // Add a new vertical module

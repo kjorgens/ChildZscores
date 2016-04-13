@@ -11,8 +11,16 @@
   function PouchService(pouchDB, uuid4) {
     var factory = {};
     var database;
+    var countryDataBase;
+    var remoteDbList;
+    var localDbList;
+
     factory.createDatabase = function (dbName) {
       database = new pouchDB (dbName);
+    };
+
+    factory.createCountryDatabase = function () {
+      countryDataBase = new pouchDB ('country_list');
     };
 
     factory.getAllDbsLocal = function(callback) {
@@ -23,6 +31,61 @@
         callback(dbs);
       });
     };
+
+    factory.saveStakesLocal = function (countryObj, callback, errCallback) {
+      countryDataBase.put(countryObj)
+          .then(function (response) {
+            // Do something with the response
+            callback(response);
+          })
+          .catch(function (error) {
+            // Do something with the error
+            errCallback(error);
+          })
+          .finally(function () {
+            // Do something when everything is done
+          });
+    };
+    // factory.createIndexCountriesLocal = function() {
+    //   countryDataBase.createIndex({
+    //     index: {
+    //       fields: ['countries']
+    //     }
+    //   }).then(function (result) {
+    //     var theResult = result;
+    //   }).catch(function (err) {
+    //     var error = err;
+    //   });
+    // };
+    //
+    factory.getCountriesLocal = function (callback, errCallback) {
+      return countryDataBase.get('liahona_kids_countries_stakes')
+      // countryDataBase.allDocs({ include_docs: true, attachments: true })
+      .then(function (response) {
+      // Do something with the response
+        callback(response);
+      })
+      .catch(function(error) {
+      // Do something with the error
+        errCallback(error);
+      });
+    };
+
+    // factory.getDbListRemote = function (callback, errorCallback, nextState) {
+    //   countryDataBase.sync('https://syncuser:mZ7K3AldcIzO@database.liahonakids.org:5984/country_list').$promise
+    //       .then(function (response) {
+    //         // Do something with the response
+    //         callback(response);
+    //       })
+    //       .catch(function (error) {
+    //         // Do something with the error
+    //         errorCallback(error);
+    //       })
+    //       .finally(function () {
+    //         nextState();
+    //         // Do something when everything is done
+    //       });
+    // };
 
     factory.createIndex = function (indexName) {
       database.createIndex({

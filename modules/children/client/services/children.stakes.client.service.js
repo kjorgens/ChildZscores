@@ -5,9 +5,9 @@
       .module('children.stakes')
       .factory('ChildrenStakes', ChildrenStakes);
 
-  ChildrenStakes.$inject = ['$resource'];
+  ChildrenStakes.$inject = ['$resource', '$rootScope'];
 
-  function ChildrenStakes($resource) {
+  function ChildrenStakes($resource, $rootScope) {
     return $resource('api/children/stakes');
   }
 }());

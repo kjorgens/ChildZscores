@@ -8,58 +8,25 @@
       .module('children')
       .controller('ChildrenListController', ChildrenListController);
 
-  ChildrenListController.$inject = ['$rootScope', '$scope', '$state', 'usSpinnerService', 'ModalService', 'ChildrenService', 'PouchService'];
+  ChildrenListController.$inject = ['$rootScope', '$scope', '$state', '$stateParams', 'childResolve', 'usSpinnerService', 'PouchService'];
 
-  function ChildrenListController($rootScope, $scope, $state, usSpinnerService, ModalService, ChildrenService, PouchService) {
+  function ChildrenListController($rootScope, $scope, $state, $stateParams, childResolve, usSpinnerService, PouchService) {
     var vm = this;
-    vm.childInfoString = childInfoString;
-    vm.findOne = findOne;
-    vm.find = find;
-    vm.appIsOffline = !$rootScope.appOnline;
-    if (vm.appIsOffline) {
-      vm.stakeList = $rootScope.localDbs;
-    } else if ($rootScope.remoteDbs) {
-      vm.stakeList = $rootScope.remoteDbs;
-    } else {
-      // vm.stakeList = 'test';
-      vm.selectedStake = 'test';
-      $rootScope.selectedStake = vm.selectedStake;
-    }
-    vm.doctored = [];
-    vm.stakeList.forEach(function(dbName) {
-      if (!dbName.startsWith("_") ) {
-        // var parts = dbName.split('_');
-        // var accum = '';
-        // var i = 0;
-        // for (i; i < parts.length - 1; i++) {
-        //   accum = accum + ' ' + parts[i].charAt(0).toUpperCase() + parts[i].slice(1);
-        // }
-        // vm.doctored.push({ stake: accum, country: parts[i] });
-        vm.doctored.push(dbName);
-      }
-    });
+    vm.childList = childResolve;
+
+    vm.liahonaStakes = $rootScope.liahonaStakes;
+    $rootScope.selectedStake = $stateParams.stakeName;
+    $rootScope.selectedDBName = $stateParams.stakeDB;
+    
+    vm.selectedStake = $rootScope.selectedStake;
+    vm.selectedCountryObject = $rootScope.selectedCountryObject;
     vm.syncUpstream = syncUpstream;
     vm.online = $rootScope.appOnline;
-    vm.find();
-//    var savedName;
-    var blinkVar;
-//    vm.stakeSelect;
-    vm.selectedStake = $rootScope.selectedStake;
-    vm.changeStake = changeStake;
+//    vm.find();
 
-    function changeStake() {
-      $rootScope.selectedStake = vm.selectedStake;
-      vm.selectedStake = vm.selectedStake;
-      PouchService.createDatabase(vm.selectedStake);
-      PouchService.createIndex('firstName');
-      PouchService.createIndex('lastName');
-      PouchService.createIndex('owner');
-      PouchService.createIndex('surveyDate');
-      vm.childList = [];
-      vm.find();
-      
-      $state.go('children.list');
-    }
+//    vm.selectedStake = $rootScope.selectedStake;
+    vm.selectedCountry = $rootScope.selectedCountry;
+    vm.selectedCountryImage = $rootScope.selectedCountryImage;
 
     vm.startSpin = function() {
       if (!vm.spinneractive) {
@@ -99,10 +66,10 @@
       vm.getError = error;
     };
     // Find existing Child
-    function findOne() {
-      //     var something = $stateParams;
-      PouchService.get({ childId: vm.childId }, getUser, getError);
-    }
+    // function findOne() {
+    //   //     var something = $stateParams;
+    //   PouchService.get({ childId: vm.childId }, getUser, getError);
+    // }
 
     function setChildren(res) {
       $scope.$apply(function() {
@@ -120,7 +87,6 @@
     var whenDone = function() {
       find();
       vm.stopSpin();
-//      $rootScope.selectedStake = savedName;
       console.log('couchdb sync complete');
     };
     var replicateIn = function (input) {
@@ -132,11 +98,9 @@
     };
 
     function syncUpstream() {
- //     savedName = $rootScope.selectedStake;
- //     $rootScope.selectedStake = 'Data Sync in Progress';
       vm.startSpin();
       PouchService.sync('https://syncuser:mZ7K3AldcIzO@database.liahonakids.org:5984/' +
-          vm.selectedStake, replicateIn, replicateError, whenDone);
+          $rootScope.selectedDBName, replicateIn, replicateError, whenDone);
     }
   }
 }());

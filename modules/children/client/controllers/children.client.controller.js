@@ -10,6 +10,14 @@
   function ChildrenController($rootScope, $scope, $state, $timeout, moment, child, ModalService, Authentication, ZScores, PouchService) {
     var vm = this;
     var editChild = false;
+   // vm.liahonaStakes = $rootScope.liahonaStakes;
+    vm.selectedStake = $rootScope.selectedStake;
+    vm.selectedDB = $rootScope.selectedDBName;
+    vm.selectedCountryObject = $rootScope.selectedCountryObject;
+    vm.selectedCountry = $rootScope.selectedCountry;
+    vm.selectedCountryImage = $rootScope.selectedCountryImage;
+    vm.online = $rootScope.appOnline;
+//    vm.find();
     if ($state.params.childId) {
       editChild = true;
       vm.child = child;
@@ -369,7 +377,7 @@
           PouchService.remove(toRemove, removeResponse, removeError);
         });
         PouchService.remove(child, removeResponse, removeError);
-        $state.go('children.list');
+        $state.go('children.list', { stakeDB: vm.selectedDB, stakeName: vm.selectedStake });
       }
     }
 

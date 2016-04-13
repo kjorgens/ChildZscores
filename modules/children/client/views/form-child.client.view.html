@@ -2,7 +2,7 @@
     <div class="page-header">
         <div class='btn-toolbar pull-right'>
             <div class="btn-group">
-                <a class="btn btn-primary" ui-sref="children.list()">Cancel</a>
+                <a class="btn btn-primary" ui-sref="children.list({stakeDB: vm.selectedDB, stakeName: vm.selectedStake})">Cancel</a>
             </div>
         </div>
         <h1 style="margin-top: 2em">{{vm.child._id ? 'Edit Existing Child' : 'Add New Child'}}</h1>
