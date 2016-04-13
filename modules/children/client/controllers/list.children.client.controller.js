@@ -17,7 +17,6 @@
     vm.liahonaStakes = $rootScope.liahonaStakes;
     $rootScope.selectedStake = $stateParams.stakeName;
     $rootScope.selectedDBName = $stateParams.stakeDB;
-    
     vm.selectedStake = $rootScope.selectedStake;
     vm.selectedCountryObject = $rootScope.selectedCountryObject;
     vm.syncUpstream = syncUpstream;
@@ -55,16 +54,16 @@
           child.doc.zScore.wl.toFixed(2);
     }
 
-    var getUser = function (childDoc) {
-      vm.child = childDoc;
-      $state.go('children.view', {
-        childId: childDoc._id
-      });
-    };
-
-    var getError = function (error) {
-      vm.getError = error;
-    };
+    // var getUser = function (childDoc) {
+    //   vm.child = childDoc;
+    //   $state.go('children.view', {
+    //     childId: childDoc._id
+    //   });
+    // };
+    //
+    // var getError = function (error) {
+    //   vm.getError = error;
+    // };
     // Find existing Child
     // function findOne() {
     //   //     var something = $stateParams;

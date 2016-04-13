@@ -15,7 +15,7 @@
           template: '<ui-view/>'
         })
         .state('children.list', {
-          url: '/children/:stakeDB/:stakeName',
+          url: '/list/:stakeDB/:stakeName',
           templateUrl: 'modules/children/client/views/list-children.client.view.html',
           controller: 'ChildrenListController',
           controllerAs: 'vm',
@@ -40,7 +40,7 @@
           }
         })
         .state('children.stake', {
-          url: '/countries/:country',
+          url: '/stakes/:country',
           templateUrl: 'modules/children/client/views/stakes.client.view.html',
           controller: 'ChildrenStakeController',
           controllerAs: 'vm',
@@ -49,7 +49,7 @@
           }
         })
         .state('children.newsurvey', {
-          url: '/:childId/survey',
+          url: '/survey/:childId',
           templateUrl: 'modules/children/client/views/add-survey.client.view.html',
           controller: 'SurveyController',
           controllerAs: 'vm',
@@ -73,7 +73,7 @@
           }
         })
         .state('children.edit', {
-          url: '/:childId/edit',
+          url: '/edit/:childId',
           templateUrl: 'modules/children/client/views/form-child.client.view.html',
           controller: 'ChildrenController',
           controllerAs: 'vm',
@@ -85,7 +85,7 @@
           }
         })
         .state('children.editsurvey', {
-          url: '/:childId/survey/:surveyId',
+          url: '/survey/:childId/:surveyId',
           templateUrl: 'modules/children/client/views/add-survey.client.view.html',
           controller: 'SurveyController',
           controllerAs: 'vm',
@@ -97,7 +97,7 @@
           }
         })
         .state('children.view', {
-          url: '/:childId',
+          url: '/view/:childId',
           templateUrl: 'modules/children/client/views/view-child.client.view.html',
           controller: 'ChildrenController',
           controllerAs: 'vm',
