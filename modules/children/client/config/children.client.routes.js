@@ -15,23 +15,39 @@
           template: '<ui-view/>'
         })
         .state('children.list', {
-          url: '/children',
+          url: '/children/:stakeDB/:stakeName',
           templateUrl: 'modules/children/client/views/list-children.client.view.html',
           controller: 'ChildrenListController',
           controllerAs: 'vm',
           resolve: {
             childResolve: listChildren
+          },
+          data: {
+            roles: ['user', 'admin']
           }
         })
-        // .state('children.country', {
-        //   url: '/children/countries',
-        //   templateUrl: 'modules/children/client/views/country.client.view.html',
-        //   controller: 'ChildrenCountryController',
-        //   controllerAs: 'vm',
-        //   data: {
-        //     roles: ['user', 'admin']
-        //   }
-        // })
+        .state('children.countries', {
+          url: '/countries',
+          templateUrl: 'modules/children/client/views/country.client.view.html',
+          controller: 'ChildrenCountryController',
+          controllerAs: 'vm',
+          resolve: {
+            countryResolve: listCountries
+            // childResolve: listChildren
+          },
+          data: {
+            roles: ['user', 'admin']
+          }
+        })
+        .state('children.stake', {
+          url: '/countries/:country',
+          templateUrl: 'modules/children/client/views/stakes.client.view.html',
+          controller: 'ChildrenStakeController',
+          controllerAs: 'vm',
+          data: {
+            roles: ['user', 'admin']
+          }
+        })
         .state('children.newsurvey', {
           url: '/:childId/survey',
           templateUrl: 'modules/children/client/views/add-survey.client.view.html',
@@ -96,7 +112,17 @@
 
   listChildren.$inject = ['$stateParams', 'PouchService'];
   function listChildren($stateParams, PouchService) {
+    PouchService.createDatabase($stateParams.stakeDB);
+    PouchService.createIndex('firstName');
+    PouchService.createIndex('lastName');
+    PouchService.createIndex('owner');
+    PouchService.createIndex('surveyDate');
     return PouchService.queryChildPromise();
+  }
+
+  listCountries.$inject = ['$stateParams', 'ChildrenStakes'];
+  function listCountries($stateParams, ChildrenStakes) {
+    return ChildrenStakes;
   }
 
   getChild.$inject = ['$stateParams', 'PouchService'];

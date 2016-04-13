@@ -8,26 +8,35 @@
   menuConfig.$inject = ['menuService', 'PouchService'];
 
   function menuConfig(menuService, PouchService) {
-    // PouchService.createDatabase('test');
-    //
-    // PouchService.createIndex('firstName');
-    // PouchService.createIndex('lastName');
-    // PouchService.createIndex('owner');
-    // PouchService.createIndex('surveyDate');
-    
     menuService.addMenuItem('topbar', {
-      title: 'Children',
-      state: 'children.list',
-//      type: 'dropdown',
+      title: 'Countries',
+      state: 'children.countries',
+ //     type: 'dropdown',
       roles: ['*']
     });
+    menuService.addMenuItem('topbar', {
+      title: 'Children',
+      state: 'children',
+      type: 'dropdown',
+      roles: ['*']
+    });
+    // menuService.addSubMenuItem('topbar', 'children', {
+    //   title: 'List Children',
+    //   state: 'children.list({stakeDB: vm.selectedDB, stakeName: vm.selectedStake})',
+    //   roles: ['*']
+    // });
+    menuService.addSubMenuItem('topbar', 'children', {
+      title: 'Add Child',
+      state: 'children.create',
+      roles: ['*']
+    });
+    // menuService.addSubMenuItem('topbar', 'children', {
+    //   title: 'Select Country',
+    //   state: 'children.countries',
+    //   roles: ['*']
+    // });
+ 
 
-//     menuService.addMenuItem('topbar', {
-//       title: 'Country',
-//       state: 'children.Country',
-// //      type: 'dropdown',
-//       roles: ['*']
-//     });
 
     // Add the dropdown list item
     // menuService.addSubMenuItem('topbar', 'children', {

@@ -10,6 +10,14 @@
   function ChildrenController($rootScope, $scope, $state, $timeout, moment, child, ModalService, Authentication, ZScores, PouchService) {
     var vm = this;
     var editChild = false;
+   // vm.liahonaStakes = $rootScope.liahonaStakes;
+    vm.selectedStake = $rootScope.selectedStake;
+    vm.selectedDB = $rootScope.selectedDBName;
+    vm.selectedCountryObject = $rootScope.selectedCountryObject;
+    vm.selectedCountry = $rootScope.selectedCountry;
+    vm.selectedCountryImage = $rootScope.selectedCountryImage;
+    vm.online = $rootScope.appOnline;
+//    vm.find();
     if ($state.params.childId) {
       editChild = true;
       vm.child = child;
@@ -72,43 +80,39 @@
     vm.checkAllFieldsValid = checkAllFieldsValid;
 
     function gradeZScores(survey) {
-      if (survey.zScore.ha < -3) {
-        vm.haStatus = 'dangerZscore';
-        vm.child.screeningStatus = 'dangerZscore';
+      vm.haStatus = 'normalZscore';
+      vm.waStatus = 'normalZscore';
+      vm.wlStatus = 'normalZscore';
+      if (survey.zScore.ha < -2) {
+        vm.haStatus = 'redZoneZscore';
+        vm.child.screeningStatus = 'redZoneZscore';
       } else {
-        if (survey.zScore.ha < -2) {
-          if (vm.child.screeningStatus !== 'dangerZscore') {
-            vm.child.screeningStatus = 'marginalZscore';
-          }
+        if (survey.zScore.ha < -1 && survey.zScore.ha > -2) {
           vm.haStatus = 'marginalZscore';
-        } else {
-          vm.haStatus = 'normalZscore';
+          vm.child.screeningStatus = 'marginalZscore';
         }
       }
-      if (survey.zScore.wa < -3) {
-        vm.waStatus = 'dangerZscore';
-        vm.child.screeningStatus = 'dangerZscore';
+      if (survey.zScore.wa < -2) {
+        vm.waStatus = 'redZoneZscore';
+        vm.child.screeningStatus = 'redZoneZscore';
       } else {
-        if (survey.zScore.wa < -2) {
-          if (vm.child.screeningStatus !== 'dangerZscore') {
-            vm.child.screeningStatus = 'marginalZscore';
-          }
+        if (survey.zScore.wa < -1 && survey.zScore.wa > -2) {
+          vm.child.screeningStatus = 'marginalZscore';
           vm.waStatus = 'marginalZscore';
-        } else {
-          vm.waStatus = 'normalZscore';
         }
       }
       if (survey.zScore.wl < -3) {
         vm.wlStatus = 'dangerZscore';
         vm.child.screeningStatus = 'dangerZscore';
       } else {
-        if (survey.zScore.wl < -2) {
-          if (vm.child.screeningStatus !== 'dangerZscore') {
+        if (survey.zScore.wl < -2 && survey.zScore.wl > -3) {
+          vm.child.screeningStatus = 'redZoneZscore';
+          vm.wlStatus = 'redZoneZscore';
+        } else {
+          if (survey.zScore.wl < -1 && survey.zScore.wl > -2) {
+            vm.wlStatus = 'marginalZscore';
             vm.child.screeningStatus = 'marginalZscore';
           }
-          vm.wlStatus = 'marginalZscore';
-        } else {
-          vm.wlStatus = 'normalZscore';
         }
       }
     }
@@ -117,9 +121,9 @@
       $scope.$apply(function() {
         vm.surveys = surveys.docs;
  //       vm.surveys.forEach(function(survey) {
-        if (vm.surveys.length > 0) {
-          gradeZScores(vm.surveys[0]);
-        }
+ //        if (vm.surveys.length > 0) {
+ //          gradeZScores(vm.surveys[0]);
+ //        }
  //       });
       });
     }
@@ -373,7 +377,7 @@
           PouchService.remove(toRemove, removeResponse, removeError);
         });
         PouchService.remove(child, removeResponse, removeError);
-        $state.go('children.list');
+        $state.go('children.list', { stakeDB: vm.selectedDB, stakeName: vm.selectedStake });
       }
     }
 

@@ -566,7 +566,38 @@
       '  Z scores: h/a: ' + Number(heightForAge).toFixed(2) + '  w/a: ' +
       Number(weightForAge).toFixed(2) + '  w/h: ' +
       Number(weightForLength).toFixed(2);
-      callback({ ha: heightForAge, wa: weightForAge, wl: weightForLength, zscoreString: zscoreString });
+      var haStatus = 'normalZscore';
+      var waStatus = 'normalZscore';
+      var wlStatus = 'normalZscore';
+      if (heightForAge < -2) {
+        haStatus = 'redZoneZscore';
+        } else {
+        if (heightForAge < -1 && heightForAge > -2) {
+          haStatus = 'marginalZscore';
+        }
+      }
+      if (weightForAge < -2) {
+        waStatus = 'redZoneZscore';
+      } else {
+        if (weightForAge < -1 && weightForAge > -2) {
+          waStatus = 'marginalZscore';
+        }
+      }
+      if (weightForLength < -3) {
+        wlStatus = 'dangerZscore';
+      } else {
+        if (weightForLength < -2 && weightForLength > -3) {
+          wlStatus = 'redZoneZscore';
+        } else {
+          if (weightForLength < -1 && weightForLength > -2) {
+            wlStatus = 'marginalZscore';
+          }
+        }
+      }
+      callback({ ha: heightForAge, haStatus: haStatus,
+        wa: weightForAge, waStatus: waStatus,
+        wl: weightForLength, wlStatus: wlStatus,
+        zscoreString: zscoreString });
     };
     return { getMethod: getMethod };
   }

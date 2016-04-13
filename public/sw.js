@@ -29,7 +29,7 @@ self.addEventListener('install', function (event) {
     return Promise.all(
         cacheNames.map(function(cacheName) {
           // If this cache name isn't present in the array of "expected" cache names, then delete it.
-          if(expectedCaches.indexOf(cacheName) == -1) {
+          if (expectedCaches.indexOf(cacheName) === -1) {
             console.log('Deleting out of date cache: ', cacheName);
             return caches.delete(cacheName);
           }
@@ -71,7 +71,8 @@ self.addEventListener('install', function (event) {
       '/modules/core/client/views/403.client.view.html',
       '/modules/core/client/views/404.client.view.html',
       '/modules/core/client/views/header.client.view.html',
-      '/modules/core/client/views/home.client.view.html'
+      '/modules/core/client/views/home.client.view.html',
+      '/modules/children/client/views/stakes.client.view.html'
     ]);
   }));
 
@@ -130,7 +131,7 @@ self.addEventListener('fetch', function (event) {
               var cacheCopy = response.clone();
               caches.open(CACHE_LIST['dynamic-cache'])
                 .then(function (cache) {
-                  if (event.request.method !== 'POST'){
+                  if (event.request.method !== 'POST') {
                     cache.put(event.request, cacheCopy);
                   }
                 });

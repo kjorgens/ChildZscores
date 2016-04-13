@@ -27,12 +27,25 @@
     });
 
     $stateProvider
-      .state('home', {
-        url: '/',
-        templateUrl: 'modules/core/client/views/home.client.view.html',
-        controller: 'HomeController',
-        controllerAs: 'vm'
-      })
+        .state('home', {
+          url: '/',
+          templateUrl: 'modules/children/client/views/country.client.view.html',
+          controller: 'ChildrenCountryController',
+          controllerAs: 'vm',
+          resolve: {
+            countryResolve: listCountries
+            // childResolve: listChildren
+          }
+          // data: {
+          //   roles: ['user', 'admin']
+          // }
+        })
+      // .state('home', {
+      //   url: '/',
+      //   templateUrl: 'modules/core/client/views/home.client.view.html',
+      //   controller: 'HomeController',
+      //   controllerAs: 'vm'
+      // })
       .state('not-found', {
         url: '/not-found',
         templateUrl: 'modules/core/client/views/404.client.view.html',
@@ -57,6 +70,11 @@
           pageTitle: 'Forbidden'
         }
       });
+    listCountries.$inject = ['$stateParams', 'ChildrenStakes'];
+    function listCountries($stateParams, ChildrenStakes) {
+      return ChildrenStakes;
+      
+    }
   }
 }());
 

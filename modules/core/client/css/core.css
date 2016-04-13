@@ -84,6 +84,10 @@ a:hover .header-profile-image {
   color: white;
 }
 
+.redZoneZscore {
+  color: red;
+}
+
 .lower {
   text-transform: lowercase;
 }

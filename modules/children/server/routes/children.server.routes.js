@@ -14,8 +14,10 @@ module.exports = function (app) {
 
   // children collection routes
   router.route('/stakes')
-      .get(childrenPolicy.isAllowed, children.listDbs);
+      .get(childrenPolicy.isAllowed, children.getCountryList);
 
+  router.route('/countries')
+      .get(childrenPolicy.isAllowed, children.getCountryList);
 
   // children collection routes
   router.route('/')
