@@ -11,11 +11,11 @@
     var vm = this;
     var editChild = false;
    // vm.liahonaStakes = $rootScope.liahonaStakes;
-    vm.selectedStake = $rootScope.selectedStake;
-    vm.selectedDB = $rootScope.selectedDBName;
-    vm.selectedCountryObject = $rootScope.selectedCountryObject;
-    vm.selectedCountry = $rootScope.selectedCountry;
-    vm.selectedCountryImage = $rootScope.selectedCountryImage;
+    vm.selectedStake = sessionStorage.getItem('selectedStake');
+    vm.selectedDB = sessionStorage.getItem('selectedDBName');
+//    vm.selectedCountryObject = sessionStorage.getItem('selectedCountryObject');
+    vm.selectedCountry = sessionStorage.getItem('selectedCountry');
+    vm.selectedCountryImage = sessionStorage.getItem('selectedCountryImage');
     vm.online = $rootScope.appOnline;
 //    vm.find();
     if ($state.params.childId) {
@@ -35,7 +35,7 @@
       PouchService.getSurveys(vm.child._id, setSurveyList, surveyErrors);
     } else {
       vm.ageIsValid = false;
-      vm.stake = $rootScope.selectedStake;
+      vm.stake = sessionStorage.getItem('selectedStake');
       vm.firstNameIsValid = false;
       vm.lastNameIsValid = false;
       vm.genderIsValid = false;

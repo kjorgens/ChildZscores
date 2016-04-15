@@ -14,18 +14,18 @@
     var vm = this;
     vm.childList = childResolve;
 
-    vm.liahonaStakes = $rootScope.liahonaStakes;
-    $rootScope.selectedStake = $stateParams.stakeName;
-    $rootScope.selectedDBName = $stateParams.stakeDB;
-    vm.selectedStake = $rootScope.selectedStake;
-    vm.selectedCountryObject = $rootScope.selectedCountryObject;
+ //   vm.liahonaStakes = sessionStorage.getItem('liahonaStakesObject');
+    sessionStorage.setItem('selectedStake', $stateParams.stakeName);
+    sessionStorage.setItem('selectedDBName', $stateParams.stakeDB);
+    vm.selectedStake = sessionStorage.getItem('selectedStake');
+ //   vm.selectedCountryObject = sessionStorage.getItem('selectedCountryObject');
     vm.syncUpstream = syncUpstream;
     vm.online = $rootScope.appOnline;
 //    vm.find();
 
 //    vm.selectedStake = $rootScope.selectedStake;
-    vm.selectedCountry = $rootScope.selectedCountry;
-    vm.selectedCountryImage = $rootScope.selectedCountryImage;
+    vm.selectedCountry = sessionStorage.getItem('selectedCountry');
+    vm.selectedCountryImage = sessionStorage.getItem('selectedCountryImage');
 
     vm.startSpin = function() {
       if (!vm.spinneractive) {
@@ -99,7 +99,7 @@
     function syncUpstream() {
       vm.startSpin();
       PouchService.sync('https://syncuser:mZ7K3AldcIzO@database.liahonakids.org:5984/' +
-          $rootScope.selectedDBName, replicateIn, replicateError, whenDone);
+          sessionStorage.getItem('selectedDBName'), replicateIn, replicateError, whenDone);
     }
   }
 }());
