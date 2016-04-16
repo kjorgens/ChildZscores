@@ -20,19 +20,22 @@
             <span ng-bind="vm.child.interviewer"></span>
         </h3>
     </div>
-    <div class="col-md-12">
+    <div class="col-md-12 CreateChildFormContainer">
         <form name="vm.form.surveyForm" class="form-horizontal"
               ng-submit="vm.addSurvey(vm.form.surveyForm.$valid)" novalidate>
             <fieldset>
                 <div class="row">
                     <div class="form-group">
-                        <label for="vm.surveyDate" class="col-sm-3 control-label">Screening date</label>
-                        <div class="col-sm-3">
-                            <input type="date" id="vm.surveyDate"  class="form-control"
-                                   uib-datepicker-popup
-                                   ng-model="vm.surveyDate"
-                                   is-open="status.opened" required>
-                        </div>
+
+                      <label for="vm.survey.weight" class="col-sm-2 control-label">Weight</label>
+                      <div class="col-sm-4">
+                        <input type="number" class="form-control" ng-blur="vm.checkWeightIsValid()"
+                               ng-model="vm.survey.weight" id="vm.survey.weight"
+                               placeholder="Weight" required>
+                        <div class="validationMessage" ng-if="!vm.childweightIsValid"><p>Please enter a valid
+                          weight (3-18)</p></div>
+                      </div>
+
                         <div ng-class="{'has-error':(!vm.childHeightIsValid)}">
                             <label for="vm.survey.height" class="col-sm-2 control-label">Height</label>
                             <div class="col-sm-4">
@@ -44,14 +47,9 @@
                             </div>
                         </div>
                         <div ng-class="{'has-error':(!vm.childweightIsValid)}">
-                            <label for="vm.survey.weight" class="col-sm-2 control-label">Weight</label>
-                            <div class="col-sm-4">
-                                <input type="number" class="form-control" ng-blur="vm.checkWeightIsValid()"
-                                       ng-model="vm.survey.weight" id="vm.survey.weight"
-                                       placeholder="Weight" required>
-                                <div class="validationMessage" ng-if="!vm.childweightIsValid"><p>Please enter a valid
-                                    weight (3-18)</p></div>
-                            </div>
+
+
+
                         </div>
                     </div>
                     <div class="form-group">
@@ -60,13 +58,23 @@
                                 <textarea class="form-control" ng-model="vm.survey.comments" id="vm.survey.comments"
                                           placeholder="Comments" ></textarea>
                         </div>
-                        <div class="col-sm-4" style="text-align: center">
-                            <div style="margin-top:4%;">
-                                <button type="submit" class="btn btn-primary">{{vm.survey._id ? 'Update' : 'Create'}}
-                                </button>
-                            </div>
-                        </div>
+                      <label for="vm.surveyDate" class="col-sm-2 control-label">Screening date</label>
+                      <div class="col-sm-4">
+                        <input type="date" id="vm.surveyDate"  class="form-control"
+                               uib-datepicker-popup
+                               ng-model="vm.surveyDate"
+                               is-open="status.opened" required>
+                      </div>
+
+
                     </div>
+
+                  <div class="col-sm-4" style="text-align: center">
+                    <div style="margin-top:4%;">
+                      <button type="submit" class="btn btn-primary">{{vm.survey._id ? 'Update' : 'Create'}}
+                      </button>
+                    </div>
+                  </div>
                     <!--<video id="video" width="640" height="480" autoplay></video>-->
                     <!--<button id="snap">Snap Photo</button>-->
                     <!--<canvas id="canvas" width="640" height="480"></canvas>-->

@@ -13,7 +13,9 @@
     if ($state.params.childId) {
       editChild = true;
       vm.child = child;
+      vm.child.firstname = true;
       vm.ageIsValid = true;
+      vm.firstNameIsValid = true;
       vm.firstNameIsValid = true;
       vm.lastNameIsValid = true;
       vm.genderIsValid = true;
@@ -25,13 +27,13 @@
       vm.birthDate = new Date(child.birthDate);
       PouchService.getSurveys(vm.child._id, setSurveyList, surveyErrors);
     } else {
-      vm.ageIsValid = false;
+      //vm.ageIsValid = false;
 
-      vm.firstNameIsValid = false;
-      vm.lastNameIsValid = false;
-      vm.genderIsValid = false;
-      vm.birthdateIsValid = false;
-      vm.stakeIsValid = false;
+      //vm.firstNameIsValid = false;
+      //vm.lastNameIsValid = false;
+      //vm.genderIsValid = false;
+      //vm.birthdateIsValid = false;
+      //vm.stakeIsValid = false;
       vm.surveyDate = new Date();
     }
 
@@ -62,19 +64,19 @@
     vm.setMonthCount = setMonthCount;
     vm.today = today;
 
-    vm.checkFirstNameIsValid = checkFirstNameIsValid;
-    vm.checkLastNameIsValid = checkLastNameIsValid;
-    vm.checkGenderIsValid = checkGenderIsValid;
+    //vm.checkFirstNameIsValid = checkFirstNameIsValid;
+    //vm.checkLastNameIsValid = checkLastNameIsValid;
+    //vm.checkGenderIsValid = checkGenderIsValid;
 
  //   vm.checkMotherIsValid = checkMotherIsValid;
  //   vm.checkFatherIsValid = checkLastNameIsValid;
  //   vm.checkStreetAddressIsValid = checkStreetAddressIsValid;
  //   vm.checkCityIsValid = checkCityIsValid;
-    vm.checkStakeIsValid = checkStakeIsValid;
- //   vm.checkWardIsValid = checkWardIsValid;
-    vm.checkAgeIsValid = checkAgeIsValid;
-    vm.checkEnteredAgeIsValid = checkEnteredAgeIsValid;
-    vm.checkAllFieldsValid = checkAllFieldsValid;
+ //   vm.checkStakeIsValid = checkStakeIsValid;
+ ////   vm.checkWardIsValid = checkWardIsValid;
+ //   vm.checkAgeIsValid = checkAgeIsValid;
+ //   vm.checkEnteredAgeIsValid = checkEnteredAgeIsValid;
+ //   vm.checkAllFieldsValid = checkAllFieldsValid;
 //    vm.childInfoString = childInfoString;
 //    vm.syncUpstream = syncUpstream;
 
@@ -96,16 +98,16 @@
     }
 
     function checkAllFieldsValid() {
-      checkFirstNameIsValid();
-      checkLastNameIsValid();
-      checkGenderIsValid();
- //     checkMotherIsValid ();
- //     checkFatherIsValid ();
-//      checkStreetAddressIsValid ();
-//      checkCityIsValid ();
-      checkStakeIsValid();
-//      checkWardIsValid ();
-      checkAgeIsValid();
+//      checkFirstNameIsValid();
+//      checkLastNameIsValid();
+//      checkGenderIsValid();
+// //     checkMotherIsValid ();
+// //     checkFatherIsValid ();
+////      checkStreetAddressIsValid ();
+////      checkCityIsValid ();
+//      checkStakeIsValid();
+////      checkWardIsValid ();
+//      checkAgeIsValid();
 
       if (vm.firstNameIsValid === true && vm.lastNameIsValid === true &&
           vm.genderIsalid === true && vm.ageIsValid === true) {
