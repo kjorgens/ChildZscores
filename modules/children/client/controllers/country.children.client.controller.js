@@ -13,6 +13,9 @@
  //     sessionStorage.setItem('liahonaStakesObject', input);
       vm.liahonaStakes = input;
     }
+    function returnFromPut(input) {
+        console.log(input);
+    }
     function handleError(input) {
       console.log(input);
     }
@@ -21,7 +24,8 @@
       ChildrenStakes.get(function(retVal) {
  //       sessionStorage.setItem('liahonaStakesObject', retVal);
         vm.liahonaStakes = retVal;
-//        PouchService.saveStakesLocal(retVal, storeDbList, handleError);
+        PouchService.createCountryDatabase();
+        PouchService.putStakesLocal(retVal, returnFromPut, handleError);
       });
     } else {
       PouchService.createCountryDatabase();
