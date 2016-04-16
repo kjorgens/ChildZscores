@@ -5,18 +5,41 @@
       .module('children')
       .controller('ChildrenStakeController', ChildrenStakeController);
 
-  ChildrenStakeController.$inject = ['$rootScope', '$scope', '$stateParams'];
+  ChildrenStakeController.$inject = ['$rootScope', '$scope', 'ChildrenStakes', '$stateParams', 'PouchService'];
 
-  function ChildrenStakeController($rootScope, $scope, $stateParams) {
+  function ChildrenStakeController($rootScope, $scope, ChildrenStakes, $stateParams, PouchService) {
     var vm = this;
 
     function findCountry(country) {
       return country.name === $stateParams.country;
     }
-    vm.liahonaStakes = $rootScope.liahonaStakes;
-    vm.selectedCountry = vm.liahonaStakes.countries.find(findCountry);
-    $rootScope.selectedCountry = vm.selectedCountry.name;
-    $rootScope.selectedCountryImage = vm.selectedCountry.image;
+
+//    vm.liahonaStakes = sessionStorage.getItem ('liahonaStakesObject');
+
+
+    function storeDbList(input) {
+      //     sessionStorage.setItem('liahonaStakesObject', input);
+      vm.liahonaStakes = input;
+      vm.selectedCountry = vm.liahonaStakes.countries.find(findCountry);
+      sessionStorage.setItem('selectedCountry', vm.selectedCountry.name);
+      sessionStorage.getItem('selectedCountryImage', vm.selectedCountry.image);
+    }
+
+    function handleError(input) {
+      console.log(input);
+    }
+
+    if ($rootScope.appOnline) {
+      ChildrenStakes.get(function (retVal) {
+        //       sessionStorage.setItem('liahonaStakesObject', retVal);
+        storeDbList(retVal);
+ //       vm.liahonaStakes = retVal;
+//        PouchService.saveStakesLocal(retVal, storeDbList, handleError);
+      });
+    } else {
+      PouchService.createCountryDatabase();
+      PouchService.getCountriesLocal(storeDbList, handleError);
+    }
   }
 }());
 

@@ -32,34 +32,46 @@
       });
     };
 
-    factory.saveStakesLocal = function (countryObj, callback, errCallback) {
-      countryDataBase.put(countryObj)
+    factory.putStakesLocal = function (countryObj, callback, errCallback) {
+      var newObj = {};
+      countryDataBase.get('liahona_kids_countries_stakes')
           .then(function (response) {
-            // Do something with the response
-            callback(response);
+            newObj._id = response._id;
+            newObj._rev = response._rev;
+            newObj.countries = countryObj.countries;
+            countryDataBase.put(newObj)
+                .then(function (response) {
+                  // Do something with the response
+                  callback(response);
+                })
+                .catch(function (error) {
+                  // Do something with the error
+                  errCallback(error);
+                })
+                .finally(function () {
+                  // Do something when everything is done
+                });
           })
           .catch(function (error) {
-            // Do something with the error
-            errCallback(error);
-          })
-          .finally(function () {
-            // Do something when everything is done
+            newObj._id = 'liahona_kids_countries_stakes';
+            newObj.countries = countryObj.countries;
+            countryDataBase.put(newObj)
+                .then(function (response) {
+                  // Do something with the response
+                  callback(response);
+                })
+                .catch (function (error) {
+                  // Do something with the error
+                  errCallback(error);
+                })
+                .finally(function () {
+                  // Do something when everything is done
+                });
           });
     };
-    // factory.createIndexCountriesLocal = function() {
-    //   countryDataBase.createIndex({
-    //     index: {
-    //       fields: ['countries']
-    //     }
-    //   }).then(function (result) {
-    //     var theResult = result;
-    //   }).catch(function (err) {
-    //     var error = err;
-    //   });
-    // };
-    //
+
     factory.getCountriesLocal = function (callback, errCallback) {
-      return countryDataBase.get('liahona_kids_countries_stakes')
+      countryDataBase.get('liahona_kids_countries_stakes')
       // countryDataBase.allDocs({ include_docs: true, attachments: true })
       .then(function (response) {
       // Do something with the response
@@ -143,10 +155,10 @@
       });
     };
 
-    factory.destroyDatabase = function (dbName) {
-      database = new pouchDB (dbName);
-      database.destroy();
-    };
+    // factory.destroyDatabase = function (dbName) {
+    //   database = new pouchDB (dbName);
+    //   database.destroy();
+    // };
 
     factory.getAll = function (callback, errCallback) {
       database.allDocs({ include_docs: true, attachments: true })
