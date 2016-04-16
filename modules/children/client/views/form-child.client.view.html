@@ -20,8 +20,8 @@
                                 <input class="form-control required" type="text" ng-blur="vm.checkFirstNameIsValid()"
                                        ng-model="vm.child.firstName" id="vm.child.firstName" placeholder="First Name"
                                        required>
-                                <div class="validationMessage" ng-if="!vm.firstNameIsValid"><p>Please enter a valid
-                                    name</p></div>
+                                <div class="validationMessage" ng-if="!vm.firstNameIsValid"><p>Required
+                                    </p></div>
                             </div>
                         </div>
                         <div ng-class="{'has-error':(!vm.lastNameIsValid)}">
@@ -32,8 +32,8 @@
                                        id="vm.child.lastName"
                                        placeholder="Last Name"
                                        required>
-                                <div class="validationMessage" ng-if="!vm.lastNameIsValid"><p>Please enter a valid
-                                    name</p></div>
+                                <div class="validationMessage" ng-if="!vm.lastNameIsValid"><p>Required
+                                    </p></div>
                             </div>
                         </div>
                     </div>
@@ -43,18 +43,42 @@
                             <div class="col-sm-4">
                                 <input class="form-control" type="number" ng-blur="vm.checkEnteredAgeIsValid()"
                                        ng-model="vm.enteredMonthAge" id="vm.enteredMonthAge" required>
-                                <div class="validationMessage" ng-if="!vm.ageIsValid"><p>Please enter a valid age (1-60)
+                                <div class="validationMessage" ng-if="!vm.ageIsValid"><p>Age (months) or birthdate required (1-60)
                                 </p></div>
                             </div>
                         </div>
                         <div ng-class="{'has-error':(!vm.ageIsValid)}">
                             <label for="vm.birthDate" class="col-sm-2 control-label">Birthdate</label>
                             <div class="col-sm-4">
-                                <input type="date" id="vm.birthDate" ng-blur="vm.ageIsValid" class="form-control"
+                                <input type="date" id="vm.birthDate" ng-blur="vm.checkAgeIsValid()" class="form-control"
                                        ng-model="vm.birthDate"
                                        is-open="status.opened" required>
-                                <div class="validationMessage" ng-if="!vm.ageIsValid"><p>Please select a
-                                    valid birthdate</p></div>
+                                <div class="validationMessage" ng-if="!vm.ageIsValid"><p>Age (months) or birthdate required
+                                    </p></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group float-left">
+                        <div >
+                            <label for="vm.phoneNum" class="col-sm-2 control-label">Telephone Number</label>
+                            <div class="col-sm-4">
+                                <input class="form-control" type="tel"
+                                       ng-model="vm.phoneNum" id="vm.phoneNum" required>
+                                <div></div>
+                            </div>
+                        </div>
+                        <div ng-class="{'has-error':(!vm.genderIsValid)}">
+                            <label for="vm.child.gender" class="col-sm-2 control-label">Gender</label>
+                            <div class="col-sm-4">
+                                <select type="input" ng-change="vm.checkGenderIsValid()" class="form-control"
+                                        ng-model="vm.child.gender"
+                                        id="vm.child.gender"
+                                        required>
+                                    <option>Girl</option>
+                                    <option>Boy</option>
+                                </select>
+                                <div class="validationMessage" ng-if="!vm.genderIsValid"><p>Gender required
+                                </p></div>
                             </div>
                         </div>
                     </div>
@@ -110,27 +134,28 @@
                                 <textarea class="form-control" ng-model="vm.child.comments" id="vm.child.comments"
                                           placeholder="Comments"></textarea>
                         </div>
-                        <div ng-class="{'has-error':(!vm.genderIsValid)}">
-                            <label for="vm.child.gender" class="col-sm-2 control-label">Gender</label>
+                        <div >
+                            <label for="vm.memberStatus" class="col-sm-2 control-label">LDS member?</label>
                             <div class="col-sm-4">
-                                <select type="input" ng-change="vm.checkGenderIsValid()" class="form-control"
-                                        ng-model="vm.child.gender"
-                                        id="vm.child.gender"
+                                <input type="checkbox" id="vm.memberStatus"  class="form-control"
+                                       value="yes"
                                         required>
-                                    <option>Girl</option>
-                                    <option>Boy</option>
-                                </select>
-                                <div class="validationMessage" ng-if="!vm.genderIsValid"><p>Please select a
-                                    gender</p></div>
+
                             </div>
                         </div>
-                        <div class="col-sm-4 pull-right" >
-                            <div style="margin-top:4%;">
-                                <button type="submit" class="btn btn-primary">{{vm.child._id ? 'Update' : 'Submit'}}
-                                </button>
-                            </div>
-                        </div>
+
                     </div>
+                  <div class="form-group">
+                    <div ng-class="{'has-error':(!vm.genderIsValid)}">
+
+                      <div class="col-sm-4 right-side-child">
+                        <div style="margin-top:4%;">
+                          <button type="submit" class="btn btn-primary">{{vm.child._id ? 'Update' : 'Create'}}
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
             </fieldset>
         </form>
