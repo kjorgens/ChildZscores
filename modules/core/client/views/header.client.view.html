@@ -40,7 +40,7 @@
             <a ui-sref="{{item.state}}" ng-bind="item.title"></a>
           </li>
           <li class="divider"></li>
-          <li>
+          <li ng-if="vm.appOnLine">
             <a href="#" ng-click="vm.authentication.signout()">Signout</a>
           </li>
         </ul>

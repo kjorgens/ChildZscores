@@ -51,16 +51,16 @@
     vm.userHasUserRole = false;
 
     vm.authentication = Authentication;
-    if (vm.authentication.user.roles !== undefined && vm.authentication.user.roles !== null) {
-      vm.authentication.user.roles.forEach(function (role) {
-        if (role.indexOf('admin') !== -1) {
-          vm.userHasAdminRole = true;
-        }
-        if (role.indexOf('user') !== -1) {
-          vm.userHasUserRole = true;
-        }
-      });
-    }
+    // if (vm.authentication.user.roles !== undefined && vm.authentication.user.roles !== null) {
+    //   vm.authentication.user.roles.forEach(function (role) {
+    //     if (role.indexOf('admin') !== -1) {
+    //       vm.userHasAdminRole = true;
+    //     }
+    //     if (role.indexOf('user') !== -1) {
+    //       vm.userHasUserRole = true;
+    //     }
+    //   });
+    // }
     vm.error = null;
     vm.form = {};
     vm.enteredMonthAge = undefined;
@@ -334,8 +334,8 @@
           ward: vm.child.ward,
           phone: vm.phoneNum,
           memberStaus: vm.memberStatus,
-          screeningStatus: vm.screeningStatus,
-          interviewer: vm.authentication.user.displayName
+          screeningStatus: vm.screeningStatus
+//          interviewer: vm.authentication.user.displayName
         };
 
         PouchService.insert(childObject, newChild, errorHandle);

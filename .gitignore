@@ -39,6 +39,7 @@ _site/
 *.tmp
 *.bak
 *.swp
+*.zip
 logs/
 build/
 
