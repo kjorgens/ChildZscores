@@ -196,6 +196,8 @@
       //    interviewer: vm.authentication.user.displayName
         };
         PouchService.insert(surveyObject, surveyAdded, addedError);
+        vm.survey.weight = '';
+        vm.survey.height = '';
       }
     }
 

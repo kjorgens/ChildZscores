@@ -6,16 +6,18 @@
     .module('children.pouchService')
     .factory('PouchService', PouchService);
 
-  PouchService.$inject = ['pouchDB', 'uuid4'];
+  PouchService.$inject = ['pouchDB', 'uuid4', 'moment'];
 
-  function PouchService(pouchDB, uuid4) {
+  function PouchService(pouchDB, uuid4, moment) {
     var factory = {};
     var database;
     var countryDataBase;
     var remoteDbList;
     var localDbList;
+    var currentDbName;
 
     factory.createDatabase = function (dbName) {
+      currentDbName = dbName;
       database = new pouchDB (dbName);
     };
 
@@ -252,7 +254,7 @@
     };
 
     factory.insert = function (childInfo, callback, errorCallback) {
-      childInfo._id = childInfo._id || uuid4.generate();
+      childInfo._id = childInfo._id || currentDbName + '_' + moment.now();
       if (childInfo._rev) {
         childInfo._rev = childInfo._rev;
       }

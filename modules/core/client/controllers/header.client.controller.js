@@ -9,7 +9,7 @@
 
   function HeaderController($rootScope, $scope, $state, ChildrenStakes, Authentication, menuService, PouchService) {
     var vm = this;
-    vm.appOnLine = $rootScope.appOnline;
+    vm.appOnLine = navigator.onLine;
     // function storeDbList(input) {
     //   $rootScope.globalDBList = input;
     // }
