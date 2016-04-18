@@ -23,7 +23,7 @@
             childResolve: listChildren
           },
           data: {
-            roles: ['user', 'admin']
+
           }
         })
         .state('children.countries', {
@@ -36,7 +36,7 @@
             // childResolve: listChildren
           },
           data: {
-            roles: ['user', 'admin']
+
           }
         })
         .state('children.stake', {
@@ -45,7 +45,7 @@
           controller: 'ChildrenStakeController',
           controllerAs: 'vm',
           data: {
-            roles: ['user', 'admin']
+
           }
         })
         .state('children.newsurvey', {
@@ -57,7 +57,7 @@
             surveyResolve: getSurvey
           },
           data: {
-            roles: ['user', 'admin']
+
           }
         })
         .state('children.create', {
@@ -69,7 +69,7 @@
             childResolve: newChild
           },
           data: {
-            roles: ['user', 'admin']
+
           }
         })
         .state('children.edit', {
@@ -81,7 +81,7 @@
             childResolve: getChild
           },
           data: {
-            roles: ['user', 'admin']
+
           }
         })
         .state('children.editsurvey', {
@@ -93,7 +93,7 @@
             surveyResolve: getSurvey
           },
           data: {
-            roles: ['user', 'admin']
+
           }
         })
         .state('children.view', {
@@ -105,7 +105,7 @@
             childResolve: getChild
           },
           data: {
-            roles: ['user', 'admin']
+
           }
         });
   }

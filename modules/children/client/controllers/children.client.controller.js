@@ -17,6 +17,7 @@
     vm.selectedCountry = sessionStorage.getItem('selectedCountry');
     vm.selectedCountryImage = sessionStorage.getItem('selectedCountryImage');
     vm.online = $rootScope.appOnline;
+    vm.phoneNum;
 //    vm.find();
     if ($state.params.childId) {
       editChild = true;
@@ -36,10 +37,10 @@
     } else {
       vm.ageIsValid = false;
       vm.stake = sessionStorage.getItem('selectedStake');
-      vm.firstNameIsValid = false;
-      vm.lastNameIsValid = false;
-      vm.genderIsValid = false;
-      vm.birthdateIsValid = false;
+  //    vm.firstNameIsValid = false;
+  //    vm.lastNameIsValid = false;
+  //    vm.genderIsValid = false;
+  //    vm.birthdateIsValid = false;
  //     vm.stakeIsValid = false;
       vm.surveyDate = new Date();
     }
@@ -50,16 +51,16 @@
     vm.userHasUserRole = false;
 
     vm.authentication = Authentication;
-    if (vm.authentication.user.roles !== undefined && vm.authentication.user.roles !== null) {
-      vm.authentication.user.roles.forEach(function (role) {
-        if (role.indexOf('admin') !== -1) {
-          vm.userHasAdminRole = true;
-        }
-        if (role.indexOf('user') !== -1) {
-          vm.userHasUserRole = true;
-        }
-      });
-    }
+    // if (vm.authentication.user.roles !== undefined && vm.authentication.user.roles !== null) {
+    //   vm.authentication.user.roles.forEach(function (role) {
+    //     if (role.indexOf('admin') !== -1) {
+    //       vm.userHasAdminRole = true;
+    //     }
+    //     if (role.indexOf('user') !== -1) {
+    //       vm.userHasUserRole = true;
+    //     }
+    //   });
+    // }
     vm.error = null;
     vm.form = {};
     vm.enteredMonthAge = undefined;
@@ -77,7 +78,7 @@
     vm.checkStakeIsValid = checkStakeIsValid;
     vm.checkAgeIsValid = checkAgeIsValid;
     vm.checkEnteredAgeIsValid = checkEnteredAgeIsValid;
-    vm.checkAllFieldsValid = checkAllFieldsValid;
+    // vm.checkAllFieldsValid = checkAllFieldsValid;
 
     function gradeZScores(survey) {
       vm.haStatus = 'normalZscore';
@@ -165,7 +166,7 @@
 
     function checkFirstNameIsValid() {
       if (vm.child.firstName) {
-        if (vm.child.firstName.length < 1 || vm.child.firstName.length > 25) {
+        if (vm.child.firstName.length < 1) {
           vm.firstNameIsValid = false;
         } else {
           vm.firstNameIsValid = true;
@@ -280,8 +281,8 @@
         vm.ageIsValid = false;
       } else {
         vm.ageIsValid = true;
-        vm.child.monthAge = vm.enteredMonthAge || vm.monthAge.toFixed(2);
-        vm.enteredMonthAge = vm.child.monthAge;
+        vm.child.monthAge = vm.monthAge.toFixed(2);
+        vm.enteredMonthAge = Number(vm.monthAge);
       }
     }
 
@@ -331,8 +332,10 @@
           city: vm.child.city,
           stake: vm.child.stake,
           ward: vm.child.ward,
-          screeningStatus: vm.screeningStatus,
-          interviewer: vm.authentication.user.displayName
+          phone: vm.phoneNum,
+          memberStaus: vm.memberStatus,
+          screeningStatus: vm.screeningStatus
+//          interviewer: vm.authentication.user.displayName
         };
 
         PouchService.insert(childObject, newChild, errorHandle);

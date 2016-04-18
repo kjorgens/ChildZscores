@@ -5,13 +5,15 @@
     .module('users.admin')
     .run(menuConfig);
 
-  menuConfig.$inject = ['menuService'];
+  menuConfig.$inject = ['menuService', '$rootScope'];
 
   // Configuring the Users module
-  function menuConfig(menuService) {
-    menuService.addSubMenuItem('topbar', 'admin', {
-      title: 'Manage Users',
-      state: 'admin.users'
-    });
+  function menuConfig(menuService, $rootScope) {
+    if (navigator.onLine) {
+      menuService.addSubMenuItem('topbar', 'admin', {
+        title: 'Manage Users',
+        state: 'admin.users'
+      });
+    }
   }
 }());
