@@ -1,28 +1,39 @@
 <section>
-    <div class="page-header">
+    <div class="page-header" style="margin-top: 6em">
+        <h2>
+        <a ui-sref="children.list({stakeDB: vm.selectedDB, stakeName:vm.selectedStake})">
+            <span ng-bind="vm.selectedStake"></span>
+            <i class="glyphicon glyphicon-list"></i>
+        </a>
+        </h2>
+        <h2>
+            <a ui-sref="children.edit({childId: vm.child._id,surveyId:''})">
+                <span ng-bind="vm.child.firstName"></span>
+                <span ng-bind="vm.child.lastName"></span>
+                <i class="glyphicon glyphicon-edit"></i>
+            </a>
+        </h2>
+        Birth Date:
+        <span ng-bind="vm.child.birthDate | date:'mediumDate'"></span>
         <div class='btn-toolbar pull-right'>
             <div class="btn-group">
-                <a class="btn btn-primary" ui-sref="children.list({stakeDB: vm.selectedDB, stakeName: vm.selectedStake})">
-                    Child List
-                    <i class="glyphicon glyphicon-list"></i>
-                </a>
+
+                <!--<a class="btn btn-primary" ui-sref="children.list({stakeDB: vm.selectedDB, stakeName: vm.selectedStake})">-->
+                <!--Child List-->
+                <!--<i class="glyphicon glyphicon-list"></i>-->
+                <!--</a>-->
                 <a class="btn btn-primary" ui-sref="children.newsurvey({childId:vm.child._id})">
                     New Screening
                     <i class="glyphicon glyphicon-plus"></i>
                 </a>
-                <a class="btn btn-primary" ui-sref="children.edit({childId: vm.child._id,surveyId:''})">
-                    Edit
-                    <i class="glyphicon glyphicon-edit"></i>
-                </a>
-                <a class="btn btn-primary" ng-click="vm.remove(vm.child)" >
+
+                <a class="btn btn-primary" ng-click="vm.remove(vm.child)">
 
                     <i class="glyphicon glyphicon-trash"></i>
                 </a>
             </div>
         </div>
-        <h2 style="margin-top: 2em"><span ng-bind="vm.child.firstName"></span>
-            <span ng-bind="vm.child.lastName"></span></h2>Birth Date:
-        <span ng-bind="vm.child.birthDate | date:'mediumDate'"></span>
+
     </div>
     <small>
         <a ng-repeat="survey in vm.surveys"

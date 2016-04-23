@@ -3,7 +3,9 @@
     <div class="row">
       <div class="col-md-4" class="pull-left">
         <img src={{vm.selectedCountryImage}}>
-        <h3>{{vm.selectedCountry}}</h3>
+        <h3><a ui-sref="children.stake({country: vm.selectedCountry})">{{vm.selectedCountry}}</a>
+          <i class="glyphicon glyphicon-list"></i>
+        </h3>
         <h3>
         <a ui-sref="children.sync({stakeDB: vm.selectedStakeDB, stakeName:vm.selectedStake})">{{vm.selectedStake}}</a>
           <i class="glyphicon glyphicon-refresh"></i>
