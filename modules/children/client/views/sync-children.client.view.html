@@ -1,0 +1,39 @@
+<section>
+    <div class="page-header" style="margin-top: 4em">
+        <img src={{vm.selectedCountryImage}}>
+        <h3>{{vm.selectedCountry}}</h3>
+        <h3>{{vm.selectedStake}}</h3>
+
+    </div>
+    <div class="list-group borderless">
+        <a ng-click="vm.syncUpstream()" class="list-group-item borderless">
+            <small class="list-group-item-text">
+                <div class="alert alert-info" role="alert" style="text-align: center">
+                <h3>
+                    <span >Sync {{vm.selectedStake}}</span>
+                    <i class="glyphicon glyphicon-refresh"></i>
+                </h3>
+                </div>
+            </small>
+        </a>
+    </div>
+    <h5>Pressing the sync button above will
+        sync all children records from the remote database and
+        will sync the records on this machine up to the remote database.
+        Prior to new screenings, when you have internet access,
+        sync your stake before you start a screening, and sync again after
+        you have finished a screening session.
+        You must be signed in and have internet access to sync.
+        To sync another stake, Press Liahona Kids on the top menu bar,
+        Select the country and stake, and hit the sync button.
+        To conserve storage on your device, only sync stakes you are
+        working with.</h5>
+    <!--<div class="col-sm-4" style="text-align: center">-->
+        <!--<div style="margin-top:4%;">-->
+            <!--<button type="submit" class="btn btn-primary" ng-click="vm.syncUpstream()">Sync Database-->
+                <!--<i class="glyphicon glyphicon-refresh"></i>-->
+            <!--</button>-->
+        <!--</div>-->
+    <!--</div>-->
+    <span us-spinner="{radius:30, width:8, length: 16}" spinner-key="spinner-sync" spinner-theme="bigBlue"></span>
+</section>

@@ -1,11 +1,11 @@
 <section>
-    <div class="page-header">
+    <div class="page-header" style="margin-top: 6em">
         <div class='btn-toolbar pull-right'>
             <div class="btn-group">
-                <a class="btn btn-primary" ui-sref="children.list({stakeDB: vm.selectedDB, stakeName: vm.selectedStake})">Cancel</a>
+                <a class="btn btn-primary" ui-sref="children.view({childId: vm.child._id})">Cancel</a>
             </div>
         </div>
-        <h1 style="margin-top: 2em">{{vm.child._id ? 'Edit Existing Child' : 'Add New Child'}}</h1>
+        <h3 style="margin-top: 2em">{{vm.child._id ? 'Edit Existing Child' : 'Add New Child'}}</h3>
     </div>
     </div>
     <div class="col-md-12">

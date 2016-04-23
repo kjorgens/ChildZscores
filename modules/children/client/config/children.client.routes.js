@@ -26,6 +26,19 @@
 
           }
         })
+        .state('children.sync', {
+          url: '/sync/:stakeDB/:stakeName',
+          templateUrl: 'modules/children/client/views/sync-children.client.view.html',
+          controller: 'ChildrenSyncController',
+          controllerAs: 'vm',
+          resolve: {
+            childSync: listCountries
+          },
+          data: {
+            roles: ['user', 'admin']
+     //       pageTitle: 'Sync database {{ database.title }}'
+          }
+        })
         .state('children.countries', {
           url: '/countries',
           templateUrl: 'modules/children/client/views/country.client.view.html',
@@ -113,13 +126,14 @@
   listChildren.$inject = ['$stateParams', 'PouchService'];
   function listChildren($stateParams, PouchService) {
     PouchService.createDatabase($stateParams.stakeDB);
-    PouchService.createIndex('firstName');
-    PouchService.createIndex('lastName');
-    PouchService.createIndex('owner');
-    PouchService.createIndex('surveyDate');
-    return PouchService.queryChildPromise();
+    return PouchService.initLocalDb();
   }
 
+  initLocalDb.$inject = ['$stateParams', 'PouchService'];
+  function initLocalDb($stateParams, PouchService) {
+    PouchService.createDatabase($stateParams.stakeDB);
+    return PouchService.initLocalDb();
+  }
   listCountries.$inject = ['$stateParams', 'ChildrenStakes'];
   function listCountries($stateParams, ChildrenStakes) {
     return ChildrenStakes;

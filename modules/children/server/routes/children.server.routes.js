@@ -19,6 +19,9 @@ module.exports = function (app) {
   router.route('/countries')
       .get(childrenPolicy.isAllowed, children.getCountryList);
 
+  // router.route('/sync/:stakeDB/:stakeName')
+  //     .get(childrenPolicy.isAllowed, children.getRemoteCountryList);
+
   // children collection routes
   router.route('/')
       .get(childrenPolicy.isAllowed, children.list)
