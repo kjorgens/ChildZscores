@@ -10,9 +10,12 @@
   function SurveyController($scope, $state, $timeout, moment, survey, Authentication, ZScores, PouchService) {
     var vm = this;
     vm.survey = survey;
-
+  //  vm.surveyRemove = surveyRemove;
     getOwner($state.params.childId);
-
+    vm.selectedStake = localStorage.getItem('selectedStake');
+    vm.selectedCountry = localStorage.getItem('selectedCountry');
+    vm.selectedCountryImage = localStorage.getItem('selectedCountryImage');
+    vm.selectedDB = localStorage.getItem('selectedDBName');
     vm.authentication = Authentication;
     vm.error = null;
     vm.form = {};

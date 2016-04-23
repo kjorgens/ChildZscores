@@ -67,6 +67,8 @@ self.addEventListener('install', function (event) {
       '/modules/children/client/views/list-children.client.view.html',
       '/modules/children/client/views/view-child.client.view.html',
       '/modules/children/client/views/sync-children.client.view.html',
+      '/modules/children/client/views/remove-child.client.view.html',
+      '/modules/children/client/views/remove-screening.client.view.html',
       '/modules/children/client/img/boliva.png',
       '/modules/children/client/img/columbia.png',
       '/modules/children/client/img/ecuador.png',

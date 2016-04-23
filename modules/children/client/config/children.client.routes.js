@@ -26,6 +26,19 @@
 
           }
         })
+        .state('children.remove', {
+          url: '/remove/:childId',
+          templateUrl: 'modules/children/client/views/remove-child.client.view.html',
+          controller: 'ChildrenRemoveController',
+          controllerAs: 'vm',
+          resolve: {
+            childRemove: getChild
+          },
+          data: {
+            roles: ['user', 'admin']
+            //       pageTitle: 'Sync database {{ database.title }}'
+          }
+        })
         .state('children.sync', {
           url: '/sync/:stakeDB/:stakeName',
           templateUrl: 'modules/children/client/views/sync-children.client.view.html',
@@ -98,8 +111,20 @@
           }
         })
         .state('children.editsurvey', {
-          url: '/survey/:childId/:surveyId',
+          url: '/survey/edit/:childId/:surveyId',
           templateUrl: 'modules/children/client/views/add-survey.client.view.html',
+          controller: 'SurveyController',
+          controllerAs: 'vm',
+          resolve: {
+            surveyResolve: getSurvey
+          },
+          data: {
+
+          }
+        })
+        .state('children.removeSurvey', {
+          url: '/survey/remove/:childId/:surveyId',
+          templateUrl: 'modules/children/client/views/remove-screening.client.view.html',
           controller: 'SurveyController',
           controllerAs: 'vm',
           resolve: {
