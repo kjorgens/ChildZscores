@@ -2,17 +2,20 @@
   'use strict';
 
   angular
-      .module('children')
-      .controller('SurveyController', SurveyController);
+    .module('children')
+    .controller('SurveyController', SurveyController);
 
   SurveyController.$inject = ['$scope', '$state', '$timeout', 'moment', 'surveyResolve', 'Authentication', 'ZScores', 'PouchService'];
 
   function SurveyController($scope, $state, $timeout, moment, survey, Authentication, ZScores, PouchService) {
     var vm = this;
     vm.survey = survey;
-
+  //  vm.surveyRemove = surveyRemove;
     getOwner($state.params.childId);
-
+    vm.selectedStake = localStorage.getItem('selectedStake');
+    vm.selectedCountry = localStorage.getItem('selectedCountry');
+    vm.selectedCountryImage = localStorage.getItem('selectedCountryImage');
+    vm.selectedDB = localStorage.getItem('selectedDBName');
     vm.authentication = Authentication;
     vm.error = null;
     vm.form = {};
@@ -23,16 +26,16 @@
     vm.commentOverride = commentOverride;
 
     vm.authentication = Authentication;
-    if (vm.authentication.user.roles !== undefined && vm.authentication.user.roles !== null) {
-      vm.authentication.user.roles.forEach(function (role) {
-        if (role.indexOf('admin') !== -1) {
-          vm.userHasAdminRole = true;
-        }
-        if (role.indexOf('user') !== -1) {
-          vm.userHasUserRole = true;
-        }
-      });
-    }
+    // if (vm.authentication.user.roles !== undefined && vm.authentication.user.roles !== null) {
+    //   vm.authentication.user.roles.forEach(function (role) {
+    //     if (role.indexOf('admin') !== -1) {
+    //       vm.userHasAdminRole = true;
+    //     }
+    //     if (role.indexOf('user') !== -1) {
+    //       vm.userHasUserRole = true;
+    //     }
+    //   });
+    // }
   //  vm.checkGenderIsValid = checkGenderIsValid;
     vm.checkHeightIsValid = checkHeightIsValid;
     vm.checkWeightIsValid = checkWeightIsValid;
@@ -196,6 +199,8 @@
       //    interviewer: vm.authentication.user.displayName
         };
         PouchService.insert(surveyObject, surveyAdded, addedError);
+        vm.survey.weight = '';
+        vm.survey.height = '';
       }
     }
 

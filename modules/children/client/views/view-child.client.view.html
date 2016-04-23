@@ -1,39 +1,69 @@
 <section>
-    <div class="page-header">
+    <div class="page-header" style="margin-top: 6em">
+        <!--<h4>-->
+            <!--<span><a ui-sref="children.stake({country: vm.selectedCountry})">{{vm.selectedCountry}}</a></span>-->
+            <!--<i class="glyphicon glyphicon-list"></i>-->
+        <!--</h4>-->
+        <h4>
+            <span><a ui-sref="children.list({stakeDB: vm.selectedDB, stakeName:vm.selectedStake})">{{vm.selectedStake}}</a></span>
+            <i class="glyphicon glyphicon-list"></i>
+        </h4>
+        <h3>
+            <span><a ui-sref="children.edit({childId: vm.child._id,surveyId:''})">{{vm.child.firstName}}{{vm.child.lastName}}</a></span>
+                <i class="glyphicon glyphicon-edit"></i>
+        </h3>
+        Birth Date:
+        <span ng-bind="vm.child.birthDate | date:'mediumDate'"></span>
+        <h3>
+            <span><a ui-sref="children.newsurvey({childId:vm.child._id})">Add Screening</a></span>
+            <i class="glyphicon glyphicon-plus"></i>
+        </h3>
+        <!--<h3>-->
+            <!--<span><a ui-sref="children.remove({childId:vm.child._id})">Remove Child Record</a></span>-->
+            <!--<i class="glyphicon glyphicon-trash"></i>-->
+        <!--</h3>-->
         <div class='btn-toolbar pull-right'>
             <div class="btn-group">
-                <a class="btn btn-primary" ui-sref="children.create" ng-if="vm.userHasUserRole">
-                    New Child
-                    <i class="glyphicon glyphicon-plus"></i>
-                </a>
-                <a class="btn btn-primary" ui-sref="children.newsurvey({childId:vm.child._id})">
-                    New Screening
-                    <i class="glyphicon glyphicon-plus"></i>
-                </a>
-                <a class="btn btn-primary" ui-sref="children.edit({childId: vm.child._id,surveyId:''})">
-                    Edit
-                    <i class="glyphicon glyphicon-edit"></i>
-                </a>
-                <a class="btn btn-primary" ng-click="vm.remove(vm.child)" ng-if="vm.userHasAdminRole">
-                    Remove
-                    <i class="glyphicon glyphicon-trash"></i>
-                </a>
+
+                <!--<a class="btn btn-primary" ui-sref="children.list({stakeDB: vm.selectedDB, stakeName: vm.selectedStake})">-->
+                <!--Child List-->
+                <!--<i class="glyphicon glyphicon-list"></i>-->
+                <!--</a>-->
+                <!--<a class="btn btn-primary" ui-sref="children.newsurvey({childId:vm.child._id})">-->
+                    <!--New Screening-->
+                    <!--<i class="glyphicon glyphicon-plus"></i>-->
+                <!--</a>-->
+
+                <!--<a class="btn btn-primary" ng-click="vm.remove(vm.child)">-->
+
+                    <!--<i class="glyphicon glyphicon-trash"></i>-->
+                <!--</a>-->
             </div>
         </div>
-        <h2 style="margin-top: 2em"><span ng-bind="vm.child.firstName"></span>
-            <span ng-bind="vm.child.lastName"></span></h2>Birth Date:
-        <span ng-bind="vm.child.birthDate | date:'mediumDate'"></span>
+
     </div>
     <small>
-        <a ng-repeat="survey in vm.surveys.docs"
+        <a ng-repeat="survey in vm.surveys"
            ui-sref="children.editsurvey({ surveyId:survey._id, childId:vm.child._id})" class="list-group-item clearfix">
             <small class="list-group-item-text ZscoreListContainer">
-                <h4>Survey date: <span ng-bind="survey.surveyDate | date:'mediumDate'"></span>
+                <h4>Screening date: <span ng-bind="survey.surveyDate | date:'mediumDate'"></span>
                     , Height
                     <span ng-bind="survey.height | number:2 "></span>, Weight
                     <span ng-bind="survey.weight | number:2 "></span></h4>
                 <h4>Z Scores:
-                    <span ng-bind="survey.zScore.zscoreString"></span>
+                    <li ng-class="{normalZscore: 'normalZscore', dangerZscore: 'dangerZscore',
+                    marginalZscore: 'marginalZscore', redZoneZscore: 'redZoneZscore'}[ survey.zScore.haStatus ]">
+                        height/age: <span   ng-bind="survey.zScore.ha | number:2"></span>
+                    </li>
+                    <li ng-class="{normalZscore: 'normalZscore', dangerZscore: 'dangerZscore',
+                    marginalZscore: 'marginalZscore', redZoneZscore: 'redZoneZscore'}[ survey.zScore.waStatus ]">
+                        weight/age:  <span  ng-bind="survey.zScore.wa | number:2"></span>
+                    </li>
+                    <li ng-class="{normalZscore: 'normalZscore', dangerZscore: 'dangerZscore',
+                    marginalZscore: 'marginalZscore', redZoneZscore: 'redZoneZscore'}[ survey.zScore.wlStatus ]">
+                        weight/height:  <span  ng-bind="survey.zScore.wl | number:2"></span>
+                    </li>
+                    <!--<span ng-bind="survey.zScore.zscoreString"></span>-->
                 </h4>
                 Screening done by
                 <span ng-bind="vm.child.interviewer"></span>
@@ -41,4 +71,8 @@
         </a>
         </div>
     </small>
+    <h5>
+        <span><a ui-sref="children.remove({childId:vm.child._id})">Remove Child Record</a></span>
+        <i class="glyphicon glyphicon-trash"></i>
+    </h5>
 </section>

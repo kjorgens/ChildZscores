@@ -1,47 +1,39 @@
 (function () {
   'use strict';
 
-// Configuring the Children module
+// Configuring the liahona kids database module
   angular
     .module('children')
-    .run(menuConfig);
+    .run(dataConfig);
 
-  menuConfig.$inject = ['$rootScope', 'Menus', 'PouchService'];
+  dataConfig.$inject = ['$rootScope', 'PouchService', 'ChildrenStakes'];
 
-  function menuConfig($rootScope, Menus, PouchService) {
+  function dataConfig($rootScope, PouchService, ChildrenStakes) {
     // Add the children dropdown item
-    PouchService.createDatabase('Ecuador');
-    //
-    PouchService.createIndex('firstName');
-    PouchService.createIndex('lastName');
-    PouchService.createIndex('owner');
-    PouchService.createIndex('surveyDate');
+    // $rootScope.selectedStake = 'temporary';
+    // PouchService.createDatabase('temporary');
+    // PouchService.createCountryDatabase('country_list');
+    // PouchService.createIndex('firstName');
+    // PouchService.createIndex('lastName');
+    // PouchService.createIndex('owner');
+    // PouchService.createIndex('surveyDate');
+    $rootScope.appOnline = navigator.onLine;
+    console.log('App is ' + ($rootScope.appOnline ? 'online' : 'offline'));
 
-    $rootScope.selectedCountry = 'Ecuador';
-    Menus.addMenuItem('topbar', {
-      title: 'Children',
-      state: 'children.list',
- //     type: 'dropdown',
-      roles: ['*']
-    });
-    // Menus.addMenuItem('topbar', {
-    //  title: 'Country',
-    //  state: 'children.country',
-    //  type: 'dropdown',
-    //  roles: ['*']
-    // });
+    // function storeDbList(input) {
+    //   $rootScope.globalDBList = input;
+    // }
+    // function handleError(input) {
+    //   console.log(input);
+    // }
     //
-    // Add the dropdown create item
-    // Menus.addSubMenuItem('topbar', 'children.country', {
-    //  title: 'Add Country',
-    //  state: 'children.country',
-    //  roles: ['*']
-    // });
-    // Add the dropdown create item
-    // Menus.addSubMenuItem('topbar', 'children.country', {
-    //  title: 'Select Country',
-    //  state: 'children.country',
-    //  roles: ['*']
-    // });
+    // if ($rootScope.appOnline) {
+    //   ChildrenStakes.get(function(retVal) {
+    //     $rootScope.liahonaStakes = retVal;
+    //     PouchService.saveStakesLocal(retVal, storeDbList, handleError);
+    //   });
+    // } else {
+    //   PouchService.getCountriesLocal(storeDbList, handleError);
+    // }
   }
 })();

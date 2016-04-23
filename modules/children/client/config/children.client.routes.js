@@ -15,16 +15,67 @@
           template: '<ui-view/>'
         })
         .state('children.list', {
-          url: '/children',
+          url: '/list/:stakeDB/:stakeName',
           templateUrl: 'modules/children/client/views/list-children.client.view.html',
           controller: 'ChildrenListController',
           controllerAs: 'vm',
           resolve: {
             childResolve: listChildren
+          },
+          data: {
+
+          }
+        })
+        .state('children.remove', {
+          url: '/remove/:childId',
+          templateUrl: 'modules/children/client/views/remove-child.client.view.html',
+          controller: 'ChildrenRemoveController',
+          controllerAs: 'vm',
+          resolve: {
+            childRemove: getChild
+          },
+          data: {
+            roles: ['user', 'admin']
+            //       pageTitle: 'Sync database {{ database.title }}'
+          }
+        })
+        .state('children.sync', {
+          url: '/sync/:stakeDB/:stakeName',
+          templateUrl: 'modules/children/client/views/sync-children.client.view.html',
+          controller: 'ChildrenSyncController',
+          controllerAs: 'vm',
+          resolve: {
+            childSync: listCountries
+          },
+          data: {
+            roles: ['user', 'admin']
+     //       pageTitle: 'Sync database {{ database.title }}'
+          }
+        })
+        .state('children.countries', {
+          url: '/countries',
+          templateUrl: 'modules/children/client/views/country.client.view.html',
+          controller: 'ChildrenCountryController',
+          controllerAs: 'vm',
+          resolve: {
+            countryResolve: listCountries
+            // childResolve: listChildren
+          },
+          data: {
+
+          }
+        })
+        .state('children.stake', {
+          url: '/stakes/:country',
+          templateUrl: 'modules/children/client/views/stakes.client.view.html',
+          controller: 'ChildrenStakeController',
+          controllerAs: 'vm',
+          data: {
+
           }
         })
         .state('children.newsurvey', {
-          url: '/:childId/survey',
+          url: '/survey/:childId',
           templateUrl: 'modules/children/client/views/add-survey.client.view.html',
           controller: 'SurveyController',
           controllerAs: 'vm',
@@ -32,7 +83,7 @@
             surveyResolve: getSurvey
           },
           data: {
-            roles: ['user', 'admin']
+
           }
         })
         .state('children.create', {
@@ -44,11 +95,11 @@
             childResolve: newChild
           },
           data: {
-            roles: ['user', 'admin']
+
           }
         })
         .state('children.edit', {
-          url: '/:childId/edit',
+          url: '/edit/:childId',
           templateUrl: 'modules/children/client/views/form-child.client.view.html',
           controller: 'ChildrenController',
           controllerAs: 'vm',
@@ -56,11 +107,11 @@
             childResolve: getChild
           },
           data: {
-            roles: ['user', 'admin']
+
           }
         })
         .state('children.editsurvey', {
-          url: '/:childId/survey/:surveyId',
+          url: '/survey/edit/:childId/:surveyId',
           templateUrl: 'modules/children/client/views/add-survey.client.view.html',
           controller: 'SurveyController',
           controllerAs: 'vm',
@@ -68,11 +119,23 @@
             surveyResolve: getSurvey
           },
           data: {
-            roles: ['user', 'admin']
+
+          }
+        })
+        .state('children.removeSurvey', {
+          url: '/survey/remove/:childId/:surveyId',
+          templateUrl: 'modules/children/client/views/remove-screening.client.view.html',
+          controller: 'SurveyController',
+          controllerAs: 'vm',
+          resolve: {
+            surveyResolve: getSurvey
+          },
+          data: {
+
           }
         })
         .state('children.view', {
-          url: '/:childId',
+          url: '/view/:childId',
           templateUrl: 'modules/children/client/views/view-child.client.view.html',
           controller: 'ChildrenController',
           controllerAs: 'vm',
@@ -80,19 +143,28 @@
             childResolve: getChild
           },
           data: {
-            roles: ['user', 'admin']
+
           }
         });
   }
 
-  listChildren.$inject = ['PouchService'];
+  listChildren.$inject = ['$stateParams', 'PouchService'];
+  function listChildren($stateParams, PouchService) {
+    PouchService.createDatabase($stateParams.stakeDB);
+    return PouchService.initLocalDb();
+  }
 
-  function listChildren(PouchService) {
-    return PouchService.queryChildPromise();
+  initLocalDb.$inject = ['$stateParams', 'PouchService'];
+  function initLocalDb($stateParams, PouchService) {
+    PouchService.createDatabase($stateParams.stakeDB);
+    return PouchService.initLocalDb();
+  }
+  listCountries.$inject = ['$stateParams', 'ChildrenStakes'];
+  function listCountries($stateParams, ChildrenStakes) {
+    return ChildrenStakes;
   }
 
   getChild.$inject = ['$stateParams', 'PouchService'];
-
   function getChild($stateParams, PouchService) {
     if ($stateParams.childId === '') {
       return PouchService;
@@ -104,7 +176,6 @@
   }
 
   getSurvey.$inject = ['$stateParams', 'PouchService'];
-
   function getSurvey($stateParams, PouchService) {
     if ($stateParams.surveyId === undefined) {
       return PouchService;
@@ -116,13 +187,11 @@
   }
 
   newChild.$inject = ['PouchService'];
-
   function newChild(PouchService) {
     return PouchService;
   }
 
   listDataBases.$inject = ['PouchService'];
-
   function listDataBases(PouchService) {
     return PouchService;
   }

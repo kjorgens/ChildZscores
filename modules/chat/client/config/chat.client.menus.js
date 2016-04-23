@@ -9,9 +9,11 @@
 
   function menuConfig(menuService) {
     // Set top bar menu items
-    menuService.addMenuItem('topbar', {
-      title: 'Chat',
-      state: 'chat'
-    });
+    if (navigator.onLine) {
+      menuService.addMenuItem('topbar', {
+        title: 'Chat',
+        state: 'chat'
+      });
+    }
   }
 }());

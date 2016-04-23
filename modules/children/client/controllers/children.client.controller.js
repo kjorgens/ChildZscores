@@ -10,9 +10,19 @@
   function ChildrenController($rootScope, $scope, $state, $timeout, moment, child, ModalService, Authentication, ZScores, PouchService) {
     var vm = this;
     var editChild = false;
+   // vm.liahonaStakes = $rootScope.liahonaStakes;
+    vm.selectedStake = sessionStorage.getItem('selectedStake');
+    vm.selectedDB = sessionStorage.getItem('selectedDBName');
+//    vm.selectedCountryObject = sessionStorage.getItem('selectedCountryObject');
+    vm.selectedCountry = sessionStorage.getItem('selectedCountry');
+    vm.selectedCountryImage = sessionStorage.getItem('selectedCountryImage');
+    vm.online = $rootScope.appOnline;
+    vm.phoneNum;
+//    vm.find();
     if ($state.params.childId) {
       editChild = true;
       vm.child = child;
+      // vm.child.stake = $rootScope.selectedStake;
       vm.ageIsValid = true;
       vm.firstNameIsValid = true;
       vm.lastNameIsValid = true;
@@ -26,12 +36,12 @@
       PouchService.getSurveys(vm.child._id, setSurveyList, surveyErrors);
     } else {
       vm.ageIsValid = false;
-
-      vm.firstNameIsValid = false;
-      vm.lastNameIsValid = false;
-      vm.genderIsValid = false;
-      vm.birthdateIsValid = false;
-      vm.stakeIsValid = false;
+      vm.stake = sessionStorage.getItem('selectedStake');
+  //    vm.firstNameIsValid = false;
+  //    vm.lastNameIsValid = false;
+  //    vm.genderIsValid = false;
+  //    vm.birthdateIsValid = false;
+ //     vm.stakeIsValid = false;
       vm.surveyDate = new Date();
     }
 
@@ -41,16 +51,16 @@
     vm.userHasUserRole = false;
 
     vm.authentication = Authentication;
-    if (vm.authentication.user.roles !== undefined && vm.authentication.user.roles !== null) {
-      vm.authentication.user.roles.forEach(function (role) {
-        if (role.indexOf('admin') !== -1) {
-          vm.userHasAdminRole = true;
-        }
-        if (role.indexOf('user') !== -1) {
-          vm.userHasUserRole = true;
-        }
-      });
-    }
+    // if (vm.authentication.user.roles !== undefined && vm.authentication.user.roles !== null) {
+    //   vm.authentication.user.roles.forEach(function (role) {
+    //     if (role.indexOf('admin') !== -1) {
+    //       vm.userHasAdminRole = true;
+    //     }
+    //     if (role.indexOf('user') !== -1) {
+    //       vm.userHasUserRole = true;
+    //     }
+    //   });
+    // }
     vm.error = null;
     vm.form = {};
     vm.enteredMonthAge = undefined;
@@ -65,29 +75,57 @@
     vm.checkFirstNameIsValid = checkFirstNameIsValid;
     vm.checkLastNameIsValid = checkLastNameIsValid;
     vm.checkGenderIsValid = checkGenderIsValid;
-
- //   vm.checkMotherIsValid = checkMotherIsValid;
- //   vm.checkFatherIsValid = checkLastNameIsValid;
- //   vm.checkStreetAddressIsValid = checkStreetAddressIsValid;
- //   vm.checkCityIsValid = checkCityIsValid;
     vm.checkStakeIsValid = checkStakeIsValid;
- //   vm.checkWardIsValid = checkWardIsValid;
     vm.checkAgeIsValid = checkAgeIsValid;
     vm.checkEnteredAgeIsValid = checkEnteredAgeIsValid;
-    vm.checkAllFieldsValid = checkAllFieldsValid;
-//    vm.childInfoString = childInfoString;
-//    vm.syncUpstream = syncUpstream;
+    // vm.checkAllFieldsValid = checkAllFieldsValid;
 
-    // Put event listeners into place
+    function gradeZScores(survey) {
+      vm.haStatus = 'normalZscore';
+      vm.waStatus = 'normalZscore';
+      vm.wlStatus = 'normalZscore';
+      if (survey.zScore.ha < -2) {
+        vm.haStatus = 'redZoneZscore';
+        vm.child.screeningStatus = 'redZoneZscore';
+      } else {
+        if (survey.zScore.ha < -1 && survey.zScore.ha > -2) {
+          vm.haStatus = 'marginalZscore';
+          vm.child.screeningStatus = 'marginalZscore';
+        }
+      }
+      if (survey.zScore.wa < -2) {
+        vm.waStatus = 'redZoneZscore';
+        vm.child.screeningStatus = 'redZoneZscore';
+      } else {
+        if (survey.zScore.wa < -1 && survey.zScore.wa > -2) {
+          vm.child.screeningStatus = 'marginalZscore';
+          vm.waStatus = 'marginalZscore';
+        }
+      }
+      if (survey.zScore.wl < -3) {
+        vm.wlStatus = 'dangerZscore';
+        vm.child.screeningStatus = 'dangerZscore';
+      } else {
+        if (survey.zScore.wl < -2 && survey.zScore.wl > -3) {
+          vm.child.screeningStatus = 'redZoneZscore';
+          vm.wlStatus = 'redZoneZscore';
+        } else {
+          if (survey.zScore.wl < -1 && survey.zScore.wl > -2) {
+            vm.wlStatus = 'marginalZscore';
+            vm.child.screeningStatus = 'marginalZscore';
+          }
+        }
+      }
+    }
 
     function setSurveyList(surveys) {
       $scope.$apply(function() {
-        vm.surveys = surveys;
-        // vm.surveys.forEach(function(survey){
-        //  if(Math.abs(survey.zscore.ha) > 2 || Math.abs(survey.zscore.wa) > 2 || Math.abs(survey.zscore.wl) > 2){
-        //    vm.screeningColor = 'orange';
-        //  }
-        // });
+        vm.surveys = surveys.docs;
+ //       vm.surveys.forEach(function(survey) {
+ //        if (vm.surveys.length > 0) {
+ //          gradeZScores(vm.surveys[0]);
+ //        }
+ //       });
       });
     }
 
@@ -99,12 +137,7 @@
       checkFirstNameIsValid();
       checkLastNameIsValid();
       checkGenderIsValid();
- //     checkMotherIsValid ();
- //     checkFatherIsValid ();
-//      checkStreetAddressIsValid ();
-//      checkCityIsValid ();
       checkStakeIsValid();
-//      checkWardIsValid ();
       checkAgeIsValid();
 
       if (vm.firstNameIsValid === true && vm.lastNameIsValid === true &&
@@ -120,9 +153,7 @@
     }
 
     function setMonthCount() {
-
       var months;
-
       var rightNow = new Date();
       vm.monthAge = moment(rightNow).diff(moment(vm.birthDate), 'months');
       if (vm.monthAge > 60) {
@@ -135,7 +166,7 @@
 
     function checkFirstNameIsValid() {
       if (vm.child.firstName) {
-        if (vm.child.firstName.length < 1 || vm.child.firstName.length > 25) {
+        if (vm.child.firstName.length < 1) {
           vm.firstNameIsValid = false;
         } else {
           vm.firstNameIsValid = true;
@@ -250,8 +281,8 @@
         vm.ageIsValid = false;
       } else {
         vm.ageIsValid = true;
-        vm.child.monthAge = vm.enteredMonthAge || vm.monthAge.toFixed(2);
-        vm.enteredMonthAge = vm.child.monthAge;
+        vm.child.monthAge = vm.monthAge.toFixed(2);
+        vm.enteredMonthAge = Number(vm.monthAge);
       }
     }
 
@@ -301,7 +332,10 @@
           city: vm.child.city,
           stake: vm.child.stake,
           ward: vm.child.ward,
-          interviewer: vm.authentication.user.displayName
+          phone: vm.phoneNum,
+          memberStaus: vm.memberStatus,
+          screeningStatus: vm.screeningStatus
+//          interviewer: vm.authentication.user.displayName
         };
 
         PouchService.insert(childObject, newChild, errorHandle);
@@ -342,11 +376,11 @@
     // Remove existing Child
     function remove(child) {
       if (child) {
-        vm.surveys.docs.forEach(function(toRemove) {
+        vm.surveys.forEach(function(toRemove) {
           PouchService.remove(toRemove, removeResponse, removeError);
         });
         PouchService.remove(child, removeResponse, removeError);
-        $state.go('children.list');
+        $state.go('children.list', { stakeDB: vm.selectedDB, stakeName: vm.selectedStake });
       }
     }
 

@@ -23,6 +23,7 @@ module.exports = {
         'public/lib/angular-file-upload/dist/angular-file-upload.js',
         'public/lib/owasp-password-strength-test/owasp-password-strength-test.js',
         'public/lib/pouchdb/dist/pouchdb.js',
+        'public/lib/pouchdb-all-dbs/dist/pouchdb.all-dbs.js',
         'public/lib/pouchdb-find/dist/pouchdb.find.js',
         'public/lib/angular-pouchdb/angular-pouchdb.js',
         'public/lib/angular-uuid/uuid.js',

@@ -1,0 +1,22 @@
+<section>
+    <div class="page-header" style="margin-top: 8em">
+        <img src="modules/core/client/img/brand/logo_small.png">
+        <h1>Select Country</h1>
+    </div>
+    <div class="list-group">
+        <a ng-repeat="country in vm.liahonaStakes.countries" ui-sref="children.stake({country: country.name})" class="list-group-item">
+            <small class="list-group-item-text">
+                <h2>
+                    <img ng-src={{country.image}}>
+                    <span ng-bind="country.name"></span>
+                </h2>
+            </small>
+        </a>
+    </div>
+    <h4>
+        <br>  Designed for offline use with Chrome
+        <br>  You must enable offline pages in Chrome
+        <br>  Open your brower at chrome://flags/#offline-pages-mode
+        <br>  And ensure this option is enabled
+    </h4>
+</section>

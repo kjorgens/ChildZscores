@@ -1,0 +1,38 @@
+<section>
+    <div class="page-header" style="margin-top: 4em">
+        <img src={{vm.selectedCountryImage}}>
+        <!--<h3>{{vm.selectedCountry}}</h3>-->
+        <!--<h3>{{vm.selectedStake}}</h3>-->
+        <!--<h4>-->
+        <!--<span><a ui-sref="children.stake({country: vm.selectedCountry})">{{vm.selectedCountry}}</a></span>-->
+        <!--<i class="glyphicon glyphicon-list"></i>-->
+        <!--</h4>-->
+        <!--<h4>-->
+        <!--<span><a ui-sref="children.list({stakeDB: vm.selectedDB, stakeName:vm.selectedStake})">{{vm.selectedStake}}</a></span>-->
+        <!--<i class="glyphicon glyphicon-list"></i>-->
+        <!--</h4>-->
+        <!--<h3>-->
+        <!--<span><a ui-sref="children.edit({childId: vm.child._id,surveyId:''})">{{vm.child.firstName}}{{vm.child.lastName}}</a></span>-->
+        <!--<i class="glyphicon glyphicon-edit"></i>-->
+        <!--</h3>-->
+        <h3>
+            <span><a ui-sref="children.view({childId: vm.child._id})">Cancel</a></span>
+        </h3>
+    </div>
+    <div class="list-group borderless">
+        <a ng-click="vm.remove(vm.survey)" class="list-group-item borderless">
+            <small class="list-group-item-text">
+                <div class="alert alert-danger" role="alert" style="text-align: center">
+                    <h3>
+                        <span >Remove screening for {{vm.child.firstName}} {{vm.child.lastName}}</span>
+                        <i class="glyphicon glyphicon-trash"></i>
+                    </h3>
+                </div>
+            </small>
+        </a>
+    </div>
+    <h3>Pressing the button above will
+        remove this screening record from the local database, and on the next successful sync, the
+        record will be removed from the remote database.</h3>
+
+</section>

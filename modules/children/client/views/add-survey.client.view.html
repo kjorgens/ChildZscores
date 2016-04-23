@@ -1,38 +1,63 @@
 <section>
-    <div class="page-header">
-        <div class='btn-toolbar pull-right'>
-            <div class="btn-group">
-                <a class="btn btn-primary" ui-sref="children.view({childId: vm.child._id})">Cancel</a>
-            </div>
-            <a class="btn btn-primary" ng-click="vm.remove(vm.survey)" ng-if="vm.userHasAdminRole">
-                Remove
-                <i class="glyphicon glyphicon-trash"></i>
-            </a>
-        </div>
-        <h1 style="margin-top: 2em">{{vm.survey._id ? 'Edit Screening' : 'Add New Screening'}}</h1>
-        <h3 class="list-group-item-heading">
-            <h2><span ng-bind="vm.child.firstName"></span>
+    <div class="page-header" style="margin-top: 4em">
+        <!--<img src={{vm.selectedCountryImage}}>-->
+        <!--&lt;!&ndash;<h3>{{vm.selectedCountry}}</h3>&ndash;&gt;-->
+        <!--&lt;!&ndash;<h3>{{vm.selectedStake}}</h3>&ndash;&gt;-->
+        <!--<h4>-->
+            <!--<span><a ui-sref="children.stake({country: vm.selectedCountry})">{{vm.selectedCountry}}</a></span>-->
+            <!--<i class="glyphicon glyphicon-list"></i>-->
+        <!--</h4>-->
+        <!--<h4>-->
+            <!--<span><a ui-sref="children.list({stakeDB: vm.selectedDB, stakeName:vm.selectedStake})">{{vm.selectedStake}}</a></span>-->
+            <!--<i class="glyphicon glyphicon-list"></i>-->
+        <!--</h4>-->
+        <!--<h3>-->
+            <!--<span><a ui-sref="children.edit({childId: vm.child._id,surveyId:''})">{{vm.child.firstName}}{{vm.child.lastName}}</a></span>-->
+            <!--<i class="glyphicon glyphicon-edit"></i>-->
+        <!--</h3>-->
+
+        <!--<div class='btn-toolbar pull-right'>-->
+            <!--<div class="btn-group">-->
+                <!--<a class="btn btn-primary" ui-sref="children.view({childId: vm.child._id})">Cancel</a>-->
+            <!--</div>-->
+            <!--<a class="btn btn-primary" ng-click="vm.remove(vm.survey)">-->
+                <!--Remove-->
+                <!--<i class="glyphicon glyphicon-trash"></i>-->
+            <!--</a>-->
+        <!--</div>-->
+
+        <h4 class="list-group-item-heading">
+            <h3><span ng-bind="vm.child.firstName"></span>
             <span ng-bind="vm.child.lastName"></span>
-            <span ng-bind="vm.child.birthDate | date:'mediumDate'"></span></h2>
+            <span ng-bind="vm.child.birthDate | date:'mediumDate'"></span></h3>
             Screened on
             <span ng-bind="vm.rightNow | date:'mediumDate'"></span>
             by
             <span ng-bind="vm.child.interviewer"></span>
+        </h4>
+        <h2>{{vm.survey._id ? 'Edit Screening' : 'Add New Screening'}}</h2>
+        <h3>
+            <span><a ui-sref="children.view({childId: vm.child._id})">Cancel</a></span>
         </h3>
+
+
     </div>
-    <div class="col-md-12">
+    <div class="col-md-12 CreateChildFormContainer">
         <form name="vm.form.surveyForm" class="form-horizontal"
               ng-submit="vm.addSurvey(vm.form.surveyForm.$valid)" novalidate>
             <fieldset>
                 <div class="row">
                     <div class="form-group">
-                        <label for="vm.surveyDate" class="col-sm-3 control-label">Screening date</label>
-                        <div class="col-sm-3">
-                            <input type="date" id="vm.surveyDate"  class="form-control"
-                                   uib-datepicker-popup
-                                   ng-model="vm.surveyDate"
-                                   is-open="status.opened" required>
-                        </div>
+
+                      <label for="vm.survey.weight" class="col-sm-2 control-label">Weight</label>
+                      <div class="col-sm-4" ng-class="{'has-error':(!vm.childWeightIsValid)}">
+                        <input type="number" class="form-control" ng-blur="vm.checkWeightIsValid()"
+                               ng-model="vm.survey.weight" id="vm.survey.weight"
+                               placeholder="Weight" required>
+                        <div class="validationMessage" ng-if="!vm.childweightIsValid"><p>Please enter a valid
+                          weight (3-18)</p></div>
+                      </div>
+
                         <div ng-class="{'has-error':(!vm.childHeightIsValid)}">
                             <label for="vm.survey.height" class="col-sm-2 control-label">Height</label>
                             <div class="col-sm-4">
@@ -44,14 +69,9 @@
                             </div>
                         </div>
                         <div ng-class="{'has-error':(!vm.childweightIsValid)}">
-                            <label for="vm.survey.weight" class="col-sm-2 control-label">Weight</label>
-                            <div class="col-sm-4">
-                                <input type="number" class="form-control" ng-blur="vm.checkWeightIsValid()"
-                                       ng-model="vm.survey.weight" id="vm.survey.weight"
-                                       placeholder="Weight" required>
-                                <div class="validationMessage" ng-if="!vm.childweightIsValid"><p>Please enter a valid
-                                    weight (3-18)</p></div>
-                            </div>
+
+
+
                         </div>
                     </div>
                     <div class="form-group">
@@ -60,18 +80,33 @@
                                 <textarea class="form-control" ng-model="vm.survey.comments" id="vm.survey.comments"
                                           placeholder="Comments" ></textarea>
                         </div>
-                        <div class="col-sm-4" style="text-align: center">
-                            <div style="margin-top:4%;">
-                                <button type="submit" class="btn btn-primary">{{vm.survey._id ? 'Update' : 'Create'}}
-                                </button>
-                            </div>
-                        </div>
+                      <label for="vm.surveyDate" class="col-sm-2 control-label">Screening date</label>
+                      <div class="col-sm-4">
+                        <input type="date" id="vm.surveyDate"  class="form-control"
+                               uib-datepicker-popup
+                               ng-model="vm.surveyDate"
+                               is-open="status.opened" required>
+                      </div>
+
+
                     </div>
+
+                  <div class="col-sm-4" style="text-align: center">
+                    <div style="margin-top:4%;">
+                      <button type="submit" class="btn btn-primary">{{vm.survey._id ? 'Update' : 'Create'}}
+                      </button>
+                    </div>
+                  </div>
                     <!--<video id="video" width="640" height="480" autoplay></video>-->
                     <!--<button id="snap">Snap Photo</button>-->
                     <!--<canvas id="canvas" width="640" height="480"></canvas>-->
                 </div>
             </fieldset>
         </form>
+
     </div>
+    <h5>
+        <span><a ui-sref="children.removeSurvey({ surveyId:vm.survey._id, childId:vm.child._id})">Remove Screening</a></span>
+        <i class="glyphicon glyphicon-trash"></i>
+    </h5>
 </section>

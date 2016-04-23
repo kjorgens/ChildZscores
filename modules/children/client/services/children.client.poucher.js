@@ -6,25 +6,135 @@
     .module('children.pouchService')
     .factory('PouchService', PouchService);
 
-  PouchService.$inject = ['pouchDB', 'uuid4'];
+  PouchService.$inject = ['$q', 'pouchDB', 'uuid4', 'moment'];
 
-  function PouchService(pouchDB, uuid4) {
+  function PouchService($q, pouchDB, uuid4, moment) {
     var factory = {};
     var database;
+    var countryDataBase;
+    var remoteDbList;
+    var localDbList;
+    var currentDbName;
+
     factory.createDatabase = function (dbName) {
+      currentDbName = dbName;
       database = new pouchDB (dbName);
     };
 
-    factory.createIndex = function (indexName) {
-      database.createIndex({
-        index: {
-          fields: [indexName]
-        }
-      }).then(function (result) {
-        var theResult = result;
-      }).catch(function (err) {
-        var error = err;
+    factory.createCountryDatabase = function () {
+      countryDataBase = new pouchDB ('country_list');
+    };
+
+    factory.initLocalDb = function(indexNames) {
+      var deferred = $q.defer();
+      var indexFunctions = [];
+      angular.forEach(indexNames, function(index) {
+        indexFunctions.push(database.createIndex({ index: { fields: [index] } }));
       });
+      $q.all(indexFunctions)
+      .then(
+          function(results) {
+            deferred.resolve(results);
+          },
+          function(errors) {
+            deferred.reject(errors);
+          },
+          function(updates) {
+            deferred.update(updates);
+          });
+      return deferred.promise;
+    };
+
+    factory.getAllDbsLocal = function(callback) {
+      PouchDB.allDbs(function(err, dbs) {
+        if (err) {
+          var error = err;
+        }
+        callback(dbs);
+      });
+    };
+
+    factory.putStakesLocal = function (countryObj, callback, errCallback) {
+      var newObj = {};
+      countryDataBase.get('liahona_kids_countries_stakes')
+          .then(function (response) {
+            newObj._id = response._id;
+            newObj._rev = response._rev;
+            newObj.countries = countryObj.countries;
+            countryDataBase.put(newObj)
+                .then(function (response) {
+                  // Do something with the response
+                  callback(response);
+                })
+                .catch(function (error) {
+                  // Do something with the error
+                  errCallback(error);
+                })
+                .finally(function () {
+                  // Do something when everything is done
+                });
+          })
+          .catch(function (error) {
+            newObj._id = 'liahona_kids_countries_stakes';
+            newObj.countries = countryObj.countries;
+            countryDataBase.put(newObj)
+                .then(function (response) {
+                  // Do something with the response
+                  callback(response);
+                })
+                .catch(function (error) {
+                  // Do something with the error
+                  errCallback(error);
+                })
+                .finally(function () {
+                  // Do something when everything is done
+                });
+          });
+    };
+
+    factory.getCountriesLocal = function (callback, errCallback) {
+      countryDataBase.get('liahona_kids_countries_stakes')
+      // countryDataBase.allDocs({ include_docs: true, attachments: true })
+      .then(function (response) {
+      // Do something with the response
+        callback(response);
+      })
+      .catch(function(error) {
+      // Do something with the error
+        errCallback(error);
+      });
+    };
+
+    // factory.getDbListRemote = function (callback, errorCallback, nextState) {
+    //   countryDataBase.sync('https://syncuser:mZ7K3AldcIzO@database.liahonakids.org:5984/country_list').$promise
+    //       .then(function (response) {
+    //         // Do something with the response
+    //         callback(response);
+    //       })
+    //       .catch(function (error) {
+    //         // Do something with the error
+    //         errorCallback(error);
+    //       })
+    //       .finally(function () {
+    //         nextState();
+    //         // Do something when everything is done
+    //       });
+    // };
+
+    factory.createIndex = function (indexName, callback, errCallback) {
+      return database.createIndex({ index: {
+        fields: [indexName]
+      }
+      });
+//      database.createIndex
+      //   index: {
+      //     fields: [indexName]
+      //   }
+      // }).then(function (result) {
+      //   callback(result);
+      // }).catch(function (err) {
+      //   errCallback(err);
+      // });
     };
 
     factory.queryChildPromise = function () {
@@ -71,9 +181,10 @@
       });
     };
 
-    factory.destroyDatabase = function (dbName) {
-      database.destroy(dbName);
-    };
+    // factory.destroyDatabase = function (dbName) {
+    //   database = new pouchDB (dbName);
+    //   database.destroy();
+    // };
 
     factory.getAll = function (callback, errCallback) {
       database.allDocs({ include_docs: true, attachments: true })
@@ -167,7 +278,7 @@
     };
 
     factory.insert = function (childInfo, callback, errorCallback) {
-      childInfo._id = childInfo._id || uuid4.generate();
+      childInfo._id = childInfo._id || currentDbName + '_' + moment.now();
       if (childInfo._rev) {
         childInfo._rev = childInfo._rev;
       }

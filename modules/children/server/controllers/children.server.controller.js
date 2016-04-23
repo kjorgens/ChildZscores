@@ -6,6 +6,7 @@
 var path = require('path'),
   mongoose = require('mongoose'),
   Child = mongoose.model('Child'),
+  request = require('request'),
   errorHandler = require(path.resolve('./modules/core/server/controllers/errors.server.controller'));
 
 /**
@@ -70,6 +71,31 @@ exports.update = function(req, res) {
   });
 };
 
+exports.getCountryList = function(req, res) {
+  request.get("https://database.liahonakids.org:5984/country_list/liahona_kids_countries_stakes", function (error, response, body) {
+    if (!error && response.statusCode === 200) {
+      var jsonObj = JSON.parse(body);
+      res.json(jsonObj);
+    } else {
+      return res.status(400).send({
+        message: errorHandler.getErrorMessage(error)
+      });
+    }
+  });
+};
+
+exports.listDbs = function(req, res) {
+  request.get("https://database.liahonakids.org:5984/_all_dbs", function (error, response, body) {
+    if (!error && response.statusCode === 200) {
+      var jsonObj = JSON.parse(body);
+      res.json(jsonObj);
+    } else {
+      return res.status(400).send({
+        message: errorHandler.getErrorMessage(error)
+      });
+    }
+  });
+};
 /**
  * Delete an child
  */

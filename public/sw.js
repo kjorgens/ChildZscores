@@ -29,7 +29,7 @@ self.addEventListener('install', function (event) {
     return Promise.all(
         cacheNames.map(function(cacheName) {
           // If this cache name isn't present in the array of "expected" cache names, then delete it.
-          if(expectedCaches.indexOf(cacheName) == -1) {
+          if (expectedCaches.indexOf(cacheName) === -1) {
             console.log('Deleting out of date cache: ', cacheName);
             return caches.delete(cacheName);
           }
@@ -55,6 +55,7 @@ self.addEventListener('install', function (event) {
       '/public/lib/owasp-password-strength-test/owasp-password-strength-test.js',
       '/public/lib/pouchdb/dist/pouchdb.min.js',
       '/public/lib/pouchdb-find/dist/pouchdb.find.min.js',
+      '/public/lib/pouchdb-all-dbs/dist/pouchdb.all-dbs.min.js',
       '/public/lib/angular-pouchdb/angular-pouchdb.min.js',
       '/public/lib/angular-uuid/uuid.min.js',
       '/public/lib/angular-spinner/angular-spinner.min.js',
@@ -65,12 +66,24 @@ self.addEventListener('install', function (event) {
       '/modules/children/client/views/form-child.client.view.html',
       '/modules/children/client/views/list-children.client.view.html',
       '/modules/children/client/views/view-child.client.view.html',
+      '/modules/children/client/views/sync-children.client.view.html',
+      '/modules/children/client/views/remove-child.client.view.html',
+      '/modules/children/client/views/remove-screening.client.view.html',
+      '/modules/children/client/img/boliva.png',
+      '/modules/children/client/img/columbia.png',
+      '/modules/children/client/img/ecuador.png',
+      '/modules/children/client/img/guatamala.png',
+      '/modules/children/client/img/mongolia.png',
+      '/modules/children/client/img/peru.png',
+      '/modules/children/client/img/philippines.png',
+      '/modules/children/client/img/zimbabwe.png',
       '/modules/chat/client/views/chat.client.view.html',
       '/modules/core/client/views/400.client.view.html',
       '/modules/core/client/views/403.client.view.html',
       '/modules/core/client/views/404.client.view.html',
       '/modules/core/client/views/header.client.view.html',
-      '/modules/core/client/views/home.client.view.html'
+      '/modules/core/client/views/home.client.view.html',
+      '/modules/children/client/views/stakes.client.view.html'
     ]);
   }));
 
@@ -94,7 +107,7 @@ var whitelist = [
 
 ];
 
-self.onmessage = function(msg){
+self.onmessage = function(msg) {
   console.log('MESSAGE RECEIVED IN SERVICE WORKER ', msg);
 };
 
@@ -125,18 +138,18 @@ self.addEventListener('fetch', function (event) {
     return event.respondWith(
         fetch(event.request)
             .then(function (response) {
-              console.log('responding with latest');
+ //             console.log('responding with latest');
               var cacheCopy = response.clone();
               caches.open(CACHE_LIST['dynamic-cache'])
                 .then(function (cache) {
-                  if (event.request.method !== 'POST'){
+                  if (event.request.method !== 'POST') {
                     cache.put(event.request, cacheCopy);
                   }
                 });
               return response;
             })
             .catch(function () {
-              console.log('responding from cache');
+ //             console.log('responding from cache');
               return caches.match(event.request);
             })
     );

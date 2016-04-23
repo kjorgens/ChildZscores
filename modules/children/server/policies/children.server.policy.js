@@ -18,7 +18,7 @@ exports.invokeRolesPolicies = function () {
       resources: '/',
       permissions: '*'
     }, {
-      resources: '/:childId',
+      resources: '/view/:childId',
       permissions: '*'
     }]
   }, {
@@ -27,25 +27,28 @@ exports.invokeRolesPolicies = function () {
       resources: '/',
       permissions: ['get', 'post']
     }, {
-      resources: '/:childId',
+      resources: '/view/:childId',
       permissions: ['get']
     }, {
-      resources: '/children',
-      permissions: ['get', 'post']
-    }, {
+    //   resources: '/children',
+    //   permissions: ['get', 'post']
+    // }, {
       resources: '/create',
       permissions: ['get', 'post']
     }, {
-      resources: '/:childId/edit',
+      resources: '/edit/:childId',
       permissions: ['get', 'post']
     }, {
-      resources: '/:childId/survey/:surveyId',
+      resources: '/survey/:childId/:surveyId',
       permissions: ['get', 'post']
     }]
   }, {
     roles: ['guest'],
     allows: [{
       resources: '/',
+      permissions: ['get']
+    }, {
+      resources: '/stakes',
       permissions: ['get']
     }, {
       resources: '/:childId',

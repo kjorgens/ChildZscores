@@ -1,0 +1,16 @@
+<section>
+    <div class="page-header" style="margin-top: 8em">
+        <img src={{vm.selectedCountry.image}}>
+        <h1>Select Stake</h1>
+    </div>
+    <div class="list-group">
+        <a ng-repeat="stake in vm.selectedCountry.stakes"
+           ui-sref="children.list({stakeDB: stake.stakeDB, stakeName: stake.stakeName})" class="list-group-item">
+            <small class="list-group-item-text">
+                <h3>
+                    <span ng-bind="stake.stakeName"></span>
+                </h3>
+            </small>
+        </a>
+    </div>
+</section>

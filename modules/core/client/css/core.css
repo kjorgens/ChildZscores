@@ -42,17 +42,24 @@ a:hover .header-profile-image {
 .has-error .help-inline.error-text {
   display: inline;
 }
+.selectStake {
+  font-size: 25px;
+}
+
+.backgroundStyle {
+    background-color: #f9b35d;
+}
 
 .CreateChildFormContainer {
-  color: black;
-  background-color: #65AEAE;
-  border-radius: 5px;
-  padding: 2%;
-  padding-top: -2%;
-  font-size: 16px;
-  font-weight: lighter;
-  border: 1px solid #CFD3D3;
-  font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif;
+    color: black;
+    background-color: #f9b35d;
+    border-radius: 5px;
+    padding: 2%;
+    padding-top: -2%;
+    font-size: 16px;
+    font-weight: lighter;
+    border: 1px solid #CFD3D3;
+    font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif;
 }
 
 .CreateChildContainer {
@@ -66,5 +73,29 @@ a:hover .header-profile-image {
   color: #a94442;
 }
 
+.right-side-child {
+  text-align: center;
+}
+
 .required input:after { content:"*"; }
 
+.normalZscore {
+  color: green;
+}
+
+.marginalZscore {
+  color: orange;
+}
+
+.dangerZscore {
+  background-color: black;
+  color: white;
+}
+
+.redZoneZscore {
+  color: red;
+}
+
+.lower {
+  text-transform: lowercase;
+}
