@@ -14,13 +14,13 @@
       vm.liahonaStakes = input;
     }
     function returnFromPut(input) {
-        console.log(input);
+      console.log(input);
     }
     function handleError(input) {
       console.log(input);
     }
 
-    if ($rootScope.appOnline) {
+    if (navigator.onLine) {
       ChildrenStakes.get(function(retVal) {
  //       sessionStorage.setItem('liahonaStakesObject', retVal);
         vm.liahonaStakes = retVal;
@@ -28,6 +28,8 @@
         PouchService.putStakesLocal(retVal, returnFromPut, handleError);
       });
     } else {
+      // use the last database if it exits
+      // $state.go('children.list',{country,stake}
       PouchService.createCountryDatabase();
       PouchService.getCountriesLocal(storeDbList, handleError);
     }

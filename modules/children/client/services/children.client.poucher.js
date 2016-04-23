@@ -6,9 +6,9 @@
     .module('children.pouchService')
     .factory('PouchService', PouchService);
 
-  PouchService.$inject = ['pouchDB', 'uuid4', 'moment'];
+  PouchService.$inject = ['$q', 'pouchDB', 'uuid4', 'moment'];
 
-  function PouchService(pouchDB, uuid4, moment) {
+  function PouchService($q, pouchDB, uuid4, moment) {
     var factory = {};
     var database;
     var countryDataBase;
@@ -23,6 +23,26 @@
 
     factory.createCountryDatabase = function () {
       countryDataBase = new pouchDB ('country_list');
+    };
+
+    factory.initLocalDb = function(indexNames) {
+      var deferred = $q.defer();
+      var indexFunctions = [];
+      angular.forEach(indexNames, function(index) {
+        indexFunctions.push(database.createIndex({ index: { fields: [index] } }));
+      });
+      $q.all(indexFunctions)
+      .then(
+          function(results) {
+            deferred.resolve(results);
+          },
+          function(errors) {
+            deferred.reject(errors);
+          },
+          function(updates) {
+            deferred.update(updates);
+          });
+      return deferred.promise;
     };
 
     factory.getAllDbsLocal = function(callback) {
@@ -62,7 +82,7 @@
                   // Do something with the response
                   callback(response);
                 })
-                .catch (function (error) {
+                .catch(function (error) {
                   // Do something with the error
                   errCallback(error);
                 })
@@ -101,16 +121,20 @@
     //       });
     // };
 
-    factory.createIndex = function (indexName) {
-      database.createIndex({
-        index: {
-          fields: [indexName]
-        }
-      }).then(function (result) {
-        var theResult = result;
-      }).catch(function (err) {
-        var error = err;
+    factory.createIndex = function (indexName, callback, errCallback) {
+      return database.createIndex({ index: {
+        fields: [indexName]
+      }
       });
+//      database.createIndex
+      //   index: {
+      //     fields: [indexName]
+      //   }
+      // }).then(function (result) {
+      //   callback(result);
+      // }).catch(function (err) {
+      //   errCallback(err);
+      // });
     };
 
     factory.queryChildPromise = function () {

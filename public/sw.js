@@ -66,6 +66,7 @@ self.addEventListener('install', function (event) {
       '/modules/children/client/views/form-child.client.view.html',
       '/modules/children/client/views/list-children.client.view.html',
       '/modules/children/client/views/view-child.client.view.html',
+      '/modules/children/client/views/sync-children.client.view.html',
       '/modules/children/client/img/boliva.png',
       '/modules/children/client/img/columbia.png',
       '/modules/children/client/img/ecuador.png',
@@ -73,6 +74,7 @@ self.addEventListener('install', function (event) {
       '/modules/children/client/img/mongolia.png',
       '/modules/children/client/img/peru.png',
       '/modules/children/client/img/philippines.png',
+      '/modules/children/client/img/zimbabwe.png',
       '/modules/chat/client/views/chat.client.view.html',
       '/modules/core/client/views/400.client.view.html',
       '/modules/core/client/views/403.client.view.html',
@@ -134,7 +136,7 @@ self.addEventListener('fetch', function (event) {
     return event.respondWith(
         fetch(event.request)
             .then(function (response) {
-              console.log('responding with latest');
+ //             console.log('responding with latest');
               var cacheCopy = response.clone();
               caches.open(CACHE_LIST['dynamic-cache'])
                 .then(function (cache) {
@@ -145,7 +147,7 @@ self.addEventListener('fetch', function (event) {
               return response;
             })
             .catch(function () {
-              console.log('responding from cache');
+ //             console.log('responding from cache');
               return caches.match(event.request);
             })
     );
