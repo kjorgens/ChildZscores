@@ -1,24 +1,46 @@
 <section>
-    <div class="page-header">
-        <div class='btn-toolbar pull-right'>
-            <div class="btn-group">
-                <a class="btn btn-primary" ui-sref="children.view({childId: vm.child._id})">Cancel</a>
-            </div>
-            <a class="btn btn-primary" ng-click="vm.remove(vm.survey)">
-                Remove
-                <i class="glyphicon glyphicon-trash"></i>
-            </a>
-        </div>
-        <h1 style="margin-top: 2em">{{vm.survey._id ? 'Edit Screening' : 'Add New Screening'}}</h1>
-        <h3 class="list-group-item-heading">
-            <h2><span ng-bind="vm.child.firstName"></span>
+    <div class="page-header" style="margin-top: 4em">
+        <!--<img src={{vm.selectedCountryImage}}>-->
+        <!--&lt;!&ndash;<h3>{{vm.selectedCountry}}</h3>&ndash;&gt;-->
+        <!--&lt;!&ndash;<h3>{{vm.selectedStake}}</h3>&ndash;&gt;-->
+        <!--<h4>-->
+            <!--<span><a ui-sref="children.stake({country: vm.selectedCountry})">{{vm.selectedCountry}}</a></span>-->
+            <!--<i class="glyphicon glyphicon-list"></i>-->
+        <!--</h4>-->
+        <!--<h4>-->
+            <!--<span><a ui-sref="children.list({stakeDB: vm.selectedDB, stakeName:vm.selectedStake})">{{vm.selectedStake}}</a></span>-->
+            <!--<i class="glyphicon glyphicon-list"></i>-->
+        <!--</h4>-->
+        <!--<h3>-->
+            <!--<span><a ui-sref="children.edit({childId: vm.child._id,surveyId:''})">{{vm.child.firstName}}{{vm.child.lastName}}</a></span>-->
+            <!--<i class="glyphicon glyphicon-edit"></i>-->
+        <!--</h3>-->
+
+        <!--<div class='btn-toolbar pull-right'>-->
+            <!--<div class="btn-group">-->
+                <!--<a class="btn btn-primary" ui-sref="children.view({childId: vm.child._id})">Cancel</a>-->
+            <!--</div>-->
+            <!--<a class="btn btn-primary" ng-click="vm.remove(vm.survey)">-->
+                <!--Remove-->
+                <!--<i class="glyphicon glyphicon-trash"></i>-->
+            <!--</a>-->
+        <!--</div>-->
+
+        <h4 class="list-group-item-heading">
+            <h3><span ng-bind="vm.child.firstName"></span>
             <span ng-bind="vm.child.lastName"></span>
-            <span ng-bind="vm.child.birthDate | date:'mediumDate'"></span></h2>
+            <span ng-bind="vm.child.birthDate | date:'mediumDate'"></span></h3>
             Screened on
             <span ng-bind="vm.rightNow | date:'mediumDate'"></span>
             by
             <span ng-bind="vm.child.interviewer"></span>
+        </h4>
+        <h2>{{vm.survey._id ? 'Edit Screening' : 'Add New Screening'}}</h2>
+        <h3>
+            <span><a ui-sref="children.view({childId: vm.child._id})">Cancel</a></span>
         </h3>
+
+
     </div>
     <div class="col-md-12 CreateChildFormContainer">
         <form name="vm.form.surveyForm" class="form-horizontal"
@@ -81,5 +103,10 @@
                 </div>
             </fieldset>
         </form>
+
     </div>
+    <h5>
+        <span><a ui-sref="children.removeSurvey({ surveyId:vm.survey._id, childId:vm.child._id})">Remove Screening</a></span>
+        <i class="glyphicon glyphicon-trash"></i>
+    </h5>
 </section>

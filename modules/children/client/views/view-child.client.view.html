@@ -1,20 +1,27 @@
 <section>
     <div class="page-header" style="margin-top: 6em">
-        <h2>
-        <a ui-sref="children.list({stakeDB: vm.selectedDB, stakeName:vm.selectedStake})">
-            <span ng-bind="vm.selectedStake"></span>
+        <!--<h4>-->
+            <!--<span><a ui-sref="children.stake({country: vm.selectedCountry})">{{vm.selectedCountry}}</a></span>-->
+            <!--<i class="glyphicon glyphicon-list"></i>-->
+        <!--</h4>-->
+        <h4>
+            <span><a ui-sref="children.list({stakeDB: vm.selectedDB, stakeName:vm.selectedStake})">{{vm.selectedStake}}</a></span>
             <i class="glyphicon glyphicon-list"></i>
-        </a>
-        </h2>
-        <h2>
-            <a ui-sref="children.edit({childId: vm.child._id,surveyId:''})">
-                <span ng-bind="vm.child.firstName"></span>
-                <span ng-bind="vm.child.lastName"></span>
+        </h4>
+        <h3>
+            <span><a ui-sref="children.edit({childId: vm.child._id,surveyId:''})">{{vm.child.firstName}}{{vm.child.lastName}}</a></span>
                 <i class="glyphicon glyphicon-edit"></i>
-            </a>
-        </h2>
+        </h3>
         Birth Date:
         <span ng-bind="vm.child.birthDate | date:'mediumDate'"></span>
+        <h3>
+            <span><a ui-sref="children.newsurvey({childId:vm.child._id})">Add Screening</a></span>
+            <i class="glyphicon glyphicon-plus"></i>
+        </h3>
+        <!--<h3>-->
+            <!--<span><a ui-sref="children.remove({childId:vm.child._id})">Remove Child Record</a></span>-->
+            <!--<i class="glyphicon glyphicon-trash"></i>-->
+        <!--</h3>-->
         <div class='btn-toolbar pull-right'>
             <div class="btn-group">
 
@@ -22,15 +29,15 @@
                 <!--Child List-->
                 <!--<i class="glyphicon glyphicon-list"></i>-->
                 <!--</a>-->
-                <a class="btn btn-primary" ui-sref="children.newsurvey({childId:vm.child._id})">
-                    New Screening
-                    <i class="glyphicon glyphicon-plus"></i>
-                </a>
+                <!--<a class="btn btn-primary" ui-sref="children.newsurvey({childId:vm.child._id})">-->
+                    <!--New Screening-->
+                    <!--<i class="glyphicon glyphicon-plus"></i>-->
+                <!--</a>-->
 
-                <a class="btn btn-primary" ng-click="vm.remove(vm.child)">
+                <!--<a class="btn btn-primary" ng-click="vm.remove(vm.child)">-->
 
-                    <i class="glyphicon glyphicon-trash"></i>
-                </a>
+                    <!--<i class="glyphicon glyphicon-trash"></i>-->
+                <!--</a>-->
             </div>
         </div>
 
@@ -64,4 +71,8 @@
         </a>
         </div>
     </small>
+    <h5>
+        <span><a ui-sref="children.remove({childId:vm.child._id})">Remove Child Record</a></span>
+        <i class="glyphicon glyphicon-trash"></i>
+    </h5>
 </section>

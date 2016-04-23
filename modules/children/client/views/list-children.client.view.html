@@ -2,29 +2,34 @@
   <div class="page-header" style="margin-top: 4em">
     <div class="row">
       <div class="col-md-4" class="pull-left">
-        <img src={{vm.selectedCountryImage}}>
-        <h3><a ui-sref="children.stake({country: vm.selectedCountry})">{{vm.selectedCountry}}</a>
+        <!--<img src={{vm.selectedCountryImage}}>-->
+        <h3>
+          <span><a ui-sref="children.stake({country: vm.selectedCountry})">{{vm.selectedCountry}}</a></span>
           <i class="glyphicon glyphicon-list"></i>
         </h3>
         <h3>
-        <a ui-sref="children.sync({stakeDB: vm.selectedStakeDB, stakeName:vm.selectedStake})">{{vm.selectedStake}}</a>
+        <a ui-sref="children.sync({stakeDB: vm.selectedStakeDB, stakeName:vm.selectedStake})">Sync {{vm.selectedStake}}</a>
           <i class="glyphicon glyphicon-refresh"></i>
+        </h3>
+        <h3>
+        <a ui-sref="children.create">Add Child</a>
+        <i class="glyphicon glyphicon-plus"></i>
         </h3>
       </div>
     </div>
-  <div class='btn-toolbar pull-right'>
-    <div class="btn-group" style="margin-top: 2em">
-      <a class="btn btn-primary" ui-sref="children.create">
-        Add Child
-        <i class="glyphicon glyphicon-plus"></i>
-      </a>
-      <!--<a class="btn btn-primary" ui-sref="children.sync({stakeDB: vm.selectedStakeDB, stakeName:vm.selectedStake})" ng-if="vm.online">-->
-        <!--Sync-->
-        <!--<i class="glyphicon glyphicon-refresh"></i>-->
+  <!--<div class='btn-toolbar pull-right'>-->
+    <!--<div class="btn-group" style="margin-top: 2em">-->
+      <!--<a class="btn btn-primary" ui-sref="children.create">-->
+        <!--Add Child-->
+        <!--<i class="glyphicon glyphicon-plus"></i>-->
       <!--</a>-->
+      <!--&lt;!&ndash;<a class="btn btn-primary" ui-sref="children.sync({stakeDB: vm.selectedStakeDB, stakeName:vm.selectedStake})" ng-if="vm.online">&ndash;&gt;-->
+        <!--&lt;!&ndash;Sync&ndash;&gt;-->
+        <!--&lt;!&ndash;<i class="glyphicon glyphicon-refresh"></i>&ndash;&gt;-->
+      <!--&lt;!&ndash;</a>&ndash;&gt;-->
 
-    </div>
-    </div>
+    <!--</div>-->
+    <!--</div>-->
   </div>
 
     <div class="row">
@@ -61,6 +66,6 @@
   </div>
   <span us-spinner="{radius:30, width:8, length: 16}" spinner-key="spinner-sync" spinner-theme="bigBlue"></span>
   <h3><div class="alert alert-warning text-center" ng-if="!vm.childList.docs.length">
-    No children listed? <a ui-sref="children.sync({stakeDB: vm.selectedStakeDB, stakeName:vm.selectedStake})">Sync</a> or <a ui-sref="children.create">Create</a>?
+    No children listed? <a ui-sref="children.sync({stakeDB: vm.selectedStakeDB, stakeName:vm.selectedStake})">Sync</a><i class="glyphicon glyphicon-refresh"></i> or <a ui-sref="children.create">Add Child</a><i class="glyphicon glyphicon-plus"></i>?
   </div></h3>
 </section>
