@@ -8,51 +8,42 @@
       .module('children')
       .controller('ChildrenListController', ChildrenListController);
 
-  ChildrenListController.$inject = ['$rootScope', '$scope', '$state', '$stateParams', 'childResolve', 'usSpinnerService', 'PouchService'];
+  ChildrenListController.$inject = ['$rootScope', '$scope', '$state', '$stateParams', '$window', 'childResolve', 'usSpinnerService', 'PouchService'];
 
-  function ChildrenListController($rootScope, $scope, $state, $stateParams, childResolve, usSpinnerService, PouchService) {
+  function ChildrenListController($rootScope, $scope, $state, $stateParams, $window, childResolve, usSpinnerService, PouchService) {
     var vm = this;
 
     vm.childList = childResolve;
 
- //   vm.liahonaStakes = sessionStorage.getItem('liahonaStakesObject');
     sessionStorage.setItem('selectedStake', $stateParams.stakeName);
     sessionStorage.setItem('selectedDBName', $stateParams.stakeDB);
     localStorage.setItem('selectedStake', $stateParams.stakeName);
     localStorage.setItem('selectedDBName', $stateParams.stakeDB);
-//    localStorage.setItem('selectedCountry', $stateParams.stakeName);
+
     vm.selectedStake = $stateParams.stakeName;
     vm.selectedStakeDB = $stateParams.stakeDB;
- //   vm.selectedCountryObject = sessionStorage.getItem('selectedCountryObject');
 
-//    vm.syncUpstream = syncUpstream;
-    vm.online = $rootScope.appOnline;
+    vm.onLine = navigator.onLine;
     vm.find = find;
     vm.find();
-//    vm.selectedStake = $rootScope.selectedStake;
+
+    $window.addEventListener('offline', function () {
+      $scope.$apply(function() {
+        vm.onLine = false;
+        vm.appStatus = 'Offline';
+        vm.onlineStatusColor = 'offline';
+      });
+    }, false);
+    $window.addEventListener('online', function () {
+      $scope.$apply(function() {
+        vm.onLine = true;
+        vm.appStatus = 'Online';
+        vm.onlineStatusColor = 'online';
+      });
+    }, false);
+
     vm.selectedCountry = sessionStorage.getItem('selectedCountry');
     vm.selectedCountryImage = sessionStorage.getItem('selectedCountryImage');
-
-    // vm.startSpin = function() {
-    //   if (!vm.spinneractive) {
-    //     usSpinnerService.spin('spinner-sync');
-    //   }
-    // };
-    //
-    // vm.stopSpin = function() {
-    //   if (vm.spinneractive) {
-    //     usSpinnerService.stop('spinner-sync');
-    //   }
-    // };
-    // vm.spinneractive = false;
-
-    // $rootScope.$on('us-spinner:spin', function(event, key) {
-    //   vm.spinneractive = true;
-    // });
-    //
-    // $rootScope.$on('us-spinner:stop', function(event, key) {
-    //   vm.spinneractive = false;
-    // });
 
     function childInfoString(child) {
       return child.doc.firstName + ' ' + child.doc.lastName + ' --- Birth age: ' + child.doc.monthAge.toFixed(2) + ' months,' +
@@ -60,28 +51,11 @@
           child.doc.zScore.wl.toFixed(2);
     }
 
-    // var getUser = function (childDoc) {
-    //   vm.child = childDoc;
-    //   $state.go('children.view', {
-    //     childId: childDoc._id
-    //   });
-    // };
-    //
-    // var getError = function (error) {
-    //   vm.getError = error;
-    // };
-    // Find existing Child
-    // function findOne() {
-    //   //     var something = $stateParams;
-    //   PouchService.get({ childId: vm.childId }, getUser, getError);
-    // }
-
     function setChildren(res) {
       $scope.$apply(function() {
         vm.childList = res;
       });
     }
-
     function listChildrenErrors(error) {
       vm.error = error;
     }
@@ -89,24 +63,6 @@
     function find () {
       return PouchService.queryChildren(setChildren, listChildrenErrors);
     }
-    // function whenDone() {
-    //   find();
-    //   vm.stopSpin();
-    //   console.log('couchdb sync complete');
-    // }
-    // function replicateIn (input) {
-    //   vm.repInData = input;
-    // }
-    //
-    // function replicateError(err) {
-    //   vm.repError = err;
-    // }
-    //
-    // function syncUpstream() {
-    //   vm.startSpin();
-    //   PouchService.sync('https://syncuser:mZ7K3AldcIzO@database.liahonakids.org:5984/' +
-    //       sessionStorage.getItem('selectedDBName'), replicateIn, replicateError, whenDone);
-    // }
   }
 }());
 
