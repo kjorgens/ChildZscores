@@ -20,7 +20,8 @@
           controller: 'ChildrenListController',
           controllerAs: 'vm',
           resolve: {
-            childResolve: listChildren
+    //        childResolve: listChildren
+            childResolve: initLocalDb
           },
           data: {
 
@@ -161,8 +162,9 @@
   initLocalDb.$inject = ['$stateParams', 'PouchService'];
   function initLocalDb($stateParams, PouchService) {
     PouchService.createDatabase($stateParams.stakeDB);
-    return PouchService.initLocalDb();
+    return PouchService.initLocalDb(['firstName', 'lastName', 'owner', 'surveyDate']);
   }
+
   listCountries.$inject = ['$stateParams', 'ChildrenStakes'];
   function listCountries($stateParams, ChildrenStakes) {
     return ChildrenStakes;
