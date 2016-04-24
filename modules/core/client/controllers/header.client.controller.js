@@ -5,29 +5,34 @@
     .module('core')
     .controller('HeaderController', HeaderController);
 
-  HeaderController.$inject = ['$rootScope', '$scope', '$state', 'ChildrenStakes', 'Authentication', 'menuService', 'PouchService'];
+  HeaderController.$inject = ['$rootScope', '$scope', '$state', '$window', 'ChildrenStakes', 'Authentication', 'menuService', 'PouchService'];
 
-  function HeaderController($rootScope, $scope, $state, ChildrenStakes, Authentication, menuService, PouchService) {
+  function HeaderController($rootScope, $scope, $state, $window, ChildrenStakes, Authentication, menuService, PouchService) {
     var vm = this;
+    vm.appStatus = 'test';
     vm.appOnLine = navigator.onLine;
-    // function storeDbList(input) {
-    //   $rootScope.globalDBList = input;
-    // }
-    // function handleError(input) {
-    //   console.log(input);
-    // }
-    // if ($rootScope.appOnline) {
-    //   ChildrenStakes.get(function(retVal) {
-    //     $rootScope.liahonaStakes = retVal;
-    //     PouchService.saveStakesLocal(retVal, storeDbList, handleError);
-    //   });
-    // } else {
-    //   PouchService.getCountriesLocal(storeDbList, handleError);
-    // }
-    // vm.selectedStake = $rootScope.selectedStake;
-    // vm.selectedCountry = $rootScope.selectedCountry;
-    // vm.selectedDB = $rootScope.selectedDBName;
-    //
+    if (navigator.onLine) {
+      vm.appStatus = 'Online';
+      vm.onlineStatusColor = 'online';
+    } else {
+      vm.appStatus = 'Offline';
+      vm.onlineStatusColor = 'offline';
+    }
+    $window.addEventListener('offline', function () {
+      $scope.$apply(function() {
+        vm.appOnLine = false;
+        vm.appStatus = 'Offline';
+        vm.onlineStatusColor = 'offline';
+      });
+    }, false);
+    $window.addEventListener('online', function () {
+      $scope.$apply(function() {
+        vm.appOnLine = true;
+        vm.appStatus = 'Online';
+        vm.onlineStatusColor = 'online';
+      });
+    }, false);
+
     vm.accountMenu = menuService.getMenu('account').items[0];
     vm.authentication = Authentication;
     vm.isCollapsed = false;

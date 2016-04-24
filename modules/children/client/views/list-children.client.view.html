@@ -1,71 +1,64 @@
 <section>
-  <div class="page-header" style="margin-top: 4em">
-    <div class="row">
-      <div class="col-md-4" class="pull-left">
-        <!--<img src={{vm.selectedCountryImage}}>-->
-        <h4>
-          <span><a ui-sref="children.stake({country: vm.selectedCountry})">{{vm.selectedCountry}} <i class="glyphicon glyphicon-list"></i></a></span>
-          <!--<i class="glyphicon glyphicon-list"></i>-->
-        </h4>
-        <h4>
-        <a ui-sref="children.sync({stakeDB: vm.selectedStakeDB, stakeName:vm.selectedStake})">{{vm.selectedStake}} <i class="glyphicon glyphicon-refresh"></i></a>
-          <!--<i class="glyphicon glyphicon-refresh"></i>-->
-        </h4>
-        <h3>
-        <a ui-sref="children.create">Add Child  <i class="glyphicon glyphicon-plus"></i></a>
-        <!--<i class="glyphicon glyphicon-plus"></i>-->
-        </h3>
-      </div>
-    </div>
-  <!--<div class='btn-toolbar pull-right'>-->
-    <!--<div class="btn-group" style="margin-top: 2em">-->
-      <!--<a class="btn btn-primary" ui-sref="children.create">-->
-        <!--Add Child-->
-        <!--<i class="glyphicon glyphicon-plus"></i>-->
-      <!--</a>-->
-      <!--&lt;!&ndash;<a class="btn btn-primary" ui-sref="children.sync({stakeDB: vm.selectedStakeDB, stakeName:vm.selectedStake})" ng-if="vm.online">&ndash;&gt;-->
-        <!--&lt;!&ndash;Sync&ndash;&gt;-->
-        <!--&lt;!&ndash;<i class="glyphicon glyphicon-refresh"></i>&ndash;&gt;-->
-      <!--&lt;!&ndash;</a>&ndash;&gt;-->
-
-    <!--</div>-->
-    <!--</div>-->
-  </div>
-
-    <div class="row">
-
-      <div ng-if="vm.selectedCountryObject">
-      <h3>
-        <label  for="selectedStake">Stake <i class="glyphicon glyphicon-refresh"></i></label><br>
-
-        <select class="col-md-4  input-lg" name="selectedStake" id="selectedStake" ng-model="vm.selectedCountryObject" ng-change="vm.changeStake()">
-          <option ng-repeat="stake in vm.selectedCountryObject" value="{{stake.stakeName}}">{{stake.stakeName}}</option>
-
-        </select><br>
-      </h3>
+    <div class="page-header" style="margin-top: 4em">
+        <div class="row">
+            <div class="col-md-4" class="pull-left">
+                <!--<img src={{vm.selectedCountryImage}}>-->
+                <h4>
+                    <span><a ui-sref="children.stake({country: vm.selectedCountry})">{{vm.selectedCountry}} <i
+                            class="glyphicon glyphicon-list"></i></a></span>
+                </h4>
+                <h4>
+                    <div ng-if="vm.onLine">
+                        <a ui-sref="children.sync({stakeDB: vm.selectedStakeDB, stakeName:vm.selectedStake})">{{vm.selectedStake}}
+                            <i class="glyphicon glyphicon-refresh"></i></a>
+                    </div>
+                    <div ng-if="!vm.onLine">
+                        {{vm.selectedStake}}
+                    </div>
+                </h4>
+                <h3>
+                    <a ui-sref="children.create">Add Child <i class="glyphicon glyphicon-plus"></i></a>
+                </h3>
+            </div>
         </div>
-      <!--</form>-->
     </div>
-  </div>
+    <div class="row">
+        <div ng-if="vm.selectedCountryObject">
+            <h3>
+                <label for="selectedStake">Stake <i class="glyphicon glyphicon-refresh"></i></label><br>
+                <select class="col-md-4  input-lg" name="selectedStake" id="selectedStake"
+                        ng-model="vm.selectedCountryObject" ng-change="vm.changeStake()">
+                    <option ng-repeat="stake in vm.selectedCountryObject" value="{{stake.stakeName}}">
+                        {{stake.stakeName}}
+                    </option>
+                </select><br>
+            </h3>
+        </div>
+    </div>
+    <div class="list-group">
+        <a ng-repeat="child in vm.childList.docs" ui-sref="children.view({childId: child._id})" class="list-group-item">
+            <small class="list-group-item-text">
+                <h3><span ng-bind="child.firstName"></span>
+                    <span ng-bind="child.lastName"></span></h3>
 
-  </div>
-  <div class="list-group">
-    <a ng-repeat="child in vm.childList.docs" ui-sref="children.view({childId: child._id})" class="list-group-item">
-      <small class="list-group-item-text">
-        <h3><span ng-bind="child.firstName"></span>
-          <span ng-bind="child.lastName"></span></h3>
-
-        <span ng-bind="child.gender"></span>, born
-        <span ng-bind="child.birthDate | date:'mediumDate'"></span>,
-        First Screening:
-        <span ng-bind="child.created | date:'mediumDate'"></span>
-        by
-        <span ng-bind="child.interviewer"></span>
-      </small>
-    </a>
-  </div>
-  <span us-spinner="{radius:30, width:8, length: 16}" spinner-key="spinner-sync" spinner-theme="bigBlue"></span>
-  <h4><div class="alert alert-warning text-center" ng-if="!vm.childList.docs.length">
-    No children listed? <a ui-sref="children.sync({stakeDB: vm.selectedStakeDB, stakeName:vm.selectedStake})">Sync <i class="glyphicon glyphicon-refresh"></i></a> or <a ui-sref="children.create">Add Child <i class="glyphicon glyphicon-plus"></i></a>?
-  </div></h4>
+                <span ng-bind="child.gender"></span>, born
+                <span ng-bind="child.birthDate | date:'mediumDate'"></span>,
+                First Screening:
+                <span ng-bind="child.created | date:'mediumDate'"></span>
+                by
+                <span ng-bind="child.interviewer"></span>
+            </small>
+        </a>
+    </div>
+    <span us-spinner="{radius:30, width:8, length: 16}" spinner-key="spinner-sync" spinner-theme="bigBlue"></span>
+    <h4>
+        <div ng-if="vm.onLine && !vm.childList.docs.length" class="alert alert-warning text-center">
+            No children listed? <a ui-sref="children.sync({stakeDB: vm.selectedStakeDB, stakeName:vm.selectedStake})">Sync
+            <i class="glyphicon glyphicon-refresh"></i></a> or <a ui-sref="children.create">Add Child <i
+                class="glyphicon glyphicon-plus"></i></a>
+        </div>
+        <div ng-if="!vm.onLine && !vm.childList.docs.length" class="alert alert-warning text-center">
+            No children listed? <a ui-sref="children.create">Add Child <i class="glyphicon glyphicon-plus"></i></a>
+        </div>
+    </h4>
 </section>
