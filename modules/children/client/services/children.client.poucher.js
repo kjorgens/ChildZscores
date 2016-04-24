@@ -278,7 +278,10 @@
     };
 
     factory.insert = function (childInfo, callback, errorCallback) {
-      childInfo._id = childInfo._id || currentDbName + '_' + moment.now();
+      if (childInfo._id.length <= 5) {
+        childInfo._id = childInfo._id + currentDbName + '_' + moment.now();
+      }
+
       if (childInfo._rev) {
         childInfo._rev = childInfo._rev;
       }

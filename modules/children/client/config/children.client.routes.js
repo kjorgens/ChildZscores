@@ -151,7 +151,11 @@
   listChildren.$inject = ['$stateParams', 'PouchService'];
   function listChildren($stateParams, PouchService) {
     PouchService.createDatabase($stateParams.stakeDB);
-    return PouchService.initLocalDb();
+    PouchService.createIndex('firstName');
+    PouchService.createIndex('lastName');
+    PouchService.createIndex('owner');
+    PouchService.createIndex('surveyDate');
+    return PouchService.queryChildPromise();
   }
 
   initLocalDb.$inject = ['$stateParams', 'PouchService'];

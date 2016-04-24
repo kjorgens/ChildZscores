@@ -334,7 +334,8 @@
           ward: vm.child.ward,
           phone: vm.phoneNum,
           memberStaus: vm.memberStatus,
-          screeningStatus: vm.screeningStatus
+          screeningStatus: vm.screeningStatus,
+          _id: 'chld_'
 //          interviewer: vm.authentication.user.displayName
         };
 
