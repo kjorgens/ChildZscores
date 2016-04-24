@@ -72,7 +72,7 @@ exports.update = function(req, res) {
 };
 
 exports.getCountryList = function(req, res) {
-  request.get("https://database.liahonakids.org:5984/country_list/liahona_kids_countries_stakes", function (error, response, body) {
+  request.get("https://syncuser:mZ7K3AldcIzO@database.liahonakids.org:5984/country_list/liahona_kids_countries_stakes", function (error, response, body) {
     if (!error && response.statusCode === 200) {
       var jsonObj = JSON.parse(body);
       res.json(jsonObj);
@@ -85,7 +85,7 @@ exports.getCountryList = function(req, res) {
 };
 
 exports.listDbs = function(req, res) {
-  request.get("https://database.liahonakids.org:5984/_all_dbs", function (error, response, body) {
+  request.get("https://syncuser:mZ7K3AldcIzO@database.liahonakids.org:5984/_all_dbs", function (error, response, body) {
     if (!error && response.statusCode === 200) {
       var jsonObj = JSON.parse(body);
       res.json(jsonObj);
