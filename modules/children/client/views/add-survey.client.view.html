@@ -35,7 +35,7 @@
             by
             <span ng-bind="vm.child.interviewer"></span>
         </h4>
-        <h2>{{vm.survey._id ? 'Edit Screening' : 'Add New Screening'}}</h2>
+        <h2>{{vm.survey._id ? 'Edit, Change values' : 'New Screening'}}</h2>
         <h3>
             <span><a ui-sref="children.view({childId: vm.child._id})">Cancel</a></span>
         </h3>
@@ -90,13 +90,15 @@
 
 
                     </div>
-
-                  <div class="col-sm-4" style="text-align: center">
-                    <div style="margin-top:4%;">
-                      <button type="submit" class="btn btn-primary">{{vm.survey._id ? 'Update' : 'Create'}}
-                      </button>
-                    </div>
-                  </div>
+                    <h3>
+                        <span><a ng-click="vm.addSurvey(vm.form.surveyForm.$valid)">{{vm.child._id ? 'Update ' : 'Create '}}Child Record <i class="glyphicon glyphicon-export"></i></a></span>
+                    </h3>
+                  <!--<div class="col-sm-4" style="text-align: center">-->
+                    <!--<div style="margin-top:4%;">-->
+                      <!--<button type="submit" class="btn btn-primary">{{vm.survey._id ? 'Update' : 'Create'}}-->
+                      <!--</button>-->
+                    <!--</div>-->
+                  <!--</div>-->
                     <!--<video id="video" width="640" height="480" autoplay></video>-->
                     <!--<button id="snap">Snap Photo</button>-->
                     <!--<canvas id="canvas" width="640" height="480"></canvas>-->
@@ -106,7 +108,7 @@
 
     </div>
     <h5>
-        <span><a ui-sref="children.removeSurvey({ surveyId:vm.survey._id, childId:vm.child._id})">Remove Screening</a></span>
-        <i class="glyphicon glyphicon-trash"></i>
+        <span><a ui-sref="children.removeSurvey({ surveyId:vm.survey._id, childId:vm.child._id})">Remove Screening <i class="glyphicon glyphicon-trash"></i></a></span>
+
     </h5>
 </section>
