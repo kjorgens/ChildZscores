@@ -1,16 +1,20 @@
 <section>
     <div class="page-header" style="margin-top: 6em">
-        <div class='btn-toolbar pull-right'>
-            <div class="btn-group" ng-if="vm.child._id">
-                <a class="btn btn-primary" ui-sref="children.view({childId: vm.child._id})"
-                >Cancel</a>
-            </div>
-            <div class="btn-group" ng-if="!vm.child._id">
-                <a class="btn btn-primary"
-                   ui-sref="children.list({stakeDB: vm.selectedDB, stakeName: vm.selectedStake})">Cancel</a>
-            </div>
-        </div>
+
+        <!--<div class='btn-toolbar pull-right'>-->
+            <!--<div class="btn-group" ng-if="vm.child._id">-->
+                <!--<a class="btn btn-primary" ui-sref="children.view({childId: vm.child._id})"-->
+                <!--&gt;Cancel</a>-->
+            <!--</div>-->
+            <!--<div class="btn-group" ng-if="!vm.child._id">-->
+                <!--<a class="btn btn-primary"-->
+                   <!--ui-sref="children.list({stakeDB: vm.selectedDB, stakeName: vm.selectedStake})">Cancel</a>-->
+            <!--</div>-->
+        <!--</div>-->
         <h3 style="margin-top: 2em">{{vm.child._id ? 'Edit Existing Child' : 'Add New Child'}}</h3>
+        <h3>
+            <span><a ui-sref="children.list({stakeDB: vm.selectedDB, stakeName: vm.selectedStake})">Cancel</a></span>
+        </h3>
     </div>
     </div>
     <div class="col-md-12">
@@ -153,18 +157,23 @@
                   <div class="form-group">
                     <div ng-class="{'has-error':(!vm.genderIsValid)}">
 
-                      <div class="col-sm-4 right-side-child">
-                        <div style="margin-top:4%;">
-                          <button type="submit" class="btn btn-primary">{{vm.child._id ? 'Update' : 'Create'}}
-                          </button>
-                        </div>
-                      </div>
+                      <!--<div class="col-sm-4 right-side-child">-->
+                        <!--<div style="margin-top:4%;">-->
+                          <!--<button type="submit" class="btn btn-primary">{{vm.child._id ? 'Update' : 'Create'}}-->
+                          <!--</button>-->
+                        <!--</div>-->
+                      <!--</div>-->
                     </div>
                   </div>
                 </div>
             </fieldset>
         </form>
+
     </div>
+    <h3 style="margin-top: 1em">
+        <span><a ng-click="vm.create(vm.form.childForm.$valid)">
+            {{vm.child._id ? 'Update ' : 'Create '}}Child Record <i class="glyphicon glyphicon-export"></i></a></span>
+    </h3>
     <!--<div class="panel-footer">-->
         <!--<div class="pull-right">-->
             <!--<button type="submit" class="btn btn-primary" ng-click="vm.create(vm.form.childForm.$valid)">{{vm.child._id ? 'Update' : 'Create'}}-->

@@ -178,6 +178,7 @@
         vm.survey.zScore = vm.zScore;
         PouchService.insert(vm.survey, surveyUpdated, addedError);
       } else {
+        vm.survey._id = undefined;
         var bday = new Date(vm.child.birthDate);
 
         var rightNow = new Date();
@@ -188,6 +189,7 @@
         });
 
         var surveyObject = {
+          _id: 'scr_',
           owner: vm.child._id,
           surveyDate: vm.dt,
           zScore: vm.zScore,

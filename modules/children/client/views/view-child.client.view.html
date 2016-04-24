@@ -5,18 +5,16 @@
             <!--<i class="glyphicon glyphicon-list"></i>-->
         <!--</h4>-->
         <h4>
-            <span><a ui-sref="children.list({stakeDB: vm.selectedDB, stakeName:vm.selectedStake})">{{vm.selectedStake}}</a></span>
-            <i class="glyphicon glyphicon-list"></i>
+            <span><a ui-sref="children.list({stakeDB: vm.selectedDB, stakeName:vm.selectedStake})">{{vm.selectedStake}} <i class="glyphicon glyphicon-list"></i></a></span>
         </h4>
         <h3>
-            <span><a ui-sref="children.edit({childId: vm.child._id,surveyId:''})">{{vm.child.firstName}}{{vm.child.lastName}}</a></span>
-                <i class="glyphicon glyphicon-edit"></i>
+            {{vm.child.firstName}} {{vm.child.lastName}}
+            <span><a ui-sref="children.edit({childId: vm.child._id,surveyId:''})">   <i class="glyphicon glyphicon-edit"></i></a></span>
         </h3>
         Birth Date:
         <span ng-bind="vm.child.birthDate | date:'mediumDate'"></span>
         <h3>
-            <span><a ui-sref="children.newsurvey({childId:vm.child._id})">Add Screening</a></span>
-            <i class="glyphicon glyphicon-plus"></i>
+            <span><a ui-sref="children.newsurvey({childId:vm.child._id})">Add Screening <i class="glyphicon glyphicon-plus"></i></a></span>
         </h3>
         <!--<h3>-->
             <!--<span><a ui-sref="children.remove({childId:vm.child._id})">Remove Child Record</a></span>-->
@@ -72,7 +70,6 @@
         </div>
     </small>
     <h5>
-        <span><a ui-sref="children.remove({childId:vm.child._id})">Remove Child Record</a></span>
-        <i class="glyphicon glyphicon-trash"></i>
+        <span><a ui-sref="children.remove({childId:vm.child._id})">Remove Child Record <i class="glyphicon glyphicon-trash"></i></a></span>
     </h5>
 </section>
