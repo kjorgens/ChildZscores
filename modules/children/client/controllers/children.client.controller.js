@@ -31,8 +31,11 @@
       vm.fatherIsValid = true;
       vm.birthdateIsValid = true;
       vm.stakeIsValid = true;
-      vm.entermonthAge = child.monthAge;
-      vm.birthDate = new Date(child.birthDate);
+      // vm.child.enteredMonthAge = child.monthAge;
+      // var rightNow = new Date();
+      // vm.child.monthAge = moment(rightNow).diff(moment(vm.birthDate), 'months');
+      // vm.child.stake = vm.selectedStake;
+      vm.child.birthDate = new Date(vm.child.birthDate);
       PouchService.getSurveys(vm.child._id, setSurveyList, surveyErrors);
     } else {
       vm.ageIsValid = false;
@@ -63,7 +66,7 @@
     // }
     vm.error = null;
     vm.form = {};
-    vm.enteredMonthAge = undefined;
+//    vm.enteredMonthAge = undefined;
     vm.remove = remove;
     vm.create = create;
     vm.update = update;
@@ -155,12 +158,12 @@
     function setMonthCount() {
       var months;
       var rightNow = new Date();
-      vm.monthAge = moment(rightNow).diff(moment(vm.birthDate), 'months');
-      if (vm.monthAge > 60) {
+      vm.child.monthAge = moment(rightNow).diff(moment(vm.child.birthDate), 'months');
+      if (vm.child.monthAge > 60) {
         vm.ageIsValid = false;
       } else {
         vm.ageIsValid = true;
-        vm.child.monthAge = vm.enteredMonthAge || vm.monthAge.toFixed(2);
+        vm.child.monthAge = vm.child.monthAge.toFixed(2);
       }
     }
 
@@ -264,25 +267,25 @@
     vm.minStartDate = new Date(year - 5, month, day);
 
     function checkEnteredAgeIsValid() {
-      if (vm.enteredMonthAge < 1 || vm.enteredMonthAge > 60) {
+      if (vm.child.monthAge < 1 || vm.child.monthAge > 60) {
         vm.ageIsValid = false;
       } else {
         vm.ageIsValid = true;
-        vm.birthDate = new Date(year, month - vm.enteredMonthAge, day);
+        vm.child.birthDate = new Date(year, month - vm.child.monthAge, day);
         vm.ageIsValid = true;
-        vm.child.monthAge = vm.enteredMonthAge;
+ //       vm.child.monthAge = vm.enteredMonthAge;
       }
     }
 
     function checkAgeIsValid() {
       var rightNow = new Date();
-      vm.monthAge = moment(rightNow).diff(moment(vm.birthDate), 'months');
-      if (vm.monthAge > 60) {
+      var monthAge = moment(rightNow).diff(moment(vm.child.birthDate), 'months');
+      if (monthAge > 60) {
         vm.ageIsValid = false;
       } else {
         vm.ageIsValid = true;
-        vm.child.monthAge = vm.monthAge.toFixed(2);
-        vm.enteredMonthAge = Number(vm.monthAge);
+        vm.child.monthAge = Number(monthAge.toFixed(2));
+  //      vm.enteredMonthAge = Number(vm.monthAge);
       }
     }
 
@@ -320,9 +323,9 @@
 
         var childObject = {
           created: vm.dt,
-          monthAge: vm.child.monthAge || vm.enteredMonthAge,
+          monthAge: vm.child.monthAge,
           gender: vm.child.gender,
-          birthDate: vm.birthDate,
+          birthDate: vm.child.birthDate,
           firstName: vm.child.firstName,
           lastName: vm.child.lastName,
           comments: vm.child.comments,
@@ -330,10 +333,10 @@
           mother: vm.child.mother,
           address: vm.child.address,
           city: vm.child.city,
-          stake: vm.child.stake,
+          stake: vm.child.stake || vm.selectedStake,
           ward: vm.child.ward,
-          phone: vm.phoneNum,
-          memberStaus: vm.memberStatus,
+          phone: vm.child.phoneNum,
+          memberStaus: vm.child.memberStatus,
           screeningStatus: vm.screeningStatus,
           _id: 'chld_'
 //          interviewer: vm.authentication.user.displayName
