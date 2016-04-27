@@ -8,14 +8,16 @@
       .module('children')
       .controller('ChildrenSyncController', ChildrenSyncController);
 
-  ChildrenSyncController.$inject = ['$rootScope', '$scope', '$state', '$stateParams', 'childSync', 'usSpinnerService', 'PouchService'];
+  ChildrenSyncController.$inject = ['$rootScope', '$scope', '$state', '$stateParams', 'Authentication', 'childSync', 'usSpinnerService', 'PouchService'];
 
-  function ChildrenSyncController($rootScope, $scope, $state, $stateParams, childSync, usSpinnerService, PouchService) {
+  function ChildrenSyncController($rootScope, $scope, $state, $stateParams, Authentication, childSync, usSpinnerService, PouchService) {
     var vm = this;
     vm.stakeDB = $stateParams.stakeDB;
     vm.selectedStake = localStorage.getItem('selectedStake');
     vm.selectedCountry = localStorage.getItem('selectedCountry');
     vm.selectedCountryImage = localStorage.getItem('selectedCountryImage');
+
+    vm.authentication = Authentication;
 
     vm.selectedStake = $stateParams.stakeName;
     //   vm.selectedCountryObject = sessionStorage.getItem('selectedCountryObject');
@@ -36,7 +38,7 @@
       }
     };
     vm.spinneractive = false;
-  
+
     $rootScope.$on('us-spinner:spin', function(event, key) {
       vm.spinneractive = true;
     });

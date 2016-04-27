@@ -73,7 +73,6 @@
     listCountries.$inject = ['$stateParams', 'ChildrenStakes'];
     function listCountries($stateParams, ChildrenStakes) {
       return ChildrenStakes;
-      
     }
   }
 }());

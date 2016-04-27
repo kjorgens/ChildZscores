@@ -42,6 +42,10 @@
 
 
     </div>
+    <h3 ng-if="vm.childHeightIsValid && vm.childWeightIsValid" >
+                        <span><a ng-click="vm.addSurvey(vm.form.surveyForm.$valid)">{{vm.child._id ? 'Update ' : 'Create '}}Child Record <i
+                                class="glyphicon glyphicon-export"></i></a></span>
+    </h3>
     <div class="col-md-12 CreateChildFormContainer">
         <form name="vm.form.surveyForm" class="form-horizontal"
               ng-submit="vm.addSurvey(vm.form.surveyForm.$valid)" novalidate>
@@ -49,56 +53,55 @@
                 <div class="row">
                     <div class="form-group">
 
-                      <label for="vm.survey.weight" class="col-sm-2 control-label">Weight</label>
-                      <div class="col-sm-4" ng-class="{'has-error':(!vm.childWeightIsValid)}">
-                        <input type="number" class="form-control" ng-blur="vm.checkWeightIsValid()"
-                               ng-model="vm.survey.weight" id="vm.survey.weight"
-                               placeholder="Weight" required>
-                        <div class="validationMessage" ng-if="!vm.childweightIsValid"><p>Please enter a valid
-                          weight (3-18)</p></div>
-                      </div>
+                        <div ng-class="{'has-error':(!vm.childWeightIsValid)}">
+                            <label for="vm.survey.weight" class="col-sm-2 control-label">Weight (kg)</label>
+                            <div class="col-sm-4">
+                                <input type="number" class="form-control" ng-blur="vm.checkWeightIsValid()"
+                                       ng-model="vm.survey.weight" id="vm.survey.weight"
+                                       placeholder="Weight" required>
+                                <div class="validationMessage" ng-if="!vm.childWeightIsValid"><p>Please enter a valid
+                                    weight (3-18)</p></div>
+                            </div>
+                        </div>
 
                         <div ng-class="{'has-error':(!vm.childHeightIsValid)}">
-                            <label for="vm.survey.height" class="col-sm-2 control-label">Height</label>
+                            <label for="vm.survey.height" class="col-sm-2 control-label">Height (cm)</label>
                             <div class="col-sm-4">
                                 <input type="number" class="form-control" ng-blur="vm.checkHeightIsValid()"
                                        ng-model="vm.survey.height" id="vm.survey.height"
                                        placeholder="Height" required>
-                                <div class="validationMessage" ng-if="!vm.childHeightIsValid"><p>Please enter a valid height (45-110)
+                                <div class="validationMessage" ng-if="!vm.childHeightIsValid"><p>Please enter a valid
+                                    height (45-110)
                                 </p></div>
                             </div>
-                        </div>
-                        <div ng-class="{'has-error':(!vm.childweightIsValid)}">
-
-
-
                         </div>
                     </div>
                     <div class="form-group">
                         <label for="vm.survey.comments" class="col-sm-2 control-label">Comments</label>
                         <div class="col-sm-4">
                                 <textarea class="form-control" ng-model="vm.survey.comments" id="vm.survey.comments"
-                                          placeholder="Comments" ></textarea>
+                                          placeholder="Comments"></textarea>
                         </div>
-                      <label for="vm.surveyDate" class="col-sm-2 control-label">Screening date</label>
-                      <div class="col-sm-4">
-                        <input type="date" id="vm.surveyDate"  class="form-control"
-                               uib-datepicker-popup
-                               ng-model="vm.surveyDate"
-                               is-open="status.opened" required>
-                      </div>
+                        <label for="vm.surveyDate" class="col-sm-2 control-label">Screening date</label>
+                        <div class="col-sm-4">
+                            <input type="date" id="vm.surveyDate" class="form-control"
+                                   uib-datepicker-popup
+                                   ng-model="vm.surveyDate"
+                                   is-open="status.opened" required>
+                        </div>
 
 
                     </div>
-                    <h3>
-                        <span><a ng-click="vm.addSurvey(vm.form.surveyForm.$valid)">{{vm.child._id ? 'Update ' : 'Create '}}Child Record <i class="glyphicon glyphicon-export"></i></a></span>
-                    </h3>
-                  <!--<div class="col-sm-4" style="text-align: center">-->
+                    <!--<h3 ng-if="vm.childHeightIsValid && vm.childWeightIsValid" >-->
+                        <!--<span><a ng-click="vm.addSurvey(vm.form.surveyForm.$valid)">{{vm.child._id ? 'Update ' : 'Create '}}Child Record <i-->
+                                <!--class="glyphicon glyphicon-export"></i></a></span>-->
+                    <!--</h3>-->
+                    <!--<div class="col-sm-4" style="text-align: center">-->
                     <!--<div style="margin-top:4%;">-->
-                      <!--<button type="submit" class="btn btn-primary">{{vm.survey._id ? 'Update' : 'Create'}}-->
-                      <!--</button>-->
+                    <!--<button type="submit" class="btn btn-primary">{{vm.survey._id ? 'Update' : 'Create'}}-->
+                    <!--</button>-->
                     <!--</div>-->
-                  <!--</div>-->
+                    <!--</div>-->
                     <!--<video id="video" width="640" height="480" autoplay></video>-->
                     <!--<button id="snap">Snap Photo</button>-->
                     <!--<canvas id="canvas" width="640" height="480"></canvas>-->
@@ -107,7 +110,8 @@
         </form>
 
     </div>
-    <h5>
-        <span><a ui-sref="children.removeSurvey({ surveyId:vm.survey._id, childId:vm.child._id})">Remove Screening <i class="glyphicon glyphicon-trash"></i></a></span>
+    <h5 ng-if="vm.survey._id">
+        <span><a ui-sref="children.removeSurvey({ surveyId:vm.survey._id, childId:vm.child._id})">Remove Screening <i
+                class="glyphicon glyphicon-trash"></i></a></span>
     </h5>
 </section>

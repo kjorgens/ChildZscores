@@ -58,7 +58,7 @@
         // If successful we assign the response to the global user model
 
         Authentication.login(response.user, response.token);
-
+        localStorage.setItem('lastInterviewer', response.user.displayName);
         // And redirect to the previous or home page
         $state.go($state.previous.state.name || 'home', $state.previous.params);
       }).error(function (response) {

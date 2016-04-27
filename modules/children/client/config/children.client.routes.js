@@ -49,7 +49,7 @@
             childSync: listCountries
           },
           data: {
-            roles: ['user', 'admin']
+            roles: ['admin', 'sync']
      //       pageTitle: 'Sync database {{ database.title }}'
           }
         })

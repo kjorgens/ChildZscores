@@ -16,7 +16,10 @@
             <span><a ui-sref="children.list({stakeDB: vm.selectedDB, stakeName: vm.selectedStake})">Cancel</a></span>
         </h3>
     </div>
-    </div>
+    <h3 style="margin-top: 1em" ng-if="vm.form.childForm.$valid">
+        <span><a ng-click="vm.create(vm.form.childForm.$valid)">
+            {{vm.child._id ? 'Update ' : 'Create '}}Child Record <i class="glyphicon glyphicon-export"></i></a></span>
+    </h3>
     <div class="col-md-12">
         <form name="vm.form.childForm" class="form-horizontal" ng-submit="vm.create(vm.form.childForm.$valid)"
               novalidate>
@@ -48,19 +51,19 @@
                     </div>
                     <div class="form-group float-left">
                         <div ng-class="{'has-error':(!vm.ageIsValid)}">
-                            <label for="vm.enteredMonthAge" class="col-sm-2 control-label">Age in Months</label>
+                            <label for="vm.child.monthAge" class="col-sm-2 control-label">Age in Months</label>
                             <div class="col-sm-4">
                                 <input class="form-control" type="number" ng-blur="vm.checkEnteredAgeIsValid()"
-                                       ng-model="vm.enteredMonthAge" id="vm.enteredMonthAge" required>
+                                       ng-model="vm.child.monthAge" id="vm.child.monthAge" required>
                                 <div class="validationMessage" ng-if="!vm.ageIsValid"><p>Age (months) or birthdate required (1-60)
                                 </p></div>
                             </div>
                         </div>
                         <div ng-class="{'has-error':(!vm.ageIsValid)}">
-                            <label for="vm.birthDate" class="col-sm-2 control-label">Birthdate</label>
+                            <label for="vm.child.birthDate" class="col-sm-2 control-label">Birthdate</label>
                             <div class="col-sm-4">
-                                <input type="date" id="vm.birthDate" ng-blur="vm.checkAgeIsValid()" class="form-control"
-                                       ng-model="vm.birthDate"
+                                <input type="date" id="vm.child.birthDate" ng-blur="vm.checkAgeIsValid()" class="form-control"
+                                       ng-model="vm.child.birthDate"
                                        is-open="status.opened" required>
                                 <div class="validationMessage" ng-if="!vm.ageIsValid"><p>Age (months) or birthdate required
                                     </p></div>
@@ -69,10 +72,10 @@
                     </div>
                     <div class="form-group float-left">
                         <div >
-                            <label for="vm.phoneNum" class="col-sm-2 control-label">Telephone Number</label>
+                            <label for="vm.child.phoneNum" class="col-sm-2 control-label">Telephone Number</label>
                             <div class="col-sm-4">
                                 <input class="form-control" type="tel"
-                                       ng-model="vm.phoneNum" id="vm.phoneNum" >
+                                       ng-model="vm.child.phoneNum" id="vm.child.phoneNum" >
                                 <div></div>
                             </div>
                         </div>
@@ -121,11 +124,11 @@
                     </div>
                     <div class="form-group">
                         <!--<div ng-class="{'has-error':(!vm.stakeIsValid)}">-->
-                            <label for="vm.stake" class="col-sm-2 control-label">Stake</label>
+                            <label for="vm.child.stake" class="col-sm-2 control-label">Stake</label>
                             <div class="col-sm-4">
                                 <input type="input" class="form-control" ng-blur="vm.checkStakeIsValid()"
-                                       ng-model="vm.stake" id="vm.stake"
-                                       placeholder="Stake">
+                                       ng-model="vm.child.stake" id="vm.child.stake"
+                                       placeholder={{vm.selectedStake}}>
                                 <!--<div class="validationMessage" ng-if="!vm.stakeIsValid"><p>Please enter a valid-->
                                     <!--stake</p></div>-->
                             </div>
@@ -170,7 +173,7 @@
         </form>
 
     </div>
-    <h3 style="margin-top: 1em">
+    <h3 style="margin-top: 1em" ng-if="vm.form.childForm.$valid">
         <span><a ng-click="vm.create(vm.form.childForm.$valid)">
             {{vm.child._id ? 'Update ' : 'Create '}}Child Record <i class="glyphicon glyphicon-export"></i></a></span>
     </h3>
