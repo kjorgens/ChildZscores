@@ -45,6 +45,12 @@ a:hover .header-profile-image {
 .selectStake {
   font-size: 25px;
 }
+.offline {
+    color: red;
+}
+.online {
+    color: green;
+}
 
 .backgroundStyle {
     background-color: #f9b35d;
