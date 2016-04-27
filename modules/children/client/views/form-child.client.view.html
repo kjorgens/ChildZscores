@@ -16,7 +16,10 @@
             <span><a ui-sref="children.list({stakeDB: vm.selectedDB, stakeName: vm.selectedStake})">Cancel</a></span>
         </h3>
     </div>
-    </div>
+    <h3 style="margin-top: 1em" ng-if="vm.form.childForm.$valid">
+        <span><a ng-click="vm.create(vm.form.childForm.$valid)">
+            {{vm.child._id ? 'Update ' : 'Create '}}Child Record <i class="glyphicon glyphicon-export"></i></a></span>
+    </h3>
     <div class="col-md-12">
         <form name="vm.form.childForm" class="form-horizontal" ng-submit="vm.create(vm.form.childForm.$valid)"
               novalidate>
@@ -170,7 +173,7 @@
         </form>
 
     </div>
-    <h3 style="margin-top: 1em">
+    <h3 style="margin-top: 1em" ng-if="vm.form.childForm.$valid">
         <span><a ng-click="vm.create(vm.form.childForm.$valid)">
             {{vm.child._id ? 'Update ' : 'Create '}}Child Record <i class="glyphicon glyphicon-export"></i></a></span>
     </h3>

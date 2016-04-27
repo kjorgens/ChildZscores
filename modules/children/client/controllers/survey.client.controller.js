@@ -44,7 +44,7 @@
 
     vm.ageIsValid = false;
     vm.childHeightIsValid = false;
-    vm.childweightIsValid = false;
+    vm.childWeightIsValid = false;
  //   vm.genderIsValid = true;
 //    vm.heightIsValid = true;
 //    vm.weightIsValid = true;
@@ -99,9 +99,9 @@
     function checkWeightIsValid () {
       if (vm.survey.weight) {
         if (vm.survey.weight > 18 || vm.survey.weight < 3) {
-          vm.childweightIsValid = false;
+          vm.childWeightIsValid = false;
         } else {
-          vm.childweightIsValid = true;
+          vm.childWeightIsValid = true;
           if (vm.ageIsValid && vm.heightIsValid) {
             vm.zScoreGetter(vm.survey.gender, vm.ageInMonths || vm.monthAge, vm.survey.height, vm.survey.weight, function (zscore) {
               vm.survey.zScore = zscore;
@@ -109,7 +109,7 @@
           }
         }
       } else {
-        vm.childweightIsValid = false;
+        vm.childWeightIsValid = false;
       }
     }
 
@@ -197,8 +197,8 @@
           weight: vm.survey.weight,
           height: vm.survey.height,
           monthAge: vm.ageOverride || ageMoments,
-          comments: vm.child.comments
-      //    interviewer: vm.authentication.user.displayName
+          comments: vm.child.comments,
+          interviewer: localStorage.getItem('lastInterviewer')
         };
         PouchService.insert(surveyObject, surveyAdded, addedError);
         vm.survey.weight = '';

@@ -338,8 +338,8 @@
           phone: vm.child.phoneNum,
           memberStaus: vm.child.memberStatus,
           screeningStatus: vm.screeningStatus,
-          _id: 'chld_'
-//          interviewer: vm.authentication.user.displayName
+          _id: 'chld_',
+          interviewer: localStorage.getItem('lastInterviewer')
         };
 
         PouchService.insert(childObject, newChild, errorHandle);
