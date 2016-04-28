@@ -40,6 +40,7 @@
     vm.selectedCountryImage = localStorage.getItem('selectedCountryImage');
     vm.selectedDB = localStorage.getItem('selectedDBName');
     vm.authentication = Authentication;
+    vm.interviewer = localStorage.getItem('lastInterviewer');
     vm.error = null;
     vm.form = {};
     vm.remove = remove;
@@ -198,7 +199,7 @@
           height: vm.survey.height,
           monthAge: vm.ageOverride || ageMoments,
           comments: vm.child.comments,
-          interviewer: localStorage.getItem('lastInterviewer'),
+          interviewer: vm.interviewer,
           latitude: vm.latitude,
           longitude: vm.longitude
         };
