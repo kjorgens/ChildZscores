@@ -4,13 +4,15 @@
         <h1>Select Country</h1>
     </div>
     <div class="list-group">
-        <a ng-repeat="country in vm.liahonaStakes.countries" ui-sref="children.stake({country: country.name})" class="list-group-item">
+        <a ng-repeat="country in vm.liahonaStakes.countries" ui-sref="children.stake({country: country.name})" >
+          <button class="select_list">
             <small class="list-group-item-text">
                 <h2>
                     <img ng-src={{country.image}}>
                     <span ng-bind="country.name"></span>
                 </h2>
             </small>
+          </button>
         </a>
     </div>
     <h4>
