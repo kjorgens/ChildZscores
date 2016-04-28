@@ -105,3 +105,15 @@ a:hover .header-profile-image {
 .lower {
   text-transform: lowercase;
 }
+
+.select_list{
+    border-radius: 20px;
+    width:80%;
+    text-align: left;
+    background-color:white;
+    height: 110px;
+}
+
+.select_list:hover{
+    background-color: #f1f1f1;
+}
