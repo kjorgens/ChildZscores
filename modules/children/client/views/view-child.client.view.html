@@ -1,9 +1,5 @@
 <section>
     <div class="page-header" style="margin-top: 6em">
-        <!--<h4>-->
-            <!--<span><a ui-sref="children.stake({country: vm.selectedCountry})">{{vm.selectedCountry}}</a></span>-->
-            <!--<i class="glyphicon glyphicon-list"></i>-->
-        <!--</h4>-->
         <h4>
             <span><a ui-sref="children.list({stakeDB: vm.selectedDB, stakeName:vm.selectedStake})">{{vm.selectedStake}} <i class="glyphicon glyphicon-list"></i></a></span>
         </h4>
@@ -16,29 +12,6 @@
         <h3>
             <span><a ui-sref="children.newsurvey({childId:vm.child._id})">Add Screening <i class="glyphicon glyphicon-plus"></i></a></span>
         </h3>
-        <!--<h3>-->
-            <!--<span><a ui-sref="children.remove({childId:vm.child._id})">Remove Child Record</a></span>-->
-            <!--<i class="glyphicon glyphicon-trash"></i>-->
-        <!--</h3>-->
-        <div class='btn-toolbar pull-right'>
-            <div class="btn-group">
-
-                <!--<a class="btn btn-primary" ui-sref="children.list({stakeDB: vm.selectedDB, stakeName: vm.selectedStake})">-->
-                <!--Child List-->
-                <!--<i class="glyphicon glyphicon-list"></i>-->
-                <!--</a>-->
-                <!--<a class="btn btn-primary" ui-sref="children.newsurvey({childId:vm.child._id})">-->
-                    <!--New Screening-->
-                    <!--<i class="glyphicon glyphicon-plus"></i>-->
-                <!--</a>-->
-
-                <!--<a class="btn btn-primary" ng-click="vm.remove(vm.child)">-->
-
-                    <!--<i class="glyphicon glyphicon-trash"></i>-->
-                <!--</a>-->
-            </div>
-        </div>
-
     </div>
     <small>
         <a ng-repeat="survey in vm.surveys"
@@ -61,10 +34,9 @@
                     marginalZscore: 'marginalZscore', redZoneZscore: 'redZoneZscore'}[ survey.zScore.wlStatus ]">
                         weight/height:  <span  ng-bind="survey.zScore.wl | number:2"></span>
                     </li>
-                    <!--<span ng-bind="survey.zScore.zscoreString"></span>-->
                 </h4>
                 Screening done by
-                <span ng-bind="vm.child.interviewer"></span>
+                <span ng-bind="survey.interviewer"></span>
             </small>
         </a>
         </div>

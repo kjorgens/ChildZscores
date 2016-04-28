@@ -18,6 +18,7 @@
     vm.selectedCountryImage = sessionStorage.getItem('selectedCountryImage');
     vm.online = $rootScope.appOnline;
     vm.phoneNum;
+    vm.interviewer = localStorage.getItem('lastInterviewer');
 //    vm.find();
     if ($state.params.childId) {
       editChild = true;

@@ -10,6 +10,29 @@
   function SurveyController($scope, $state, $timeout, moment, survey, Authentication, ZScores, PouchService) {
     var vm = this;
     vm.survey = survey;
+    if (navigator.geolocation) {
+      console.log('Geolocation is supported!');
+    } else {
+      console.log('Geolocation is not supported for this Browser/OS version yet.');
+    }
+    var geoOptions = {
+      maximumAge: 5 * 60 * 1000
+    };
+    var startPos;
+    var geoSuccess = function(position) {
+      startPos = position;
+      vm.latitude = startPos.coords.latitude;
+      vm.longitude = startPos.coords.longitude;
+    };
+    var geoError = function(error) {
+      console.log('Geolocation Error occurred. Error code: ' + error.code);
+      // error.code can be:
+      //   0: unknown error
+      //   1: permission denied
+      //   2: position unavailable (error response from location provider)
+      //   3: timed out
+    };
+    navigator.geolocation.getCurrentPosition(geoSuccess, geoError, geoOptions);
   //  vm.surveyRemove = surveyRemove;
     getOwner($state.params.childId);
     vm.selectedStake = localStorage.getItem('selectedStake');
@@ -17,6 +40,7 @@
     vm.selectedCountryImage = localStorage.getItem('selectedCountryImage');
     vm.selectedDB = localStorage.getItem('selectedDBName');
     vm.authentication = Authentication;
+    vm.interviewer = localStorage.getItem('lastInterviewer');
     vm.error = null;
     vm.form = {};
     vm.remove = remove;
@@ -26,28 +50,15 @@
     vm.commentOverride = commentOverride;
 
     vm.authentication = Authentication;
-    // if (vm.authentication.user.roles !== undefined && vm.authentication.user.roles !== null) {
-    //   vm.authentication.user.roles.forEach(function (role) {
-    //     if (role.indexOf('admin') !== -1) {
-    //       vm.userHasAdminRole = true;
-    //     }
-    //     if (role.indexOf('user') !== -1) {
-    //       vm.userHasUserRole = true;
-    //     }
-    //   });
-    // }
-  //  vm.checkGenderIsValid = checkGenderIsValid;
+
     vm.checkHeightIsValid = checkHeightIsValid;
     vm.checkWeightIsValid = checkWeightIsValid;
- //   vm.checkMonthAgeIsValid = checkMonthAgeIsValid;
     vm.checkAllFieldsValid = checkAllFieldsValid;
 
     vm.ageIsValid = false;
     vm.childHeightIsValid = false;
     vm.childWeightIsValid = false;
- //   vm.genderIsValid = true;
-//    vm.heightIsValid = true;
-//    vm.weightIsValid = true;
+
     vm.birthDate = new Date();
     vm.surveyDate = new Date();
     vm.survey.comments = '';
@@ -71,7 +82,6 @@
     }
 
     function checkAllFieldsValid() {
-   //   checkGenderIsValid ();
       checkHeightIsValid();
       checkWeightIsValid();
       checkMonthAgeIsValid();
@@ -120,15 +130,6 @@
       }
     }
 
-    // function checkGenderIsValid() {
-    //  if (vm.survey.gender) {
-    //    vm.genderIsValid = true;
-    //  }
-    //  else {
-    //    vm.genderIsValid = false;
-    //  }
-    // }
-
     function checkMonthAgeIsValid() {
       var bday = new Date(vm.child.birthDate);
       vm.ageInMonths = moment(vm.surveyDate).diff(moment(bday), 'months');
@@ -170,7 +171,7 @@
     }
 
     function addSurvey(isValid) {
-      commentOverride();
+ //     commentOverride();
       if (vm.survey._id) {
         vm.zScoreGetter(vm.child.gender, vm.ageOverride || vm.child.monthAge, vm.survey.height, vm.survey.weight, function (zscore) {
           vm.zScore = zscore;
@@ -198,7 +199,9 @@
           height: vm.survey.height,
           monthAge: vm.ageOverride || ageMoments,
           comments: vm.child.comments,
-          interviewer: localStorage.getItem('lastInterviewer')
+          interviewer: vm.interviewer,
+          latitude: vm.latitude,
+          longitude: vm.longitude
         };
         PouchService.insert(surveyObject, surveyAdded, addedError);
         vm.survey.weight = '';
