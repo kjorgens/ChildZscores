@@ -5,9 +5,9 @@
     .module('children')
     .controller('ChildrenController', ChildrenController);
 
-  ChildrenController.$inject = ['$rootScope', '$scope', '$state', '$timeout', 'moment', 'childResolve', 'ModalService', 'Authentication', 'ZScores', 'PouchService'];
+  ChildrenController.$inject = ['$rootScope', '$scope', '$state', '$timeout', '$translate', 'moment', 'childResolve', 'ModalService', 'Authentication', 'ZScores', 'PouchService'];
 
-  function ChildrenController($rootScope, $scope, $state, $timeout, moment, child, ModalService, Authentication, ZScores, PouchService) {
+  function ChildrenController($rootScope, $scope, $state, $timeout, $translate, moment, child, ModalService, Authentication, ZScores, PouchService) {
     var vm = this;
     var editChild = false;
    // vm.liahonaStakes = $rootScope.liahonaStakes;
@@ -31,7 +31,7 @@
       vm.motherIsValid = true;
       vm.fatherIsValid = true;
       vm.birthdateIsValid = true;
-      vm.stakeIsValid = true;
+    //  vm.stakeIsValid = true;
       // vm.child.enteredMonthAge = child.monthAge;
       // var rightNow = new Date();
       // vm.child.monthAge = moment(rightNow).diff(moment(vm.birthDate), 'months');
@@ -40,7 +40,7 @@
       PouchService.getSurveys(vm.child._id, setSurveyList, surveyErrors);
     } else {
       vm.ageIsValid = false;
-      vm.stake = sessionStorage.getItem('selectedStake');
+ //     vm.stake = sessionStorage.getItem('selectedStake');
   //    vm.firstNameIsValid = false;
   //    vm.lastNameIsValid = false;
   //    vm.genderIsValid = false;
@@ -79,11 +79,27 @@
     vm.checkFirstNameIsValid = checkFirstNameIsValid;
     vm.checkLastNameIsValid = checkLastNameIsValid;
     vm.checkGenderIsValid = checkGenderIsValid;
-    vm.checkStakeIsValid = checkStakeIsValid;
+//    vm.checkStakeIsValid = checkStakeIsValid;
     vm.checkAgeIsValid = checkAgeIsValid;
     vm.checkEnteredAgeIsValid = checkEnteredAgeIsValid;
     // vm.checkAllFieldsValid = checkAllFieldsValid;
-
+    $rootScope.$on('$translateChangeSuccess', function () {
+      $translate(['BIRTHDATE', 'ADD_SCREENING', 'SCREENING_DATE', 'HEIGHT', 'WEIGHT',
+            'Z_SCORES', 'H_A', 'W_A', 'W_H', 'SCREENING_DONE_BY', 'REMOVE_CHILD_RECORD']).then(function (translations) {
+              vm.bday = translations.BIRTHDATE;
+              vm.add_screening = translations.ADD_SCREENING;
+              vm.screen_date = translations.SCREENING_DATE;
+              vm.height = translations.HEIGHT;
+              vm.weight = translations.WEIGHT;
+              vm.zScores = translations.Z_SCORES;
+              vm.ha = translations.H_A;
+              vm.wa = translations.W_A;
+              vm.wh = translations.W_H;
+              vm.doneBy = translations.SCREENING_DONE_BY;
+              vm.removeChild = translations.REMOVE_CHILD_RECORD;
+            });
+    });
+    $translate.use('en');
     function gradeZScores(survey) {
       vm.haStatus = 'normalZscore';
       vm.waStatus = 'normalZscore';
@@ -224,17 +240,17 @@
       }
     }
 
-    function checkStakeIsValid () {
-      if (vm.child.stake) {
-        if (vm.child.stake.length < 1 || vm.child.stake.length > 25) {
-          vm.stakeIsValid = false;
-        } else {
-          vm.stakeIsValid = true;
-        }
-      } else {
-        vm.stakeIsValid = false;
-      }
-    }
+    // function checkStakeIsValid () {
+    //   if (vm.child.stake) {
+    //     if (vm.child.stake.length < 1 || vm.child.stake.length > 25) {
+    //       vm.stakeIsValid = false;
+    //     } else {
+    //       vm.stakeIsValid = true;
+    //     }
+    //   } else {
+    //     vm.stakeIsValid = false;
+    //   }
+    // }
 
     function checkWardIsValid () {
       if (vm.child.ward) {
@@ -334,7 +350,7 @@
           mother: vm.child.mother,
           address: vm.child.address,
           city: vm.child.city,
-          stake: vm.child.stake || vm.selectedStake,
+          idGroup: vm.child.idGroup,
           ward: vm.child.ward,
           phone: vm.child.phoneNum,
           memberStaus: vm.child.memberStatus,
@@ -353,7 +369,7 @@
         vm.child.mother = '';
         vm.child.address = '';
         vm.child.city = '';
-        vm.child.stake = '';
+        vm.child.idGroup = '';
         vm.child.ward = '';
         // vm.created = Date.now;
         // vm.birthdate = '';

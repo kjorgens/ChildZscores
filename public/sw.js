@@ -60,6 +60,7 @@ self.addEventListener('install', function (event) {
       '/public/lib/angular-uuid/uuid.min.js',
       '/public/lib/angular-spinner/angular-spinner.min.js',
       '/public/lib/spin/spin.min.js',
+      '/public/lib/angular-translate/angular-translate.min.js',
       '/public/lib/bootstrap/dist/css/bootstrap.min.css',
       '/public/lib/bootstrap/dist/css/bootstrap-theme.min.css',
       '/modules/children/client/views/add-survey.client.view.html',

@@ -2,8 +2,9 @@
 
   'use strict';
 
-  app.registerModule('children', ['angularMoment', 'core']);
+  app.registerModule('children', ['angularMoment', 'core', 'pascalprecht.translate']);
   app.registerModule('children.services');
+  app.registerModule('children.translate');
   app.registerModule('children.stakes');
   app.registerModule('children.modalService');
   app.registerModule('children.pouchService', ['pouchdb', 'uuid']);
