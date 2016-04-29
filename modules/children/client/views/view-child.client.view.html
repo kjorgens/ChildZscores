@@ -7,41 +7,41 @@
             {{vm.child.firstName}} {{vm.child.lastName}}
             <span><a ui-sref="children.edit({childId: vm.child._id,surveyId:''})">   <i class="glyphicon glyphicon-edit"></i></a></span>
         </h3>
-        Birth Date:
+        <p translate>{{ADD_SCREENING}}</p>
         <span ng-bind="vm.child.birthDate | date:'mediumDate'"></span>
         <h3>
-            <span><a ui-sref="children.newsurvey({childId:vm.child._id})">Add Screening <i class="glyphicon glyphicon-plus"></i></a></span>
+            <span><a ui-sref="children.newsurvey({childId:vm.child._id})">{{vm.add_screening}} <i class="glyphicon glyphicon-plus"></i></a></span>
         </h3>
     </div>
     <small>
         <a ng-repeat="survey in vm.surveys"
            ui-sref="children.editsurvey({ surveyId:survey._id, childId:vm.child._id})" class="list-group-item clearfix">
             <small class="list-group-item-text ZscoreListContainer">
-                <h4>Screening date: <span ng-bind="survey.surveyDate | date:'mediumDate'"></span>
-                    , Height
-                    <span ng-bind="survey.height | number:2 "></span>, Weight
+                <h4>{{vm.bday}}: <span ng-bind="survey.surveyDate | date:'mediumDate'"></span>
+                    , {{vm.height}}
+                    <span ng-bind="survey.height | number:2 "></span>, {{vm.weight}}
                     <span ng-bind="survey.weight | number:2 "></span></h4>
-                <h4>Z Scores:
+                <h4>{{vm.zScores}}:
                     <li ng-class="{normalZscore: 'normalZscore', dangerZscore: 'dangerZscore',
                     marginalZscore: 'marginalZscore', redZoneZscore: 'redZoneZscore'}[ survey.zScore.haStatus ]">
-                        height/age: <span   ng-bind="survey.zScore.ha | number:2"></span>
+                        {{vm.ha}}: <span   ng-bind="survey.zScore.ha | number:2"></span>
                     </li>
                     <li ng-class="{normalZscore: 'normalZscore', dangerZscore: 'dangerZscore',
                     marginalZscore: 'marginalZscore', redZoneZscore: 'redZoneZscore'}[ survey.zScore.waStatus ]">
-                        weight/age:  <span  ng-bind="survey.zScore.wa | number:2"></span>
+                        {{vm.wa}}:  <span  ng-bind="survey.zScore.wa | number:2"></span>
                     </li>
                     <li ng-class="{normalZscore: 'normalZscore', dangerZscore: 'dangerZscore',
                     marginalZscore: 'marginalZscore', redZoneZscore: 'redZoneZscore'}[ survey.zScore.wlStatus ]">
-                        weight/height:  <span  ng-bind="survey.zScore.wl | number:2"></span>
+                        {{vm.wh}}:  <span  ng-bind="survey.zScore.wl | number:2"></span>
                     </li>
                 </h4>
-                Screening done by
+                {{vm.doneBy}}
                 <span ng-bind="survey.interviewer"></span>
             </small>
         </a>
         </div>
     </small>
     <h5>
-        <span><a ui-sref="children.remove({childId:vm.child._id})">Remove Child Record <i class="glyphicon glyphicon-trash"></i></a></span>
+        <span><a ui-sref="children.remove({childId:vm.child._id})">{{vm.removeChild}} <i class="glyphicon glyphicon-trash"></i></a></span>
     </h5>
 </section>
