@@ -17,7 +17,7 @@
                     </div>
                 </h4>
                 <h3>
-                    <a ui-sref="children.create">Add Child <i class="glyphicon glyphicon-plus"></i></a>
+                    <a ui-sref="children.create">{{'ADD_NEW_CHILD' | translate}} <i class="glyphicon glyphicon-plus"></i></a>
                 </h3>
             </div>
         </div>
@@ -25,7 +25,7 @@
     <div class="row">
         <div ng-if="vm.selectedCountryObject">
             <h3>
-                <label for="selectedStake">Stake <i class="glyphicon glyphicon-refresh"></i></label><br>
+                <label for="selectedStake">{{'STAKE' | translate}} <i class="glyphicon glyphicon-refresh"></i></label><br>
                 <select class="col-md-4  input-lg" name="selectedStake" id="selectedStake"
                         ng-model="vm.selectedCountryObject" ng-change="vm.changeStake()">
                     <option ng-repeat="stake in vm.selectedCountryObject" value="{{stake.stakeName}}">
@@ -41,11 +41,11 @@
                 <h3><span ng-bind="child.firstName"></span>
                     <span ng-bind="child.lastName"></span></h3>
 
-                <span ng-bind="child.gender"></span>, born
+                 {{child.gender === 'Boy' ? vm.boy : vm.girl}}, {{'BORN' | translate}}
                 <span ng-bind="child.birthDate | date:'mediumDate'"></span>,
-                Record created:
+                {{'RECORD_CREATED' | translate}}:
                 <span ng-bind="child.created | date:'mediumDate'"></span>
-                by
+                {{'BY' | translate}}
                 <span ng-bind="child.interviewer"></span>
             </small>
         </a>
@@ -53,12 +53,12 @@
     <span us-spinner="{radius:30, width:8, length: 16}" spinner-key="spinner-sync" spinner-theme="bigBlue"></span>
     <h4>
         <div ng-if="vm.onLine && !vm.childList.docs.length" class="alert alert-warning text-center">
-            No children listed? <a ui-sref="children.sync({stakeDB: vm.selectedStakeDB, stakeName:vm.selectedStake})">Sync
-            <i class="glyphicon glyphicon-refresh"></i></a> or <a ui-sref="children.create">Add Child <i
+            {{'NO_CHILDREN_LISTED' | translate}} <a ui-sref="children.sync({stakeDB: vm.selectedStakeDB, stakeName:vm.selectedStake})">{{'SYNC' | translate}}
+            <i class="glyphicon glyphicon-refresh"></i></a> or <a ui-sref="children.create">{{'ADD_NEW_CHILD' | translate}} <i
                 class="glyphicon glyphicon-plus"></i></a>
         </div>
         <div ng-if="!vm.onLine && !vm.childList.docs.length" class="alert alert-warning text-center">
-            No children listed? <a ui-sref="children.create">Add Child <i class="glyphicon glyphicon-plus"></i></a>
+           {{'NO_CHILDREN_LISTED' | translate}} <a ui-sref="children.create">{{'ADD_NEW_CHILD' | translate}} <i class="glyphicon glyphicon-plus"></i></a>
         </div>
     </h4>
 </section>

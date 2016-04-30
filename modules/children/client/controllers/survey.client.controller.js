@@ -5,10 +5,11 @@
     .module('children')
     .controller('SurveyController', SurveyController);
 
-  SurveyController.$inject = ['$scope', '$state', '$timeout', 'moment', 'surveyResolve', 'Authentication', 'ZScores', 'PouchService'];
+  SurveyController.$inject = ['$rootScope', '$scope', '$state', '$timeout', '$translate', 'moment', 'surveyResolve', 'Authentication', 'ZScores', 'PouchService'];
 
-  function SurveyController($scope, $state, $timeout, moment, survey, Authentication, ZScores, PouchService) {
+  function SurveyController($rootScope, $scope, $state, $timeout, $translate, moment, survey, Authentication, ZScores, PouchService) {
     var vm = this;
+    $translate.use($rootScope.SelectedLanguage);
     vm.survey = survey;
     if (navigator.geolocation) {
       console.log('Geolocation is supported!');
@@ -34,6 +35,21 @@
     };
     navigator.geolocation.getCurrentPosition(geoSuccess, geoError, geoOptions);
   //  vm.surveyRemove = surveyRemove;
+    function performTranslation() {
+      $translate(['BOY', 'GIRL', 'EDIT_CHANGE_VALUES', 'NEW_SCREENING']).then(function (translations) {
+        vm.boy = translations.BOY;
+        vm.girl = translations.GIRL;
+        vm.editMsg = translations.EDIT_CHANGE_VALUES;
+        vm.newScreen = translations.NEW_SCREENING;
+        vm.updateMsg = translations.UPDATE;
+        vm.createMsg = translations.CREATE;
+      });
+    }
+    performTranslation();
+
+    $rootScope.$on('$translateChangeSuccess', function () {
+      performTranslation();
+    });
     getOwner($state.params.childId);
     vm.selectedStake = localStorage.getItem('selectedStake');
     vm.selectedCountry = localStorage.getItem('selectedCountry');

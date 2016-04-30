@@ -7,6 +7,7 @@
       <span class="icon-bar"></span>
     </button>
     <span ><a ui-sref="home" class="navbar-brand">Liahona Kids <span ng-class="vm.onlineStatusColor">{{vm.appStatus}}</span></a></span>
+    <span ><a ng-click="vm.toggleLanguage()" class="navbar-brand"> {{vm.language}}</a></span>
   </div>
   <nav class="navbar-collapse" uib-collapse="!vm.isCollapsed" role="navigation">
     <ul class="nav navbar-nav" ng-if="vm.menu.shouldRender(vm.authentication.user);">

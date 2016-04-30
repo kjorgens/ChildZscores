@@ -16,7 +16,7 @@
             <!--<i class="glyphicon glyphicon-edit"></i>-->
         <!--</h3>-->
         <h3>
-            <span><a ui-sref="children.list({stakeDB: vm.selectedDB, stakeName:vm.selectedStake})">Cancel</a></span>
+            <span><a ui-sref="children.list({stakeDB: vm.selectedDB, stakeName:vm.selectedStake})">{{'CANCEL' | translate}}</a></span>
         </h3>
     </div>
     <div class="list-group borderless">
@@ -24,17 +24,14 @@
             <small class="list-group-item-text">
                 <div class="alert alert-danger" role="alert" style="text-align: center">
                     <h3>
-                        <span >Remove {{vm.child.firstName}}{{vm.child.lastName}} and related records </span>
+                        <span >{{'REMOVE' | translate}} {{vm.child.firstName}}{{vm.child.lastName}} {{'AND_RELATED_RECORDS' | translate}} </span>
                         <i class="glyphicon glyphicon-trash"></i>
                     </h3>
                 </div>
             </small>
         </a>
     </div>
-    <h3>Pressing the button above will
-        remove this child record and all screening records related to this
-        child from the local database, and on the next successful sync, all
-        records related to the child will be removed from the remote database.</h3>
+    <h3>{{'REMOVE_CHILD_MSG' | translate}}</h3>
     <!--<div class="col-sm-4" style="text-align: center">-->
     <!--<div style="margin-top:4%;">-->
     <!--<button type="submit" class="btn btn-primary" ng-click="vm.syncUpstream()">Sync Database-->

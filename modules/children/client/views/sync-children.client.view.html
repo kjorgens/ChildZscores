@@ -13,7 +13,7 @@
         <!--</h4>-->
 
         <h3>
-            <span><a ui-sref="children.list({stakeDB: vm.stakeDB, stakeName:vm.selectedStake})">Cancel</a></span>
+            <span><a ui-sref="children.list({stakeDB: vm.stakeDB, stakeName:vm.selectedStake})">{{'CANCEL' | translate}}</a></span>
         </h3>
 
     </div>
@@ -22,24 +22,14 @@
             <small class="list-group-item-text">
                 <div class="alert alert-info" role="alert" style="text-align: center">
                 <h3>
-                    <span >Sync {{vm.selectedStake}}</span>
+                    <span >{{'SYNC' | translate}} {{vm.selectedStake}}</span>
                     <i class="glyphicon glyphicon-refresh"></i>
                 </h3>
                 </div>
             </small>
         </a>
     </div>
-    <h5>Pressing the sync button above will
-        sync all children records from the remote database and
-        will sync the records on this machine up to the remote database.
-        Prior to new screenings, when you have internet access,
-        sync your stake before you start a screening, and sync again after
-        you have finished a screening session.
-        You must be signed in and have internet access to sync.
-        To sync another stake, Press Liahona Kids on the top menu bar,
-        Select the country and stake, and hit the sync button.
-        To conserve storage on your device, only sync stakes you are
-        working with.</h5>
+    <h5>{{'SYNC_MESSAGE' | translate}}</h5>
     <!--<div class="col-sm-4" style="text-align: center">-->
         <!--<div style="margin-top:4%;">-->
             <!--<button type="submit" class="btn btn-primary" ng-click="vm.syncUpstream()">Sync Database-->

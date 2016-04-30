@@ -8,11 +8,11 @@
       .module('children')
       .controller('ChildrenListController', ChildrenListController);
 
-  ChildrenListController.$inject = ['$rootScope', '$scope', '$state', '$stateParams', '$window', 'childResolve', 'usSpinnerService', 'PouchService'];
+  ChildrenListController.$inject = ['$rootScope', '$scope', '$state', '$stateParams', '$window', '$translate', 'childResolve', 'usSpinnerService', 'PouchService'];
 
-  function ChildrenListController($rootScope, $scope, $state, $stateParams, $window, childResolve, usSpinnerService, PouchService) {
+  function ChildrenListController($rootScope, $scope, $state, $stateParams, $window, $translate, childResolve, usSpinnerService, PouchService) {
     var vm = this;
-
+    $translate.use($rootScope.SelectedLanguage);
     vm.childList = childResolve;
 
     sessionStorage.setItem('selectedStake', $stateParams.stakeName);
@@ -22,11 +22,21 @@
 
     vm.selectedStake = $stateParams.stakeName;
     vm.selectedStakeDB = $stateParams.stakeDB;
-
+    function performTranslation() {
+      $translate(['BOY', 'GIRL']).then(function (translations) {
+        vm.boy = translations.BOY;
+        vm.girl = translations.GIRL;
+      });
+    }
+    performTranslation();
+    
     vm.onLine = navigator.onLine;
     vm.find = find;
     vm.find();
-
+    $rootScope.$on('$translateChangeSuccess', function () {
+      performTranslation();
+    });
+    // $translate.use('es');
     $window.addEventListener('offline', function () {
       $scope.$apply(function() {
         vm.onLine = false;

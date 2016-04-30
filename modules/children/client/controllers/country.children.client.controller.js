@@ -5,10 +5,11 @@
       .module('children')
       .controller('ChildrenCountryController', ChildrenCountryController);
 
-  ChildrenCountryController.$inject = ['$rootScope', '$scope', '$state', 'ModalService', 'ChildrenService', 'ChildrenStakes', 'PouchService'];
+  ChildrenCountryController.$inject = ['$rootScope', '$scope', '$state', '$translate', 'ModalService', 'ChildrenService', 'ChildrenStakes', 'PouchService'];
 
-  function ChildrenCountryController($rootScope, $scope, $state, ModalService, ChildrenService, ChildrenStakes, PouchService) {
+  function ChildrenCountryController($rootScope, $scope, $state, $translate, ModalService, ChildrenService, ChildrenStakes, PouchService) {
     var vm = this;
+    $translate.use($rootScope.SelectedLanguage);
     function storeDbList(input) {
  //     sessionStorage.setItem('liahonaStakesObject', input);
       vm.liahonaStakes = input;

@@ -5,11 +5,11 @@
       .module('children')
       .controller('ChildrenStakeController', ChildrenStakeController);
 
-  ChildrenStakeController.$inject = ['$rootScope', '$scope', 'ChildrenStakes', '$stateParams', 'PouchService'];
+  ChildrenStakeController.$inject = ['$rootScope', '$scope', '$translate', 'ChildrenStakes', '$stateParams', 'PouchService'];
 
-  function ChildrenStakeController($rootScope, $scope, ChildrenStakes, $stateParams, PouchService) {
+  function ChildrenStakeController($rootScope, $scope, $translate, ChildrenStakes, $stateParams, PouchService) {
     var vm = this;
-
+    $translate.use($rootScope.SelectedLanguage);
     function findCountry(country) {
       return country.name === $stateParams.country;
     }
