@@ -20,6 +20,9 @@ exports.invokeRolesPolicies = function () {
     }, {
       resources: '/view/:childId',
       permissions: '*'
+    }, {
+      resources: '/sync',
+      permissions: '*'
     }]
   }, {
     roles: ['user'],
@@ -30,9 +33,6 @@ exports.invokeRolesPolicies = function () {
       resources: '/view/:childId',
       permissions: ['get']
     }, {
-    //   resources: '/children',
-    //   permissions: ['get', 'post']
-    // }, {
       resources: '/create',
       permissions: ['get', 'post']
     }, {
@@ -52,6 +52,21 @@ exports.invokeRolesPolicies = function () {
       permissions: ['get']
     }, {
       resources: '/:childId',
+      permissions: ['get']
+    }]
+  }, {
+    roles: ['sync'],
+    allows: [{
+      resources: '/',
+      permissions: ['get']
+    }, {
+      resources: '/stakes',
+      permissions: ['get']
+    }, {
+      resources: '/:childId',
+      permissions: ['get']
+    }, {
+      resources: '/sync',
       permissions: ['get']
     }]
   }]);

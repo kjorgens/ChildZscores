@@ -29,7 +29,7 @@
       });
     }
     performTranslation();
-    
+
     vm.onLine = navigator.onLine;
     vm.find = find;
     vm.find();

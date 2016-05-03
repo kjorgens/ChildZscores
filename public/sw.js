@@ -48,7 +48,9 @@ self.addEventListener('install', function (event) {
       '/public/lib/angular-resource/angular-resource.min.js',
       '/public/lib/angular-animate/angular-animate.min.js',
       '/public/lib/angular-messages/angular-messages.min.js',
+      '/public/lib/angular-moment/angular-moment.min.js',
       '/public/lib/angular-ui-router/release/angular-ui-router.min.js',
+      '/public/lib/angular-ui-router-uib-modal/release/angular-ui-router-uib-modal.min.js',
       '/public/lib/angular-ui-utils/ui-utils.min.js',
       '/public/lib/angular-bootstrap/ui-bootstrap-tpls.min.js',
       '/public/lib/angular-file-upload/angular-file-upload.min.js',
@@ -61,15 +63,21 @@ self.addEventListener('install', function (event) {
       '/public/lib/angular-spinner/angular-spinner.min.js',
       '/public/lib/spin/spin.min.js',
       '/public/lib/angular-translate/angular-translate.min.js',
+      '/public/lib/angular-sanitize/angular-sanitize.min.js',
+      '/public/lib/bootstrap/dist/js/bootstrap.min.js',
+      '/public/lib/jquery/dist/jquery.min.js',
+      '/public/lib/moment/min/moment.min.js',
       '/public/lib/bootstrap/dist/css/bootstrap.min.css',
       '/public/lib/bootstrap/dist/css/bootstrap-theme.min.css',
       '/modules/children/client/views/add-survey.client.view.html',
+      '/modules/children/client/views/country.client.view.html',
       '/modules/children/client/views/form-child.client.view.html',
       '/modules/children/client/views/list-children.client.view.html',
       '/modules/children/client/views/view-child.client.view.html',
       '/modules/children/client/views/sync-children.client.view.html',
       '/modules/children/client/views/remove-child.client.view.html',
       '/modules/children/client/views/remove-screening.client.view.html',
+      '/modules/children/client/views/stakes.client.view.html',
       '/modules/children/client/img/boliva.png',
       '/modules/children/client/img/columbia.png',
       '/modules/children/client/img/ecuador.png',
@@ -83,8 +91,8 @@ self.addEventListener('install', function (event) {
       '/modules/core/client/views/403.client.view.html',
       '/modules/core/client/views/404.client.view.html',
       '/modules/core/client/views/header.client.view.html',
-      '/modules/core/client/views/home.client.view.html',
-      '/modules/children/client/views/stakes.client.view.html'
+      '/modules/core/client/views/home.client.view.html'
+
     ]);
   }));
 

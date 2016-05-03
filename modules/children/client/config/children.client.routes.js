@@ -50,7 +50,20 @@
           },
           data: {
             roles: ['admin', 'sync']
-     //       pageTitle: 'Sync database {{ database.title }}'
+            //       pageTitle: 'Sync database {{ database.title }}'
+          }
+        })
+        .state('children.getsync', {
+          url: '/syncinfo/',
+          templateUrl: 'modules/children/client/views/sync-children.client.view.html',
+          controller: 'ChildrenSyncController',
+          controllerAs: 'vm',
+          resolve: {
+            ChildrenSync: getSyncInfo
+          },
+          data: {
+            roles: ['admin', 'sync']
+            //       pageTitle: 'Sync database {{ database.title }}'
           }
         })
         .state('children.countries', {
@@ -179,6 +192,11 @@
         childId: $stateParams.childId
       });     // .$promise;
     }
+  }
+
+  getSyncInfo.$inject = ['$stateParams', 'ChildrenGetSync', 'Authentication'];
+  function getSyncInfo($stateParams, ChildrenGetSync) {
+    return ChildrenGetSync.get();
   }
 
   getSurvey.$inject = ['$stateParams', 'PouchService'];

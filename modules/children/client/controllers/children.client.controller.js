@@ -56,16 +56,7 @@
     vm.userHasUserRole = false;
 
     vm.authentication = Authentication;
-    // if (vm.authentication.user.roles !== undefined && vm.authentication.user.roles !== null) {
-    //   vm.authentication.user.roles.forEach(function (role) {
-    //     if (role.indexOf('admin') !== -1) {
-    //       vm.userHasAdminRole = true;
-    //     }
-    //     if (role.indexOf('user') !== -1) {
-    //       vm.userHasUserRole = true;
-    //     }
-    //   });
-    // }
+
     vm.error = null;
     vm.form = {};
 //    vm.enteredMonthAge = undefined;
@@ -80,7 +71,6 @@
     vm.checkFirstNameIsValid = checkFirstNameIsValid;
     vm.checkLastNameIsValid = checkLastNameIsValid;
     vm.checkGenderIsValid = checkGenderIsValid;
-//    vm.checkStakeIsValid = checkStakeIsValid;
     vm.checkAgeIsValid = checkAgeIsValid;
     vm.checkEnteredAgeIsValid = checkEnteredAgeIsValid;
     // vm.checkAllFieldsValid = checkAllFieldsValid;
@@ -240,18 +230,6 @@
         vm.fatherIsValid = false;
       }
     }
-
-    // function checkStakeIsValid () {
-    //   if (vm.child.stake) {
-    //     if (vm.child.stake.length < 1 || vm.child.stake.length > 25) {
-    //       vm.stakeIsValid = false;
-    //     } else {
-    //       vm.stakeIsValid = true;
-    //     }
-    //   } else {
-    //     vm.stakeIsValid = false;
-    //   }
-    // }
 
     function checkWardIsValid () {
       if (vm.child.ward) {

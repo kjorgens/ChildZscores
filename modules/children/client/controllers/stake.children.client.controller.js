@@ -32,17 +32,17 @@
       console.log(input);
     }
 
-    if ($rootScope.appOnline) {
-      ChildrenStakes.get(function (retVal) {
-        //       sessionStorage.setItem('liahonaStakesObject', retVal);
-        storeDbList(retVal);
- //       vm.liahonaStakes = retVal;
-//        PouchService.saveStakesLocal(retVal, storeDbList, handleError);
-      });
-    } else {
-      PouchService.createCountryDatabase();
-      PouchService.getCountriesLocal(storeDbList, handleError);
-    }
+//     if ($rootScope.appOnline) {
+//       ChildrenStakes.get(function (retVal) {
+//         //       sessionStorage.setItem('liahonaStakesObject', retVal);
+//         storeDbList(retVal);
+//  //       vm.liahonaStakes = retVal;
+// //        PouchService.saveStakesLocal(retVal, storeDbList, handleError);
+//       });
+//     } else {
+    PouchService.createCountryDatabase();
+    PouchService.getCountriesLocal(storeDbList, handleError);
+  //   }
   }
 }());
 

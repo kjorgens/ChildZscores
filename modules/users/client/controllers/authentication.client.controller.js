@@ -5,9 +5,9 @@
     .module('users')
     .controller('AuthenticationController', AuthenticationController);
 
-  AuthenticationController.$inject = ['$scope', '$state', '$http', '$location', '$window', 'Authentication', 'PasswordValidator'];
+  AuthenticationController.$inject = ['$scope', '$state', '$http', '$location', '$window', 'ChildrenStakes', 'Authentication', 'PouchService', 'PasswordValidator'];
 
-  function AuthenticationController($scope, $state, $http, $location, $window, Authentication, PasswordValidator) {
+  function AuthenticationController($scope, $state, $http, $location, $window, ChildrenStakes, Authentication, PouchService, PasswordValidator) {
     var vm = this;
 
     vm.authentication = Authentication;
@@ -23,6 +23,20 @@
     if (vm.authentication.user) {
       $location.path('/');
     }
+    function returnFromPut(input) {
+      console.log(input);
+    }
+
+    function handleError(input) {
+      console.log(input);
+    }
+
+    function populateLocalDB() {
+      ChildrenStakes.get(function (retVal) {
+        PouchService.createCountryDatabase();
+        PouchService.putStakesLocal(retVal, returnFromPut, handleError);
+      });
+    }
 
     function signup(isValid) {
       vm.error = null;
@@ -37,7 +51,7 @@
         // If successful we assign the response to the global user model
 
         Authentication.login(response.user, response.token);
-
+        populateLocalDB();
         // And redirect to the previous or home page
         $state.go($state.previous.state.name || 'home', $state.previous.params);
       }).error(function (response) {
@@ -60,6 +74,7 @@
         Authentication.login(response.user, response.token);
         localStorage.setItem('lastInterviewer', response.user.displayName);
         // And redirect to the previous or home page
+        populateLocalDB();
         $state.go($state.previous.state.name || 'home', $state.previous.params);
       }).error(function (response) {
         vm.error = response.message;

@@ -21,19 +21,19 @@
       console.log(input);
     }
 
-    if (navigator.onLine) {
-      ChildrenStakes.get(function(retVal) {
- //       sessionStorage.setItem('liahonaStakesObject', retVal);
-        vm.liahonaStakes = retVal;
-        PouchService.createCountryDatabase();
-        PouchService.putStakesLocal(retVal, returnFromPut, handleError);
-      });
-    } else {
+ //    if (navigator.onLine) {
+ //      ChildrenStakes.get(function(retVal) {
+ // //       sessionStorage.setItem('liahonaStakesObject', retVal);
+ //        vm.liahonaStakes = retVal;
+ //        PouchService.createCountryDatabase();
+ //        PouchService.putStakesLocal(retVal, returnFromPut, handleError);
+ //      });
+ //    } else {
       // use the last database if it exits
       // $state.go('children.list',{country,stake}
-      PouchService.createCountryDatabase();
-      PouchService.getCountriesLocal(storeDbList, handleError);
-    }
+    PouchService.createCountryDatabase();
+    PouchService.getCountriesLocal(storeDbList, handleError);
+    // }
   }
 }());
 

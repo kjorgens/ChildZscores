@@ -8,10 +8,13 @@
       .module('children')
       .controller('ChildrenSyncController', ChildrenSyncController);
 
-  ChildrenSyncController.$inject = ['$rootScope', '$scope', '$state', '$stateParams', 'Authentication', 'childSync', 'usSpinnerService', 'PouchService'];
+  ChildrenSyncController.$inject = ['$rootScope', '$scope', '$state', '$stateParams', 'Authentication', 'ChildrenGetSync', 'usSpinnerService', 'PouchService'];
 
-  function ChildrenSyncController($rootScope, $scope, $state, $stateParams, Authentication, childSync, usSpinnerService, PouchService) {
+  function ChildrenSyncController($rootScope, $scope, $state, $stateParams, Authentication, ChildrenGetSync, usSpinnerService, PouchService) {
     var vm = this;
+    ChildrenGetSync.get(function(input) {
+      vm.syncStuff = input;
+    });
     vm.stakeDB = $stateParams.stakeDB;
     vm.selectedStake = localStorage.getItem('selectedStake');
     vm.selectedCountry = localStorage.getItem('selectedCountry');
@@ -69,8 +72,8 @@
 
     function syncUpstream() {
       vm.startSpin();
-      PouchService.sync('https://syncuser:mZ7K3AldcIzO@database.liahonakids.org:5984/' +
-          vm.stakeDB, replicateIn, replicateError, whenDone);
+      PouchService.sync('https://' + vm.syncStuff.entity + '@' +
+          vm.syncStuff.url + '/' + vm.stakeDB, replicateIn, replicateError, whenDone);
     }
   }
 }());
