@@ -89,12 +89,12 @@
       EDIT_EXISTING_CHILD: 'Editar Niño existente',
       ADD_NEW_CHILD: 'Agregar nuevo Niño',
       CANCEL: 'Cancelar',
-      UPDATE: 'Actualizar',
+      UPDATE: 'Actualizar ',
       CREATE: 'Crear',
       CHILD_RECORD: 'Registro de Niños',
-      FIRST_NAME: 'Nombre de pila',
+      FIRST_NAME: 'Nombre',
       LAST_NAME: 'Apellido',
-      REQUIRED: 'Required',
+      REQUIRED: 'Requerido',
       AGE_IN_MONTHS: 'Edad en Meses',
       AGE_BIRTHDATE: 'La edad o fecha de nacimiento requerida',
       TELEPHONE_NUMBER: 'Número de teléfono',
@@ -107,10 +107,10 @@
       ID_GROUP: '/ Identificación del grupo',
       WARD: 'Sala',
       COMMENTS: 'comentarios',
-      LDS_MEMBER: 'LDS iglesia miembro?',
+      LDS_MEMBER: 'Iglesia SUD miembro?',
       BOY: 'Chico',
       GIRL: 'Niña',
-      STAKE: 'LDS Stake',
+      STAKE: 'Estaca SUD',
       SYNC: 'Sincronizar',
       NO_CHILDREN_LISTED: 'No se enumeran los niños ?',
       BORN: 'nacido',
@@ -135,7 +135,7 @@
       'de empezar la proyección , y de nuevo después de la sincronización    que haya terminado una sesión de proyecciones. ' +
       'Usted debe estar firmado y tener acceso de Internet para la sincronización. Para sincronizar otra estaca ,' +
       'Liahona Press niños en la barra de menú superior , Seleccionar el país y de la estaca , y pulsa el botón de sincronización . ' +
-      'Para conservar el almacenamiento en el dispositivo, sólo estacas de sincronización que está trabajando con.',
+      'Para conservar el almacenamiento en el dispositivo, sólo stake de sincronización que está trabajando con.',
       REMOVE_SCREENING_MSG: 'Al pulsar el botón de arriba eliminará este registro de selección de la base de datos local , y en la siguiente ' +
       ' Sincronización correcta , el registro será eliminado de la base de datos remota',
       EDIT_CHANGE_VALUES: 'Editar , cambiar los valores',
@@ -147,5 +147,6 @@
     $translateProvider
         .translations('es', translationsES)
         .preferredLanguage('es');
+    $translateProvider.useSanitizeValueStrategy('escape');
   }
 }());

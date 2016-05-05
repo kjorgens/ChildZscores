@@ -33,6 +33,7 @@ _site/
 *.log
 *.csv
 *.dat
+*.env
 *.out
 *.pid
 *.gz

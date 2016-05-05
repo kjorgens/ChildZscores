@@ -13,6 +13,10 @@ module.exports = function (app) {
   var router = express.Router();
 
   // children collection routes
+  router.route('/sync')
+      .get(passport.authenticate('jwt', { session: false }), childrenPolicy.isAllowed, children.getSyncURL);
+
+  // children collection routes
   router.route('/stakes')
       .get(childrenPolicy.isAllowed, children.getCountryList);
 
