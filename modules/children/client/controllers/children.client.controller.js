@@ -10,6 +10,7 @@
   function ChildrenController($rootScope, $scope, $state, $timeout, $translate, moment, child, ModalService, Authentication, ZScores, PouchService) {
     var vm = this;
     var editChild = false;
+    $translate.use($rootScope.SelectedLanguage);
    // vm.liahonaStakes = $rootScope.liahonaStakes;
     vm.selectedStake = sessionStorage.getItem('selectedStake');
     vm.selectedDB = sessionStorage.getItem('selectedDBName');
@@ -55,16 +56,7 @@
     vm.userHasUserRole = false;
 
     vm.authentication = Authentication;
-    // if (vm.authentication.user.roles !== undefined && vm.authentication.user.roles !== null) {
-    //   vm.authentication.user.roles.forEach(function (role) {
-    //     if (role.indexOf('admin') !== -1) {
-    //       vm.userHasAdminRole = true;
-    //     }
-    //     if (role.indexOf('user') !== -1) {
-    //       vm.userHasUserRole = true;
-    //     }
-    //   });
-    // }
+
     vm.error = null;
     vm.form = {};
 //    vm.enteredMonthAge = undefined;
@@ -79,27 +71,26 @@
     vm.checkFirstNameIsValid = checkFirstNameIsValid;
     vm.checkLastNameIsValid = checkLastNameIsValid;
     vm.checkGenderIsValid = checkGenderIsValid;
-//    vm.checkStakeIsValid = checkStakeIsValid;
     vm.checkAgeIsValid = checkAgeIsValid;
     vm.checkEnteredAgeIsValid = checkEnteredAgeIsValid;
     // vm.checkAllFieldsValid = checkAllFieldsValid;
+    function performTranslation() {
+      $translate(['BOY', 'GIRL', 'CHILD_RECORD', 'UPDATE', 'CREATE',
+        'EDIT_EXISTING_CHILD', 'ADD_NEW_CHILD']).then(function (translations) {
+          vm.boy = translations.BOY;
+          vm.girl = translations.GIRL;
+          vm.childRec = translations.CHILD_RECORD;
+          vm.update = translations.UPDATE;
+          vm.createRec = translations.CREATE;
+          vm.edit_existing = translations.EDIT_EXISTING_CHILD;
+          vm.add_new = translations.ADD_NEW_CHILD;
+        });
+    }
+    performTranslation();
     $rootScope.$on('$translateChangeSuccess', function () {
-      $translate(['BIRTHDATE', 'ADD_SCREENING', 'SCREENING_DATE', 'HEIGHT', 'WEIGHT',
-            'Z_SCORES', 'H_A', 'W_A', 'W_H', 'SCREENING_DONE_BY', 'REMOVE_CHILD_RECORD']).then(function (translations) {
-              vm.bday = translations.BIRTHDATE;
-              vm.add_screening = translations.ADD_SCREENING;
-              vm.screen_date = translations.SCREENING_DATE;
-              vm.height = translations.HEIGHT;
-              vm.weight = translations.WEIGHT;
-              vm.zScores = translations.Z_SCORES;
-              vm.ha = translations.H_A;
-              vm.wa = translations.W_A;
-              vm.wh = translations.W_H;
-              vm.doneBy = translations.SCREENING_DONE_BY;
-              vm.removeChild = translations.REMOVE_CHILD_RECORD;
-            });
+      performTranslation();
     });
-    $translate.use('en');
+
     function gradeZScores(survey) {
       vm.haStatus = 'normalZscore';
       vm.waStatus = 'normalZscore';
@@ -157,7 +148,7 @@
       checkFirstNameIsValid();
       checkLastNameIsValid();
       checkGenderIsValid();
-      checkStakeIsValid();
+      // checkStakeIsValid();
       checkAgeIsValid();
 
       if (vm.firstNameIsValid === true && vm.lastNameIsValid === true &&
@@ -239,18 +230,6 @@
         vm.fatherIsValid = false;
       }
     }
-
-    // function checkStakeIsValid () {
-    //   if (vm.child.stake) {
-    //     if (vm.child.stake.length < 1 || vm.child.stake.length > 25) {
-    //       vm.stakeIsValid = false;
-    //     } else {
-    //       vm.stakeIsValid = true;
-    //     }
-    //   } else {
-    //     vm.stakeIsValid = false;
-    //   }
-    // }
 
     function checkWardIsValid () {
       if (vm.child.ward) {

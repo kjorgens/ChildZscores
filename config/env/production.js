@@ -18,7 +18,7 @@ module.exports = {
     // Enable mongoose debug mode
     debug: process.env.MONGODB_DEBUG || false
   },
-  couch: {
+  couchSync: {
     url: 'https://' + process.env.SYNC_ENTITY + '@' + process.env.COUCH_URL + '/ecuador'
   },
   log: {

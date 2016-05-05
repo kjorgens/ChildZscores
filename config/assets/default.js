@@ -30,7 +30,9 @@ module.exports = {
         'public/lib/angular-ui-router-uib-modal/angular-ui-router-uib-modal.js',
         'public/lib/moment/moment.js',
         'public/lib/angular-moment/angular-moment.js',
-        'public/lib/angular-translate/angular-translate.js'
+        'public/lib/angular-translate/angular-translate.js',
+        'public/lib/angular-sanitize/angular-sanitize.js'
+       
         // end bower:js
       ],
       tests: ['public/lib/angular-mocks/angular-mocks.js']

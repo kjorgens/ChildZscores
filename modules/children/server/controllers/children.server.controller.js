@@ -8,6 +8,13 @@ var path = require('path'),
   Child = mongoose.model('Child'),
   request = require('request'),
   errorHandler = require(path.resolve('./modules/core/server/controllers/errors.server.controller'));
+  // configEnvy = require('config-envy')({
+  //   env: process.env.NODE_ENV, // The environment config to pull from. Will be based on the `env` property of the lane
+  //   cwd: process.cwd(), // The current working directory to base storage options from
+  //   localEnv: '.env', // The path to an overriding .env for the local environment
+  //   overrideProcess: false, // Set to true if you want the existing environment variables to be overridden by your .env files
+  //   silent: false // Set to true if you want to be notified of any errors that happen when trying to read your .env files
+  // });
 
 /**
  * Create a child
@@ -71,8 +78,13 @@ exports.update = function(req, res) {
   });
 };
 
+exports.getSyncURL = function(req, res) {
+  return res.json({ entity: process.env.SYNC_ENTITY, url: process.env.COUCH_URL });
+};
+
 exports.getCountryList = function(req, res) {
-  request.get("https://syncuser:mZ7K3AldcIzO@database.liahonakids.org:5984/country_list/liahona_kids_countries_stakes", function (error, response, body) {
+  request.get('https://' + process.env.SYNC_ENTITY + '@' + process.env.COUCH_URL +
+      '/country_list/liahona_kids_countries_stakes', function (error, response, body) {
     if (!error && response.statusCode === 200) {
       var jsonObj = JSON.parse(body);
       res.json(jsonObj);
@@ -85,7 +97,8 @@ exports.getCountryList = function(req, res) {
 };
 
 exports.listDbs = function(req, res) {
-  request.get("https://syncuser:mZ7K3AldcIzO@database.liahonakids.org:5984/_all_dbs", function (error, response, body) {
+  request.get('https://' + process.env.SYNC_ENTITY + '@' + process.env.COUCH_URL +
+      '/_all_dbs', function (error, response, body) {
     if (!error && response.statusCode === 200) {
       var jsonObj = JSON.parse(body);
       res.json(jsonObj);
