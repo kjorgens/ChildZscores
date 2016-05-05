@@ -109,6 +109,20 @@ exports.listDbs = function(req, res) {
     }
   });
 };
+
+exports.createCSVFromDB = function(req, res) {
+  request.get('https://' + process.env.SYNC_ENTITY + '@' + process.env.COUCH_URL +
+      '/_all_dbs', function (error, response, body) {
+    if (!error && response.statusCode === 200) {
+      var jsonObj = JSON.parse(body);
+      res.json(jsonObj);
+    } else {
+      return res.status(400).send({
+        message: errorHandler.getErrorMessage(error)
+      });
+    }
+  });
+};
 /**
  * Delete an child
  */
