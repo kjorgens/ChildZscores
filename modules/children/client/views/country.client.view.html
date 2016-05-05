@@ -1,7 +1,14 @@
 <section>
     <div class="page-header" style="margin-top: 8em">
         <img src="modules/core/client/img/brand/logo_small.png">
-        <h1>{{'SELECT_COUNTRY' | translate}}</h1>
+        <!--<h1>{{'SELECT_COUNTRY' | translate}}</h1>-->
+
+        <h1>
+            <div ng-if="vm.onLine">
+                  <span><a ng-click="vm.refreshCountryList">{{'SELECT_COUNTRY' | translate}} <i
+                          class="glyphicon glyphicon-refresh"></i></a></span>
+            </div>
+        </h1>
     </div>
     <div class="list-group">
         <a ng-repeat="country in vm.liahonaStakes.countries" ui-sref="children.stake({country: country.name})" class="list-group-item">
@@ -20,4 +27,5 @@
         <!--<br>  Open your brower at chrome://flags/#offline-pages-mode-->
         <!--<br>  And ensure this option is enabled-->
     </h4>
+    <span us-spinner="{radius:30, width:8, length: 16}" spinner-key="spinner-sync" spinner-theme="bigBlue"></span>
 </section>
