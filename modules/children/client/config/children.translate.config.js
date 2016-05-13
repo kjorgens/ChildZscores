@@ -24,6 +24,8 @@
       EDIT_EXISTING_CHILD: 'Edit existing child',
       ADD_NEW_CHILD: 'Add new child',
       CANCEL: 'Cancel',
+      YES: 'Yes',
+      NO: 'No',
       UPDATE: 'Update',
       CREATE: 'Create',
       CHILD_RECORD: 'Child Record',
@@ -72,7 +74,9 @@
       REMOVE_SCREENING_MSG: 'Pressing the button above will remove this screening record from the local database, and on the next ' +
       'successful sync, the record will be removed from the remote database.',
       EDIT_CHANGE_VALUES: 'Edit, Change values',
-      NEW_SCREENING: 'New Screening'
+      NEW_SCREENING: 'New Screening',
+      GENERATE_REPORT: 'Generate .csv file for downloading',
+      DOWNLOAD_MSG: 'Download {{reportName}}'
     };
     var translationsES = {
       BIRTHDATE: 'Fecha de nacimiento',
@@ -89,6 +93,8 @@
       EDIT_EXISTING_CHILD: 'Editar Niño existente',
       ADD_NEW_CHILD: 'Agregar nuevo Niño',
       CANCEL: 'Cancelar',
+      YES: 'Sí',
+      NO: 'No',
       UPDATE: 'Actualizar ',
       CREATE: 'Crear',
       CHILD_RECORD: 'Registro de Niños',
@@ -139,7 +145,9 @@
       REMOVE_SCREENING_MSG: 'Al pulsar el botón de arriba eliminará este registro de selección de la base de datos local , y en la siguiente ' +
       ' Sincronización correcta , el registro será eliminado de la base de datos remota',
       EDIT_CHANGE_VALUES: 'Editar , cambiar los valores',
-      NEW_SCREENING: 'nueva Proyección'
+      NEW_SCREENING: 'nueva Proyección',
+      GENERATE_REPORT: 'Generar archivo CSV para descargar',
+      DOWNLOAD_MSG: 'Descargar archivo {{reportName}}'
     };
     $translateProvider
         .translations('en', translationsEN)

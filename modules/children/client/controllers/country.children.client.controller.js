@@ -21,11 +21,10 @@
       console.log(input);
     }
     function handleError(input) {
-      console.log(input + ' attempt to retrieve info remote');
-      getStakesDB();
-      vm.stopSpin();
+      console.log (input + ' attempt to retrieve info remote');
+      getStakesDB ();
+      vm.stopSpin ();
     }
-    
     vm.startSpin = function() {
       if (!vm.spinneractive) {
         usSpinnerService.spin('spinner-sync');
@@ -46,11 +45,11 @@
     $rootScope.$on('us-spinner:stop', function(event, key) {
       vm.spinneractive = false;
     });
-    function refreshCountryList(){
+    function refreshCountryList() {
       vm.startSpin();
       getStakesDB();
     }
-  
+    
     function getStakesDB() {
       if (navigator.onLine) {
         ChildrenStakes.get(function(retVal) {
@@ -58,11 +57,10 @@
           PouchService.createCountryDatabase();
           PouchService.putStakesLocal(retVal, returnFromPut, handleError);
         });
-      } 
+      }
     }
     PouchService.createCountryDatabase();
     PouchService.getCountriesLocal(storeDbList, handleError);
-    
   }
 }());
 

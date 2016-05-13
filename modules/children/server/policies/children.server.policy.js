@@ -23,6 +23,9 @@ exports.invokeRolesPolicies = function () {
     }, {
       resources: '/sync',
       permissions: '*'
+    }, {
+      resources: '/report/:stakeDB',
+      permissions: ['*']
     }]
   }, {
     roles: ['user'],
@@ -67,6 +70,13 @@ exports.invokeRolesPolicies = function () {
       permissions: ['get']
     }, {
       resources: '/sync',
+      permissions: ['get']
+    }, {
+      resources: '/report/:stakeDB',
+      permissions: ['get']
+    },
+    {
+      resources: '/files/:csvFile',
       permissions: ['get']
     }]
   }]);

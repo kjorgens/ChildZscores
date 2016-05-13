@@ -40,12 +40,16 @@
           //   roles: ['user', 'admin']
           // }
         })
-      // .state('home', {
-      //   url: '/',
-      //   templateUrl: 'modules/core/client/views/home.client.view.html',
-      //   controller: 'HomeController',
-      //   controllerAs: 'vm'
-      // })
+        .state('fileDownload', {
+           url: '/files/:fileToDownload',
+           // templateUrl: 'modules/children/client/views/sync-children.client.view.html',
+           // controller: 'ChildrenSyncController',
+           // controllerAs: 'vm',
+           data: {
+             roles: ['admin', 'sync']
+         //       pageTitle: 'Sync database {{ database.title }}'
+           }
+         })
       .state('not-found', {
         url: '/not-found',
         templateUrl: 'modules/core/client/views/404.client.view.html',

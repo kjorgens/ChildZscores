@@ -53,6 +53,19 @@
             //       pageTitle: 'Sync database {{ database.title }}'
           }
         })
+        .state('children.report', {
+          url: '/report/:stakeDB',
+          templateUrl: 'modules/children/client/views/sync-children.client.view.html',
+          controller: 'ChildrenSyncController',
+          controllerAs: 'vm',
+          resolve: {
+            genReport: generateCSV
+          },
+          data: {
+            roles: ['admin', 'sync']
+            //       pageTitle: 'Sync database {{ database.title }}'
+          }
+        })
         .state('children.getsync', {
           url: '/syncinfo/',
           templateUrl: 'modules/children/client/views/sync-children.client.view.html',
@@ -181,6 +194,11 @@
   listCountries.$inject = ['$stateParams', 'ChildrenStakes'];
   function listCountries($stateParams, ChildrenStakes) {
     return ChildrenStakes;
+  }
+
+  generateCSV.$inject = ['$stateParams', 'ChildrenReport'];
+  function generateCSV($stateParams, ChildrenReport) {
+    return ChildrenReport;
   }
 
   getChild.$inject = ['$stateParams', 'PouchService'];

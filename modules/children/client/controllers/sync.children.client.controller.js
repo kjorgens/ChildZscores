@@ -8,13 +8,16 @@
       .module('children')
       .controller('ChildrenSyncController', ChildrenSyncController);
 
-  ChildrenSyncController.$inject = ['$rootScope', '$scope', '$state', '$stateParams', 'Authentication', 'ChildrenGetSync', 'usSpinnerService', 'PouchService'];
+  ChildrenSyncController.$inject = ['$rootScope', '$scope', '$state', '$stateParams', 'ChildrenReport', 'Authentication', 'ChildrenGetSync', 'usSpinnerService', 'PouchService'];
 
-  function ChildrenSyncController($rootScope, $scope, $state, $stateParams, Authentication, ChildrenGetSync, usSpinnerService, PouchService) {
+  function ChildrenSyncController($rootScope, $scope, $state, $stateParams, ChildrenReport, Authentication, ChildrenGetSync, usSpinnerService, PouchService) {
     var vm = this;
     ChildrenGetSync.get(function(input) {
       vm.syncStuff = input;
     });
+    vm.reportToDownload = '';
+    vm.reportName = $stateParams.stakeDB + '.csv';
+    vm.reportReady = false;
     vm.stakeDB = $stateParams.stakeDB;
     vm.selectedStake = localStorage.getItem('selectedStake');
     vm.selectedCountry = localStorage.getItem('selectedCountry');
@@ -24,7 +27,7 @@
 
     vm.selectedStake = $stateParams.stakeName;
     //   vm.selectedCountryObject = sessionStorage.getItem('selectedCountryObject');
-
+    vm.createReport = createReport;
     vm.syncUpstream = syncUpstream;
     vm.online = $rootScope.appOnline;
 //    vm.find();
@@ -50,12 +53,6 @@
       vm.spinneractive = false;
     });
 
-    // function childInfoString(child) {
-    //   return child.doc.firstName + ' ' + child.doc.lastName + ' --- Birth age: ' + child.doc.monthAge.toFixed(2) + ' months,' +
-    //       '  Z Scores: height/age: ' + child.doc.zScore.ha.toFixed(2) + ' weight/age: ' + child.doc.zScore.wa.toFixed(2) + ' weight/height: ' +
-    //       child.doc.zScore.wl.toFixed(2);
-    // }
-
     function whenDone() {
       find();
       vm.stopSpin();
@@ -75,6 +72,25 @@
       PouchService.sync('https://' + vm.syncStuff.entity + '@' +
           vm.syncStuff.url + '/' + vm.stakeDB, replicateIn, replicateError, whenDone);
     }
+
+    function returnReport(input) {
+      vm.stopSpin();
+      vm.reportReady = true;
+      vm.reportToDownload = '/' + input.message;
+      vm.reportName = vm.stakeDB + '.csv';
+      vm.reportFileName = { reportName: vm.reportName };
+      console.log(input);
+    }
+
+    function getError(error) {
+      vm.stopSpin();
+      console.log(error);
+    }
+    function createReport() {
+      vm.startSpin();
+      ChildrenReport.get({ stakeDB: vm.stakeDB }, returnReport, getError);
+    }
+//    createReport();
   }
 }());
 

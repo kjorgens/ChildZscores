@@ -10,6 +10,7 @@
   function ChildrenController($rootScope, $scope, $state, $timeout, $translate, moment, child, ModalService, Authentication, ZScores, PouchService) {
     var vm = this;
     var editChild = false;
+
     $translate.use($rootScope.SelectedLanguage);
    // vm.liahonaStakes = $rootScope.liahonaStakes;
     vm.selectedStake = sessionStorage.getItem('selectedStake');
@@ -32,12 +33,15 @@
       vm.motherIsValid = true;
       vm.fatherIsValid = true;
       vm.birthdateIsValid = true;
+      vm.membershipIsValid = true;
+
     //  vm.stakeIsValid = true;
       // vm.child.enteredMonthAge = child.monthAge;
       // var rightNow = new Date();
       // vm.child.monthAge = moment(rightNow).diff(moment(vm.birthDate), 'months');
       // vm.child.stake = vm.selectedStake;
       vm.child.birthDate = new Date(vm.child.birthDate);
+
       PouchService.getSurveys(vm.child._id, setSurveyList, surveyErrors);
     } else {
       vm.ageIsValid = false;
@@ -59,7 +63,7 @@
 
     vm.error = null;
     vm.form = {};
-//    vm.enteredMonthAge = undefined;
+//    vm.enteredMonthAge = undefined;ldsMemberChecked
     vm.remove = remove;
     vm.create = create;
     vm.update = update;
@@ -68,9 +72,11 @@
     vm.setMonthCount = setMonthCount;
     vm.today = today;
 
+    vm.ldsMemberChecked = ldsMemberChecked;
     vm.checkFirstNameIsValid = checkFirstNameIsValid;
     vm.checkLastNameIsValid = checkLastNameIsValid;
     vm.checkGenderIsValid = checkGenderIsValid;
+    vm.checkMembershipIsValid = checkMembershipIsValid;
     vm.checkAgeIsValid = checkAgeIsValid;
     vm.checkEnteredAgeIsValid = checkEnteredAgeIsValid;
     // vm.checkAllFieldsValid = checkAllFieldsValid;
@@ -200,10 +206,18 @@
     }
 
     function checkGenderIsValid() {
-      if (vm.child.gender === 'Boy' || vm.child.gender === 'Girl') {
+      if (vm.child.gender === 'Boy' || vm.child.gender === 'Girl' || vm.child.gender === 'Chico' || vm.child.gender === 'Niña') {
         vm.genderIsValid = true;
       } else {
         vm.genderIsValid = false;
+      }
+    }
+
+    function checkMembershipIsValid(){
+      if (vm.child.memberStatus === 'Yes' || vm.child.memberStatus === 'No' || vm.child.memberStatus === 'Sí') {
+        vm.membershipIsValid = true;
+      } else {
+        vm.membershipIsValid = false;
       }
     }
 
@@ -285,6 +299,17 @@
       }
     }
 
+    function ldsMemberChecked() {
+      if (vm.memberChecked === 'YES'){
+        console.log('child is member');
+        vm.child.memberStatus = 'YES';
+      }
+      else {
+        console.log('child is not a member');
+        vm.child.memberStatus = 'NO';
+      }
+    }
+
     function updated(child) {
       vm.child = child;
     }
@@ -332,7 +357,7 @@
           idGroup: vm.child.idGroup,
           ward: vm.child.ward,
           phone: vm.child.phoneNum,
-          memberStaus: vm.child.memberStatus,
+          memberStaus: vm.memberStatus,
           screeningStatus: vm.screeningStatus,
           _id: 'chld_',
           interviewer: localStorage.getItem('lastInterviewer')

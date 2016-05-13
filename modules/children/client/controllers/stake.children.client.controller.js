@@ -15,7 +15,6 @@
     function findCountry(country) {
       return country.name === $stateParams.country;
     }
-    
     function returnFromPut(input) {
       vm.stopSpin();
       console.log(input);
@@ -62,10 +61,6 @@
       localStorage.setItem('selectedCountry', vm.selectedCountry.name);
       sessionStorage.getItem('selectedCountryImage', vm.selectedCountry.image);
       localStorage.setItem('selectedCountryImage', vm.selectedCountry.image);
-    }
-
-    function handleError(input) {
-      console.log(input);
     }
 
     function getStakesDB() {
