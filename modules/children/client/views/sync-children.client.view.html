@@ -1,21 +1,12 @@
 <section>
     <div class="page-header" style="margin-top: 4em">
-        <img src={{vm.selectedCountryImage}}>
-        <!--<h3>{{vm.selectedCountry}}</h3>-->
-        <!--<h3>{{vm.selectedStake}}</h3>-->
-        <!--<h4>-->
-            <!--<span><a ui-sref="children.stake({country: vm.selectedCountry})">{{vm.selectedCountry}}</a></span>-->
-            <!--<i class="glyphicon glyphicon-list"></i>-->
-        <!--</h4>-->
-        <!--<h4>-->
-            <!--<span><a ui-sref="children.list({stakeDB: vm.stakedDB, stakeName:vm.selectedStake})">{{vm.selectedStake}}</a></span>-->
-            <!--<i class="glyphicon glyphicon-list"></i>-->
-        <!--</h4>-->
+
+<img src={{vm.selectedCountryImage}}>
+            <!--<a ui-sref="children.list({stakeDB: vm.stakeDB, stakeName:vm.selectedStake})"></a>-->
 
         <h3>
             <span><a ui-sref="children.list({stakeDB: vm.stakeDB, stakeName:vm.selectedStake})">{{'CANCEL' | translate}}</a></span>
         </h3>
-
     </div>
     <div class="list-group borderless">
         <a ng-click="vm.syncUpstream()" class="list-group-item borderless">
@@ -29,13 +20,21 @@
             </small>
         </a>
     </div>
+    <h3>
+        <div ng-if="vm.reportReady">
+            <a target="_self" ng-href={{vm.reportToDownload}} download={{vm.reportName}}>{{'DOWNLOAD_MSG' |
+                translate:vm.reportFileName}} </a>
+            <i class="glyphicon glyphicon-download-alt"></i>
+        </div>
+    </h3>
+    <h3>
+        <div ng-if="!vm.reportReady">
+            <a ng-click="vm.createReport()">
+                <span>{{'GENERATE_REPORT' | translate}} </span>
+                <i class="glyphicon glyphicon-share"></i>
+            </a>
+        </div>
+    </h3>
     <h5>{{'SYNC_MESSAGE' | translate}}</h5>
-    <!--<div class="col-sm-4" style="text-align: center">-->
-        <!--<div style="margin-top:4%;">-->
-            <!--<button type="submit" class="btn btn-primary" ng-click="vm.syncUpstream()">Sync Database-->
-                <!--<i class="glyphicon glyphicon-refresh"></i>-->
-            <!--</button>-->
-        <!--</div>-->
-    <!--</div>-->
     <span us-spinner="{radius:30, width:8, length: 16}" spinner-key="spinner-sync" spinner-theme="bigBlue"></span>
 </section>

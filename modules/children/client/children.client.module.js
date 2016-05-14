@@ -4,6 +4,7 @@
 
   app.registerModule('children', ['angularMoment', 'core', 'pascalprecht.translate', 'ngSanitize']);
   app.registerModule('children.services');
+  app.registerModule('children.report');
   app.registerModule('children.translate');
   app.registerModule('children.stakes');
   app.registerModule('children.getsync');

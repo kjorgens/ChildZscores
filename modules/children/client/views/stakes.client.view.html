@@ -1,7 +1,16 @@
 <section>
     <div class="page-header" style="margin-top: 8em">
         <img src={{vm.selectedCountry.image}}>
-        <h1>{{'SELECT_STAKE' | translate}}</h1>
+        <!--<h1>{{'SELECT_STAKE' | translate}}</h1>-->
+        <h1>
+            <div ng-if="vm.onLine">
+                  <span><a ng-click="vm.refreshCountryList()">{{'SELECT_STAKE' | translate}} <i
+                          class="glyphicon glyphicon-refresh"></i></a></span>
+            </div>
+            <div ng-if="!vm.onLine">
+                {{'SELECT_STAKE' | translate}}
+            </div>
+        </h1>
     </div>
     <div class="list-group">
         <a ng-repeat="stake in vm.selectedCountry.stakes"
@@ -13,4 +22,5 @@
             </small>
         </a>
     </div>
+    <span us-spinner="{radius:30, width:8, length: 16}" spinner-key="spinner-sync" spinner-theme="bigBlue"></span>
 </section>

@@ -14,7 +14,6 @@
     vm.messageText = '';
     vm.sendMessage = sendMessage;
     vm.appOnLine = navigator.onLine;
-   
     init();
 
     function init() {

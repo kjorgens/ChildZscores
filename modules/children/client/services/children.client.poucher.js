@@ -18,11 +18,11 @@
 
     factory.createDatabase = function (dbName) {
       currentDbName = dbName;
-      database = new pouchDB (dbName);
+      database = new pouchDB(dbName);
     };
 
     factory.createCountryDatabase = function () {
-      countryDataBase = new pouchDB ('country_list');
+      countryDataBase = new pouchDB('country_list');
     };
 
     factory.initLocalDb = function(indexNames) {

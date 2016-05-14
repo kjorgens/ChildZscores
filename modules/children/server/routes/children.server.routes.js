@@ -4,42 +4,30 @@
  * Module dependencies
  */
 var passport = require('passport'),
-  express = require('express'),
-  childrenPolicy = require('../policies/children.server.policy'),
-  children = require('../controllers/children.server.controller');
+    express = require('express'),
+    childrenPolicy = require('../policies/children.server.policy'),
+    children = require('../controllers/children.server.controller');
 
 
 module.exports = function (app) {
   var router = express.Router();
 
-  // children collection routes
+  // sync db routes
   router.route('/sync')
       .get(passport.authenticate('jwt', { session: false }), childrenPolicy.isAllowed, children.getSyncURL);
 
-  // children collection routes
+  // create .csv report file
+  router.route('/report/:stakeDB')
+      .get(passport.authenticate('jwt', { session: false }),childrenPolicy.isAllowed, children.createCSVFromDB);
+
+  // retrieve stakes route
   router.route('/stakes')
       .get(childrenPolicy.isAllowed, children.getCountryList);
 
+  // retrieve countries route
   router.route('/countries')
       .get(childrenPolicy.isAllowed, children.getCountryList);
 
-  // router.route('/sync/:stakeDB/:stakeName')
-  //     .get(childrenPolicy.isAllowed, children.getRemoteCountryList);
-
-  // children collection routes
-  router.route('/')
-      .get(childrenPolicy.isAllowed, children.list)
-      .post(passport.authenticate('jwt', { session: false }), childrenPolicy.isAllowed, children.create);
-
-  // Single child routes
-  router.route('/:childId')
-      .get(childrenPolicy.isAllowed, children.read)
-      .put(passport.authenticate('jwt', { session: false }), childrenPolicy.isAllowed, children.update)
-      .delete(passport.authenticate('jwt', { session: false }), childrenPolicy.isAllowed, children.delete);
-
-  // Finish by binding the child middleware
-  router.param('childId', children.childByID);
 
   app.use('/api/children', router);
 };
-
