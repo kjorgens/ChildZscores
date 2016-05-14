@@ -22,6 +22,8 @@
     vm.phoneNum;
     vm.interviewer = localStorage.getItem('lastInterviewer');
 //    vm.find();
+    vm.genders = [{ value: 'Boy', translationId:'TXT_MALE' }, { value: 'Girl', translationId:'TXT_FEMALE'}];
+    vm.yesNo = [{ value: 'Yes', translationId:'YES' }, { value: 'No', translationId:'NO'}];
     if ($state.params.childId) {
       editChild = true;
       vm.child = child;
@@ -206,7 +208,7 @@
     }
 
     function checkGenderIsValid() {
-      if (vm.child.gender === 'Boy' || vm.child.gender === 'Girl' || vm.child.gender === 'Chico' || vm.child.gender === 'Niña') {
+      if (vm.child.gender === 'Boy' || vm.child.gender === 'Girl' ) {
         vm.genderIsValid = true;
       } else {
         vm.genderIsValid = false;
@@ -214,7 +216,7 @@
     }
 
     function checkMembershipIsValid(){
-      if (vm.child.memberStatus === 'Yes' || vm.child.memberStatus === 'No' || vm.child.memberStatus === 'Sí') {
+      if (vm.child.memberStatus === 'Yes' || vm.child.memberStatus === 'No') {
         vm.membershipIsValid = true;
       } else {
         vm.membershipIsValid = false;
@@ -357,7 +359,7 @@
           idGroup: vm.child.idGroup,
           ward: vm.child.ward,
           phone: vm.child.phoneNum,
-          memberStaus: vm.memberStatus,
+          memberStaus: vm.child.memberStatus,
           screeningStatus: vm.screeningStatus,
           _id: 'chld_',
           interviewer: localStorage.getItem('lastInterviewer')
@@ -375,6 +377,7 @@
         vm.child.city = '';
         vm.child.idGroup = '';
         vm.child.ward = '';
+        vm.child.memberStatus = '';
         // vm.created = Date.now;
         // vm.birthdate = '';
         // vm.monthAge = 0;

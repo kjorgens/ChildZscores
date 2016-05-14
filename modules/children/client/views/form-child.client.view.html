@@ -83,12 +83,11 @@
                         <div ng-class="{'has-error':(!vm.genderIsValid)}">
                             <label for="vm.child.gender" class="col-sm-2 control-label">{{'GENDER' | translate}}</label>
                             <div class="col-sm-4">
-                                <select type="input" ng-change="vm.checkGenderIsValid()" class="form-control"
+                                <select  ng-change="vm.checkGenderIsValid()" class="form-control"
                                         ng-model="vm.child.gender"
                                         id="vm.child.gender"
+                                        ng-options="gender.value as gender.translationId | translate for gender in vm.genders"
                                         required>
-                                    <option>{{'GIRL' | translate}}</option>
-                                    <option>{{'BOY' | translate}}</option>
                                 </select>
                                 <div class="validationMessage" ng-if="!vm.genderIsValid"><p>{{'GENDER_REQUIRED' | translate}}
                                 </p></div>
@@ -129,7 +128,6 @@
                                 <input type="input" class="form-control"
                                        ng-model="vm.child.idGroup" id="vm.child.idGroup"
                                        placeholder="{{'ID_GROUP' | translate}}">
-
                             </div>
                         <label for="vm.child.ward" class="col-sm-2 control-label">{{'WARD' | translate}}</label>
                         <div class="col-sm-4">
@@ -144,29 +142,20 @@
                                 <textarea class="form-control" ng-model="vm.child.comments" id="vm.child.comments"
                                           placeholder="{{'COMMENTS' | translate}}"></textarea>
                         </div>
-                        <div ng-class="{'has-error':(!vm.genderIsValid)}">
+                        <div ng-class="{'has-error':(!vm.membershipIsValid)}">
                             <label for="vm.child.memberStatus" class="col-sm-2 control-label">{{'LDS_MEMBER' | translate}}</label>
                             <div class="col-sm-4">
-                                <select type="input" ng-change="vm.checkMembershipIsValid()" class="form-control"
-                                        ng-model="vm.child.memberStatus"
-                                        id="vm.child.memberStatus"
-                                        required>
-                                    <option>{{'YES' | translate}}</option>
-                                    <option>{{'NO' | translate}}</option>
+                                <select  ng-change="vm.checkMembershipIsValid()" class="form-control"
+                                         ng-model="vm.child.memberStatus"
+                                         id="vm.child.memberStatus"
+                                         ng-options="yesno.value as yesno.translationId | translate for yesno in vm.yesNo"
+                                         required>
                                 </select>
                                 <div class="validationMessage" ng-if="!vm.membershipIsValid"><p>{{'GENDER_REQUIRED' | translate}}
                                 </p></div>
                             </div>
                         </div>
-                        <!--<div >-->
-                            <!--<label for="vm.memberStatus" class="col-sm-2 control-label">{{'LDS_MEMBER' | translate}}</label>-->
-                            <!--<div class="col-sm-4">-->
-                                <!--<input type="checkbox" id="vm.memberStatus"  class="form-control"-->
-                                       <!--ng-model="vm.memberChecked" checked="checked">-->
-                            <!--</div>-->
-                        <!--</div>-->
-
-                    </div>
+                     </div>
                   <div class="form-group">
                     <div ng-class="{'has-error':(!vm.genderIsValid)}">
 
