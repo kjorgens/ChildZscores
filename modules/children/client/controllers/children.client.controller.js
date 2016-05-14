@@ -12,14 +12,11 @@
     var editChild = false;
 
     $translate.use($rootScope.SelectedLanguage);
-   // vm.liahonaStakes = $rootScope.liahonaStakes;
     vm.selectedStake = sessionStorage.getItem('selectedStake');
     vm.selectedDB = sessionStorage.getItem('selectedDBName');
-//    vm.selectedCountryObject = sessionStorage.getItem('selectedCountryObject');
     vm.selectedCountry = sessionStorage.getItem('selectedCountry');
     vm.selectedCountryImage = sessionStorage.getItem('selectedCountryImage');
     vm.online = $rootScope.appOnline;
-    vm.phoneNum;
     vm.interviewer = localStorage.getItem('lastInterviewer');
 //    vm.find();
     vm.genders = [{ value: 'Boy', translationId:'TXT_MALE' }, { value: 'Girl', translationId:'TXT_FEMALE'}];
@@ -37,22 +34,11 @@
       vm.birthdateIsValid = true;
       vm.membershipIsValid = true;
 
-    //  vm.stakeIsValid = true;
-      // vm.child.enteredMonthAge = child.monthAge;
-      // var rightNow = new Date();
-      // vm.child.monthAge = moment(rightNow).diff(moment(vm.birthDate), 'months');
-      // vm.child.stake = vm.selectedStake;
       vm.child.birthDate = new Date(vm.child.birthDate);
 
       PouchService.getSurveys(vm.child._id, setSurveyList, surveyErrors);
     } else {
       vm.ageIsValid = false;
- //     vm.stake = sessionStorage.getItem('selectedStake');
-  //    vm.firstNameIsValid = false;
-  //    vm.lastNameIsValid = false;
-  //    vm.genderIsValid = false;
-  //    vm.birthdateIsValid = false;
- //     vm.stakeIsValid = false;
       vm.surveyDate = new Date();
     }
 
@@ -65,7 +51,6 @@
 
     vm.error = null;
     vm.form = {};
-//    vm.enteredMonthAge = undefined;ldsMemberChecked
     vm.remove = remove;
     vm.create = create;
     vm.update = update;
@@ -74,7 +59,6 @@
     vm.setMonthCount = setMonthCount;
     vm.today = today;
 
-    vm.ldsMemberChecked = ldsMemberChecked;
     vm.checkFirstNameIsValid = checkFirstNameIsValid;
     vm.checkLastNameIsValid = checkLastNameIsValid;
     vm.checkGenderIsValid = checkGenderIsValid;
@@ -156,7 +140,6 @@
       checkFirstNameIsValid();
       checkLastNameIsValid();
       checkGenderIsValid();
-      // checkStakeIsValid();
       checkAgeIsValid();
 
       if (vm.firstNameIsValid === true && vm.lastNameIsValid === true &&
@@ -285,7 +268,6 @@
         vm.ageIsValid = true;
         vm.child.birthDate = new Date(year, month - vm.child.monthAge, day);
         vm.ageIsValid = true;
- //       vm.child.monthAge = vm.enteredMonthAge;
       }
     }
 
@@ -297,18 +279,20 @@
       } else {
         vm.ageIsValid = true;
         vm.child.monthAge = Number(monthAge.toFixed(2));
-  //      vm.enteredMonthAge = Number(vm.monthAge);
       }
     }
 
     function ldsMemberChecked() {
       if (vm.memberChecked === 'YES'){
         console.log('child is member');
-        vm.child.memberStatus = 'YES';
+        // vm.child.memberStatus = 'Yes';
+        vm.checkMembershipIsValid = true;
+
       }
       else {
         console.log('child is not a member');
-        vm.child.memberStatus = 'NO';
+        // vm.child.memberStatus = 'No';
+        vm.checkMembershipIsValid = true;
       }
     }
 
@@ -358,7 +342,7 @@
           city: vm.child.city,
           idGroup: vm.child.idGroup,
           ward: vm.child.ward,
-          phone: vm.child.phoneNum,
+          phone: vm.child.phone,
           memberStaus: vm.child.memberStatus,
           screeningStatus: vm.screeningStatus,
           _id: 'chld_',

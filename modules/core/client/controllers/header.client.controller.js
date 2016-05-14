@@ -9,9 +9,9 @@
 
   function HeaderController($rootScope, $scope, $state, $window, $translate, ChildrenStakes, Authentication, menuService, PouchService) {
     var vm = this;
-    $rootScope.SelectedLanguage = 'es';
-    $translate.use('es');
-    vm.language = 'English';
+    $rootScope.SelectedLanguage = 'en';
+    $translate.use('en');
+    vm.language = 'Español';
     vm.appStatus = 'test';
     vm.toggleLanguage = toggleLanguage;
     vm.appOnLine = navigator.onLine;
