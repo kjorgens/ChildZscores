@@ -111,6 +111,7 @@ module.exports = function (grunt) {
         files: [
  //         {src: ['.ebextensions/01-ebextensions.config'], dest: '/'},
  //         {src: ['.ebextensions/03-nginx.config'], dest: '/'},
+          { src: ['files'], dest: '/' },
           { src: ['package.json'], dest: '/' },
           { src: ['.ebextensions/01-nginx.config'], dest: '/' },
  //         { src: ['.ebextensions/00-npm-script'], dest: '/' },
