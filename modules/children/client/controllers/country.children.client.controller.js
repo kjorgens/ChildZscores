@@ -5,9 +5,9 @@
       .module('children')
       .controller('ChildrenCountryController', ChildrenCountryController);
 
-  ChildrenCountryController.$inject = ['$rootScope', '$scope', '$state', '$translate', 'ModalService', 'ChildrenService', 'ChildrenStakes', 'PouchService'];
+  ChildrenCountryController.$inject = ['$rootScope', '$scope', '$state', '$translate', 'usSpinnerService', 'ModalService', 'ChildrenService', 'ChildrenStakes', 'PouchService'];
 
-  function ChildrenCountryController($rootScope, $scope, $state, $translate, ModalService, ChildrenService, ChildrenStakes, PouchService) {
+  function ChildrenCountryController($rootScope, $scope, $state, $translate, usSpinnerService, ModalService, ChildrenService, ChildrenStakes, PouchService) {
     var vm = this;
     vm.refreshCountryList = refreshCountryList;
     vm.onLine = navigator.onLine;
@@ -17,10 +17,13 @@
       vm.stopSpin();
     }
     function returnFromPut(input) {
+      vm.stopSpin();
       console.log(input);
     }
     function handleError(input) {
-      console.log(input);
+      console.log (input + ' attempt to retrieve info remote');
+      getStakesDB ();
+      vm.stopSpin ();
     }
     vm.startSpin = function() {
       if (!vm.spinneractive) {
@@ -42,27 +45,22 @@
     $rootScope.$on('us-spinner:stop', function(event, key) {
       vm.spinneractive = false;
     });
-    function refreshCountryList(){
+    function refreshCountryList() {
       vm.startSpin();
-      ChildrenStakes.get(function(retVal) {
-        vm.liahonaStakes = retVal;
-        PouchService.createCountryDatabase();
-        PouchService.putStakesLocal(retVal, returnFromPut, handleError);
-      });
+      getStakesDB();
     }
-  
-    if (navigator.onLine) {
-      ChildrenStakes.get(function(retVal) {
-        vm.liahonaStakes = retVal;
-        PouchService.createCountryDatabase();
-        PouchService.putStakesLocal(retVal, returnFromPut, handleError);
-      });
-    } else {
-      // use the last database if it exits
-      // $state.go('children.list',{country,stake}
-      PouchService.createCountryDatabase();
-      PouchService.getCountriesLocal(storeDbList, handleError);
+    
+    function getStakesDB() {
+      if (navigator.onLine) {
+        ChildrenStakes.get(function(retVal) {
+          vm.liahonaStakes = retVal;
+          PouchService.createCountryDatabase();
+          PouchService.putStakesLocal(retVal, returnFromPut, handleError);
+        });
+      }
     }
+    PouchService.createCountryDatabase();
+    PouchService.getCountriesLocal(storeDbList, handleError);
   }
 }());
 

@@ -571,7 +571,7 @@
       var wlStatus = 'normalZscore';
       if (heightForAge < -2) {
         haStatus = 'redZoneZscore';
-        } else {
+      } else {
         if (heightForAge < -1 && heightForAge > -2) {
           haStatus = 'marginalZscore';
         }

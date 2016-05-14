@@ -78,7 +78,7 @@ self.addEventListener('install', function (event) {
       '/modules/children/client/views/remove-child.client.view.html',
       '/modules/children/client/views/remove-screening.client.view.html',
       '/modules/children/client/views/stakes.client.view.html',
-      '/modules/children/client/img/boliva.png',
+      '/modules/children/client/img/bolivia.png',
       '/modules/children/client/img/columbia.png',
       '/modules/children/client/img/ecuador.png',
       '/modules/children/client/img/guatamala.png',

@@ -5,8 +5,11 @@
 
         <h1>
             <div ng-if="vm.onLine">
-                  <span><a ng-click="vm.refreshCountryList">{{'SELECT_COUNTRY' | translate}} <i
+                  <span><a ng-click="vm.refreshCountryList()">{{'SELECT_COUNTRY' | translate}} <i
                           class="glyphicon glyphicon-refresh"></i></a></span>
+            </div>
+            <div ng-if="!vm.onLine">
+                {{'SELECT_COUNTRY' | translate}}
             </div>
         </h1>
     </div>
