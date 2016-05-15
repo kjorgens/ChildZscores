@@ -91,8 +91,8 @@ self.addEventListener('install', function (event) {
       '/modules/core/client/views/403.client.view.html',
       '/modules/core/client/views/404.client.view.html',
       '/modules/core/client/views/header.client.view.html',
-      '/modules/core/client/views/home.client.view.html'
-
+      '/modules/core/client/views/home.client.view.html',
+      '/modules/core/client/views/chromeonly.client.view.html'
     ]);
   }));
 
