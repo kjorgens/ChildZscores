@@ -76,7 +76,8 @@
       EDIT_CHANGE_VALUES: 'Edit, Change values',
       NEW_SCREENING: 'New Screening',
       GENERATE_REPORT: 'Generate .csv file for downloading',
-      DOWNLOAD_MSG: 'Download {{reportName}}'
+      DOWNLOAD_MSG: 'Download {{reportName}}',
+      MEMBER_STATUS_REQUIRED: 'LDS membership status required'
     };
     var translationsES = {
       BIRTHDATE: 'Fecha de nacimiento',
@@ -147,7 +148,8 @@
       EDIT_CHANGE_VALUES: 'Editar , cambiar los valores',
       NEW_SCREENING: 'nueva Proyección',
       GENERATE_REPORT: 'Generar archivo CSV para descargar',
-      DOWNLOAD_MSG: 'Descargar archivo {{reportName}}'
+      DOWNLOAD_MSG: 'Descargar archivo {{reportName}}',
+      MEMBER_STATUS_REQUIRED: 'el estado requiere LDS'
     };
     $translateProvider
         .translations('en', translationsEN)
