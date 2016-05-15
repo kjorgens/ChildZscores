@@ -343,7 +343,7 @@
           idGroup: vm.child.idGroup,
           ward: vm.child.ward,
           phone: vm.child.phone,
-          memberStaus: vm.child.memberStatus,
+          memberStatus: vm.child.memberStatus,
           screeningStatus: vm.screeningStatus,
           _id: 'chld_',
           interviewer: localStorage.getItem('lastInterviewer')

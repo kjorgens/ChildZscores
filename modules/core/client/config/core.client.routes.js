@@ -66,6 +66,15 @@
           pageTitle: 'Bad-Request'
         }
       })
+        .state('chrome-only', {
+          url: '/chrome-only',
+          templateUrl: 'modules/core/client/views/chromeonly.client.view.html',
+          controller: 'HeaderController',
+          data: {
+            ignoreState: true,
+            pageTitle: 'Chrome Only Please'
+          }
+        })
       .state('forbidden', {
         url: '/forbidden',
         templateUrl: 'modules/core/client/views/403.client.view.html',
