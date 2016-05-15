@@ -41,7 +41,7 @@
                 <h3><span ng-bind="child.firstName"></span>
                     <span ng-bind="child.lastName"></span></h3>
 
-                 {{child.gender === 'Boy' ? vm.boy : vm.girl}}, {{'BORN' | translate}}
+                 {{child.gender === 'Boy' ? ('TXT_MALE' | translate) : ('TXT_FEMALE' | translate)}}, {{'BORN' | translate}}
                 <span ng-bind="child.birthDate | date:'mediumDate'"></span>,
                 {{'RECORD_CREATED' | translate}}:
                 <span ng-bind="child.created | date:'mediumDate'"></span>

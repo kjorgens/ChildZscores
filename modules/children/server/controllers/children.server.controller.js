@@ -58,7 +58,7 @@ function pullSaveScreenData(input) {
 
 function insertHeaderLine(input) {
   return new Promise(function(resolve, reject) {
-    var headerLine = 'id,gender,firstName,lastName,mother,phone,address,ward,lds,weight,height,age,ha,wa,wh\n';
+    var headerLine = 'id,gender,firstName,lastName,idGroup,mother,phone,address,ward,lds,weight,height,age,ha,wa,wh\n';
     input.fileDis.write(headerLine, function(err) {
       if (err) {
         console.log(err);
@@ -72,7 +72,7 @@ function insertHeaderLine(input) {
 function addLineToFile(input) {
   return new Promise(function (resolve, reject) {
     var dataLine = input.screenInfo.id + ',' + input.screenInfo.key.gender + ',' + input.ownerInfo.firstName + ',' + input.ownerInfo.lastName +
-        ',' + input.ownerInfo.mother + ',' + input.ownerInfo.phone + ',' + input.ownerInfo.address + ',' + input.ownerInfo.ward +
+        ',' + input.ownerInfo.idGroup + ',' + input.ownerInfo.mother + ',' + input.ownerInfo.phone + ',' + input.ownerInfo.address + ',' + input.ownerInfo.ward +
         ',' + input.ownerInfo.memberStatus + ',' + input.screenInfo.key.weight + ',' + input.screenInfo.key.height + ',' + input.screenInfo.key.monthAge +
         ',' + input.screenInfo.key.zScore.ha + ',' + input.screenInfo.key.zScore.wa + ',' + input.screenInfo.key.zScore.wl + '\n';
     input.fileDis.write(dataLine, function(err) {

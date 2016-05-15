@@ -5,13 +5,22 @@
     .module('core')
     .controller('HeaderController', HeaderController);
 
-  HeaderController.$inject = ['$rootScope', '$scope', '$state', '$window', '$translate', 'ChildrenStakes', 'Authentication', 'menuService', 'PouchService'];
+  HeaderController.$inject = ['$rootScope', '$scope', '$state', '$window', '$translate', 'Authentication', 'menuService'];
 
-  function HeaderController($rootScope, $scope, $state, $window, $translate, ChildrenStakes, Authentication, menuService, PouchService) {
+  function HeaderController($rootScope, $scope, $state, $window, $translate, Authentication, menuService) {
     var vm = this;
-    $rootScope.SelectedLanguage = 'es';
-    $translate.use('es');
-    vm.language = 'English';
+
+    vm.browserVersion = window.navigator.userAgent;
+
+    if(window.navigator.userAgent.indexOf("Chrome") == -1) {
+      $state.go('chrome-only');
+    }
+    else if(window.navigator.userAgent.indexOf("Android") > -1 && parseInt(window.navigator.userAgent.split('Chrome/')[1].split('.')[0], 10) < 43) {
+      $state.go('chrome-only');
+    }
+    $rootScope.SelectedLanguage = 'en';
+    $translate.use('en');
+    vm.language = 'Español';
     vm.appStatus = 'test';
     vm.toggleLanguage = toggleLanguage;
     vm.appOnLine = navigator.onLine;
