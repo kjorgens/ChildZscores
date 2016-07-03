@@ -10,126 +10,165 @@ var path = require('path'),
   fs = require('fs'),
   Promise = require('bluebird'),
   errorHandler = require(path.resolve('./modules/core/server/controllers/errors.server.controller'));
-  // configEnvy = require('config-envy')({
-  //   env: process.env.NODE_ENV, // The environment config to pull from. Will be based on the `env` property of the lane
-  //   cwd: process.cwd(), // The current working directory to base storage options from
-  //   localEnv: '.env', // The path to an overriding .env for the local environment
-  //   overrideProcess: false, // Set to true if you want the existing environment variables to be overridden by your .env files
-  //   silent: false // Set to true if you want to be notified of any errors that happen when trying to read your .env files
-  // });
 
-function getOwnerData(input) {
+function getOwnerData(parmObj) {
   return new Promise(function(resolve, reject) {
-//    console.log('at get owner data input.screening.id = ' + input.screening.id);
-    var screenData = input.screening;
-    request.get('https://' + process.env.SYNC_ENTITY + '@' + process.env.COUCH_URL +
-        '/' + input.req.params.stakeDB + '/' + input.screening.key.owner, function (error, response, body) {
+    var couchURL;
+    if(process.env.COUCH_URL.indexOf('localhost') > -1 ){
+      couchURL = 'http://' + process.env.COUCH_URL + '/';
+    } else {
+      couchURL = 'https://' + process.env.SYNC_ENTITY + '@' + process.env.COUCH_URL + '/';
+    }
+    var screenData = parmObj.screenInfo.key;
+    var sortField = parmObj.sort;
+    request.get(couchURL + parmObj.stakeDB + '/' +
+        parmObj.screenInfo.key.owner, function (error, response, body) {
       if (!error && response.statusCode === 200) {
         var ownerInfo = JSON.parse(body);
-        input.ownerInfo = ownerInfo;
-        input.screenInfo = screenData;
-        resolve(addLineToFile(input));
-
+        parmObj.ownerInfo = ownerInfo;
+        parmObj.screenInfo = screenData;
+        parmObj.sortField = sortField;
+        resolve(addLineToStack(parmObj));
       } else {
-        resolve(input);
+        resolve();
       }
     });
   });
 }
 
-function pullSaveScreenData(input) {
+function pullSaveScreenData(parmObj) {
   return new Promise(function(resolve, reject) {
-    request.get('https://' + process.env.SYNC_ENTITY + '@' + process.env.COUCH_URL +
-        '/' + input.req.params.stakeDB + '/_design/scr_list/_view/screen', function(error, response, body) {
+    var couchURL;
+    var ddoc = parmObj.filter.indexOf('all') > -1 ? 'scr_list' : 'zscore_kids';
+    if(process.env.COUCH_URL.indexOf('localhost') > -1 ){
+      couchURL = 'http://' + process.env.COUCH_URL + '/';
+    } else {
+      couchURL = 'https://' + process.env.SYNC_ENTITY + '@' + process.env.COUCH_URL + '/';
+    }
+    request.get(couchURL + parmObj.stakeDB +
+        '/_design/' + ddoc + '/_view/screen', function(error, response, body) {
       if (!error && response.statusCode === 200) {
         var jsonObj = JSON.parse(body);
         var screenList = [];
         jsonObj.rows.forEach(function(screening) {
-          input.screening = screening;
-          screenList.push(getOwnerData(input));
+          parmObj.screenInfo = screening;
+          screenList.push(getOwnerData(parmObj));
         });
         resolve(screenList);
       } else {
-        reject(error);
+        reject(response);
       }
     });
   });
 }
 
-function insertHeaderLine(input) {
+function gatherScreeningInfo(parmObj) {
   return new Promise(function(resolve, reject) {
     var headerLine = 'id,gender,firstName,lastName,idGroup,mother,phone,address,ward,lds,weight,height,age,ha,wa,wh\n';
-    input.fileDis.write(headerLine, function(err) {
-      if (err) {
-        console.log(err);
-      }
- //     console.log('header written');
-      resolve(input);
-    });
-  });
-}
-
-function addLineToFile(input) {
-  return new Promise(function (resolve, reject) {
-    var dataLine = input.screenInfo.id + ',' + input.screenInfo.key.gender + ',' + input.ownerInfo.firstName + ',' + input.ownerInfo.lastName +
-        ',' + input.ownerInfo.idGroup + ',' + input.ownerInfo.mother + ',' + input.ownerInfo.phone + ',' + input.ownerInfo.address + ',' + input.ownerInfo.ward +
-        ',' + input.ownerInfo.memberStatus + ',' + input.screenInfo.key.weight + ',' + input.screenInfo.key.height + ',' + input.screenInfo.key.monthAge +
-        ',' + input.screenInfo.key.zScore.ha + ',' + input.screenInfo.key.zScore.wa + ',' + input.screenInfo.key.zScore.wl + '\n';
-    input.fileDis.write(dataLine, function(err) {
+    parmObj.fdis.write(headerLine, function(err) {
       if (err) {
         console.log(err);
         reject(err);
+      } else {
+        resolve (pullSaveScreenData(parmObj).all());
       }
-//      console.log('just wrote ' + dataLine);
-      resolve(input);
     });
   });
 }
 
-function downloadFile(input) {
-  var options = {
-    root: __dirname + '/files/',
-    dotfiles: 'deny',
-    headers: {
-      'x-timestamp': Date.now(),
-      'x-sent': true
-    }
-  };
+function writeTheLine(fileDis,line){
+  return new Promise(function(resolve,reject){
+    fileDis.write(line, function(err) {
+      if (err) {
+        console.log (err);
+      }
+      resolve();
+    });
+  })
+}
 
-  input[0].res.sendFile(input[0].req.params.stakeDB + '.csv', options, function(err) {
-    if (err) {
-      console.log(err);
-      input[0].res.status(err.status).end();
+function writeEm(sortedList){
+  return new Promise(function(resolve,reject){
+    var writeStack = [];
+    sortedList.forEach(function(line){
+      writeStack.push(writeTheLine(line.fdis,line.dataLine));
+    });
+    resolve(writeStack);
+  })
+}
+
+function addLineToStack(parmObj) {
+  return new Promise(function (resolve, reject) {
+    var cleanAddr;
+    if(parmObj.ownerInfo.address != undefined && parmObj.ownerInfo.address.indexOf(',') > -1){
+      parmObj.ownerInfo.address = parmObj.ownerInfo.address.replace(/,/g,' ');
     }
-    else {
-      console.log('Sent:', input[0].req.params.stakeDB + '.csv');
-    }
+
+    var dataObj = {
+      childId: parmObj.ownerInfo._id,
+      gender: parmObj.screenInfo.gender,
+      firstName: parmObj.ownerInfo.firstName,
+      lastName: parmObj.ownerInfo.lastName,
+      idGroup: parmObj.ownerInfo.idGroup,
+      mother: parmObj.ownerInfo.mother,
+      phone: parmObj.ownerInfo.phone,
+      address: parmObj.ownerInfo.address,
+      ward: parmObj.ownerInfo.ward || 'none specified',
+      memberStatus: parmObj.ownerInfo.memberStatus,
+      weight: parmObj.screenInfo.weight,
+      height: parmObj.screenInfo.height,
+      age: parmObj.screenInfo.monthAge,
+      ha: parmObj.screenInfo.zScore.ha,
+      wa: parmObj.screenInfo.zScore.wa,
+      wl: parmObj.screenInfo.zScore.wl
+    };
+    var dataLine = dataObj.childId + ',' + dataObj.gender + ',' + dataObj.firstName + ',' + dataObj.lastName +
+        ',' + dataObj.idGroup + ',' + dataObj.mother + ',' + dataObj.phone + ',' + dataObj.address +
+        ',' + dataObj.ward + ',' + dataObj.memberStatus + ',' + dataObj.weight + ',' + dataObj.height +
+        ',' + dataObj.age + ',' + dataObj.ha + ',' + dataObj.wa + ',' + dataObj.wl + '\n';
+  //  parmObj.lineStack.push(dataLine);
+    resolve({data: dataObj, dataLine: dataLine, fdis: parmObj.fdis, sort: parmObj.sort});
   });
-  //     .send({
-  //   message: 'files/' + req.params.stakeDB + '.csv'
-  // });
+}
+
+function sortEm(listIn) {
+  return new Promise (function (resolve, reject) {
+    listIn.sort (function (x, y) {
+      // console.log(x.data[x.sort] + ' ' + y.data[x.sort]);
+      if (x.data[x.sort] < y.data[x.sort]) {
+        return -1;
+      }
+      if (x.data[x.sort] > y.data[x.sort]) {
+        return 1;
+      }
+      if (x.data[x.sort] === y.data[x.sort]) {
+        return 0;
+      }
+    });
+    resolve (listIn);
+  })
 }
 
 exports.createCSVFromDB = function (req, res) {
   var fstream = fs.createWriteStream( 'files/' + req.params.stakeDB + '.csv');
-  var paramObj = { res: res, req: req, fileDis: fstream, ownerInfo: {}, screening: {}};
+//  var paramObj = { res: res, req: req, fileDis: fstream, ownerInfo: {}, screening: {}};
 
-  function reportCSVComplete() {
+  // var lineStack = [];
+  function reportCSVComplete(input) {
     res.status (200).send ({
       message: 'files/' + req.params.stakeDB + '.csv'
     });
   }
-
-  insertHeaderLine(paramObj).catch(function(err) {
+  var parmObj = {fdis: fstream, stakeDB: req.params.stakeDB, filter: req.params.filter, sort: req.params.sort, screenInfo: {}};
+  gatherScreeningInfo(parmObj).catch(function(err) {
     console.log(err);
   })
-    .then(pullSaveScreenData).catch(function(err) {
-      console.log(err);
-    })
-    .all().catch(function(err) {
-      console.log(err);
-    })
-    .then(reportCSVComplete);
+  .all().then(sortEm)
+  .then(writeEm).catch(function(err) {
+    console.log(err);
+  })
+   .all()
+      .then(reportCSVComplete);
 };
 
 exports.getSyncURL = function(req, res) {
@@ -164,6 +203,29 @@ exports.listDbs = function(req, res) {
   });
 };
 
+function downloadFile(input) {
+  var options = {
+    root: __dirname + '/files/',
+    dotfiles: 'deny',
+    headers: {
+      'x-timestamp': Date.now(),
+      'x-sent': true
+    }
+  };
+
+  input[0].res.sendFile(input[0].req.params.stakeDB + '.csv', options, function(err) {
+    if (err) {
+      console.log(err);
+      input[0].res.status(err.status).end();
+    }
+    else {
+      console.log('Sent:', input[0].req.params.stakeDB + '.csv');
+    }
+  });
+  //     .send({
+  //   message: 'files/' + req.params.stakeDB + '.csv'
+  // });
+}
 /**
  * Child middleware
  */
