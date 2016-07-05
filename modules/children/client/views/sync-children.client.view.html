@@ -29,7 +29,25 @@
     </h3>
     <h3>
         <div ng-if="!vm.reportReady">
-            <a ng-click="vm.createReport()">
+            <select id="filtersSelect" ng-model="vm.filterSelect">
+                <option value="">---Select csv filter---</option>
+                <option value="all">All Children</option>
+                <option value="zscore">Zscores < -2</option>
+            </select><br>
+            <select id="sortSelect" ng-model="vm.sortSelect">
+                <option value="">---Select sort field---</option>
+                <option value="ward">Ward</option>
+                <option value="ha">zscores ha</option>
+                <option value="wa">zscores wa</option>
+                <option value="wl">zscores wh</option>
+                <option value="zscore">zscores ha</option>
+                <option value="firstName">first name</option>
+                <option value="lastName">last name</option>
+                <option value="memberStatus">LDS member</option>
+                <option value="mother">mother</option>
+                <option value="father">father</option>
+            </select><br>
+            <a ng-click="vm.createReport(vm.filterSelect, vm.sortSelect)">
                 <span>{{'GENERATE_REPORT' | translate}} </span>
                 <i class="glyphicon glyphicon-share"></i>
             </a>

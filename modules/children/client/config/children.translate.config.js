@@ -57,6 +57,8 @@
       DESCRIBE_CHROME: 'Designed for offline use with Chrome. You must enable offline pages in the Chrome browser. ' +
       'Open your browser at chrome://flags/#offline-pages-mode, and ensure this option is enabled.',
       SELECT_STAKE: 'Select Stake',
+      SELECT_WARD: 'Select Ward',
+      ALL_WARDS: 'All Wards',
       SCREENED_ON: 'Screened on',
       PLEASE_ENTER_VALID_HEIGHT: 'Please enter a valid height (45-110cm)',
       PLEASE_ENTER_VALID_WEIGHT: 'Please enter a valid weight (3-18kg)',
@@ -127,6 +129,8 @@
       DESCRIBE_CHROME: 'Diseñado para su uso sin conexión con Chrome . Debe habilitar las páginas sin conexión en el ' +
       'navegador Chrome . Abra su navegador en chrome: // banderas / # offline -pages- modo , y garantizar esta opción está habilitada.',
       SELECT_STAKE: 'Seleccionar Stake',
+      SELECT_WARD: 'Seleccionar Ward',
+      ALL_WARDS: 'todos los Wards',
       SCREENED_ON: 'proyectado en',
       PLEASE_ENTER_VALID_HEIGHT: 'Por favor, introduzca una altura válida ( 45-110cm )',
       PLEASE_ENTER_VALID_WEIGHT: 'Por favor, introduzca un peso válido ( 3-18kg )',

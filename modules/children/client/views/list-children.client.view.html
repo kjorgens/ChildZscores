@@ -16,8 +16,24 @@
                         {{vm.selectedStake}}
                     </div>
                 </h4>
+                <h4 ng-if="vm.wardList">
+                    {{'SELECT_WARD' | translate}}
+                    <!--<div data-ng-if="vm.selectedWard">-->
+                    <!--<a ui-sref="children.wards({stake:vm.selectedStake})">{{vm.selectedWard}} Ward <i class="glyphicon glyphicon-list"></i></a>-->
+                    <!--</div>-->
+                    <!--<div data-ng-if="!vm.selectedWard">-->
+                    <select  ng-change="vm.selectWard()" class="form-control"
+                             ng-model="vm.selectedWard"
+                             id="selectedWard"
+                             ng-options="ward.wardName for ward in vm.wardList"
+                             required>
+                        <option value="">{{'ALL_WARDS' | translate }}</option>
+                    </select>
+
+                    <!--</div>-->
+                </h4>
                 <h3>
-                    <a ui-sref="children.create">{{'ADD_NEW_CHILD' | translate}} <i class="glyphicon glyphicon-plus"></i></a>
+                    <a ui-sref="children.create({ward:vm.selectedWard.wardName})">{{'ADD_NEW_CHILD' | translate}} <i class="glyphicon glyphicon-plus"></i></a>
                 </h3>
             </div>
         </div>
@@ -54,11 +70,11 @@
     <h4>
         <div ng-if="vm.onLine && !vm.childList.docs.length" class="alert alert-warning text-center">
             {{'NO_CHILDREN_LISTED' | translate}} <a ui-sref="children.sync({stakeDB: vm.selectedStakeDB, stakeName:vm.selectedStake})">{{'SYNC' | translate}}
-            <i class="glyphicon glyphicon-refresh"></i></a> or <a ui-sref="children.create">{{'ADD_NEW_CHILD' | translate}} <i
+            <i class="glyphicon glyphicon-refresh"></i></a> or <a ui-sref="children.create({ward:'none'})">{{'ADD_NEW_CHILD' | translate}} <i
                 class="glyphicon glyphicon-plus"></i></a>
         </div>
         <div ng-if="!vm.onLine && !vm.childList.docs.length" class="alert alert-warning text-center">
-           {{'NO_CHILDREN_LISTED' | translate}} <a ui-sref="children.create">{{'ADD_NEW_CHILD' | translate}} <i class="glyphicon glyphicon-plus"></i></a>
+           {{'NO_CHILDREN_LISTED' | translate}} <a ui-sref="children.create({ward:'none'})">{{'ADD_NEW_CHILD' | translate}} <i class="glyphicon glyphicon-plus"></i></a>
         </div>
     </h4>
 </section>

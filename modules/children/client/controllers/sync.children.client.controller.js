@@ -22,7 +22,7 @@
     vm.selectedStake = localStorage.getItem('selectedStake');
     vm.selectedCountry = localStorage.getItem('selectedCountry');
     vm.selectedCountryImage = localStorage.getItem('selectedCountryImage');
-
+    // vm.filterSelect = 'All Children';
     vm.authentication = Authentication;
 
     vm.selectedStake = $stateParams.stakeName;
@@ -86,9 +86,15 @@
       vm.stopSpin();
       console.log(error);
     }
-    function createReport() {
+    function createReport(filter,sort) {
       vm.startSpin();
-      ChildrenReport.get({ stakeDB: vm.stakeDB }, returnReport, getError);
+      if(filter === undefined){
+        filter = 'all';
+      }
+      if(sort === undefined){
+        sort = 'lastName';
+      }
+      ChildrenReport.get({ stakeDB: vm.stakeDB, filter: filter, sort: sort}, returnReport, getError);
     }
 //    createReport();
   }

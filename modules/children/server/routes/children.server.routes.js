@@ -17,7 +17,7 @@ module.exports = function (app) {
       .get(passport.authenticate('jwt', { session: false }), childrenPolicy.isAllowed, children.getSyncURL);
 
   // create .csv report file
-  router.route('/report/:stakeDB')
+  router.route('/report/:stakeDB/:filter/:sort')
       .get(passport.authenticate('jwt', { session: false }),childrenPolicy.isAllowed, children.createCSVFromDB);
 
   // retrieve stakes route

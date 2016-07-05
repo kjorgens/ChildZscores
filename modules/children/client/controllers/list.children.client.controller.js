@@ -16,12 +16,15 @@
     vm.childList = childResolve;
 
     sessionStorage.setItem('selectedStake', $stateParams.stakeName);
+ //   localStorage.setItem('selectedWard','All Wards');
     sessionStorage.setItem('selectedDBName', $stateParams.stakeDB);
     localStorage.setItem('selectedStake', $stateParams.stakeName);
     localStorage.setItem('selectedDBName', $stateParams.stakeDB);
 
     vm.selectedStake = $stateParams.stakeName;
     vm.selectedStakeDB = $stateParams.stakeDB;
+ //   vm.selectedWard = 'All Wards';
+    getWardList();
     function performTranslation() {
       $translate(['BOY', 'GIRL']).then(function (translations) {
         vm.boy = translations.BOY;
@@ -32,6 +35,7 @@
 
     vm.onLine = navigator.onLine;
     vm.find = find;
+    vm.selectWard = selectWard;
     vm.find();
     $rootScope.$on('$translateChangeSuccess', function () {
       performTranslation();
@@ -61,17 +65,64 @@
           child.doc.zScore.wl.toFixed(2);
     }
 
+    vm.startSpin = function() {
+      if (!vm.spinneractive) {
+        usSpinnerService.spin('spinner-sync');
+      }
+    };
+
+    vm.stopSpin = function() {
+      if (vm.spinneractive) {
+        usSpinnerService.stop('spinner-sync');
+      }
+    };
+   vm.spinneractive = false;
+
+    $rootScope.$on('us-spinner:spin', function(event, key) {
+      vm.spinneractive = true;
+    });
+
+    $rootScope.$on('us-spinner:stop', function(event, key) {
+      vm.spinneractive = false;
+    });
     function setChildren(res) {
       $scope.$apply(function() {
         vm.childList = res;
+        vm.stopSpin();
       });
     }
+    function storeStuff(input){
+      if(input !== null) {
+        vm.wardList = input;
+        // vm.wardList.push({ wardName: 'All Wards'} );
+        // vm.selectedWard = vm.wardList[8].wardName;
+      }
+    }
+
     function listChildrenErrors(error) {
       vm.error = error;
+      console.log(error);
+      vm.stopSpin();
     }
+
     // Find a list of Children
     function find () {
       return PouchService.queryChildren(setChildren, listChildrenErrors);
+    }
+
+    function selectWard(){
+       // vm.selectedWard = vm.selectedWard;
+      if(vm.selectedWard === undefined){
+      // if(vm.selectedWard.wardName.indexOf('All Wards') > -1){
+        return PouchService.queryChildren(setChildren, listChildrenErrors);
+      } else {
+        localStorage.setItem('selectedWard', vm.selectedWard.wardName);
+        return PouchService.queryByWard (vm.selectedWard.wardName, setChildren, listChildrenErrors);
+      }
+    }
+
+    function getWardList(){
+      return PouchService.getWardList(localStorage.getItem('selectedCountry'),vm.selectedStake, storeStuff, listChildrenErrors);
     }
   }
 }());

@@ -5,15 +5,21 @@
     .module('children')
     .controller('ChildrenController', ChildrenController);
 
-  ChildrenController.$inject = ['$rootScope', '$scope', '$state', '$timeout', '$translate', 'moment', 'childResolve', 'ModalService', 'Authentication', 'ZScores', 'PouchService'];
+  ChildrenController.$inject = ['$rootScope', '$scope', '$state', '$stateParams', '$translate', 'moment', 'childResolve', 'ModalService', 'Authentication', 'ZScores', 'PouchService'];
 
-  function ChildrenController($rootScope, $scope, $state, $timeout, $translate, moment, child, ModalService, Authentication, ZScores, PouchService) {
+  function ChildrenController($rootScope, $scope, $state, $stateParams, $translate, moment, child, ModalService, Authentication, ZScores, PouchService) {
     var vm = this;
     var editChild = false;
 
     $translate.use($rootScope.SelectedLanguage);
-    vm.selectedStake = sessionStorage.getItem('selectedStake');
+
+    vm.selectedStake = localStorage.getItem('selectedStake');
     vm.selectedDB = sessionStorage.getItem('selectedDBName');
+    // vm.selectedWard = localStorage.getItem('selectedWard');
+    vm.selectedWard = $stateParams.ward;
+    // if(vm.selectedWard.indexOf('All Wards') === -1){
+    //   vm.child.ward = vm.selectedWard;
+    // }
     vm.selectedCountry = sessionStorage.getItem('selectedCountry');
     vm.selectedCountryImage = sessionStorage.getItem('selectedCountryImage');
     vm.online = $rootScope.appOnline;
@@ -24,7 +30,6 @@
     if ($state.params.childId) {
       editChild = true;
       vm.child = child;
-      // vm.child.stake = $rootScope.selectedStake;
       vm.ageIsValid = true;
       vm.firstNameIsValid = true;
       vm.lastNameIsValid = true;
@@ -33,13 +38,18 @@
       vm.fatherIsValid = true;
       vm.birthdateIsValid = true;
       vm.membershipIsValid = true;
+      vm.wardIsValid = true;
 
       vm.child.birthDate = new Date(vm.child.birthDate);
 
       PouchService.getSurveys(vm.child._id, setSurveyList, surveyErrors);
     } else {
+      vm.child = {};
+      // vm.child.gender = 'Boy';
+      //vm.child.memberStatus = 'Yes';
       vm.ageIsValid = false;
       vm.surveyDate = new Date();
+      vm.child.ward = vm.selectedWard;
     }
 
     vm.appIsOffline = !$rootScope.appOnline;
@@ -346,7 +356,8 @@
           memberStatus: vm.child.memberStatus,
           screeningStatus: vm.screeningStatus,
           _id: 'chld_',
-          interviewer: localStorage.getItem('lastInterviewer')
+          interviewer: localStorage.getItem('lastInterviewer'),
+          lastScreening: {}
         };
 
         PouchService.insert(childObject, newChild, errorHandle);
@@ -362,6 +373,7 @@
         vm.child.idGroup = '';
         vm.child.ward = '';
         vm.child.memberStatus = '';
+        vm.child.phone = '';
         // vm.created = Date.now;
         // vm.birthdate = '';
         // vm.monthAge = 0;

@@ -15,7 +15,9 @@
     var remoteDbList;
     var localDbList;
     var currentDbName;
-
+    var pouchIndexes = [
+      'firstName','lastName','owner','surveyDate','ward'
+    ];
     factory.createDatabase = function (dbName) {
       currentDbName = dbName;
       database = new pouchDB(dbName);
@@ -25,10 +27,11 @@
       countryDataBase = new pouchDB('country_list');
     };
 
-    factory.initLocalDb = function(indexNames) {
+
+    factory.initLocalDb = function() {
       var deferred = $q.defer();
       var indexFunctions = [];
-      angular.forEach(indexNames, function(index) {
+      angular.forEach(pouchIndexes, function(index) {
         indexFunctions.push(database.createIndex({ index: { fields: [index] } }));
       });
       $q.all(indexFunctions)
@@ -105,6 +108,34 @@
       });
     };
 
+    factory.getWardList = function (countryName, stakeName, callback, errCallback) {
+      countryDataBase.get('liahona_kids_countries_stakes')
+          .then(function (response) {
+            response.countries.forEach(function(country){
+              if( country.name.indexOf(countryName) > -1 ){
+                country.stakes.forEach(function(stake){
+                  if( stake.stakeName.indexOf(stakeName) > -1 ){
+                    if( stake.wards !== undefined){
+                      callback(stake.wards);
+                    } else {
+                      callback(null);
+                    }
+                  } else {
+                    callback(null);
+                  }
+                })
+              } else {
+                callback(null);
+              }
+            })
+          })
+          .catch(function(error) {
+            // Do something with the error
+            errCallback(error);
+          });
+    };
+
+
     // factory.getDbListRemote = function (callback, errorCallback, nextState) {
     //   countryDataBase.sync('https://syncuser:mZ7K3AldcIzO@database.liahonakids.org:5984/country_list').$promise
     //       .then(function (response) {
@@ -122,9 +153,9 @@
     // };
 
     factory.createIndex = function (indexName, callback, errCallback) {
-      return database.createIndex({ index: {
-        fields: [indexName]
-      }
+        return database.createIndex({ index: {
+          fields: [indexName]
+        }
       });
 //      database.createIndex
       //   index: {
@@ -138,19 +169,42 @@
     };
 
     factory.queryChildPromise = function () {
-      return database.find({
-        selector: { firstName: { $gt: null } },
-        //       selector: { firstName: 'Berty' }
-        //       fields: ['_id', 'lastName']
-        sort: ['firstName']
-      });
+      var findObj = {
+          selector: { firstName: { $gt: null } },
+          sort: ['firstName']
+        };
+      return(factory.initLocalDb().then(database.find(findObj)));
+ //     return database.find(findObj);
     };
 
+    factory.queryByWardPromise = function (wardId) {
+      var  findObj = {
+          selector: {ward: {$eq: wardId}},
+          sort: ['firstName']
+        };
+      return database.find(findObj);
+    };
+
+    factory.queryByWard = function (wardName, callback, errorCallBack) {
+      var  findObj = {
+        selector: { 
+          ward: { $eq: wardName },
+          firstName: { $gt: null }
+        },
+        sort: ['firstName']
+      };
+      return database.find(findObj)
+          .then(function(response){
+            callback(response);
+          })
+          .catch(function(error){
+            errorCallBack(error);
+          });
+    };
+    
     factory.queryChildren = function (callback, callbackError) {
       return database.find({
         selector: { firstName: { $gt: null } },
-        // selector: { firstName: 'Bobby' },
- //       fields: ['_id', 'lastName']
         sort: ['firstName']
       })
       .then(function (response) {
@@ -271,6 +325,22 @@
           .catch(function (error) {
             // Do something with the error
             errorCallback(error);
+          })
+          .finally(function () {
+            // Do something when everything is done
+          });
+    };
+
+    factory.addScreening = function (screening, childId){
+      database.get(childId)
+          .then(function (response) {
+            var childObj = response;
+            childObj.lastScreening = screening;
+            database.put(childObj).then(callBack(childObj));
+          })
+          .catch(function (error) {
+            // Do something with the error
+            errCallback(error);
           })
           .finally(function () {
             // Do something when everything is done

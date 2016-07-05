@@ -24,7 +24,7 @@ exports.invokeRolesPolicies = function () {
       resources: '/sync',
       permissions: '*'
     }, {
-      resources: '/report/:stakeDB',
+      resources: '/report/:stakeDB/:filter/:sort',
       permissions: ['*']
     }]
   }, {
@@ -36,7 +36,7 @@ exports.invokeRolesPolicies = function () {
       resources: '/view/:childId',
       permissions: ['get']
     }, {
-      resources: '/create',
+      resources: '/create/:ward',
       permissions: ['get', 'post']
     }, {
       resources: '/edit/:childId',
@@ -72,7 +72,7 @@ exports.invokeRolesPolicies = function () {
       resources: '/sync',
       permissions: ['get']
     }, {
-      resources: '/report/:stakeDB',
+      resources: '/report/:stakeDB/:filter/:sort',
       permissions: ['get']
     },
     {

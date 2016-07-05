@@ -167,6 +167,7 @@
     };
 
     function surveyAdded(survey) {
+  //    PouchService.addScreening(vm.child._id, survey);
       $state.go('children.view', { childId: vm.child._id });
     }
 

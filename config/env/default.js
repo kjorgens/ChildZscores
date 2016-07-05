@@ -56,10 +56,5 @@ module.exports = {
     options: {  // Anything From https://www.npmjs.com/package/jsonwebtoken
       expiresIn: process.env.TOKEN_EXPIRES || '5d'
     }
-  },
-  stakes: [
-    'testing_only',
-    'Otovalo_Ecuador',
-    'Babahoyo_Ecuador'
-  ]
-};
+  }
+ };

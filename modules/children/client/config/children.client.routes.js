@@ -54,7 +54,7 @@
           }
         })
         .state('children.report', {
-          url: '/report/:stakeDB',
+          url: '/report/:stakeDB/:filter/:sort',
           templateUrl: 'modules/children/client/views/sync-children.client.view.html',
           controller: 'ChildrenSyncController',
           controllerAs: 'vm',
@@ -178,17 +178,24 @@
   listChildren.$inject = ['$stateParams', 'PouchService'];
   function listChildren($stateParams, PouchService) {
     PouchService.createDatabase($stateParams.stakeDB);
-    PouchService.createIndex('firstName');
-    PouchService.createIndex('lastName');
-    PouchService.createIndex('owner');
-    PouchService.createIndex('surveyDate');
+    // PouchService.createIndex('firstName');
+    // PouchService.createIndex('lastName');
+    // PouchService.createIndex('owner');
+    // PouchService.createIndex('surveyDate');
+    // PouchService.createIndex('ward');
     return PouchService.queryChildPromise();
   }
 
+  listWards.$inject = ['$stateParams', 'PouchService'];
+  function listWards($stateParams, PouchService) {
+    PouchService.createDatabase($stateParams.stakeDB);
+    return PouchService.queryWardPromise({ wardId: $stateParams.wardId });
+  }
+  
   initLocalDb.$inject = ['$stateParams', 'PouchService'];
   function initLocalDb($stateParams, PouchService) {
     PouchService.createDatabase($stateParams.stakeDB);
-    return PouchService.initLocalDb(['firstName', 'lastName', 'owner', 'surveyDate']);
+    return PouchService.initLocalDb();
   }
 
   listCountries.$inject = ['$stateParams', 'ChildrenStakes'];
