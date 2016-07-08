@@ -31,7 +31,7 @@
             <span ng-bind="vm.child.lastName"></span>
             <span ng-bind="vm.child.birthDate | date:'mediumDate'"></span></h3>
             {{'SCREENED_ON' | translate}}
-            <span ng-bind="vm.rightNow | date:'mediumDate'"></span>
+            <span ng-bind="vm.survey.surveyDate | date:'mediumDate'"></span>
             {{'BY' | translate}}
             <span ng-bind="vm.child.interviewer"></span>
         </h4>
@@ -83,6 +83,7 @@
                         <div class="col-sm-4">
                             <input type="date" id="vm.surveyDate" class="form-control"
                                    uib-datepicker-popup
+                                   ng-blur="vm.calculateAge()"
                                    ng-model="vm.surveyDate"
                                    is-open="status.opened" required>
                         </div>

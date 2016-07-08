@@ -17,7 +17,7 @@
         <a ng-repeat="survey in vm.surveys"
            ui-sref="children.editsurvey({ surveyId:survey._id, childId:vm.child._id})" class="list-group-item clearfix">
             <small class="list-group-item-text ZscoreListContainer">
-                <h4>{{'BIRTHDATE' | translate}}: <span ng-bind="survey.surveyDate | date:'mediumDate'"></span>
+                <h4>{{'AGE' | translate}} <span ng-bind="survey.monthAge "></span>
                     , {{'HEIGHT' | translate}}
                     <span ng-bind="survey.height | number:2 "></span>, {{'WEIGHT' | translate}}
                     <span ng-bind="survey.weight | number:2 "></span></h4>
