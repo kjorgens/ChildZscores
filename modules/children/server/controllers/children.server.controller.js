@@ -103,7 +103,24 @@ function addLineToStack(parmObj) {
     if(parmObj.ownerInfo.address != undefined && parmObj.ownerInfo.address.indexOf(',') > -1){
       parmObj.ownerInfo.address = parmObj.ownerInfo.address.replace(/,/g,' ');
     }
-
+    if(parmObj.ownerInfo.mother != undefined && parmObj.ownerInfo.mother.indexOf(',') > -1){
+      parmObj.ownerInfo.mother = parmObj.ownerInfo.mother.replace(/,/g,' ');
+    }
+    if(parmObj.ownerInfo.father != undefined && parmObj.ownerInfo.father.indexOf(',') > -1){
+      parmObj.ownerInfo.father = parmObj.ownerInfo.father.replace(/,/g,' ');
+    }
+    if(parmObj.ownerInfo.city != undefined && parmObj.ownerInfo.city.indexOf(',') > -1){
+      parmObj.ownerInfo.city = parmObj.ownerInfo.city.replace(/,/g,' ');
+    }
+    if(parmObj.ownerInfo.ward != undefined && parmObj.ownerInfo.ward.indexOf(',') > -1){
+      parmObj.ownerInfo.ward = parmObj.ownerInfo.ward.replace(/,/g,' ');
+    }
+    if(parmObj.ownerInfo.firstName != undefined && parmObj.ownerInfo.firstName.indexOf(',') > -1){
+      parmObj.ownerInfo.firstName = parmObj.ownerInfo.firstName.replace(/,/g,' ');
+    }
+    if(parmObj.ownerInfo.lastName != undefined && parmObj.ownerInfo.lastName.indexOf(',') > -1){
+      parmObj.ownerInfo.lastName = parmObj.ownerInfo.lastName.replace(/,/g,' ');
+    }
     var dataObj = {
       childId: parmObj.ownerInfo._id,
       gender: parmObj.screenInfo.gender,
@@ -120,7 +137,8 @@ function addLineToStack(parmObj) {
       age: parmObj.screenInfo.monthAge,
       ha: parmObj.screenInfo.zScore.ha,
       wa: parmObj.screenInfo.zScore.wa,
-      wl: parmObj.screenInfo.zScore.wl
+      wl: parmObj.screenInfo.zScore.wl,
+      screenId: parmObj.screenInfo._id
     };
     var dataLine = dataObj.childId + ',' + dataObj.gender + ',' + dataObj.firstName + ',' + dataObj.lastName +
         ',' + dataObj.idGroup + ',' + dataObj.mother + ',' + dataObj.phone + ',' + dataObj.address +

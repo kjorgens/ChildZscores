@@ -11,6 +11,17 @@
     var vm = this;
     $translate.use($rootScope.SelectedLanguage);
     vm.survey = survey;
+    if(vm.survey._id){
+      vm.ageIsValid = true;
+      vm.childHeightIsValid = true;
+      vm.childWeightIsValid = true;
+      vm.surveyDate = new Date(vm.survey.surveyDate);
+    } else {
+      vm.ageIsValid = false;
+      vm.childHeightIsValid = false;
+      vm.childWeightIsValid = false;
+      vm.surveyDate = new Date();
+    }
     if (navigator.geolocation) {
       console.log('Geolocation is supported!');
     } else {
@@ -62,23 +73,16 @@
     vm.remove = remove;
     vm.addSurvey = addSurvey;
     vm.update = update;
-    vm.today = today;
     vm.commentOverride = commentOverride;
 
     vm.authentication = Authentication;
-
+    vm.calculateAge = calculateAge;
     vm.checkHeightIsValid = checkHeightIsValid;
     vm.checkWeightIsValid = checkWeightIsValid;
     vm.checkAllFieldsValid = checkAllFieldsValid;
 
-    vm.ageIsValid = false;
-    vm.childHeightIsValid = false;
-    vm.childWeightIsValid = false;
-
-    vm.birthDate = new Date();
-    vm.surveyDate = new Date();
     vm.survey.comments = '';
-    vm.rightNow = vm.surveyDate;
+
     vm.surveys = [];
 
     // Put event listeners into place
@@ -122,6 +126,20 @@
       }
     }
 
+    function calculateAge () {
+      var months,
+      screenDate = moment(vm.surveyDate),
+      bday = moment(vm.child.birthDate);
+
+      months = screenDate.diff(bday, 'months', true);
+      if (months > 60) {
+        vm.ageIsValid = false;
+      } else {
+        vm.ageIsValid = true;
+        vm.survey.monthAge = months.toFixed(2);
+      }
+    }
+    
     function checkWeightIsValid () {
       if (vm.survey.weight) {
         if (vm.survey.weight > 18 || vm.survey.weight < 3) {
@@ -157,15 +175,6 @@
       }
     }
 
-    function today() {
-      vm.dt = new Date();
-    }
-    vm.today();
-
-    vm.clear = function () {
-      vm.dt = null;
-    };
-
     function surveyAdded(survey) {
   //    PouchService.addScreening(vm.child._id, survey);
       $state.go('children.view', { childId: vm.child._id });
@@ -179,42 +188,47 @@
       vm.newChildError = error;
     }
 
-    function monthDiff(d1, d2) {
+    function setMonthCount() {
       var months;
-      months = (d2.getFullYear() - d1.getFullYear()) * 12;
-      months -= d1.getMonth() + 1;
-      months += d2.getMonth();
-      return months <= 0 ? 0 : months;
+      var rightNow = new Date();
+      months = moment(new Date()).diff(moment(vm.child.birthDate), 'months');
+      if (months > 60) {
+        vm.ageIsValid = false;
+      } else {
+        vm.ageIsValid = true;
+        vm.survey.monthAge = months.toFixed(2);
+      }
     }
-
+    
     function addSurvey(isValid) {
- //     commentOverride();
+      calculateAge();
       if (vm.survey._id) {
-        vm.zScoreGetter(vm.child.gender, vm.ageOverride || vm.child.monthAge, vm.survey.height, vm.survey.weight, function (zscore) {
+        vm.zScoreGetter(vm.child.gender, vm.survey.monthAge, vm.survey.height, vm.survey.weight, function (zscore) {
           vm.zScore = zscore;
         });
         vm.survey.zScore = vm.zScore;
+        vm.survey.surveyDate = vm.surveyDate;
         PouchService.insert(vm.survey, surveyUpdated, addedError);
       } else {
         vm.survey._id = undefined;
         var bday = new Date(vm.child.birthDate);
 
-        var rightNow = new Date();
-        var ageMoments = moment(rightNow).diff(moment(bday), 'months');
+        // var rightNow = new Date();
+        // var ageMoments = moment(rightNow).diff(moment(bday), 'months');
         var zScore = {};
-        vm.zScoreGetter(vm.child.gender, vm.ageOverride || ageMoments, vm.survey.height, vm.survey.weight, function (zscore) {
+        vm.zScoreGetter(vm.child.gender, vm.survey.monthAge, vm.survey.height, vm.survey.weight, function (zscore) {
           vm.zScore = zscore;
         });
 
         var surveyObject = {
           _id: 'scr_',
           owner: vm.child._id,
-          surveyDate: vm.dt,
+          surveyDate: vm.surveyDate,
           zScore: vm.zScore,
           gender: vm.child.gender,
           weight: vm.survey.weight,
           height: vm.survey.height,
-          monthAge: vm.ageOverride || ageMoments,
+          monthAge: vm.survey.monthAge,
           comments: vm.child.comments,
           interviewer: vm.interviewer,
           latitude: vm.latitude,
@@ -249,6 +263,7 @@
         $scope.$broadcast('show-errors-check-validity', 'surveyForm');
         return false;
       }
+      vm.survey.surveyDate = vm.surveyDate;
       PouchService.put(vm.survey);
     }
 

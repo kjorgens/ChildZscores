@@ -10,8 +10,9 @@
   function translateConfig($translateProvider) {
     // add translation table
     var translationsEN = {
+      AGE: 'Age (months)',
       BIRTHDATE: 'Birth Date',
-      HEIGHT: 'Height (kg)',
+      HEIGHT: 'Height (cm)',
       WEIGHT: 'Weight (kg)',
       Z_SCORES: 'Z Scores',
       H_A: 'height/age',
@@ -82,6 +83,7 @@
       MEMBER_STATUS_REQUIRED: 'LDS membership status required'
     };
     var translationsES = {
+      AGE: 'Edad ( meses )',
       BIRTHDATE: 'Fecha de nacimiento',
       ADD_SCREENING: 'añadir el cribado',
       SCREENING_DATE: 'Fecha de cribado',
