@@ -116,7 +116,7 @@
       STREET_ADDRESS: 'Dirección',
       CITY: 'Ciudad',
       ID_GROUP: '/ Identificación del grupo',
-      WARD: 'Sala',
+      WARD: 'barrio/rama',
       COMMENTS: 'comentarios',
       LDS_MEMBER: 'Iglesia SUD miembro?',
       TXT_MALE: 'Chico',
