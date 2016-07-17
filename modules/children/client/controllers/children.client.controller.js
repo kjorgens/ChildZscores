@@ -5,9 +5,9 @@
     .module('children')
     .controller('ChildrenController', ChildrenController);
 
-  ChildrenController.$inject = ['$rootScope', '$scope', '$state', '$stateParams', '$translate', 'moment', 'childResolve', 'ModalService', 'Authentication', 'ZScores', 'PouchService'];
+  ChildrenController.$inject = ['$rootScope', '$scope', '$state', '$stateParams', '$translate', 'moment', 'childResolve', 'Authentication', 'ZScores', 'PouchService'];
 
-  function ChildrenController($rootScope, $scope, $state, $stateParams, $translate, moment, child, ModalService, Authentication, ZScores, PouchService) {
+  function ChildrenController($rootScope, $scope, $state, $stateParams, $translate, moment, child, Authentication, ZScores, PouchService) {
     var vm = this;
     var editChild = false;
 

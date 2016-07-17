@@ -5,9 +5,9 @@
       .module('children')
       .controller('ChildrenCountryController', ChildrenCountryController);
 
-  ChildrenCountryController.$inject = ['$rootScope', '$scope', '$state', '$translate', 'usSpinnerService', 'ModalService', 'ChildrenService', 'ChildrenStakes', 'PouchService'];
+  ChildrenCountryController.$inject = ['$rootScope', '$scope', '$state', '$translate', 'usSpinnerService', 'ChildrenService', 'ChildrenStakes', 'PouchService'];
 
-  function ChildrenCountryController($rootScope, $scope, $state, $translate, usSpinnerService, ModalService, ChildrenService, ChildrenStakes, PouchService) {
+  function ChildrenCountryController($rootScope, $scope, $state, $translate, usSpinnerService, ChildrenService, ChildrenStakes, PouchService) {
     var vm = this;
     vm.refreshCountryList = refreshCountryList;
     vm.onLine = navigator.onLine;
