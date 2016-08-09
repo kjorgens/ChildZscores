@@ -14,7 +14,7 @@ var path = require('path'),
 function getOwnerData(parmObj) {
   return new Promise(function(resolve, reject) {
     var couchURL;
-    if(process.env.COUCH_URL.indexOf('localhost') > -1 ){
+    if (process.env.COUCH_URL.indexOf('localhost') > -1) {
       couchURL = 'http://' + process.env.COUCH_URL + '/';
     } else {
       couchURL = 'https://' + process.env.SYNC_ENTITY + '@' + process.env.COUCH_URL + '/';
@@ -40,7 +40,7 @@ function pullSaveScreenData(parmObj) {
   return new Promise(function(resolve, reject) {
     var couchURL;
     var ddoc = parmObj.filter.indexOf('all') > -1 ? 'scr_list' : 'zscore_kids';
-    if(process.env.COUCH_URL.indexOf('localhost') > -1 ){
+    if (process.env.COUCH_URL.indexOf('localhost') > -1) {
       couchURL = 'http://' + process.env.COUCH_URL + '/';
     } else {
       couchURL = 'https://' + process.env.SYNC_ENTITY + '@' + process.env.COUCH_URL + '/';
@@ -70,56 +70,56 @@ function gatherScreeningInfo(parmObj) {
         console.log(err);
         reject(err);
       } else {
-        resolve (pullSaveScreenData(parmObj).all());
+        resolve(pullSaveScreenData(parmObj).all());
       }
     });
   });
 }
 
-function writeTheLine(fileDis,line){
-  return new Promise(function(resolve,reject){
+function writeTheLine(fileDis, line) {
+  return new Promise(function(resolve, reject) {
     fileDis.write(line, function(err) {
       if (err) {
-        console.log (err);
+        console.log(err);
       }
       resolve();
     });
-  })
+  });
 }
 
-function writeEm(sortedList){
-  return new Promise(function(resolve,reject){
+function writeEm(sortedList) {
+  return new Promise(function(resolve, reject) {
     var writeStack = [];
-    sortedList.forEach(function(line){
-      writeStack.push(writeTheLine(line.fdis,line.dataLine));
+    sortedList.forEach(function(line) {
+      writeStack.push(writeTheLine(line.fdis, line.dataLine));
     });
     resolve(writeStack);
-  })
+  });
 }
 
 function addLineToStack(parmObj) {
   return new Promise(function (resolve, reject) {
     var cleanAddr;
-    if(parmObj.ownerInfo.address != undefined && parmObj.ownerInfo.address.indexOf(',') > -1){
-      parmObj.ownerInfo.address = parmObj.ownerInfo.address.replace(/,/g,' ');
+    if (parmObj.ownerInfo.address !== undefined && parmObj.ownerInfo.address.indexOf(',') > -1) {
+      parmObj.ownerInfo.address = parmObj.ownerInfo.address.replace(/,/g, ' ');
     }
-    if(parmObj.ownerInfo.mother != undefined && parmObj.ownerInfo.mother.indexOf(',') > -1){
-      parmObj.ownerInfo.mother = parmObj.ownerInfo.mother.replace(/,/g,' ');
+    if (parmObj.ownerInfo.mother !== undefined && parmObj.ownerInfo.mother.indexOf(',') > -1) {
+      parmObj.ownerInfo.mother = parmObj.ownerInfo.mother.replace(/,/g, ' ');
     }
-    if(parmObj.ownerInfo.father != undefined && parmObj.ownerInfo.father.indexOf(',') > -1){
-      parmObj.ownerInfo.father = parmObj.ownerInfo.father.replace(/,/g,' ');
+    if (parmObj.ownerInfo.father !== undefined && parmObj.ownerInfo.father.indexOf(',') > -1) {
+      parmObj.ownerInfo.father = parmObj.ownerInfo.father.replace(/,/g, ' ');
     }
-    if(parmObj.ownerInfo.city != undefined && parmObj.ownerInfo.city.indexOf(',') > -1){
-      parmObj.ownerInfo.city = parmObj.ownerInfo.city.replace(/,/g,' ');
+    if (parmObj.ownerInfo.city !== undefined && parmObj.ownerInfo.city.indexOf(',') > -1) {
+      parmObj.ownerInfo.city = parmObj.ownerInfo.city.replace(/,/g, ' ');
     }
-    if(parmObj.ownerInfo.ward != undefined && parmObj.ownerInfo.ward.indexOf(',') > -1){
-      parmObj.ownerInfo.ward = parmObj.ownerInfo.ward.replace(/,/g,' ');
+    if (parmObj.ownerInfo.ward !== undefined && parmObj.ownerInfo.ward.indexOf(',') > -1) {
+      parmObj.ownerInfo.ward = parmObj.ownerInfo.ward.replace(/,/g, ' ');
     }
-    if(parmObj.ownerInfo.firstName != undefined && parmObj.ownerInfo.firstName.indexOf(',') > -1){
-      parmObj.ownerInfo.firstName = parmObj.ownerInfo.firstName.replace(/,/g,' ');
+    if (parmObj.ownerInfo.firstName !== undefined && parmObj.ownerInfo.firstName.indexOf(',') > -1) {
+      parmObj.ownerInfo.firstName = parmObj.ownerInfo.firstName.replace(/,/g, ' ');
     }
-    if(parmObj.ownerInfo.lastName != undefined && parmObj.ownerInfo.lastName.indexOf(',') > -1){
-      parmObj.ownerInfo.lastName = parmObj.ownerInfo.lastName.replace(/,/g,' ');
+    if (parmObj.ownerInfo.lastName !== undefined && parmObj.ownerInfo.lastName.indexOf(',') > -1) {
+      parmObj.ownerInfo.lastName = parmObj.ownerInfo.lastName.replace(/,/g, ' ');
     }
     var dataObj = {
       childId: parmObj.ownerInfo._id,
@@ -145,14 +145,13 @@ function addLineToStack(parmObj) {
         ',' + dataObj.ward + ',' + dataObj.memberStatus + ',' + dataObj.weight + ',' + dataObj.height +
         ',' + dataObj.age + ',' + dataObj.ha + ',' + dataObj.wa + ',' + dataObj.wl + '\n';
   //  parmObj.lineStack.push(dataLine);
-    resolve({data: dataObj, dataLine: dataLine, fdis: parmObj.fdis, sort: parmObj.sort});
+    resolve({ data: dataObj, dataLine: dataLine, fdis: parmObj.fdis, sort: parmObj.sort });
   });
 }
 
 function sortEm(listIn) {
-  return new Promise (function (resolve, reject) {
-    listIn.sort (function (x, y) {
-      // console.log(x.data[x.sort] + ' ' + y.data[x.sort]);
+  return new Promise(function(resolve, reject) {
+    listIn.sort(function(x, y) {
       if (x.data[x.sort] < y.data[x.sort]) {
         return -1;
       }
@@ -163,21 +162,20 @@ function sortEm(listIn) {
         return 0;
       }
     });
-    resolve (listIn);
-  })
+    resolve(listIn);
+  });
 }
 
 exports.createCSVFromDB = function (req, res) {
-  var fstream = fs.createWriteStream( 'files/' + req.params.stakeDB + '.csv');
-//  var paramObj = { res: res, req: req, fileDis: fstream, ownerInfo: {}, screening: {}};
+  var fstream = fs.createWriteStream('files/' + req.params.stakeDB + '.csv');
 
   // var lineStack = [];
   function reportCSVComplete(input) {
-    res.status (200).send ({
+    res.status(200).send({
       message: 'files/' + req.params.stakeDB + '.csv'
     });
   }
-  var parmObj = {fdis: fstream, stakeDB: req.params.stakeDB, filter: req.params.filter, sort: req.params.sort, screenInfo: {}};
+  var parmObj = { fdis: fstream, stakeDB: req.params.stakeDB, filter: req.params.filter, sort: req.params.sort, screenInfo: {} };
   gatherScreeningInfo(parmObj).catch(function(err) {
     console.log(err);
   })
@@ -235,35 +233,8 @@ function downloadFile(input) {
     if (err) {
       console.log(err);
       input[0].res.status(err.status).end();
-    }
-    else {
+    } else {
       console.log('Sent:', input[0].req.params.stakeDB + '.csv');
     }
   });
-  //     .send({
-  //   message: 'files/' + req.params.stakeDB + '.csv'
-  // });
 }
-/**
- * Child middleware
- */
-// exports.childByID = function (req, res, next, id) {
-//
-//   if (!mongoose.Types.ObjectId.isValid(id)) {
-//     return res.status(400).send({
-//       message: 'Child is invalid'
-//     });
-//   }
-//
-//   Child.findById(id).populate('user', 'displayName').exec(function (err, child) {
-//     if (err) {
-//       return next(err);
-//     } else if (!child) {
-//       return res.status(404).send({
-//         message: 'No child with that identifier has been found'
-//       });
-//     }
-//     req.child = child;
-//     next();
-//   });
-// };

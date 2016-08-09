@@ -11,7 +11,7 @@
     var vm = this;
     $translate.use($rootScope.SelectedLanguage);
     vm.survey = survey;
-    if(vm.survey._id){
+    if (vm.survey._id) {
       vm.ageIsValid = true;
       vm.childHeightIsValid = true;
       vm.childWeightIsValid = true;
@@ -128,8 +128,8 @@
 
     function calculateAge () {
       var months,
-      screenDate = moment(vm.surveyDate),
-      bday = moment(vm.child.birthDate);
+        screenDate = moment(vm.surveyDate),
+        bday = moment(vm.child.birthDate);
 
       months = screenDate.diff(bday, 'months', true);
       if (months > 60) {
@@ -139,7 +139,6 @@
         vm.survey.monthAge = months.toFixed(2);
       }
     }
-    
     function checkWeightIsValid () {
       if (vm.survey.weight) {
         if (vm.survey.weight > 18 || vm.survey.weight < 3) {
@@ -199,7 +198,7 @@
         vm.survey.monthAge = months.toFixed(2);
       }
     }
-    
+
     function addSurvey(isValid) {
       calculateAge();
       if (vm.survey._id) {

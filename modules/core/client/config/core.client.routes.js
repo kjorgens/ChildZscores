@@ -75,6 +75,15 @@
             pageTitle: 'Chrome Only Please'
           }
         })
+        .state('sync-error', {
+          url: '/sync-error',
+          templateUrl: 'modules/core/client/views/syncerror.client.view.html',
+          controller: 'HeaderController',
+          data: {
+            ignoreState: true,
+            pageTitle: 'Database Sync error'
+          }
+        })
       .state('forbidden', {
         url: '/forbidden',
         templateUrl: 'modules/core/client/views/403.client.view.html',

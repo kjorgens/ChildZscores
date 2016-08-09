@@ -191,7 +191,7 @@
     PouchService.createDatabase($stateParams.stakeDB);
     return PouchService.queryWardPromise({ wardId: $stateParams.wardId });
   }
-  
+
   initLocalDb.$inject = ['$stateParams', 'PouchService'];
   function initLocalDb($stateParams, PouchService) {
     PouchService.createDatabase($stateParams.stakeDB);

@@ -16,7 +16,7 @@
     var localDbList;
     var currentDbName;
     var pouchIndexes = [
-      'firstName','lastName','owner','surveyDate','ward'
+      'firstName', 'lastName', 'owner', 'surveyDate', 'ward'
     ];
     factory.createDatabase = function (dbName) {
       currentDbName = dbName;
@@ -27,6 +27,10 @@
       countryDataBase = new pouchDB('country_list');
     };
 
+    factory.destroyDatabase = function (dbName) {
+      database = new pouchDB (dbName);
+      database.destroy();
+    };
 
     factory.initLocalDb = function() {
       var deferred = $q.defer();
@@ -48,14 +52,14 @@
       return deferred.promise;
     };
 
-    factory.getAllDbsLocal = function(callback) {
-      PouchDB.allDbs(function(err, dbs) {
-        if (err) {
-          var error = err;
-        }
-        callback(dbs);
-      });
-    };
+    // factory.getAllDbsLocal = function(callback) {
+    //   pouchDB.allDbs(function(err, dbs) {
+    //     if (err) {
+    //       var error = err;
+    //     }
+    //     callback(dbs);
+    //   });
+    // };
 
     factory.putStakesLocal = function (countryObj, callback, errCallback) {
       var newObj = {};
@@ -111,11 +115,11 @@
     factory.getWardList = function (countryName, stakeName, callback, errCallback) {
       countryDataBase.get('liahona_kids_countries_stakes')
           .then(function (response) {
-            response.countries.forEach(function(country){
-              if( country.name.indexOf(countryName) > -1 ){
-                country.stakes.forEach(function(stake){
-                  if( stake.stakeName.indexOf(stakeName) > -1 ){
-                    if( stake.wards !== undefined){
+            response.countries.forEach(function(country) {
+              if (country.name.indexOf(countryName) > -1) {
+                country.stakes.forEach(function(stake) {
+                  if (stake.stakeName.indexOf(stakeName) > -1) {
+                    if (stake.wards !== undefined) {
                       callback(stake.wards);
                     } else {
                       callback(null);
@@ -123,11 +127,11 @@
                   } else {
                     callback(null);
                   }
-                })
+                });
               } else {
                 callback(null);
               }
-            })
+            });
           })
           .catch(function(error) {
             // Do something with the error
@@ -153,9 +157,9 @@
     // };
 
     factory.createIndex = function (indexName, callback, errCallback) {
-        return database.createIndex({ index: {
-          fields: [indexName]
-        }
+      return database.createIndex({ index: {
+        fields: [indexName]
+      }
       });
 //      database.createIndex
       //   index: {
@@ -170,38 +174,37 @@
 
     factory.queryChildPromise = function () {
       var findObj = {
-          selector: { firstName: { $gt: null } },
-          sort: ['firstName']
-        };
-      return(factory.initLocalDb().then(database.find(findObj)));
+        selector: { firstName: { $gt: null } },
+        sort: ['firstName']
+      };
+      return (factory.initLocalDb().then(database.find(findObj)));
  //     return database.find(findObj);
     };
 
     factory.queryByWardPromise = function (wardId) {
-      var  findObj = {
-          selector: {ward: {$eq: wardId}},
-          sort: ['firstName']
-        };
+      var findObj = {
+        selector: { ward: { $eq: wardId } },
+        sort: ['firstName']
+      };
       return database.find(findObj);
     };
 
     factory.queryByWard = function (wardName, callback, errorCallBack) {
-      var  findObj = {
-        selector: { 
+      var findObj = {
+        selector: {
           ward: { $eq: wardName },
           firstName: { $gt: null }
         },
         sort: ['firstName']
       };
       return database.find(findObj)
-          .then(function(response){
+          .then(function(response) {
             callback(response);
           })
-          .catch(function(error){
+          .catch(function(error) {
             errorCallBack(error);
           });
     };
-    
     factory.queryChildren = function (callback, callbackError) {
       return database.find({
         selector: { firstName: { $gt: null } },
@@ -234,12 +237,6 @@
         callbackError(error);
       });
     };
-
-    // factory.destroyDatabase = function (dbName) {
-    //   database = new pouchDB (dbName);
-    //   database.destroy();
-    // };
-
     factory.getAll = function (callback, errCallback) {
       database.allDocs({ include_docs: true, attachments: true })
           .then(function (response) {
@@ -331,7 +328,7 @@
           });
     };
 
-    factory.addScreening = function (screening, childId){
+    factory.addScreening = function (screening, childId, callBack, errCallback) {
       database.get(childId)
           .then(function (response) {
             var childObj = response;
@@ -383,6 +380,31 @@
             // Do something when everything is done
           });
     };
+
+    factory.longSync = function(localDB, remoteDB) {
+      var sync = PouchDB.sync(localDB, remoteDB, {
+        live: true,
+        retry: true
+      }).on('change', function (info) {
+        console.log(info);
+        // handle change
+      }).on('paused', function (err) {
+        console.log('Sync Paused ' + err);
+        // replication paused (e.g. replication up to date, user went offline)
+      }).on('active', function () {
+        console.log('Sync resumed');
+        // replicate resumed (e.g. new changes replicating, user went back online)
+      }).on('denied', function (err) {
+        console.log('Denied error ' + err);
+        // a document failed to replicate (e.g. due to permissions)
+      }).on('complete', function (info) {
+        console.log('Sync Complete');
+        // handle complete
+      }).on('error', function (err) {
+        console.log('Sync Error ' + err);
+        // handle error
+      });
+    }
 
     factory.sync = function (upStreamDb, callback, errorCallback, nextState) {
       database.sync(upStreamDb).$promise

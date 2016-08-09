@@ -26,7 +26,7 @@
     { M: 83.6654, S: 0.03666 },
     { M: 84.604, S: 0.03688 },
     { M: 85.5202, S: 0.03711 },
-    { M: 86.4153, S: 0.03734 },
+    { M: 85.7153, S: 0.03764 },
     { M: 86.5904, S: 0.03786 },
     { M: 87.4462, S: 0.03808 },
     { M: 88.283, S: 0.0383 },
@@ -89,7 +89,7 @@
     { M: 85.1348, S: 0.03376 },
     { M: 86.0477, S: 0.0341 },
     { M: 86.941, S: 0.03445 },
-    { M: 87.8161, S: 0.03479 },
+    { M: 87.1161, S: 0.03507 },
     { M: 87.972, S: 0.03542 },
     { M: 88.8065, S: 0.03576 },
     { M: 89.6197, S: 0.0361 },
@@ -754,6 +754,7 @@
   ZScores.$inject = [];
 
   function ZScores() {
+    var tableByAge;
     var getMethod = function (sex, age, height, weight, callback) {
       var ha,
         wa,
@@ -768,7 +769,7 @@
         ha = heightForAgeGirls[Math.round(age)];
         wa = weightForAgeGirls[Math.round(age)];
         wl = null;
-        var tableByAge = Math.round(age) >= 24 ? weightForLengthGirls24 : weightForLengthGirls;
+        tableByAge = Math.round(age) >= 24 ? weightForLengthGirls24 : weightForLengthGirls;
         for (var i = 0; i < tableByAge.length; i++) {
           if (tableByAge[i].y === (Math.round(Number(height) * 2) / 2)) {
             wl = tableByAge[i];
@@ -779,7 +780,7 @@
         ha = heightForAgeBoys[Math.round(age)];
         wa = weightForAgeBoys[Math.round(age)];
         wl = null;
-        var tableByAge = Math.round(age) >= 24 ? weightForLengthBoys24 : weightForLengthBoys;
+        tableByAge = Math.round(age) >= 24 ? weightForLengthBoys24 : weightForLengthBoys;
         for (var j = 0; j < tableByAge.length; j++) {
           if (tableByAge[j].y === (Math.round(Number(height) * 2) / 2)) {
             wl = tableByAge[j];
