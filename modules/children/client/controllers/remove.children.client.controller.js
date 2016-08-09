@@ -44,7 +44,8 @@
     function surveyErrors(error) {
       vm.surveyError = error;
     }
-    PouchService.getSurveys(vm.child_Id, setSurveyList, surveyErrors);
+
+    PouchService.getSurveys(childRemove._id, setSurveyList, surveyErrors);
   }
 }());
 

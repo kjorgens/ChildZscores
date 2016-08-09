@@ -12,32 +12,31 @@
 
     vm.browserVersion = window.navigator.userAgent;
 
-    if(window.navigator.userAgent.indexOf("Chrome") == -1) {
+    if (window.navigator.userAgent.indexOf('Chrome') === -1) {
       $state.go('chrome-only');
-    }
-    else if(window.navigator.userAgent.indexOf("Android") > -1 && parseInt(window.navigator.userAgent.split('Chrome/')[1].split('.')[0], 10) < 43) {
+    } else if (window.navigator.userAgent.indexOf('Android') > -1 && parseInt(window.navigator.userAgent.split('Chrome/')[1].split('.')[0], 10) < 43) {
       $state.go('chrome-only');
     }
     vm.languageCode = localStorage.getItem('selectedLanguage');
-    if(vm.language === undefined) {
-      //default to english for now
+    if (vm.language === undefined) {
+      // default to english for now
       $rootScope.SelectedLanguage = 'en';
-      $translate.use ('en');
+      $translate.use('en');
       vm.language = 'Español';
     } else {
-      if (vm.languageCode.indexof('en') > -1){
+      if (vm.languageCode.indexof('en') > -1) {
         $rootScope.SelectedLanguage = 'en';
-        $translate.use ('en');
+        $translate.use('en');
         vm.language = 'Español';
       } else {
         $rootScope.SelectedLanguage = 'es';
-        $translate.use ('es');
+        $translate.use('es');
         vm.language = 'English';
       }
     }
     vm.selectedStake = localStorage.getItem('selectedStake');
     vm.selectedDB = localStorage.getItem('selectedDBName');
-    if (vm.selectedStake !== undefined){
+    if (vm.selectedStake !== undefined) {
       $rootScope.selectedStake = vm.selectedStake;
  //     $state.go('children.list',{ stakeDB: vm.selectedDB, stakeName: vm.selectedStake })
     }
@@ -46,7 +45,7 @@
     vm.appOnLine = navigator.onLine;
 
     vm.selectedStake = localStorage.getItem('selectedStake');
-    if(vm.selectedStake){
+    if (vm.selectedStake) {
       $rootScope.stakeName = vm.selectedStake;
     }
     if (navigator.onLine) {

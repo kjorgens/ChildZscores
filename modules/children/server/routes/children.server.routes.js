@@ -4,10 +4,9 @@
  * Module dependencies
  */
 var passport = require('passport'),
-    express = require('express'),
-    childrenPolicy = require('../policies/children.server.policy'),
-    children = require('../controllers/children.server.controller');
-
+  express = require('express'),
+  childrenPolicy = require('../policies/children.server.policy'),
+  children = require('../controllers/children.server.controller');
 
 module.exports = function (app) {
   var router = express.Router();
@@ -18,7 +17,7 @@ module.exports = function (app) {
 
   // create .csv report file
   router.route('/report/:stakeDB/:filter/:sort')
-      .get(passport.authenticate('jwt', { session: false }),childrenPolicy.isAllowed, children.createCSVFromDB);
+      .get(passport.authenticate('jwt', { session: false }), childrenPolicy.isAllowed, children.createCSVFromDB);
 
   // retrieve stakes route
   router.route('/stakes')

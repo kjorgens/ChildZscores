@@ -57,4 +57,4 @@ module.exports = {
       expiresIn: process.env.TOKEN_EXPIRES || '5d'
     }
   }
- };
+};

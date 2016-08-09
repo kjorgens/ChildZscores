@@ -76,7 +76,7 @@
         usSpinnerService.stop('spinner-sync');
       }
     };
-   vm.spinneractive = false;
+    vm.spinneractive = false;
 
     $rootScope.$on('us-spinner:spin', function(event, key) {
       vm.spinneractive = true;
@@ -91,8 +91,8 @@
         vm.stopSpin();
       });
     }
-    function storeStuff(input){
-      if(input !== null) {
+    function storeStuff(input) {
+      if (input !== null) {
         vm.wardList = input;
         // vm.wardList.push({ wardName: 'All Wards'} );
         // vm.selectedWard = vm.wardList[8].wardName;
@@ -110,18 +110,18 @@
       return PouchService.queryChildren(setChildren, listChildrenErrors);
     }
 
-    function selectWard(){
+    function selectWard() {
        // vm.selectedWard = vm.selectedWard;
-      if(vm.selectedWard === undefined){
+      if (vm.selectedWard === undefined) {
       // if(vm.selectedWard.wardName.indexOf('All Wards') > -1){
         return PouchService.queryChildren(setChildren, listChildrenErrors);
       } else {
         localStorage.setItem('selectedWard', vm.selectedWard.wardName);
-        return PouchService.queryByWard (vm.selectedWard.wardName, setChildren, listChildrenErrors);
+        return PouchService.queryByWard(vm.selectedWard.wardName, setChildren, listChildrenErrors);
       }
     }
 
-    function getWardList(){
+    function getWardList() {
       return PouchService.getWardList(localStorage.getItem('selectedCountry'),vm.selectedStake, storeStuff, listChildrenErrors);
     }
   }

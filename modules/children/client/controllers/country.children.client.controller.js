@@ -21,9 +21,9 @@
       console.log(input);
     }
     function handleError(input) {
-      console.log (input + ' attempt to retrieve info remote');
-      getStakesDB ();
-      vm.stopSpin ();
+      console.log(input + ' attempt to retrieve info remote');
+      getStakesDB();
+      vm.stopSpin();
     }
     vm.startSpin = function() {
       if (!vm.spinneractive) {
@@ -49,7 +49,7 @@
       vm.startSpin();
       getStakesDB();
     }
-    
+
     function getStakesDB() {
       if (navigator.onLine) {
         ChildrenStakes.get(function(retVal) {

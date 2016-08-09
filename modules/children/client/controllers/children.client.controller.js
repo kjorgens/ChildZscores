@@ -25,8 +25,8 @@
     vm.online = $rootScope.appOnline;
     vm.interviewer = localStorage.getItem('lastInterviewer');
 //    vm.find();
-    vm.genders = [{ value: 'Boy', translationId:'TXT_MALE' }, { value: 'Girl', translationId:'TXT_FEMALE'}];
-    vm.yesNo = [{ value: 'Yes', translationId:'YES' }, { value: 'No', translationId:'NO'}];
+    vm.genders = [{ value: 'Boy', translationId: 'TXT_MALE' }, { value: 'Girl', translationId: 'TXT_FEMALE' }];
+    vm.yesNo = [{ value: 'Yes', translationId: 'YES' }, { value: 'No', translationId: 'NO' }];
     if ($state.params.childId) {
       editChild = true;
       vm.child = child;
@@ -46,7 +46,7 @@
     } else {
       vm.child = {};
       // vm.child.gender = 'Boy';
-      //vm.child.memberStatus = 'Yes';
+      // vm.child.memberStatus = 'Yes';
       vm.ageIsValid = false;
       vm.surveyDate = new Date();
       vm.child.ward = vm.selectedWard;
@@ -201,14 +201,14 @@
     }
 
     function checkGenderIsValid() {
-      if (vm.child.gender === 'Boy' || vm.child.gender === 'Girl' ) {
+      if (vm.child.gender === 'Boy' || vm.child.gender === 'Girl') {
         vm.genderIsValid = true;
       } else {
         vm.genderIsValid = false;
       }
     }
 
-    function checkMembershipIsValid(){
+    function checkMembershipIsValid() {
       if (vm.child.memberStatus === 'Yes' || vm.child.memberStatus === 'No') {
         vm.membershipIsValid = true;
       } else {
@@ -293,13 +293,12 @@
     }
 
     function ldsMemberChecked() {
-      if (vm.memberChecked === 'YES'){
+      if (vm.memberChecked === 'YES') {
         console.log('child is member');
         // vm.child.memberStatus = 'Yes';
         vm.checkMembershipIsValid = true;
 
-      }
-      else {
+      } else {
         console.log('child is not a member');
         // vm.child.memberStatus = 'No';
         vm.checkMembershipIsValid = true;

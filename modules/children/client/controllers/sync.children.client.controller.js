@@ -32,6 +32,10 @@
     vm.online = $rootScope.appOnline;
 //    vm.find();
 
+    vm.deleteLocalDB = function(dbName) {
+      PouchService.destroyDatabase(dbName);
+    };
+
     vm.startSpin = function() {
       if (!vm.spinneractive) {
         usSpinnerService.spin('spinner-sync');
@@ -65,12 +69,17 @@
 
     function replicateError(err) {
       vm.repError = err;
+      console.log(err);
+      // $state.go('sync-error');
     }
 
     function syncUpstream() {
       vm.startSpin();
+      console.log('start sync for ' + vm.stakeDB);
       PouchService.sync('https://' + vm.syncStuff.entity + '@' +
           vm.syncStuff.url + '/' + vm.stakeDB, replicateIn, replicateError, whenDone);
+      // PouchService.longSync(vm.stakeDB, 'https://' + vm.syncStuff.entity + '@' +
+      //      vm.syncStuff.url + '/' + vm.stakeDB);
     }
 
     function returnReport(input) {
@@ -86,15 +95,15 @@
       vm.stopSpin();
       console.log(error);
     }
-    function createReport(filter,sort) {
+    function createReport(filter, sort) {
       vm.startSpin();
-      if(filter === undefined){
+      if (filter === undefined) {
         filter = 'all';
       }
-      if(sort === undefined){
+      if (sort === undefined) {
         sort = 'lastName';
       }
-      ChildrenReport.get({ stakeDB: vm.stakeDB, filter: filter, sort: sort}, returnReport, getError);
+      ChildrenReport.get({ stakeDB: vm.stakeDB, filter: filter, sort: sort }, returnReport, getError);
     }
 //    createReport();
   }

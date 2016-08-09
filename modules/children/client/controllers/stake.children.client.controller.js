@@ -44,7 +44,7 @@
     $rootScope.$on('us-spinner:stop', function(event, key) {
       vm.spinneractive = false;
     });
-    function refreshCountryList(){
+    function refreshCountryList() {
       vm.startSpin();
       ChildrenStakes.get(function(retVal) {
         vm.liahonaStakes = retVal;
