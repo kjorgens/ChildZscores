@@ -12,9 +12,9 @@
 
   function ChildrenSyncController($rootScope, $scope, $state, $stateParams, ChildrenReport, Authentication, ChildrenGetSync, usSpinnerService, PouchService) {
     var vm = this;
-    ChildrenGetSync.get(function(input) {
-      vm.syncStuff = input;
-    });
+    // ChildrenGetSync.get(function(input) {
+    //   vm.syncStuff = input;
+    // });
     vm.reportToDownload = '';
     vm.reportName = $stateParams.stakeDB + '.csv';
     vm.reportReady = false;
@@ -76,8 +76,12 @@
     function syncUpstream() {
       vm.startSpin();
       console.log('start sync for ' + vm.stakeDB);
-      PouchService.sync('https://' + vm.syncStuff.entity + '@' +
-          vm.syncStuff.url + '/' + vm.stakeDB, replicateIn, replicateError, whenDone);
+      ChildrenGetSync.get(function(input) {
+        vm.syncStuff = input;
+        PouchService.sync('https://' + vm.syncStuff.entity + '@' +
+            vm.syncStuff.url + '/' + vm.stakeDB, replicateIn, replicateError, whenDone);
+      });
+
       // PouchService.longSync(vm.stakeDB, 'https://' + vm.syncStuff.entity + '@' +
       //      vm.syncStuff.url + '/' + vm.stakeDB);
     }
