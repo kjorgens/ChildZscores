@@ -29,7 +29,7 @@
     "pouchdb": "^5.4.5"
   },
   "resolutions": {
-    "angular": "~1.5.x"
+    "angular": "~1.5.8"
   },
   "overrides": {
     "bootstrap": {
