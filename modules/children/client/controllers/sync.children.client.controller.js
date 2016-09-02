@@ -57,19 +57,33 @@
       vm.spinneractive = false;
     });
 
-    function whenDone() {
+    function whenDoneUp() {
+      PouchService.newSyncFrom('https://' + vm.syncStuff.entity + '@' +
+          vm.syncStuff.url + '/' + vm.stakeDB, replicateDown, replicateError, whenDoneDown);
+    }
+
+    function whenDoneDown() {
       find();
       vm.stopSpin();
       console.log('couchdb sync complete');
       $state.go('children.list', { stakeDB: vm.stakeDB, stakeName: vm.selectedStake });
     }
-    function replicateIn (input) {
-      vm.repInData = input;
+
+    function replicateUp (input) {
+      console.log(JSON.stringify(input));
+      vm.repUpData = input;
+    }
+
+    function replicateDown (input) {
+      console.log(JSON.stringify(input));
+      vm.repDownData = input;
     }
 
     function replicateError(err) {
       vm.repError = err;
-      console.log(err);
+      vm.stopSpin();
+      console.log('There was an error');
+      console.log(err.message);
       // $state.go('sync-error');
     }
 
@@ -78,12 +92,16 @@
       console.log('start sync for ' + vm.stakeDB);
       ChildrenGetSync.get(function(input) {
         vm.syncStuff = input;
-        PouchService.sync('https://' + vm.syncStuff.entity + '@' +
-            vm.syncStuff.url + '/' + vm.stakeDB, replicateIn, replicateError, whenDone);
+        console.log('Ready to sync https://' + vm.syncStuff.url + '/' + vm.stakeDB);
+        PouchService.newSyncTo('https://' + vm.syncStuff.entity + '@' +
+          vm.syncStuff.url + '/' + vm.stakeDB, replicateUp, replicateError, whenDoneUp);
       });
 
-      // PouchService.longSync(vm.stakeDB, 'https://' + vm.syncStuff.entity + '@' +
-      //      vm.syncStuff.url + '/' + vm.stakeDB);
+      // ChildrenGetSync.get(function(input) {
+      //   vm.syncStuff = input;
+      //   PouchService.longSync(vm.stakeDB, 'https://' + vm.syncStuff.entity + '@' +
+      //     vm.syncStuff.url + '/' + vm.stakeDB, whenDone, replicateError);
+      // });
     }
 
     function returnReport(input) {

@@ -21,6 +21,7 @@
     factory.createDatabase = function (dbName) {
       currentDbName = dbName;
       database = new pouchDB(dbName);
+      factory.ddocFilter();
     };
 
     factory.createCountryDatabase = function () {
@@ -30,6 +31,29 @@
     factory.destroyDatabase = function (dbName) {
       database = new pouchDB (dbName);
       database.destroy();
+    };
+
+    factory.ddocFilter = function() {
+      var deferred = $q.defer();
+      database.get('_design/filter_ddocs')
+          .then(function (response) {
+            deferred.resolve('found');
+          }).catch(function(err) {
+            database.put(
+              {
+                _id: '_design/filter_ddocs',
+                filters:
+                {
+                  'ddocs': "function(doc, req) {if(doc._id[0] != '_') {return true} else {return false}  }"
+                }
+              }).then(function(response) {
+                console.log('filter created');
+                deferred.resolve('filter created');
+              }).catch(function(err) {
+                console.log(err.message);
+                deferred.reject(err.message);
+              });
+          });
     };
 
     factory.initLocalDb = function() {
@@ -381,17 +405,17 @@
           });
     };
 
-    factory.longSync = function(localDB, remoteDB) {
+    factory.longSync = function(localDB, remoteDB, callbackComplete, errorCallBack) {
       var sync = PouchDB.sync(localDB, remoteDB, {
-        live: true,
-        retry: true
+        live: false,
+        retry: false
       }).on('change', function (info) {
         console.log(info);
         // handle change
-      }).on('paused', function (err) {
-        console.log('Sync Paused ' + err);
+      }).on('paused', function (info) {
+        console.log('Sync Paused ' + info);
         // replication paused (e.g. replication up to date, user went offline)
-      }).on('active', function () {
+      }).on('active', function (info) {
         console.log('Sync resumed');
         // replicate resumed (e.g. new changes replicating, user went back online)
       }).on('denied', function (err) {
@@ -401,10 +425,43 @@
         console.log('Sync Complete');
         // handle complete
       }).on('error', function (err) {
-        console.log('Sync Error ' + err);
+        console.log('Sync Error ' + err.message);
+        errorCallBack(err);
         // handle error
       });
-    }
+    };
+
+    factory.newSyncTo = function(upStreamDb, callback, errorCallback, nextState) {
+      database.replicate.to(upStreamDb, { filter: 'filter_ddocs/ddocs' }).$promise
+          .then(function (response) {
+            // Do something with the response
+            callback(response);
+          })
+          .catch(function (error) {
+            // Do something with the error
+            errorCallback(error);
+          })
+          .finally(function () {
+            nextState();
+            // Do something when everything is done
+          });
+    };
+
+    factory.newSyncFrom = function(upStreamDb, callback, errorCallback, nextState) {
+      database.replicate.from(upStreamDb, { filter: 'filter_ddocs/ddocs' }).$promise
+          .then(function (response) {
+            // Do something with the response
+            callback(response);
+          })
+          .catch(function (error) {
+            // Do something with the error
+            errorCallback(error);
+          })
+          .finally(function () {
+            nextState();
+            // Do something when everything is done
+          });
+    };
 
     factory.sync = function (upStreamDb, callback, errorCallback, nextState) {
       database.sync(upStreamDb).$promise
