@@ -27,7 +27,6 @@
     "angular-translate": "^2.11.0",
     "angular-sanitize": "^1.5.5",
     "pouchdb": "^5.4.5"
- //   "angular-i18n": "^1.5.8"
   },
   "resolutions": {
     "angular": "~1.5.8"
