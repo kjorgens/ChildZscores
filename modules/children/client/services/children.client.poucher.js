@@ -29,7 +29,7 @@
     };
 
     factory.destroyDatabase = function (dbName) {
-      database = new pouchDB (dbName);
+      database = new pouchDB(dbName);
       database.destroy();
     };
 
@@ -44,7 +44,7 @@
                 _id: '_design/filter_ddocs',
                 filters:
                 {
-                  'ddocs': "function(doc, req) {if(doc._id[0] != '_') {return true} else {return false}  }"
+                  'ddocs': 'function(doc, req) {if(doc._id[0] != \'_\') {return true} else {return false}  }'
                 }
               }).then(function(response) {
                 console.log('filter created');
@@ -184,7 +184,8 @@
       return database.createIndex({ index: {
         fields: [indexName]
       }
-      });
+    });
+
 //      database.createIndex
       //   index: {
       //     fields: [indexName]
@@ -261,6 +262,7 @@
         callbackError(error);
       });
     };
+
     factory.getAll = function (callback, errCallback) {
       database.allDocs({ include_docs: true, attachments: true })
           .then(function (response) {
@@ -352,20 +354,85 @@
           });
     };
 
+    function calculateStatus(screeningObj) {
+      return new Promise(function(resolve, reject) {
+        var zscoreStatus = '';
+        if (screeningObj.zScore.wl < -2) {
+          zscoreStatus = 'Acute: supplements required';
+        } else if ((screeningObj.zScore.ha < -2 || screeningObj.zScore.wa < -2) && screeningObj.age > 6 && screeningObj.age < 36) {
+          zscoreStatus = 'Acute: supplements required';
+        } else if ((screeningObj.zScore.ha < -2 || screeningObj.zScore.wa < -2) && screeningObj.age > 36 && screeningObj.age < 48) {
+          zscoreStatus = 'Micro nutrients required';
+        } else if (screeningObj.zScore.ha < -1 ||
+            screeningObj.zScore.wa < -1 ||
+            screeningObj.zScore.wl < -1) {
+          zscoreStatus = 'At Risk: Come to next screening';
+        } else {
+          zscoreStatus = 'Normal';
+        }
+        resolve({ screeningObj: screeningObj, zscoreStatus: zscoreStatus });
+      });
+    }
+
+    function statusColor(status) {
+      if (status.indexOf('Acute') > -1) {
+        return 'redZoneZscore';
+      } else if (status.indexOf('Micro') > -1) {
+        return 'redZoneZscore';
+      } else if (status.indexOf('Risk') > -1) {
+        return 'marginalZscore';
+      } else {
+        return 'normalZscore';
+      }
+    }
+
+    function updateChildRecord(input) {
+      return new Promise(function(resolve, reject) {
+        database.get(input.screeningObj.owner)
+            .then(function (response) {
+              var childObj = response;
+              if (childObj.lastScreening !== input.screeningObj._id) {
+                childObj.zscoreStatus = input.zscoreStatus;
+                childObj.lastScreening = input.screeningObj._id;
+                childObj.statusColor = statusColor(input.zscoreStatus);
+              } else {
+                childObj.zscoreStatus = input.zscoreStatus;
+                childObj.statusColor = statusColor(input.zscoreStatus);
+              }
+              resolve(database.put(childObj));
+            })
+            .catch(function (error) {
+              // Do something with the error
+              reject(error);
+            })
+            .finally(function () {
+              // Do something when everything is done
+            });
+      });
+    }
+
+    function getScreeningInfo(parmObj) {
+      return new Promise(function(resolve, reject) {
+        resolve(database.get(parmObj.screening));
+      });
+    }
+
     factory.addScreening = function (screening, childId, callBack, errCallback) {
-      database.get(childId)
-          .then(function (response) {
-            var childObj = response;
-            childObj.lastScreening = screening;
-            database.put(childObj).then(callBack(childObj));
-          })
-          .catch(function (error) {
-            // Do something with the error
-            errCallback(error);
-          })
-          .finally(function () {
-            // Do something when everything is done
-          });
+      getScreeningInfo({ screening: screening.id, child: childId })
+            .then(calculateStatus)
+            .then(updateChildRecord)
+            .then(callBack).catch(function(err) {
+              console.log(err);
+            });
+    };
+
+    factory.updateScreening = function (screening, childId, callBack, errCallback) {
+      getScreeningInfo({ screening: screening.id, child: childId })
+          .then(calculateStatus)
+          .then(updateChildRecord)
+          .then(callBack).catch(function(err) {
+            console.log(err);
+      });
     };
 
     factory.insert = function (childInfo, callback, errorCallback) {
@@ -403,32 +470,6 @@
           .finally(function () {
             // Do something when everything is done
           });
-    };
-
-    factory.longSync = function(localDB, remoteDB, callbackComplete, errorCallBack) {
-      var sync = PouchDB.sync(localDB, remoteDB, {
-        live: false,
-        retry: false
-      }).on('change', function (info) {
-        console.log(info);
-        // handle change
-      }).on('paused', function (info) {
-        console.log('Sync Paused ' + info);
-        // replication paused (e.g. replication up to date, user went offline)
-      }).on('active', function (info) {
-        console.log('Sync resumed');
-        // replicate resumed (e.g. new changes replicating, user went back online)
-      }).on('denied', function (err) {
-        console.log('Denied error ' + err);
-        // a document failed to replicate (e.g. due to permissions)
-      }).on('complete', function (info) {
-        console.log('Sync Complete');
-        // handle complete
-      }).on('error', function (err) {
-        console.log('Sync Error ' + err.message);
-        errorCallBack(err);
-        // handle error
-      });
     };
 
     factory.newSyncTo = function(upStreamDb, callback, errorCallback, nextState) {

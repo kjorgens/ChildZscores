@@ -7,7 +7,8 @@ var should = require('should'),
 /*
  Globals
  */
-var token, token1;
+var token,
+  token1;
 /**
  * User routes tests
  */

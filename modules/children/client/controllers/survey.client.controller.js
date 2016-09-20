@@ -5,23 +5,49 @@
     .module('children')
     .controller('SurveyController', SurveyController);
 
-  SurveyController.$inject = ['$rootScope', '$scope', '$state', '$timeout', '$translate', 'moment', 'surveyResolve', 'Authentication', 'ZScores', 'PouchService'];
+  SurveyController.$inject = ['$rootScope', '$scope', '$state', '$timeout', '$translate', 'moment', 'surveyResolve', 'Authentication', 'ZScores', 'PouchService', 'ModalService'];
 
-  function SurveyController($rootScope, $scope, $state, $timeout, $translate, moment, survey, Authentication, ZScores, PouchService) {
+  function SurveyController($rootScope, $scope, $state, $timeout, $translate, moment, survey, Authentication, ZScores, PouchService, ModalService) {
     var vm = this;
     $translate.use($rootScope.SelectedLanguage);
     vm.survey = survey;
+
+    function checkAllFieldsValid() {
+      if (vm.childHeightIsValid === true &&
+          vm.childWeightIsValid === true &&
+              vm.ageIsValid === true) {
+        vm.allFieldsValid = true;
+        vm.invalidFields = false;
+      } else if (vm.childHeightIsValid === false ||
+          vm.childWeightIsValid === false ||
+          vm.ageIsValid === false) {
+        vm.allFieldsValid = false;
+        vm.invalidFields = true;
+      } else if ((vm.childHeightIsValid === undefined) &&
+          (vm.childWeightIsValid === undefined) &&
+          (vm.ageIsValid === undefined)) {
+        vm.allFieldsValid = true;
+        vm.invalidFields = true;
+      }
+    }
+
     if (vm.survey._id) {
-      vm.ageIsValid = true;
-      vm.childHeightIsValid = true;
-      vm.childWeightIsValid = true;
+  //    vm.ageIsValid = true;
+ //    vm.childHeightIsValid = true;
+ //     vm.childWeightIsValid = true;
       vm.surveyDate = new Date(vm.survey.surveyDate);
     } else {
+ //     vm.invalidFields = true;
+      vm.survey.height = '';
+      vm.survey.weight = '';
+      vm.survey.comments = '';
+
       vm.ageIsValid = false;
-      vm.childHeightIsValid = false;
-      vm.childWeightIsValid = false;
+      vm.childHeightIsValid = undefined;
+      vm.childWeightIsValid = undefined;
       vm.surveyDate = new Date();
     }
+
     if (navigator.geolocation) {
       console.log('Geolocation is supported!');
     } else {
@@ -47,13 +73,15 @@
     navigator.geolocation.getCurrentPosition(geoSuccess, geoError, geoOptions);
   //  vm.surveyRemove = surveyRemove;
     function performTranslation() {
-      $translate(['BOY', 'GIRL', 'EDIT_CHANGE_VALUES', 'NEW_SCREENING']).then(function (translations) {
+      $translate(['BOY', 'GIRL', 'EDIT_CHANGE_VALUES', 'NEW_SCREENING', 'UPDATE', 'CREATE', 'HEIGHT_EXCEEDED', 'REDO_MEASUREMENT']).then(function (translations) {
         vm.boy = translations.BOY;
         vm.girl = translations.GIRL;
         vm.editMsg = translations.EDIT_CHANGE_VALUES;
         vm.newScreen = translations.NEW_SCREENING;
         vm.updateMsg = translations.UPDATE;
         vm.createMsg = translations.CREATE;
+        vm.heightExceeded = translations.HEIGHT_EXCEEDED;
+        vm.redoMeasurement = translations.REDO_MEASUREMENT;
       });
     }
     performTranslation();
@@ -81,7 +109,6 @@
     vm.checkWeightIsValid = checkWeightIsValid;
     vm.checkAllFieldsValid = checkAllFieldsValid;
 
-    vm.survey.comments = '';
 
     vm.surveys = [];
 
@@ -101,18 +128,17 @@
       vm.surveyError = error;
     }
 
-    function checkAllFieldsValid() {
-      checkHeightIsValid();
-      checkWeightIsValid();
-      checkMonthAgeIsValid();
-    }
-
     vm.zScoreGetter = ZScores.getMethod;
 
     function checkHeightIsValid () {
       if (vm.survey.height) {
-        if (vm.survey.height > 110 || vm.survey.height < 45) {
+        if ((vm.survey.monthAge < 24 && vm.survey.height > 110) ||
+            (vm.survey.monthAge > 24 && vm.survey.height > 120) ||
+            (vm.survey.monthAge < 24 && vm.survey.height < 45) ||
+            (vm.survey.monthAge > 24 && vm.survey.height < 65)) {
+          // vm.invalidInput(vm.heightExceeded, vm.redoMeasurement);
           vm.childHeightIsValid = false;
+          vm.invalidFields = true;
         } else {
           vm.childHeightIsValid = true;
           if (vm.ageIsValid && vm.weightIsValid) {
@@ -124,6 +150,7 @@
       } else {
         vm.childHeightIsValid = false;
       }
+      vm.checkAllFieldsValid();
     }
 
     function calculateAge () {
@@ -138,11 +165,13 @@
         vm.ageIsValid = true;
         vm.survey.monthAge = months.toFixed(2);
       }
+      vm.checkAllFieldsValid();
     }
     function checkWeightIsValid () {
       if (vm.survey.weight) {
         if (vm.survey.weight > 18 || vm.survey.weight < 3) {
           vm.childWeightIsValid = false;
+          vm.invalidFields = true;
         } else {
           vm.childWeightIsValid = true;
           if (vm.ageIsValid && vm.heightIsValid) {
@@ -154,6 +183,7 @@
       } else {
         vm.childWeightIsValid = false;
       }
+      vm.checkAllFieldsValid();
     }
 
     function commentOverride() {
@@ -172,14 +202,23 @@
         vm.ageIsValid = true;
         vm.child.monthAge = vm.ageInMonths;
       }
+      vm.checkAllFieldsValid();
     }
 
-    function surveyAdded(survey) {
-  //    PouchService.addScreening(vm.child._id, survey);
+    function updateChildError(err) {
+      vm.reportError('Error updating child ', err.message, true);
+    }
+
+    function childUpdated(obj) {
       $state.go('children.view', { childId: vm.child._id });
     }
 
+    function surveyAdded(survey) {
+      PouchService.addScreening(survey, vm.child._id, childUpdated, updateChildError);
+    }
+
     function surveyUpdated(survey) {
+      PouchService.addScreening(survey, vm.child._id, childUpdated, updateChildError);
       $state.go('children.view', { childId: vm.survey.owner });
     }
 
@@ -199,8 +238,28 @@
       }
     }
 
-    function addSurvey(isValid) {
+    function undefinedTurnFalse() {
+      vm.checkHeightIsValid();
+      vm.checkWeightIsValid();
+      if (vm.childHeightIsValid === undefined) {
+        vm.childHeightIsValid = false;
+      }
+      if (vm.childWeightIsValid === undefined) {
+        vm.childWeightIsValid = false;
+      }
+      if (vm.ageIsValid === undefined) {
+        vm.ageIsValid = false;
+      }
+    }
+
+    function addSurvey() {
       calculateAge();
+
+      if (vm.invalidFields === true || vm.invalidFields === undefined) {
+        undefinedTurnFalse();
+        return false;
+      }
+
       if (vm.survey._id) {
         vm.zScoreGetter(vm.child.gender, vm.survey.monthAge, vm.survey.height, vm.survey.weight, function (zscore) {
           vm.zScore = zscore;
@@ -211,9 +270,6 @@
       } else {
         vm.survey._id = undefined;
         var bday = new Date(vm.child.birthDate);
-
-        // var rightNow = new Date();
-        // var ageMoments = moment(rightNow).diff(moment(bday), 'months');
         var zScore = {};
         vm.zScoreGetter(vm.child.gender, vm.survey.monthAge, vm.survey.height, vm.survey.weight, function (zscore) {
           vm.zScore = zscore;
@@ -268,6 +324,7 @@
 
     function getUser (childDoc) {
       vm.child = childDoc;
+      calculateAge();
     }
 
     function getError (error) {
@@ -277,6 +334,10 @@
     function getOwner(ownerId) {
       PouchService.get({ childId: ownerId }, getUser, getError);
     }
+
+    vm.reportError = function (title, error, notifyKarl) {
+      return ModalService.infoModal(title + ' :\n', error + (notifyKarl ? '\n Please contact kjorgens@yahoo.com' : ''));
+    };
   }
 }());
 

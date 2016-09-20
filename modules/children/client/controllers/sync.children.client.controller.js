@@ -8,10 +8,80 @@
       .module('children')
       .controller('ChildrenSyncController', ChildrenSyncController);
 
-  ChildrenSyncController.$inject = ['$rootScope', '$scope', '$state', '$stateParams', 'ChildrenReport', 'Authentication', 'ChildrenGetSync', 'usSpinnerService', 'PouchService'];
+  ChildrenSyncController.$inject = ['$rootScope', '$window', '$timeout', '$scope', '$state', '$stateParams', 'ChildrenReport',
+    'Authentication', 'ChildrenGetSync', 'usSpinnerService', 'PouchService', 'FileUploader', 'ModalService'];
 
-  function ChildrenSyncController($rootScope, $scope, $state, $stateParams, ChildrenReport, Authentication, ChildrenGetSync, usSpinnerService, PouchService) {
+  function ChildrenSyncController($rootScope, $window, $timeout, $scope, $state, $stateParams, ChildrenReport,
+    Authentication, ChildrenGetSync, usSpinnerService, PouchService, FileUploader, ModalService) {
     var vm = this;
+    vm.user = Authentication.user;
+    vm.uploadExcelCsv = uploadExcelCsv;
+
+    // Create file uploader instance
+    vm.uploader = new FileUploader({
+      url: 'api/children/upload',
+      alias: 'newUploadCsv',
+      headers: {
+        Authorization: 'JWT ' + Authentication.token
+      }
+    });
+    // Set file uploader image filter
+    vm.uploader.filters.push({
+      name: 'imageFilter',
+      fn: function (item, options) {
+        var type = '|' + item.type.slice(item.type.lastIndexOf('/') + 1) + '|';
+        return '|csv|'.indexOf(type) !== -1;
+      }
+    });
+    // Called after the user selected a new picture file
+    function onAfterAddingFile(fileItem) {
+      if ($window.FileReader) {
+        var fileReader = new FileReader();
+        fileReader.readAsDataURL(fileItem._file);
+
+        fileReader.onload = function (fileReaderEvent) {
+          $timeout(function () {
+            vm.imageURL = fileReaderEvent.target.result;
+          }, 0);
+        };
+      }
+    }
+
+    // Called after the user has successfully uploaded a new picture
+    function onSuccessItem(fileItem, response, status, headers) {
+      // Show success message
+      vm.success = true;
+
+      // Populate user object
+      vm.user = Authentication.user = response;
+
+      // Clear upload buttons
+      cancelUpload();
+    }
+
+    // Called after the user has failed to uploaded a new picture
+    function onErrorItem(fileItem, response, status, headers) {
+      // Clear upload buttons
+      cancelUpload();
+
+      // Show error message
+      vm.error = response.message;
+    }
+
+    // Change user profile picture
+    function uploadExcelCsv() {
+      // Clear messages
+      vm.success = vm.error = null;
+
+      // Start upload
+      vm.uploader.uploadAll();
+    }
+
+    // Cancel the upload process
+    function cancelUpload() {
+      vm.uploader.clearQueue();
+      vm.imageURL = vm.user.profileImageURL;
+    }
     // ChildrenGetSync.get(function(input) {
     //   vm.syncStuff = input;
     // });
@@ -59,7 +129,7 @@
 
     function whenDoneUp() {
       PouchService.newSyncFrom('https://' + vm.syncStuff.entity + '@' +
-          vm.syncStuff.url + '/' + vm.stakeDB, replicateDown, replicateError, whenDoneDown);
+          vm.syncStuff.url + '/' + vm.stakeDB, replicateDown, replicateErrorDown, whenDoneDown);
     }
 
     function whenDoneDown() {
@@ -70,21 +140,31 @@
     }
 
     function replicateUp (input) {
+      vm.repUpStats = input;
       console.log(JSON.stringify(input));
       vm.repUpData = input;
     }
 
     function replicateDown (input) {
+      vm.repDownStats = input;
       console.log(JSON.stringify(input));
       vm.repDownData = input;
     }
 
-    function replicateError(err) {
+    function replicateErrorUp(err) {
       vm.repError = err;
       vm.stopSpin();
       console.log('There was an error');
       console.log(err.message);
-      // $state.go('sync-error');
+      vm.reportError('Replication Error Sync up', err.message, true);
+    }
+
+    function replicateErrorDown(err) {
+      vm.repError = err;
+      vm.stopSpin();
+      console.log('There was an error');
+      console.log(err.message);
+      vm.reportError('Replication Error Sync Down', err.message, true);
     }
 
     function syncUpstream() {
@@ -94,14 +174,8 @@
         vm.syncStuff = input;
         console.log('Ready to sync https://' + vm.syncStuff.url + '/' + vm.stakeDB);
         PouchService.newSyncTo('https://' + vm.syncStuff.entity + '@' +
-          vm.syncStuff.url + '/' + vm.stakeDB, replicateUp, replicateError, whenDoneUp);
+          vm.syncStuff.url + '/' + vm.stakeDB, replicateUp, replicateErrorUp, whenDoneUp);
       });
-
-      // ChildrenGetSync.get(function(input) {
-      //   vm.syncStuff = input;
-      //   PouchService.longSync(vm.stakeDB, 'https://' + vm.syncStuff.entity + '@' +
-      //     vm.syncStuff.url + '/' + vm.stakeDB, whenDone, replicateError);
-      // });
     }
 
     function returnReport(input) {
@@ -113,20 +187,25 @@
       console.log(input);
     }
 
-    function getError(error) {
+    function getCsvError(error) {
       vm.stopSpin();
       console.log(error);
+      vm.reportError('Download csv error', error.data.error.message, error.data.error.name.indexOf('Empty database') < 0);
     }
-    function createReport(filter, sort) {
+    function createReport(filter, sortField) {
       vm.startSpin();
       if (filter === undefined) {
         filter = 'all';
       }
-      if (sort === undefined) {
-        sort = 'lastName';
+      if (sortField === undefined) {
+        sortField = 'lastName';
       }
-      ChildrenReport.get({ stakeDB: vm.stakeDB, filter: filter, sort: sort }, returnReport, getError);
+      ChildrenReport.get({ stakeDB: vm.stakeDB, filter: filter, sortField: sortField }, returnReport, getCsvError);
     }
+
+    vm.reportError = function (title, error, notifyKarl) {
+      return ModalService.infoModal(title + ' :\n', error + (notifyKarl ? '\n Please contact kjorgens@yahoo.com' : ''));
+    };
 //    createReport();
   }
 }());

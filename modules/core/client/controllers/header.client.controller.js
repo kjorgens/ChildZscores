@@ -5,9 +5,9 @@
     .module('core')
     .controller('HeaderController', HeaderController);
 
-  HeaderController.$inject = ['$rootScope', '$scope', '$state', '$window', '$translate', 'Authentication', 'menuService'];
+  HeaderController.$inject = ['$rootScope', '$scope', '$state', '$window', '$translate', 'moment', 'Authentication', 'menuService'];
 
-  function HeaderController($rootScope, $scope, $state, $window, $translate, Authentication, menuService) {
+  function HeaderController($rootScope, $scope, $state, $window, $translate, moment, Authentication, menuService) {
     var vm = this;
 
     vm.browserVersion = window.navigator.userAgent;
@@ -21,15 +21,18 @@
     if (vm.language === undefined) {
       // default to english for now
       $rootScope.SelectedLanguage = 'en';
+      moment.locale('en');
       $translate.use('en');
       vm.language = 'Español';
     } else {
       if (vm.languageCode.indexof('en') > -1) {
         $rootScope.SelectedLanguage = 'en';
+        moment.locale('en');
         $translate.use('en');
         vm.language = 'Español';
       } else {
         $rootScope.SelectedLanguage = 'es';
+        moment.locale('es');
         $translate.use('es');
         vm.language = 'English';
       }

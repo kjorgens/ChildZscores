@@ -5,9 +5,12 @@
  */
 var path = require('path'),
   mongoose = require('mongoose'),
-  Child = mongoose.model('Child'),
   request = require('request'),
   fs = require('fs'),
+  // csvParse = require('babyparse'),
+  moment = require('moment'),
+  csvloader = require('multer'),
+  config = require(path.resolve('./config/config')),
   Promise = require('bluebird'),
   errorHandler = require(path.resolve('./modules/core/server/controllers/errors.server.controller'));
 
@@ -27,10 +30,21 @@ function getOwnerData(parmObj) {
         var ownerInfo = JSON.parse(body);
         parmObj.ownerInfo = ownerInfo;
         parmObj.screenInfo = screenData;
-        parmObj.sortField = sortField;
         resolve(addLineToStack(parmObj));
       } else {
-        resolve();
+        var msg = '';
+        var myError = new Error();
+        myError.name = 'database error';
+        if (error) {
+          myError.message = error;
+          myError.name = 'database error';
+          reject(myError);
+        } else {
+          var reasons = JSON.parse(response.body);
+          msg = 'Database Error: ' + response.statusCode + ': ' + response.statusMessage + '  Error:' + reasons.error + ' Reason: ' + reasons.reason;
+          myError.message = msg;
+          reject(myError);
+        }
       }
     });
   });
@@ -49,6 +63,12 @@ function pullSaveScreenData(parmObj) {
         '/_design/' + ddoc + '/_view/screen', function(error, response, body) {
       if (!error && response.statusCode === 200) {
         var jsonObj = JSON.parse(body);
+        if (jsonObj.total_rows === 0) {
+          var emptyError = new Error();
+          emptyError.name = 'Empty database';
+          emptyError.message = 'No entries in ' + parmObj.stakeDB + ', Sync first?';
+          reject(emptyError);
+        }
         var screenList = [];
         jsonObj.rows.forEach(function(screening) {
           parmObj.screenInfo = screening;
@@ -56,44 +76,60 @@ function pullSaveScreenData(parmObj) {
         });
         resolve(screenList);
       } else {
-        reject(response);
+        var msg = '';
+        var myError = new Error();
+        myError.name = 'database error';
+        if (error) {
+          myError.message = error;
+          myError.name = 'database error';
+          reject(myError);
+        } else {
+          var reasons = JSON.parse(response.body);
+          msg = 'Database Error: ' + response.statusCode + ': ' + response.statusMessage + '  Error:' + reasons.error + ' Reason: ' + reasons.reason;
+          myError.message = msg;
+          reject(myError);
+        }
       }
     });
   });
 }
 
-function gatherScreeningInfo(parmObj) {
+// function writeFirstRow(fstream) {
+//   return new Promise(function(resolve, reject) {
+//
+//     fstream.write(headerLine, function(err) {
+//       if (err) {
+//         console.log(err);
+//         reject(err);
+//       } else {
+//         resolve();
+//       }
+//     });
+//   });
+// }
+
+function writeTheFile(input) {
   return new Promise(function(resolve, reject) {
-    var headerLine = 'id,gender,firstName,lastName,idGroup,mother,phone,address,ward,lds,weight,height,age,ha,wa,wh\n';
-    parmObj.fdis.write(headerLine, function(err) {
+    var headerLine = 'id,gender,firstName,lastName,idGroup,mother,phone,address,ward,lds,weight,height,age,ha,wa,wh,status\n';
+    var outPut = headerLine += input.data;
+    fs.writeFile('files/' + input.dbId + '.csv', outPut, function (err) {
       if (err) {
         console.log(err);
-        reject(err);
+        reject(err.message);
       } else {
-        resolve(pullSaveScreenData(parmObj).all());
+        resolve();
       }
     });
   });
 }
 
-function writeTheLine(fileDis, line) {
+function collectEm(sortedList) {
   return new Promise(function(resolve, reject) {
-    fileDis.write(line, function(err) {
-      if (err) {
-        console.log(err);
-      }
-      resolve();
-    });
-  });
-}
-
-function writeEm(sortedList) {
-  return new Promise(function(resolve, reject) {
-    var writeStack = [];
+    var writeStack = '';
     sortedList.forEach(function(line) {
-      writeStack.push(writeTheLine(line.fdis, line.dataLine));
+      writeStack += line.dataLine;
     });
-    resolve(writeStack);
+    resolve({ data: writeStack, dbId: sortedList[0].stakeDB });
   });
 }
 
@@ -140,51 +176,83 @@ function addLineToStack(parmObj) {
       wl: parmObj.screenInfo.zScore.wl,
       screenId: parmObj.screenInfo._id
     };
+    var zscoreStatus = '';
+    if (parmObj.screenInfo.zScore.wl < -2) {
+      zscoreStatus = 'Acute: supplements required';
+    } else if ((parmObj.screenInfo.zScore.ha < -2 || parmObj.screenInfo.zScore.wa < -2) && dataObj.age > 6 && dataObj.age < 36) {
+      zscoreStatus = 'Acute: supplements required';
+    } else if ((parmObj.screenInfo.zScore.ha < -2 || parmObj.screenInfo.zScore.wa < -2) && dataObj.age > 36 && dataObj.age < 48) {
+      zscoreStatus = 'Micro nutrients required';
+    } else if (parmObj.screenInfo.zScore.ha < -1 ||
+         parmObj.screenInfo.zScore.wa < -1 ||
+         parmObj.screenInfo.zScore.wl < -1) {
+      zscoreStatus = 'At Risk: Come to next screening';
+    } else {
+      zscoreStatus = 'Normal';
+    }
     var dataLine = dataObj.childId + ',' + dataObj.gender + ',' + dataObj.firstName + ',' + dataObj.lastName +
         ',' + dataObj.idGroup + ',' + dataObj.mother + ',' + dataObj.phone + ',' + dataObj.address +
         ',' + dataObj.ward + ',' + dataObj.memberStatus + ',' + dataObj.weight + ',' + dataObj.height +
-        ',' + dataObj.age + ',' + dataObj.ha + ',' + dataObj.wa + ',' + dataObj.wl + '\n';
-  //  parmObj.lineStack.push(dataLine);
-    resolve({ data: dataObj, dataLine: dataLine, fdis: parmObj.fdis, sort: parmObj.sort });
+        ',' + dataObj.age + ',' + dataObj.ha + ',' + dataObj.wa + ',' + dataObj.wl + ',' + zscoreStatus + '\n';
+    resolve({ data: dataObj, dataLine: dataLine, stakeDB: parmObj.stakeDB, sortField: parmObj.sortField });
   });
 }
 
 function sortEm(listIn) {
   return new Promise(function(resolve, reject) {
     listIn.sort(function(x, y) {
-      if (x.data[x.sort] < y.data[x.sort]) {
+      if (x.data[x.sortField] < y.data[x.sortField]) {
         return -1;
       }
-      if (x.data[x.sort] > y.data[x.sort]) {
+      if (x.data[x.sortField] > y.data[x.sortField]) {
         return 1;
       }
-      if (x.data[x.sort] === y.data[x.sort]) {
+      if (x.data[x.sortField] === y.data[x.sortField]) {
         return 0;
       }
+      return 0;
     });
     resolve(listIn);
   });
 }
 
 exports.createCSVFromDB = function (req, res) {
-  var fstream = fs.createWriteStream('files/' + req.params.stakeDB + '.csv');
-
-  // var lineStack = [];
   function reportCSVComplete(input) {
     res.status(200).send({
       message: 'files/' + req.params.stakeDB + '.csv'
     });
   }
-  var parmObj = { fdis: fstream, stakeDB: req.params.stakeDB, filter: req.params.filter, sort: req.params.sort, screenInfo: {} };
-  gatherScreeningInfo(parmObj).catch(function(err) {
-    console.log(err);
-  })
+
+  function reportCSVUploadComplete(input) {
+    res.status(200).send({
+      message: 'file upload complete'
+    });
+  }
+  var parmObj = { stakeDB: req.params.stakeDB, filter: req.params.filter, sortField: req.params.sortField, screenInfo: {} };
+  pullSaveScreenData(parmObj)
+    //   .catch(function(err) {
+    // return res.status(500).send({
+    //   message: 'file upload complete'
+    // });
   .all().then(sortEm)
-  .then(writeEm).catch(function(err) {
-    console.log(err);
-  })
-   .all()
-      .then(reportCSVComplete);
+    // .catch(function(err) {
+    // return res.status(500).send({
+    //   message: 'file upload complete'
+    // });
+  .then(collectEm)
+    // .catch(function(err) {
+    // return res.status(500).send({
+    //   message: 'file upload complete'
+    // });
+  .then(writeTheFile)
+  .then(reportCSVComplete).catch(function(err) {
+    res.status(500).send({
+      error: err
+    });
+    // return res.status(500).send({
+    //   message: 'Error downloading csv'
+    // });
+  });
 };
 
 exports.getSyncURL = function(req, res) {
@@ -192,7 +260,7 @@ exports.getSyncURL = function(req, res) {
 };
 
 exports.getCountryList = function(req, res) {
-  request.get('https://' + process.env.SYNC_ENTITY + '@' + process.env.COUCH_URL +
+  request.get('https://' + process.env.COUCH_URL +
       '/country_list/liahona_kids_countries_stakes', function (error, response, body) {
     if (!error && response.statusCode === 200) {
       var jsonObj = JSON.parse(body);
@@ -203,6 +271,82 @@ exports.getCountryList = function(req, res) {
       });
     }
   });
+};
+
+function infoToCouch (dataBase, record) {
+  return new Promise(function(resolve, reject) {
+    var stakeDb = require('nano')('https://' + process.env.SYNC_ENTITY + '@' + process.env.COUCH_URL + dataBase);
+    stakeDb.insert({ _id: 'scr_' + dataBase + '_' + moment.now() }, function(err, response) {
+      if (err) {
+        console.log(err.message);
+        reject(err.message);
+      } else {
+        stakeDb.insert({ _id: 'chld_' }, function(err, response){
+          if (err) {
+            console.log(err.message);
+            reject(err.message);
+          } else {
+            console.log('child record saved');
+          }
+        });
+        console.log('screening added to ' + dataBase);
+        resolve('created');
+      }
+    });
+  });
+}
+
+function weHaveData(results) {
+  // return new Promise(function(resolve, reject) {
+  var rows = results[0].data;
+  console.log('results are in');
+    // resolve(results);
+  // });
+}
+
+function locateOwner(data) {
+  return new Promise(function(resolve, reject) {
+    var stakeDb = require('nano')('https://' + process.env.SYNC_ENTITY + '@' + process.env.COUCH_URL + dataBase);
+  });
+}
+
+function parseCsv(input) {
+ // return new Promise(function(resolve, reject) {
+//  csvParse.parseFiles(input.file, { dynamicTyping: true, complete: weHaveData });
+
+ // });
+}
+
+exports.uploadCsv = function (req, res) {
+  // var user = req.user;
+  var upload = csvloader(config.uploads.csvUpload).single('newUploadCsv');
+  var csvUploadFileFilter = require(path.resolve('./config/lib/csvloader.js')).csvUploadFileFilter;
+
+  // Filtering to upload only images
+  upload.fileFilter = csvUploadFileFilter;
+
+  upload(req, res, function (uploadError) {
+    if (uploadError) {
+      return res.status(400).send({
+        message: 'Error occurred while uploading csv file'
+      });
+    } else {
+      // parse csv
+      // parseCsv(res.req.file.path);
+      // csvParse.parseFiles(res.req.file.path, { header: true, dynamicTyping: true, complete: function(results, file) {
+      //   var input = results;
+      return (res.status(200).send({ message: 'update complete' }));
+    }
+  });
+     // });
+          // .then(res.status(200).send({ message: 'update complete' }));
+
+      // locate a child (gender, first name, last name, age +- 1 month, mother
+      // and populate db with new screening and possibly new child
+  // console.log('the file ' + res.req.file.originalname + ' is saved as ' + res.req.file.path);
+
+//    }
+//  });
 };
 
 exports.listDbs = function(req, res) {

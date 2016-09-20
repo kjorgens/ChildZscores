@@ -54,7 +54,7 @@
           }
         })
         .state('children.report', {
-          url: '/report/:stakeDB/:filter/:sort',
+          url: '/report/:stakeDB/:filter/:sortField',
           templateUrl: 'modules/children/client/views/sync-children.client.view.html',
           controller: 'ChildrenSyncController',
           controllerAs: 'vm',

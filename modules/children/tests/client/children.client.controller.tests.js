@@ -69,7 +69,7 @@
       spyOn($state, 'go');
     }));
 
-    describe('vm.save() as create', function (){
+    describe('vm.save() as create', function () {
       var sampleChildPostData;
 
       beforeEach(function () {

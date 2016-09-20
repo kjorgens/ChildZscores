@@ -5,9 +5,9 @@
     .module('children')
     .controller('ChildrenController', ChildrenController);
 
-  ChildrenController.$inject = ['$rootScope', '$scope', '$state', '$stateParams', '$translate', 'moment', 'childResolve', 'Authentication', 'ZScores', 'PouchService'];
+  ChildrenController.$inject = ['$rootScope', '$scope', '$state', '$stateParams', '$translate', 'moment', 'childResolve', 'Authentication', 'ZScores', 'PouchService', 'ModalService'];
 
-  function ChildrenController($rootScope, $scope, $state, $stateParams, $translate, moment, child, Authentication, ZScores, PouchService) {
+  function ChildrenController($rootScope, $scope, $state, $stateParams, $translate, moment, child, Authentication, ZScores, PouchService, ModalService) {
     var vm = this;
     var editChild = false;
 
@@ -26,7 +26,7 @@
     vm.interviewer = localStorage.getItem('lastInterviewer');
 //    vm.find();
     vm.genders = [{ value: 'Boy', translationId: 'TXT_MALE' }, { value: 'Girl', translationId: 'TXT_FEMALE' }];
-    vm.yesNo = [{ value: 'Yes', translationId: 'YES' }, { value: 'No', translationId: 'NO' }];
+    vm.yesNo = [{ value: 'Yes', translationId: 'YES' }, { value: 'No', translationId: 'NO' }, { value: 'Unknown', translationId: 'UNKNOWN' }];
     if ($state.params.childId) {
       editChild = true;
       vm.child = child;
@@ -47,9 +47,14 @@
       vm.child = {};
       // vm.child.gender = 'Boy';
       // vm.child.memberStatus = 'Yes';
-      vm.ageIsValid = false;
+      vm.ageIsValid = undefined;
+      vm.firstNameIsValid = undefined;
+      vm.lastNameIsValid = undefined;
+      vm.genderIsValid = undefined;
+      vm.membershipIsValid = undefined;
       vm.surveyDate = new Date();
       vm.child.ward = vm.selectedWard;
+      vm.checkMembershipIsValid = false;
     }
 
     vm.appIsOffline = !$rootScope.appOnline;
@@ -75,7 +80,7 @@
     vm.checkMembershipIsValid = checkMembershipIsValid;
     vm.checkAgeIsValid = checkAgeIsValid;
     vm.checkEnteredAgeIsValid = checkEnteredAgeIsValid;
-    // vm.checkAllFieldsValid = checkAllFieldsValid;
+    vm.checkAllFieldsValid = checkAllFieldsValid;
     function performTranslation() {
       $translate(['BOY', 'GIRL', 'CHILD_RECORD', 'UPDATE', 'CREATE',
         'EDIT_EXISTING_CHILD', 'ADD_NEW_CHILD']).then(function (translations) {
@@ -88,6 +93,7 @@
           vm.add_new = translations.ADD_NEW_CHILD;
         });
     }
+
     performTranslation();
     $rootScope.$on('$translateChangeSuccess', function () {
       performTranslation();
@@ -132,13 +138,13 @@
     }
 
     function setSurveyList(surveys) {
-      $scope.$apply(function() {
+      $scope.$apply(function () {
         vm.surveys = surveys.docs;
- //       vm.surveys.forEach(function(survey) {
- //        if (vm.surveys.length > 0) {
- //          gradeZScores(vm.surveys[0]);
- //        }
- //       });
+        //       vm.surveys.forEach(function(survey) {
+        //        if (vm.surveys.length > 0) {
+        //          gradeZScores(vm.surveys[0]);
+        //        }
+        //       });
       });
     }
 
@@ -146,17 +152,45 @@
       vm.surveyError = error;
     }
 
-    function checkAllFieldsValid() {
-      checkFirstNameIsValid();
-      checkLastNameIsValid();
-      checkGenderIsValid();
-      checkAgeIsValid();
+    function undefinedTurnFalse() {
+      if (vm.firstNameIsValid === undefined) {
+        vm.firstNameIsValid = false;
+      }
+      if (vm.lastNameIsValid === undefined) {
+        vm.lastNameIsValid = false;
+      }
+      if (vm.genderIsValid === undefined) {
+        vm.genderIsValid = false;
+      }
+      if (vm.ageIsValid === undefined) {
+        vm.ageIsValid = false;
+      }
+      if (vm.membershipIsValid === undefined) {
+        vm.membershipIsValid = false;
+      }
+    }
 
-      if (vm.firstNameIsValid === true && vm.lastNameIsValid === true &&
-          vm.genderIsalid === true && vm.ageIsValid === true) {
+    function checkAllFieldsValid() {
+      if (vm.firstNameIsValid === true &&
+          vm.lastNameIsValid === true &&
+          vm.genderIsValid === true &&
+          vm.ageIsValid === true &&
+          vm.membershipIsValid === true) {
         vm.allFieldsValid = true;
-      } else {
+        vm.invalidFields = false;
+      } else if (vm.firstNameIsValid === false ||
+          vm.lastNameIsValid === false ||
+          vm.genderIsValid === false ||
+          vm.ageIsValid === false ||
+          vm.membershipIsValid === false) {
         vm.allFieldsValid = false;
+        vm.invalidFields = true;
+      } else if ((vm.firstNameIsValid === undefined || vm.firstNameIsValid === true) &&
+          (vm.lastNameIsValid === undefined || vm.lastNameIsValid === true) &&
+          (vm.genderIsValid === undefined || vm.genderIsValid === true) &&
+          (vm.ageIsValid === undefined || vm.ageIsValid === true) &&
+          (vm.membershipIsValid === undefined || vm.membershipIsValid === true)) {
+        vm.allFieldsValid = true;
       }
     }
 
@@ -186,11 +220,12 @@
       } else {
         vm.firstNameIsValid = false;
       }
+      vm.checkAllFieldsValid();
     }
 
     function checkLastNameIsValid() {
       if (vm.child.lastName) {
-        if (vm.child.lastName.length < 1 || vm.child.lastName.length > 25) {
+        if (vm.child.lastName.length < 1) {
           vm.lastNameIsValid = false;
         } else {
           vm.lastNameIsValid = true;
@@ -198,6 +233,7 @@
       } else {
         vm.lastNameIsValid = false;
       }
+      vm.checkAllFieldsValid();
     }
 
     function checkGenderIsValid() {
@@ -206,14 +242,16 @@
       } else {
         vm.genderIsValid = false;
       }
+      vm.checkAllFieldsValid();
     }
 
     function checkMembershipIsValid() {
-      if (vm.child.memberStatus === 'Yes' || vm.child.memberStatus === 'No') {
+      if (vm.child.memberStatus === 'Yes' || vm.child.memberStatus === 'No' || vm.child.memberStatus === 'Unknown') {
         vm.membershipIsValid = true;
       } else {
         vm.membershipIsValid = false;
       }
+      vm.checkAllFieldsValid();
     }
 
     function checkMotherIsValid() {
@@ -272,13 +310,16 @@
     vm.minStartDate = new Date(year - 5, month, day);
 
     function checkEnteredAgeIsValid() {
-      if (vm.child.monthAge < 1 || vm.child.monthAge > 60) {
-        vm.ageIsValid = false;
-      } else {
-        vm.ageIsValid = true;
-        vm.child.birthDate = new Date(year, month - vm.child.monthAge, day);
-        vm.ageIsValid = true;
+      if (vm.child.monthAge !== undefined) {
+        if (vm.child.monthAge < 1 || vm.child.monthAge > 60) {
+          vm.ageIsValid = false;
+        } else {
+          vm.ageIsValid = true;
+          vm.child.birthDate = new Date(year, month - vm.child.monthAge, day);
+          vm.ageIsValid = true;
+        }
       }
+      vm.checkAllFieldsValid();
     }
 
     function checkAgeIsValid() {
@@ -290,6 +331,7 @@
         vm.ageIsValid = true;
         vm.child.monthAge = Number(monthAge.toFixed(2));
       }
+      vm.checkAllFieldsValid();
     }
 
     function ldsMemberChecked() {
@@ -303,6 +345,7 @@
         // vm.child.memberStatus = 'No';
         vm.checkMembershipIsValid = true;
       }
+      vm.checkAllFieldsValid();
     }
 
     function updated(child) {
@@ -331,10 +374,13 @@
         PouchService.insert(vm.child, childUpdated, addedError);
       } else {
         vm.error = null;
-        if (!isValid) {
-          $scope.$broadcast('show-errors-check-validity', 'childForm');
 
+        if (!isValid) {
+          undefinedTurnFalse();
+          vm.invalidFields = true;
           return false;
+        } else {
+          vm.invalidFields = false;
         }
 
         var childObject = {
@@ -355,8 +401,7 @@
           memberStatus: vm.child.memberStatus,
           screeningStatus: vm.screeningStatus,
           _id: 'chld_',
-          interviewer: localStorage.getItem('lastInterviewer'),
-          lastScreening: {}
+          interviewer: localStorage.getItem('lastInterviewer')
         };
 
         PouchService.insert(childObject, newChild, errorHandle);
@@ -443,5 +488,9 @@
  //     var something = $stateParams;
       PouchService.get({ childId: vm.childId }, getUser, getError);
     }
+
+    vm.invalidInput = function () {
+      return ModalService.infoModal('Input Error:', 'Invalid or Missing data', 'Please correct or enter required fields');
+    };
   }
 }());

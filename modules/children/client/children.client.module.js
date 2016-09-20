@@ -8,7 +8,7 @@
   app.registerModule('children.translate', []);
   app.registerModule('children.stakes', []);
   app.registerModule('children.getsync', []);
-  app.registerModule('children.modalService', []);
+  app.registerModule('children.modalService', ['ui.bootstrap']);
   app.registerModule('children.pouchService', ['pouchdb', 'uuid']);
   app.registerModule('children.zscoreService', []);
   app.registerModule('children.spinner', ['angularSpinner']);

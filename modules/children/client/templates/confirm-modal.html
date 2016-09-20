@@ -1,0 +1,25 @@
+<div class="anchor default-modal-close" ng-click="dismiss()"><i class="fa fa-times fa-2x"></i><text>Close</text></div>
+<div class="default-modal-padding">
+
+    <div class="default-modal-background" >
+        <div class="default-modal-header">
+            {{title}}
+        </div>
+        <div class="default-modal-spacer"></div>
+        <div class="default-modal-body">
+            {{msg}}
+        </div>
+        <div class="default-modal-spacer"></div>
+        <div class="default-modal-footer">
+            <a ng-if="!conditional">
+                <div class="anchor modal-btn-cancel" ng-click="dismiss()"> <u>{{cancel || 'Cancel'}}</u> </div>
+                <div class="default-modal-spacer"></div>
+                <div class="anchor modal-btn-primary" ng-click="dismiss(true)">{{confirm || 'Confirm'}}</div>
+            </a>
+            <a ng-if="conditional">
+                <div class="direct-modal-btn btn btn-info" ng-click="dismiss(true)">{{confirm}}</div>
+                <div class="direct-modal-btn btn btn-info" ng-click="dismiss(false)">{{cancel}}</div>
+            </a>
+        </div>
+    </div>
+</div>

@@ -20,6 +20,12 @@
       vm.stopSpin();
       console.log(input);
     }
+
+    function handleSaveLocalError(input) {
+      vm.stopSpin();
+      console.log("error creating country db local");
+    }
+
     function handleError(input) {
       console.log(input + ' attempt to retrieve info remote');
       getStakesDB();
@@ -55,7 +61,7 @@
         ChildrenStakes.get(function(retVal) {
           vm.liahonaStakes = retVal;
           PouchService.createCountryDatabase();
-          PouchService.putStakesLocal(retVal, returnFromPut, handleError);
+          PouchService.putStakesLocal(retVal, returnFromPut, handleSaveLocalError);
         });
       }
     }
