@@ -19,14 +19,14 @@
     "angular-uuid": "~0.1.0",
     "pouchdb-find": "~0.10.3",
     "angular-moment": "^0.10.3",
-    "moment": "^2.12.0",
+    "moment": "^2.15.0",
     "angular-ui-router-uib-modal": "^0.0.4",
     "angular-spinner": "^0.8.1",
     "sw-toolbox": "^3.1.1",
     "pouchdb-all-dbs": "^1.0.1",
     "angular-translate": "^2.11.0",
     "angular-sanitize": "^1.5.5",
-    "pouchdb": "^5.4.5"
+    "pouchdb": "^6.0.5"
   },
   "resolutions": {
     "angular": "~1.5.8"
