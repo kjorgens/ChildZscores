@@ -29,7 +29,9 @@
     "pouchdb": "^6.0.5"
   },
   "resolutions": {
-    "angular": "~1.5.8"
+    "moment": "^2.15.0",
+    "angular": "~1.5.8",
+    "pouchdb": "^6.0.5"
   },
   "overrides": {
     "bootstrap": {
