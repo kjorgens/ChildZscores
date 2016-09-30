@@ -49,6 +49,12 @@ module.exports = {
       limits: {
         fileSize: 1 * 1024 * 1024 // Max file size in bytes (1 MB)
       }
+    },
+    csvUpload: {
+      dest: './uploads/csv/', // csv upload destination path
+      limits: {
+        fileSize: 5 * 1024 * 1024 // Max file size in bytes (1 MB)
+      }
     }
   },
   jwt: {

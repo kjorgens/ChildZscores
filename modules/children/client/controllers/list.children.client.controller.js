@@ -25,11 +25,17 @@
     vm.selectedStakeDB = $stateParams.stakeDB;
  //   vm.selectedWard = 'All Wards';
     getWardList();
+
     function performTranslation() {
-      $translate(['BOY', 'GIRL']).then(function (translations) {
-        vm.boy = translations.BOY;
-        vm.girl = translations.GIRL;
-      });
+      $translate(['BOY', 'GIRL', 'ACUTE_ZSCORE', 'MICRO_NUTRITION_ZSCORE', 'AT_RISK_ZSCORE', 'NORMAL_ZSCORE'])
+        .then(function (translations) {
+          vm.boy = translations.BOY;
+          vm.girl = translations.GIRL;
+          vm.zscoreAcute = translations.ACUTE_ZSCORE;
+          vm.zscoreMicro = translations.MICRO_NUTRITION_ZSCORE;
+          vm.zscoreAtRisk = translations.AT_RISK_ZSCORE;
+          vm.zscoreNormal = translations.NORMAL_ZSCORE;
+        });
     }
     performTranslation();
 
@@ -85,6 +91,7 @@
     $rootScope.$on('us-spinner:stop', function(event, key) {
       vm.spinneractive = false;
     });
+
     function setChildren(res) {
       $scope.$apply(function() {
         vm.childList = res;
@@ -122,7 +129,7 @@
     }
 
     function getWardList() {
-      return PouchService.getWardList(localStorage.getItem('selectedCountry'),vm.selectedStake, storeStuff, listChildrenErrors);
+      return PouchService.getWardList(localStorage.getItem('selectedCountry'), vm.selectedStake, storeStuff, listChildrenErrors);
     }
   }
 }());

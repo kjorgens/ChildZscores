@@ -48,6 +48,9 @@ a:hover .header-profile-image {
 .offline {
     color: red;
 }
+.validateError {
+    color: red;
+}
 .online {
     color: green;
 }
@@ -74,9 +77,26 @@ a:hover .header-profile-image {
   border: 1px solid #CFD3D3;
 }
 
+.infoModalContainer {
+    color: black;
+    background-color: #28e0f9;
+    border-radius: 5px;
+    padding: 5%;
+    padding-top: -2%;
+    font-size: 12px;
+    font-weight: lighter;
+    border: 1px solid #afd3c0;
+    font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif;
+}
 .validationMessage {
   font-size: 14px;
   color: #a94442;
+}
+
+.invalidFields {
+    font-size: 34px;
+    color: #a9590f;
+    font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif;
 }
 
 .right-side-child {

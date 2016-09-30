@@ -8,6 +8,6 @@
   ChildrenReport.$inject = ['$resource', '$rootScope'];
 
   function ChildrenReport($resource, $rootScope) {
-    return $resource('api/children/report/:stakeDB/:filter/:sort');
+    return $resource('api/children/report/:stakeDB/:filter/:sortField');
   }
 }());

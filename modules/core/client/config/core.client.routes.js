@@ -41,15 +41,15 @@
           // }
         })
         .state('fileDownload', {
-           url: '/files/:fileToDownload',
+          url: '/files/:fileToDownload',
            // templateUrl: 'modules/children/client/views/sync-children.client.view.html',
            // controller: 'ChildrenSyncController',
            // controllerAs: 'vm',
-           data: {
-             roles: ['admin', 'sync']
+          data: {
+            roles: ['admin', 'sync']
          //       pageTitle: 'Sync database {{ database.title }}'
-           }
-         })
+          }
+        })
       .state('not-found', {
         url: '/not-found',
         templateUrl: 'modules/core/client/views/404.client.view.html',
@@ -78,10 +78,18 @@
         .state('sync-error', {
           url: '/sync-error',
           templateUrl: 'modules/core/client/views/syncerror.client.view.html',
-          controller: 'HeaderController',
           data: {
             ignoreState: true,
             pageTitle: 'Database Sync error'
+          }
+        })
+        .state('500-error', {
+          url: '/server-error',
+          templateUrl: 'modules/core/client/views/500.client.view.html',
+          controller: 'HeaderController',
+          data: {
+            ignoreState: true,
+            pageTitle: 'Database error'
           }
         })
       .state('forbidden', {

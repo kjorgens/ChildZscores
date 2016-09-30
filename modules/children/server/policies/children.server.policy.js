@@ -24,7 +24,13 @@ exports.invokeRolesPolicies = function () {
       resources: '/sync',
       permissions: '*'
     }, {
-      resources: '/report/:stakeDB/:filter/:sort',
+      resources: '/remoteDBList',
+      permissions: '*'
+    }, {
+      resources: '/upload',
+      permissions: '*'
+    }, {
+      resources: '/report/:stakeDB/:filter/:sortField',
       permissions: ['*']
     }]
   }, {
@@ -44,6 +50,12 @@ exports.invokeRolesPolicies = function () {
     }, {
       resources: '/survey/:childId/:surveyId',
       permissions: ['get', 'post']
+    }, {
+      resources: '/stakes',
+      permissions: ['get']
+    }, {
+      resources: '/countries',
+      permissions: ['get']
     }]
   }, {
     roles: ['guest'],
@@ -52,6 +64,9 @@ exports.invokeRolesPolicies = function () {
       permissions: ['get']
     }, {
       resources: '/stakes',
+      permissions: ['get']
+    }, {
+      resources: '/countries',
       permissions: ['get']
     }, {
       resources: '/:childId',
@@ -63,8 +78,11 @@ exports.invokeRolesPolicies = function () {
       resources: '/',
       permissions: ['get']
     }, {
-      resources: '/stakes',
-      permissions: ['get']
+      resources: '/remoteDBlist',
+      permissions: '*'
+    }, {
+      resources: '/upload',
+      permissions: ['post', 'get']
     }, {
       resources: '/:childId',
       permissions: ['get']
@@ -72,7 +90,7 @@ exports.invokeRolesPolicies = function () {
       resources: '/sync',
       permissions: ['get']
     }, {
-      resources: '/report/:stakeDB/:filter/:sort',
+      resources: '/report/:stakeDB/:filter/:sortField',
       permissions: ['get']
     },
     {

@@ -9,8 +9,20 @@
                 </h4>
                 <h4>
                     <div ng-if="vm.onLine">
-                        <a ui-sref="children.sync({stakeDB: vm.selectedStakeDB, stakeName:vm.selectedStake})">{{vm.selectedStake}}
-                            <i class="glyphicon glyphicon-refresh"></i></a>
+                        <a ui-sref="children.sync({stakeDB: vm.selectedStakeDB, stakeName:vm.selectedStake})">{{'SYNC_OR_REPORT' | translate }}
+                            <!--<i class="glyphicon glyphicon-refresh"></i>-->
+                        </a>
+                        <h5>
+                            <div ng-if="vm.repUpStats.ok">
+                                Sync up: OK read:{{vm.repUpStats.docs_read}} written:{{vm.repupStats.docs_written}}
+                            </div>
+                            <div ng-if="vm.repUpStats.ok && !vm.repUpStats.ok">
+                                Sync up: not OK read:{{vm.repUpStats.docs_read}} written:{{vm.repupStats.docs_written}}
+                            </div>
+                            <div ng-if="vm.repError">
+                                Sync Error: {{vm.repError}}
+                            </div>
+                        </h5>
                     </div>
                     <div ng-if="!vm.onLine">
                         {{vm.selectedStake}}
@@ -56,7 +68,17 @@
             <small class="list-group-item-text">
                 <h3><span ng-bind="child.firstName"></span>
                     <span ng-bind="child.lastName"></span></h3>
-
+                <h4 ng-if="child.statusColor">
+                    {{'ZSCORE_STATUS' | translate}}:
+                    <span ng-class="child.statusColor" ng-if="child.zscoreStatus === 'Acute: supplements required'">
+                          {{'ACUTE_ZSCORE' | translate}} </span>
+                    <span ng-class="child.statusColor" ng-if="child.zscoreStatus === 'Micro nutrients required'">
+                          {{'MICRO_NUTRITION_ZSCORE' | translate}} </span>
+                    <span ng-class="child.statusColor" ng-if="child.zscoreStatus === 'At Risk: Come to next screening'">
+                          {{'AT_RISK_ZSCORE' | translate}} </span>
+                    <span ng-class="child.statusColor" ng-if="child.zscoreStatus === 'Normal'">
+                          {{'NORMAL_ZSCORE' | translate}} </span>
+                </h4>
                  {{child.gender === 'Boy' ? ('TXT_MALE' | translate) : ('TXT_FEMALE' | translate)}}, {{'BORN' | translate}}
                 <span ng-bind="child.birthDate | date:'mediumDate'"></span>,
                 {{'RECORD_CREATED' | translate}}:

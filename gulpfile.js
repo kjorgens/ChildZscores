@@ -328,7 +328,6 @@ gulp.task('mocha', function (done) {
         });
       });
   });
-
 });
 
 // Karma test runner task
@@ -414,6 +413,10 @@ gulp.task('test:client', function (done) {
 });
 
 gulp.task('test:e2e', function (done) {
+  runSequence('env:test', 'lint', 'dropdb', 'nodemon', 'protractor', done);
+});
+
+gulp.task('test:childrene2e', function (done) {
   runSequence('env:test', 'lint', 'dropdb', 'nodemon', 'protractor', done);
 });
 

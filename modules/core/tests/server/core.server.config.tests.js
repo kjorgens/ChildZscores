@@ -312,7 +312,7 @@ describe('Configuration Tests:', function () {
         seed
           .start({ logResults: false })
           .then(function () {
-            // we don't ever expect to make it here but we don't want to timeout          
+            // we don't ever expect to make it here but we don't want to timeout
             User.remove(function(err) {
               should.not.exist(err);
               // force this test to fail since we should never be here
@@ -465,7 +465,7 @@ describe('Configuration Tests:', function () {
     it('should use the default log format of "combined" when an invalid format was provided', function () {
       // manually set the config log format to be invalid
       config.log = {
-        format: '_some_invalid_format_'        
+        format: '_some_invalid_format_'
       };
 
       var format = logger.getFormat();

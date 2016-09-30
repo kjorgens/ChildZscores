@@ -16,17 +16,29 @@
             <span><a ui-sref="children.list({stakeDB: vm.selectedDB, stakeName: vm.selectedStake})">{{'CANCEL' | translate}}</a></span>
         </h3>
     </div>
-    <h3 style="margin-top: 1em" ng-if="vm.form.childForm.$valid">
-        <span><a ng-click="vm.create(vm.form.childForm.$valid)">
-            {{vm.child._id ? vm.update : vm.createRec }}{{'CHILD_RECORD' | translate}} <i class="glyphicon glyphicon-export"></i></a></span>
-    </h3>
+    <!--<h3 style="margin-top: 1em" ng-if="vm.form.childForm.$valid">-->
+        <!--<span><a ng-click="vm.create(vm.form.childForm.$valid)">-->
+            <!--{{vm.child._id ? vm.update : vm.createRec }}{{'CHILD_RECORD' | translate}} <i class="glyphicon glyphicon-export"></i></a></span>-->
+    <!--</h3>-->
+    <div ng-if="vm.invalidFields" >
+        <h2 style="margin-top: 1em">
+            <span ><a class="validateError">
+               {{'INVALID_FIELDS' | translate}} </a></span>
+        </h2>
+    </div>
+    <div>
+        <h3 style="margin-top: 1em">
+            <span><a ng-click="vm.create(vm.form.childForm.$valid)">
+               {{'UPDATE' | translate}} <i class="glyphicon glyphicon-export"></i></a></span>
+        </h3>
+    </div>
     <div class="col-md-12">
         <form name="vm.form.childForm" class="form-horizontal" ng-submit="vm.create(vm.form.childForm.$valid)"
               novalidate>
             <fieldset>
                 <div class="CreateChildFormContainer">
                     <div class="form-group float-left">
-                        <div ng-class="{'has-error':(!vm.genderIsValid)}">
+                        <div ng-class="{'has-error':(vm.genderIsValid === false)}">
                             <label for="vm.child.gender" class="col-sm-2 control-label">{{'GENDER' | translate}}</label>
                             <div class="col-sm-4">
                                 <select  ng-change="vm.checkGenderIsValid()" class="form-control"
@@ -35,7 +47,7 @@
                                          ng-options="gender.value as gender.translationId | translate for gender in vm.genders"
                                          required>
                                 </select>
-                                <div class="validationMessage" ng-if="!vm.genderIsValid"><p>{{'GENDER_REQUIRED' | translate}}
+                                <div class="validationMessage" ng-if="vm.genderIsValid === false"><p>{{'GENDER_REQUIRED' | translate}}
                                 </p></div>
                             </div>
                             <!--<div class="col-sm-3">-->
@@ -44,7 +56,7 @@
                             <!--</button>-->
                             <!--</div>-->
                         </div>
-                        <div ng-class="{'has-error':(!vm.membershipIsValid)}">
+                        <div ng-class="{'has-error':(vm.membershipIsValid === false)}">
                             <label for="vm.child.memberStatus" class="col-sm-2 control-label">{{'LDS_MEMBER' | translate}}</label>
                             <div class="col-sm-4">
                                 <select  ng-change="vm.checkMembershipIsValid()" class="form-control"
@@ -53,7 +65,7 @@
                                          ng-options="yesno.value as yesno.translationId | translate for yesno in vm.yesNo"
                                          required>
                                 </select>
-                                <div class="validationMessage" ng-if="!vm.membershipIsValid"><p>{{'MEMBER_STATUS_REQUIRED' | translate}}
+                                <div class="validationMessage" ng-if="vm.membershipIsValid === false"><p>{{'MEMBER_STATUS_REQUIRED' | translate}}
                                 </p></div>
                             </div>
                             <!--<div class="col-sm-3">-->
@@ -64,18 +76,18 @@
                         </div>
                     </div>
                     <div class="form-group float-left">
-                        <div ng-class="{'has-error':(!vm.firstNameIsValid)}">
+                        <div ng-class="{'has-error':(vm.firstNameIsValid === false)}">
                             <label for="vm.child.firstName" class="col-sm-2 control-label">{{'FIRST_NAME' | translate}}</label>
                             <div class="col-sm-4">
                                 <input class="form-control required" type="text" ng-blur="vm.checkFirstNameIsValid()"
                                        ng-model="vm.child.firstName" id="vm.child.firstName"
                                        placeholder="{{'FIRST_NAME' | translate}}"
                                        required>
-                                <div class="validationMessage" ng-if="!vm.firstNameIsValid"><p>{{'REQUIRED' | translate}}
+                                <div class="validationMessage" ng-if="vm.firstNameIsValid === false"><p>{{'REQUIRED' | translate}}
                                     </p></div>
                             </div>
                         </div>
-                        <div ng-class="{'has-error':(!vm.lastNameIsValid)}">
+                        <div ng-class="{'has-error':(vm.lastNameIsValid === false)}">
                             <label for="vm.child.lastName" class="col-sm-2 control-label">{{'LAST_NAME' | translate}}</label>
                             <div class="col-sm-4">
                                 <input type="input" class="form-control required" ng-blur="vm.checkLastNameIsValid()"
@@ -83,22 +95,22 @@
                                        id="vm.child.lastName"
                                        placeholder="{{'LAST_NAME' | translate}}"
                                        required>
-                                <div class="validationMessage" ng-if="!vm.lastNameIsValid"><p>{{'REQUIRED' | translate}}
+                                <div class="validationMessage" ng-if="vm.lastNameIsValid === false"><p>{{'REQUIRED' | translate}}
                                     </p></div>
                             </div>
                         </div>
                     </div>
                     <div class="form-group float-left">
-                        <div ng-class="{'has-error':(!vm.ageIsValid)}">
+                        <div ng-class="{'has-error':(vm.ageIsValid === false)}">
                             <label for="vm.child.monthAge" class="col-sm-2 control-label">{{'AGE_IN_MONTHS' | translate}}</label>
                             <div class="col-sm-4">
                                 <input class="form-control" type="number" ng-blur="vm.checkEnteredAgeIsValid()"
                                        ng-model="vm.child.monthAge" id="vm.child.monthAge" required>
-                                <div class="validationMessage" ng-if="!vm.ageIsValid"><p>{{'AGE_BIRTHDATE' | translate}}
+                                <div class="validationMessage" ng-if="vm.ageIsValid === false"><p>{{'AGE_BIRTHDATE' | translate}}
                                 </p></div>
                             </div>
                         </div>
-                        <div ng-class="{'has-error':(!vm.ageIsValid)}">
+                        <div ng-class="{'has-error':(vm.ageIsValid === false)}">
                             <label for="vm.child.birthDate" class="col-sm-2 control-label">{{'BIRTHDATE' | translate}}</label>
                             <div class="col-sm-4">
                                 <input type="date" id="vm.child.birthDate" ng-blur="vm.checkAgeIsValid()" class="form-control"
@@ -106,7 +118,7 @@
                                        is-open="status.opened"
                                        min="2010-1-1" max="9999-12-31"
                                        required>
-                                <div class="validationMessage" ng-if="!vm.ageIsValid"><p>{{'AGE_BIRTHDATE' | translate}}
+                                <div class="validationMessage" ng-if="vm.ageIsValid === false"><p>{{'AGE_BIRTHDATE' | translate}}
                                     </p></div>
                             </div>
                         </div>
@@ -185,10 +197,22 @@
         </form>
 
     </div>
-    <h3 style="margin-top: 1em" ng-if="vm.form.childForm.$valid">
-        <span><a ng-click="vm.create(vm.form.childForm.$valid)">
-           {{vm.child._id ? vm.update : vm.createRec}}{{'CHILD_RECORD' | translate}} <i class="glyphicon glyphicon-export"></i></a></span>
-    </h3>
+    <!--<h3 style="margin-top: 1em" ng-if="vm.form.childForm.$valid">-->
+        <!--<span><a ng-click="vm.create(vm.form.childForm.$valid)">-->
+           <!--{{vm.child._id ? vm.update : vm.createRec}}{{'CHILD_RECORD' | translate}} <i class="glyphicon glyphicon-export"></i></a></span>-->
+    <!--</h3>-->
+    <div ng-if="vm.invalidFields" >
+        <h2 style="margin-top: 1em">
+            <span ><a class="validateError">
+               {{'INVALID_FIELDS' | translate}} </a></span>
+        </h2>
+    </div>
+    <div>
+        <h3 style="margin-top: 1em">
+            <span><a ng-click="vm.create(vm.form.childForm.$valid)">
+               {{'UPDATE' | translate}} <i class="glyphicon glyphicon-export"></i></a></span>
+        </h3>
+    </div>
     <!--<div class="panel-footer">-->
         <!--<div class="pull-right">-->
             <!--<button type="submit" class="btn btn-primary" ng-click="vm.create(vm.form.childForm.$valid)">{{vm.child._id ? 'Update' : 'Create'}}-->

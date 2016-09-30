@@ -787,6 +787,9 @@
             break;
           }
         }
+        if (wl === null) {
+          console.log('out of range');
+        }
       }
       heightForAge = (Number(height) - ha.M) / (ha.S * ha.M);
       weightForAge = (Math.pow((Number(weight) / wa.M), wa.L) - 1) / (wa.S * wa.L);

@@ -29,6 +29,7 @@ module.exports = {
         'public/lib/angular-uuid/uuid.js',
         'public/lib/angular-ui-router-uib-modal/angular-ui-router-uib-modal.js',
         'public/lib/moment/moment.js',
+        // 'public/lib/angular-i18n/angular-locale_es.js',
         'public/lib/angular-moment/angular-moment.js',
         'public/lib/angular-translate/angular-translate.js',
         'public/lib/angular-sanitize/angular-sanitize.js'

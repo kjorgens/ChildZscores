@@ -1,4 +1,4 @@
-( function () {
+(function () {
   'use strict';
 
   describe('Articles Route Tests', function () {
@@ -73,7 +73,7 @@
             content: 'MEAN rocks!'
           });
 
-          //Initialize Controller
+          // Initialize Controller
           ArticlesController = $controller('ArticlesController as vm', {
             $scope: $scope,
             articleResolve: mockArticle
@@ -225,4 +225,4 @@
       });
     });
   });
-})();
+}());
