@@ -127,11 +127,6 @@
       vm.spinneractive = false;
     });
 
-    function whenDoneUp() {
-      PouchService.newSyncFrom('https://' + vm.syncStuff.entity + '@' +
-          vm.syncStuff.url + '/' + vm.stakeDB, replicateDown, replicateErrorDown, whenDoneDown);
-    }
-
     function whenDoneDown() {
       find();
       vm.stopSpin();
@@ -143,12 +138,15 @@
       vm.repUpStats = input;
       console.log(JSON.stringify(input));
       vm.repUpData = input;
+      PouchService.newSyncFrom('https://' + vm.syncStuff.entity + '@' +
+          vm.syncStuff.url + '/' + vm.stakeDB, replicateDown, replicateErrorDown);
     }
 
     function replicateDown (input) {
       vm.repDownStats = input;
       console.log(JSON.stringify(input));
       vm.repDownData = input;
+      whenDoneDown();
     }
 
     function replicateErrorUp(err) {
@@ -174,7 +172,7 @@
         vm.syncStuff = input;
         console.log('Ready to sync https://' + vm.syncStuff.url + '/' + vm.stakeDB);
         PouchService.newSyncTo('https://' + vm.syncStuff.entity + '@' +
-          vm.syncStuff.url + '/' + vm.stakeDB, replicateUp, replicateErrorUp, whenDoneUp);
+          vm.syncStuff.url + '/' + vm.stakeDB, replicateUp, replicateErrorUp);
       });
     }
 
