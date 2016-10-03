@@ -496,12 +496,12 @@
         .on('change', function (info) {
           console.log('unhandled change sync up');
         }).on('paused', function (err) {
-          console.log('sync up paused');
+          console.log('sync down paused');
         // replication paused (e.g. replication up to date, user went offline)
         }).on('active', function () {
         // replicate resumed (e.g. new changes replicating, user went back online)
         }).on('denied', function (err) {
-          console.log('failure to replicate on sync up');
+          console.log('failure to replicate on sync down');
         // a document failed to replicate (e.g. due to permissions)
         }).on('complete', function (response) {
           callback(response);
