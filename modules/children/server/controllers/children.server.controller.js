@@ -7,7 +7,7 @@ var path = require('path'),
   mongoose = require('mongoose'),
   request = require('request'),
   fs = require('fs'),
-  // csvParse = require('babyparse'),
+  csvParse = require('babyparse'),
   moment = require('moment'),
   csvloader = require('multer'),
   config = require(path.resolve('./config/config')),
@@ -34,14 +34,14 @@ function getOwnerData(parmObj) {
       } else {
         var msg = '';
         var myError = new Error();
-        myError.name = 'database error';
+        myError.name = screenData._id;
         if (error) {
           myError.message = error;
           myError.name = 'database error';
           reject(myError);
         } else {
           var reasons = JSON.parse(response.body);
-          msg = 'Database Error: ' + response.statusCode + ': ' + response.statusMessage + '  Error:' + reasons.error + ' Reason: ' + reasons.reason;
+          var msg = 'Database Error: ' + response.statusCode + ': ' + response.statusMessage + '  Error:' + reasons.error + ' Reason: ' + reasons.reason;
           myError.message = msg;
           reject(myError);
         }
@@ -77,7 +77,7 @@ function pullSaveScreenData(parmObj) {
         resolve(screenList);
       } else {
         var msg = '';
-        var myError = new Error();
+        var myError = new Error({name:'',errors:[],message:''});
         myError.name = 'database error';
         if (error) {
           myError.message = error;
@@ -85,7 +85,7 @@ function pullSaveScreenData(parmObj) {
           reject(myError);
         } else {
           var reasons = JSON.parse(response.body);
-          msg = 'Database Error: ' + response.statusCode + ': ' + response.statusMessage + '  Error:' + reasons.error + ' Reason: ' + reasons.reason;
+  //        myError.push('Database Error: ' + response.statusCode + ': ' + response.statusMessage + '  Error:' + reasons.error + ' Reason: ' + reasons.reason);
           myError.message = msg;
           reject(myError);
         }
@@ -94,23 +94,9 @@ function pullSaveScreenData(parmObj) {
   });
 }
 
-// function writeFirstRow(fstream) {
-//   return new Promise(function(resolve, reject) {
-//
-//     fstream.write(headerLine, function(err) {
-//       if (err) {
-//         console.log(err);
-//         reject(err);
-//       } else {
-//         resolve();
-//       }
-//     });
-//   });
-// }
-
 function writeTheFile(input) {
   return new Promise(function(resolve, reject) {
-    var headerLine = 'id,gender,firstName,lastName,idGroup,mother,phone,address,ward,lds,weight,height,age,ha,wa,wh,status\n';
+    var headerLine = 'id,gender,firstName,lastName,birthdate,idGroup,mother,father,phone,address,city,ward,lds,screenDate,weight,height,age,ha,wa,wh,status\n';
     var outPut = headerLine += input.data;
     fs.writeFile('files/' + input.dbId + '.csv', outPut, function (err) {
       if (err) {
@@ -162,18 +148,23 @@ function addLineToStack(parmObj) {
       gender: parmObj.screenInfo.gender,
       firstName: parmObj.ownerInfo.firstName,
       lastName: parmObj.ownerInfo.lastName,
-      idGroup: parmObj.ownerInfo.idGroup,
-      mother: parmObj.ownerInfo.mother,
-      phone: parmObj.ownerInfo.phone,
-      address: parmObj.ownerInfo.address,
-      ward: parmObj.ownerInfo.ward || 'none specified',
-      memberStatus: parmObj.ownerInfo.memberStatus,
+      birthDate: parmObj.ownerInfo.birthDate,
+      idGroup: parmObj.ownerInfo.idGroup || '',
+      mother: parmObj.ownerInfo.mother || '',
+      father: parmObj.ownerInfo.father || '',
+      city: parmObj.ownerInfo.city || '',
+      phone: parmObj.ownerInfo.phone || '',
+      address: parmObj.ownerInfo.address || '',
+      ward: parmObj.ownerInfo.ward || '',
+      memberStatus: parmObj.ownerInfo.memberStatus || '',
+      lastScreening: parmObj.ownerInfo.lastScreening,
       weight: parmObj.screenInfo.weight,
       height: parmObj.screenInfo.height,
       age: parmObj.screenInfo.monthAge,
       ha: parmObj.screenInfo.zScore.ha,
       wa: parmObj.screenInfo.zScore.wa,
       wl: parmObj.screenInfo.zScore.wl,
+      surveyDate: parmObj.screenInfo.surveyDate,
       screenId: parmObj.screenInfo._id
     };
     var zscoreStatus = '';
@@ -190,9 +181,9 @@ function addLineToStack(parmObj) {
     } else {
       zscoreStatus = 'Normal';
     }
-    var dataLine = dataObj.childId + ',' + dataObj.gender + ',' + dataObj.firstName + ',' + dataObj.lastName +
-        ',' + dataObj.idGroup + ',' + dataObj.mother + ',' + dataObj.phone + ',' + dataObj.address +
-        ',' + dataObj.ward + ',' + dataObj.memberStatus + ',' + dataObj.weight + ',' + dataObj.height +
+    var dataLine = dataObj.childId + ',' + dataObj.gender + ',' + dataObj.firstName + ',' + dataObj.lastName + ',' + dataObj.birthDate +
+        ',' + dataObj.idGroup + ',' + dataObj.mother + ',' + dataObj.father + ',' + dataObj.phone + ',' + dataObj.address +
+        ',' + dataObj.city + ',' + dataObj.ward + ',' + dataObj.memberStatus + ',' + dataObj.surveyDate + ',' + dataObj.weight + ',' + dataObj.height +
         ',' + dataObj.age + ',' + dataObj.ha + ',' + dataObj.wa + ',' + dataObj.wl + ',' + zscoreStatus + '\n';
     resolve({ data: dataObj, dataLine: dataLine, stakeDB: parmObj.stakeDB, sortField: parmObj.sortField });
   });
@@ -222,37 +213,17 @@ exports.createCSVFromDB = function (req, res) {
       message: 'files/' + req.params.stakeDB + '.csv'
     });
   }
-
-  function reportCSVUploadComplete(input) {
-    res.status(200).send({
-      message: 'file upload complete'
-    });
-  }
   var parmObj = { stakeDB: req.params.stakeDB, filter: req.params.filter, sortField: req.params.sortField, screenInfo: {} };
   pullSaveScreenData(parmObj)
-    //   .catch(function(err) {
-    // return res.status(500).send({
-    //   message: 'file upload complete'
-    // });
   .all().then(sortEm)
-    // .catch(function(err) {
-    // return res.status(500).send({
-    //   message: 'file upload complete'
-    // });
   .then(collectEm)
-    // .catch(function(err) {
-    // return res.status(500).send({
-    //   message: 'file upload complete'
-    // });
-  .then(writeTheFile)
-  .then(reportCSVComplete).catch(function(err) {
-    res.status(500).send({
-      error: err
+  .then(writeTheFile).catch(function(err) {
+    return res.status(400).send({
+      message: err.message,
+      name: err.name,
+      stack: err.stack
     });
-    // return res.status(500).send({
-    //   message: 'Error downloading csv'
-    // });
-  });
+  }).then(reportCSVComplete);
 };
 
 exports.getSyncURL = function(req, res) {
@@ -281,7 +252,7 @@ function infoToCouch (dataBase, record) {
         console.log(err.message);
         reject(err.message);
       } else {
-        stakeDb.insert({ _id: 'chld_' }, function(err, response){
+        stakeDb.insert({ _id: 'chld_' }, function(err, response) {
           if (err) {
             console.log(err.message);
             reject(err.message);
@@ -296,29 +267,271 @@ function infoToCouch (dataBase, record) {
   });
 }
 
-function weHaveData(results) {
-  // return new Promise(function(resolve, reject) {
-  var rows = results[0].data;
-  console.log('results are in');
-    // resolve(results);
-  // });
-}
+// function locateOwner(data) {
+//   return new Promise(function(resolve, reject) {
+//     var stakeDb = require('nano')('https://' + process.env.SYNC_ENTITY + '@' + process.env.COUCH_URL + dataBase);
+//   });
+// }
 
-function locateOwner(data) {
-  return new Promise(function(resolve, reject) {
-    var stakeDb = require('nano')('https://' + process.env.SYNC_ENTITY + '@' + process.env.COUCH_URL + dataBase);
+function parseCsv(input, cb) {
+  fs.rename(input, input + '.csv', function(err) {
+    if (err) {
+      console.log(err);
+    } else {
+      cb(csvParse.parseFiles(input + '.csv', { delimiter: ',', dynamicTyping: true }));
+    }
   });
 }
 
-function parseCsv(input) {
- // return new Promise(function(resolve, reject) {
-//  csvParse.parseFiles(input.file, { dynamicTyping: true, complete: weHaveData });
+function gradeZScores(screenObj) {
+  screenObj.zScore.haStatus = 'normalZscore';
+  screenObj.zScore.waStatus = 'normalZscore';
+  screenObj.zScore.wlStatus = 'normalZscore';
+  if (screenObj.zScore.ha < -2) {
+    screenObj.zScore.haStatus = 'redZoneZscore';
+  } else {
+    if (screenObj.zScore.ha < -1 && screenObj.zScore.ha > -2) {
+      screenObj.zScore.haStatus = 'marginalZscore';
+    }
+  }
+  if (screenObj.zScore.wa < -2) {
+    screenObj.zScore.waStatus = 'redZoneZscore';
+  } else {
+    if (screenObj.zScore.wa < -1 && screenObj.zScore.wa > -2) {
+      screenObj.zScore.waStatus = 'marginalZscore';
+    }
+  }
+  if (screenObj.zScore.wl < -3) {
+    screenObj.zScore.wlStatus = 'dangerZscore';
+  } else {
+    if (screenObj.zScore.wl < -2 && screenObj.zScore.wl > -3) {
+      screenObj.zScore.wlStatus = 'redZoneZscore';
+    } else {
+      if (screenObj.zScore.wl < -1 && screenObj.zScore.wl > -2) {
+        screenObj.zScore.wlStatus = 'marginalZscore';
+      }
+    }
+  }
+  return(screenObj);
+}
 
- // });
+function saveTheObjects(dataBase, childInfo, screeningInfo) {
+  return new Promise(function (resolve, reject) {
+    var stakeDb = require('nano')('https://' + process.env.SYNC_ENTITY + '@' + process.env.COUCH_URL + '/' + dataBase);
+    childInfo._id = 'chld_' + dataBase + '_' + moment.now();
+    stakeDb.insert(childInfo, function (err, childResponse) {
+      if (err) {
+        console.log(err.message);
+        reject(err);
+      } else {
+        var statusInfo = calculateStatus(screeningInfo);
+        statusInfo.screeningObj._id = 'scr_' + dataBase + '_' + moment.now();
+        statusInfo.screeningObj.owner = childResponse.id;
+        stakeDb.insert(statusInfo.screeningObj, function (err, scrResponse) {
+          if (err) {
+            console.log(err.message);
+            reject(err);
+          } else {
+            childInfo.lastScreening = scrResponse.id;
+            childInfo._rev = childResponse.rev;
+            childInfo.zscoreStatus = statusInfo.zscoreStatus;
+            childInfo.statusColor = statusColor(statusInfo.zscoreStatus);
+            stakeDb.insert(childInfo, function (err, response) {
+              if (err) {
+                console.log(err.message);
+                reject(err);
+              } else {
+                resolve('update complete');
+              }
+            });
+          }
+        });
+      }
+    });
+  });
+}
+
+function toTheDatabase(dataBase, childObj, screenObj) {
+  return new Promise(function(resolve, reject) {
+    var childInfoObj = {};
+    var newScreenObj = {zScore: { ha:'',haStatus:'', wa:'',waStatus:'', wl:'', wlStatus:''}};
+    childInfoObj.monthAge = childObj.monthAge;
+    childInfoObj.birthDate = childObj.birthDate;
+    childInfoObj.gender = childObj.gender;
+    childInfoObj.firstName = childObj.firstName;
+    childInfoObj.lastName = childObj.lastName;
+    childInfoObj.mother = childObj.mother;
+    childInfoObj.father = childObj.father;
+    childInfoObj.city = childObj.city;
+    childInfoObj.ward = childObj.ward;
+    childInfoObj.phone = childObj.phone;
+    childInfoObj.lds = childObj.lds;
+    childInfoObj.lastScreening = childObj.lastScreening;
+    newScreenObj.surveyDate = screenObj.surveyDate;
+    newScreenObj.zScore.ha = screenObj.zScore.ha;
+    newScreenObj.zScore.haStatus = screenObj.zScore.haStatus;
+    newScreenObj.zScore.wa = screenObj.zScore.wa;
+    newScreenObj.zScore.waStatus = screenObj.zScore.waStatus;
+    newScreenObj.zScore.wlStatus = screenObj.zScore.wlStatus;
+    newScreenObj.zScore.wl = screenObj.zScore.wl;
+    newScreenObj.gender = screenObj.gender;
+    newScreenObj.weight = screenObj.weight;
+    newScreenObj.height = screenObj.height;
+    newScreenObj.monthAge = screenObj.monthAge;
+    resolve(saveTheObjects(dataBase, childInfoObj, newScreenObj));
+  });
+}
+
+function calculateStatus(screeningObj) {
+    var zscoreStatus = '';
+    if (screeningObj.zScore.wl < -2) {
+      zscoreStatus = 'Acute: supplements required';
+    } else if ((screeningObj.zScore.ha < -2 || screeningObj.zScore.wa < -2) && screeningObj.age > 6 && screeningObj.age < 36) {
+      zscoreStatus = 'Acute: supplements required';
+    } else if ((screeningObj.zScore.ha < -2 || screeningObj.zScore.wa < -2) && screeningObj.age > 36 && screeningObj.age < 48) {
+      zscoreStatus = 'Micro nutrients required';
+    } else if (screeningObj.zScore.ha < -1 ||
+        screeningObj.zScore.wa < -1 ||
+        screeningObj.zScore.wl < -1) {
+      zscoreStatus = 'At Risk: Come to next screening';
+    } else {
+      zscoreStatus = 'Normal';
+    }
+    return({ screeningObj: screeningObj, zscoreStatus: zscoreStatus });
+}
+
+function statusColor(status) {
+  if (status.indexOf('Acute') > -1) {
+    return 'redZoneZscore';
+  } else if (status.indexOf('Micro') > -1) {
+    return 'redZoneZscore';
+  } else if (status.indexOf('Risk') > -1) {
+    return 'marginalZscore';
+  } else {
+    return 'normalZscore';
+  }
+}
+
+function buildObject(input) {
+  return new Promise(function(resolve, reject) {
+    var i = 0;
+    var k = 0;
+    var columnData = input.results;
+    var colIndexes = Object.keys(columnData.data[0]);
+    var firstNameIndex = 0;
+    var lastNameIndex = 0;
+    var birthDateIndex = 0;
+    var motherIndex = 0;
+    var fatherIndex = 0;
+    var addressIndex = 0;
+    var idGroupIndex = 0;
+    var cityIndex = 0;
+    var wardIndex = 0;
+    var phoneIndex = 0;
+    var monthAgeIndex = 0;
+    var genderIndex = 0;
+    var weightIndex = 0;
+    var heightIndex = 0;
+    var haIndex = 0;
+    var waIndex = 0;
+    var whIndex = 0;
+    var ldsIndex = 0;
+    var surveyDateIndex = 0;
+    var statusIndex = 0;
+
+    for (i = 1; i < columnData.data[0].length; i++) {
+      if (~columnData.data[0][i].indexOf('firstName')) {
+        firstNameIndex = i;
+      } else if (~columnData.data[0][i].indexOf('lastName')) {
+        lastNameIndex = i;
+      } else if (~columnData.data[0][i].indexOf('mother')) {
+        motherIndex = i;
+      } else if (~columnData.data[0][i].indexOf('father')) {
+        fatherIndex = i;
+      } else if (~columnData.data[0][i].indexOf('birthdate')) {
+        birthDateIndex = i;
+      } else if (~columnData.data[0][i].indexOf('address')) {
+        addressIndex = i;
+      } else if (~columnData.data[0][i].indexOf('city')) {
+        cityIndex = i;
+      } else if (~columnData.data[0][i].indexOf('ward')) {
+        wardIndex = i;
+      } else if (~columnData.data[0][i].indexOf('phone')) {
+        phoneIndex = i;
+      } else if (~columnData.data[0][i].indexOf('age')) {
+        monthAgeIndex = i;
+      } else if (~columnData.data[0][i].indexOf('gender')) {
+        genderIndex = i;
+      } else if (~columnData.data[0][i].indexOf('weight')) {
+        weightIndex = i;
+      } else if (~columnData.data[0][i].indexOf('height')) {
+        heightIndex = i;
+      } else if (~columnData.data[0][i].indexOf('ha')) {
+        haIndex = i;
+      } else if (~columnData.data[0][i].indexOf('wa')) {
+        waIndex = i;
+      } else if (~columnData.data[0][i].indexOf('wh')) {
+        whIndex = i;
+      } else if (~columnData.data[0][i].indexOf('lds')) {
+        ldsIndex = i;
+      } else if (~columnData.data[0][i].indexOf('screenDate')) {
+        surveyDateIndex = i;
+      } else if (~columnData.data[0][i].indexOf('idGroup')) {
+        idGroupIndex = i;
+      } else if (~columnData.data[0][i].indexOf('status')) {
+        statusIndex = i;
+      }else {
+        console.log(columnData.data[0][i]);
+      }
+    }
+
+    var childObj = {};
+    var screenObj = {zScore: { ha:'',haStatus:'', wa:'',waStatus:'', wl:'', wlStatus:''}};
+    var dataBaseObj = [];
+    var j;
+    // for (j = 0; j < columnData.data.length; j++) {
+      columnData.data.forEach(function(row){
+        if(row[genderIndex].indexOf('gender') > -1) {
+          console.log('Column titles');
+        } else {
+          childObj.birthDate = row[birthDateIndex];
+          childObj.firstName = row[firstNameIndex];
+          childObj.lastName = row[lastNameIndex];
+          childObj.mother = motherIndex !== 0 ? row[motherIndex] : undefined;
+          childObj.father = fatherIndex !== 0 ? row[fatherIndex] : undefined;
+          childObj.address = addressIndex !== 0 ? row[addressIndex] : undefined;
+          childObj.city = cityIndex !== 0 ? row[cityIndex] : undefined;
+          childObj.ward = wardIndex !== 0 ? row[wardIndex] : undefined;
+          childObj.phone = phoneIndex !== 0 ? row[phoneIndex] : undefined;
+          childObj.monthAge = row[monthAgeIndex];
+          childObj.gender = row[genderIndex];
+          childObj.lds = row[ldsIndex];
+          screenObj.surveyDate = row[surveyDateIndex];
+          screenObj.monthAge = row[monthAgeIndex];
+          screenObj.gender = row[genderIndex];
+          screenObj.weight = row[weightIndex];
+          screenObj.height = row[heightIndex];
+          screenObj.zScore.ha = row[haIndex];
+          screenObj.zScore.wa = row[waIndex];
+          screenObj.zScore.wl = row[whIndex];
+          dataBaseObj.push (toTheDatabase (input.dataBase, childObj, gradeZScores (screenObj)));
+        }
+      });
+    // }
+    resolve(dataBaseObj).each();
+  });
+}
+
+function processResults(results) {
+  return new Promise(function(resolve, reject) {
+    resolve(buildObject(results));
+  });
 }
 
 exports.uploadCsv = function (req, res) {
-  // var user = req.user;
+  function returnOk(){
+    return (res.status(200).send({ message: 'update complete' }));
+  }
   var upload = csvloader(config.uploads.csvUpload).single('newUploadCsv');
   var csvUploadFileFilter = require(path.resolve('./config/lib/csvloader.js')).csvUploadFileFilter;
 
@@ -332,21 +545,12 @@ exports.uploadCsv = function (req, res) {
       });
     } else {
       // parse csv
-      // parseCsv(res.req.file.path);
-      // csvParse.parseFiles(res.req.file.path, { header: true, dynamicTyping: true, complete: function(results, file) {
-      //   var input = results;
-      return (res.status(200).send({ message: 'update complete' }));
+      parseCsv(res.req.file.path, function(parsedData) {
+        processResults({ dataBase: req.params.stakeDB, results: parsedData })
+          .then(returnOk);
+      });
     }
   });
-     // });
-          // .then(res.status(200).send({ message: 'update complete' }));
-
-      // locate a child (gender, first name, last name, age +- 1 month, mother
-      // and populate db with new screening and possibly new child
-  // console.log('the file ' + res.req.file.originalname + ' is saved as ' + res.req.file.path);
-
-//    }
-//  });
 };
 
 exports.listDbs = function(req, res) {

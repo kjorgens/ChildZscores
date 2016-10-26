@@ -16,10 +16,10 @@
     var vm = this;
     vm.user = Authentication.user;
     vm.uploadExcelCsv = uploadExcelCsv;
-
+    vm.cancelUpload = cancelUpload;
     // Create file uploader instance
     vm.uploader = new FileUploader({
-      url: 'api/children/upload',
+      url: 'api/children/upload/' + $stateParams.stakeDB,
       alias: 'newUploadCsv',
       headers: {
         Authorization: 'JWT ' + Authentication.token
@@ -33,10 +33,12 @@
         return '|csv|'.indexOf(type) !== -1;
       }
     });
-    // Called after the user selected a new picture file
-    function onAfterAddingFile(fileItem) {
+    // Called after the user selected a new file
+    vm.uploader.onAfterAddingFile = function(fileItem) {
+      vm.fileToUpload = vm.uploader.queue[0].file.name;
       if ($window.FileReader) {
         var fileReader = new FileReader();
+
         fileReader.readAsDataURL(fileItem._file);
 
         fileReader.onload = function (fileReaderEvent) {
@@ -47,8 +49,8 @@
       }
     }
 
-    // Called after the user has successfully uploaded a new picture
-    function onSuccessItem(fileItem, response, status, headers) {
+    // Called after the user has successfully uploaded
+    vm.uploader.onSuccessItem = function(fileItem, response, status, headers) {
       // Show success message
       vm.success = true;
 
@@ -58,9 +60,12 @@
       // Clear upload buttons
       cancelUpload();
     }
+    vm.uploader.onCancelItem = function(fileItem, response, status, headers) {
+      console.info('onCancelItem', fileItem, response, status, headers);
+    };
 
     // Called after the user has failed to uploaded a new picture
-    function onErrorItem(fileItem, response, status, headers) {
+    vm.uploader.onErrorItem = function(fileItem, response, status, headers) {
       // Clear upload buttons
       cancelUpload();
 
@@ -74,6 +79,7 @@
       vm.success = vm.error = null;
 
       // Start upload
+
       vm.uploader.uploadAll();
     }
 
@@ -143,12 +149,15 @@
       vm.repUpStats = input;
       console.log(JSON.stringify(input));
       vm.repUpData = input;
+      PouchService.newSyncFrom('https://' + vm.syncStuff.entity + '@' +
+          vm.syncStuff.url + '/' + vm.stakeDB, replicateDown, replicateErrorDown);
     }
 
     function replicateDown (input) {
       vm.repDownStats = input;
       console.log(JSON.stringify(input));
       vm.repDownData = input;
+      whenDoneDown();
     }
 
     function replicateErrorUp(err) {
@@ -174,7 +183,7 @@
         vm.syncStuff = input;
         console.log('Ready to sync https://' + vm.syncStuff.url + '/' + vm.stakeDB);
         PouchService.newSyncTo('https://' + vm.syncStuff.entity + '@' +
-          vm.syncStuff.url + '/' + vm.stakeDB, replicateUp, replicateErrorUp, whenDoneUp);
+          vm.syncStuff.url + '/' + vm.stakeDB, replicateUp, replicateErrorUp);
       });
     }
 
@@ -189,8 +198,10 @@
 
     function getCsvError(error) {
       vm.stopSpin();
-      console.log(error);
-      vm.reportError('Download csv error', error.data.error.message, error.data.error.name.indexOf('Empty database') < 0);
+      console.log(error.data.message);
+      vm.reportError('CSV creation error', error.data.name + ' >>> ' + error.data.message, true);
+//      return ModalService.infoModal('some dumb error' + ' :\n', error + (notifyKarl ? '\n Please contact kjorgens@yahoo.com' : ''));
+//      vm.reportError('Download csv error', error.data.error.message, error.data.error.name.indexOf('Empty database') < 0);
     }
     function createReport(filter, sortField) {
       vm.startSpin();

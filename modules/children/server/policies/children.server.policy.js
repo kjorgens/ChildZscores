@@ -27,8 +27,11 @@ exports.invokeRolesPolicies = function () {
       resources: '/remoteDBList',
       permissions: '*'
     }, {
-      resources: '/upload',
+      resources: '/upload/:stakeDB',
       permissions: '*'
+    }, {
+      resources: '/stakes',
+      permissions: ['get']
     }, {
       resources: '/report/:stakeDB/:filter/:sortField',
       permissions: ['*']
@@ -81,8 +84,8 @@ exports.invokeRolesPolicies = function () {
       resources: '/remoteDBlist',
       permissions: '*'
     }, {
-      resources: '/upload',
-      permissions: ['post', 'get']
+      resources: '/stakes',
+      permissions: ['get']
     }, {
       resources: '/:childId',
       permissions: ['get']

@@ -22,6 +22,7 @@
   "dependencies": {
     "acl": "~0.4.9",
     "async": "~1.5.2",
+    "babyparse": "~0.4.6",
     "bluebird": "~3.3.5",
     "body-parser": "~1.15.0",
     "bower": "~1.7.7",
@@ -101,7 +102,7 @@
     "gulp-autoprefixer": "~3.1.0",
     "gulp-concat": "~2.6.0",
     "gulp-coverage": "~0.3.38",
-    "gulp-csslint": "~0.2.0",
+    "gulp-csslint": "^0.2.2",
     "gulp-csso": "~1.1.0",
     "gulp-eslint": "~2.0.0",
     "gulp-exit": "~0.0.2",
@@ -139,6 +140,7 @@
     "wdio-junit-reporter": "^0.1.0",
     "wdio-mocha-framework": "^0.4.2",
     "wdio-phantomjs-service": "^0.1.0",
+    "webdriverio": "~4.2.15",
     "yargs": "~3.32.0"
   }
 }

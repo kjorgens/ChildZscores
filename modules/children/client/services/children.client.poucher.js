@@ -20,16 +20,16 @@
     ];
     factory.createDatabase = function (dbName) {
       currentDbName = dbName;
-      database = new pouchDB(dbName);
+      database = pouchDB(dbName);
       factory.ddocFilter();
     };
 
     factory.createCountryDatabase = function () {
-      countryDataBase = new pouchDB('country_list');
+      countryDataBase = pouchDB('country_list');
     };
 
     factory.destroyDatabase = function (dbName) {
-      database = new pouchDB(dbName);
+      database = pouchDB(dbName);
       database.destroy();
     };
 
@@ -432,7 +432,7 @@
           .then(updateChildRecord)
           .then(callBack).catch(function(err) {
             console.log(err);
-      });
+          });
     };
 
     factory.insert = function (childInfo, callback, errorCallback) {
@@ -472,36 +472,44 @@
           });
     };
 
-    factory.newSyncTo = function(upStreamDb, callback, errorCallback, nextState) {
-      database.replicate.to(upStreamDb, { filter: 'filter_ddocs/ddocs' }).$promise
-          .then(function (response) {
-            // Do something with the response
-            callback(response);
-          })
-          .catch(function (error) {
-            // Do something with the error
-            errorCallback(error);
-          })
-          .finally(function () {
-            nextState();
-            // Do something when everything is done
-          });
+    factory.newSyncTo = function(upStreamDb, callback, errorCallback) {
+      database.replicate.to(upStreamDb, { filter: 'filter_ddocs/ddocs' })
+        .on('change', function (info) {
+          console.log('change sync up');
+        }).on('paused', function (err) {
+          console.log('sync up paused');
+        // replication paused (e.g. replication up to date, user went offline)
+        }).on('active', function () {
+        // replicate resumed (e.g. new changes replicating, user went back online)
+        }).on('denied', function (err) {
+          console.log('failure to replicate on sync up');
+        // a document failed to replicate (e.g. due to permissions)
+        }).on('complete', function (response) {
+          console.log('sync up complete');
+          callback(response);
+        }).on('error', function (err) {
+          errorCallback(err);
+        });
     };
 
-    factory.newSyncFrom = function(upStreamDb, callback, errorCallback, nextState) {
-      database.replicate.from(upStreamDb, { filter: 'filter_ddocs/ddocs' }).$promise
-          .then(function (response) {
-            // Do something with the response
-            callback(response);
-          })
-          .catch(function (error) {
-            // Do something with the error
-            errorCallback(error);
-          })
-          .finally(function () {
-            nextState();
-            // Do something when everything is done
-          });
+    factory.newSyncFrom = function(upStreamDb, callback, errorCallback) {
+      database.replicate.from(upStreamDb, { filter: 'filter_ddocs/ddocs' })
+        .on('change', function (info) {
+          console.log('change sync up');
+        }).on('paused', function (err) {
+          console.log('sync down paused');
+        // replication paused (e.g. replication up to date, user went offline)
+        }).on('active', function () {
+        // replicate resumed (e.g. new changes replicating, user went back online)
+        }).on('denied', function (err) {
+          console.log('failure to replicate on sync down');
+        // a document failed to replicate (e.g. due to permissions)
+        }).on('complete', function (response) {
+          console.log('sync down complete');
+          callback(response);
+        }).on('error', function (err) {
+          errorCallback(err);
+        });
     };
 
     factory.sync = function (upStreamDb, callback, errorCallback, nextState) {

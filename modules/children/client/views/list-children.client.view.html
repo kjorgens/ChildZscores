@@ -5,7 +5,8 @@
                 <!--<img src={{vm.selectedCountryImage}}>-->
                 <h4>
                     <span><a ui-sref="children.stake({country: vm.selectedCountry})">{{vm.selectedCountry}} <i
-                            class="glyphicon glyphicon-list"></i></a></span>
+                            class="glyphicon glyphicon-list"></i>  {{vm.selectedStake}}</a></span>
+
                 </h4>
                 <h4>
                     <div ng-if="vm.onLine">
@@ -44,8 +45,8 @@
 
                     <!--</div>-->
                 </h4>
-                <h3>
-                    <a ui-sref="children.create({ward:vm.selectedWard.wardName})">{{'ADD_NEW_CHILD' | translate}} <i class="glyphicon glyphicon-plus"></i></a>
+                <h3 >
+                   <a id="addChild" ui-sref="children.create({ward:vm.selectedWard.wardName})">{{'ADD_NEW_CHILD' | translate}} <i class="glyphicon glyphicon-plus"></i></a>
                 </h3>
             </div>
         </div>
@@ -81,10 +82,10 @@
                 </h4>
                  {{child.gender === 'Boy' ? ('TXT_MALE' | translate) : ('TXT_FEMALE' | translate)}}, {{'BORN' | translate}}
                 <span ng-bind="child.birthDate | date:'mediumDate'"></span>,
-                {{'RECORD_CREATED' | translate}}:
-                <span ng-bind="child.created | date:'mediumDate'"></span>
-                {{'BY' | translate}}
-                <span ng-bind="child.interviewer"></span>
+                <!--{{'RECORD_CREATED' | translate}}:-->
+                <!--<span ng-bind="child.created | date:'mediumDate'"></span>-->
+                <!--{{'BY' | translate}}-->
+                <!--<span ng-bind="child.interviewer"></span>-->
             </small>
         </a>
     </div>

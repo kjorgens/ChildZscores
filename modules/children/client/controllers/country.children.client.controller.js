@@ -27,7 +27,7 @@
     }
 
     function handleError(input) {
-      console.log(input + ' attempt to retrieve info remote');
+      console.log(input + " attempt to retrieve info remote");
       getStakesDB();
       vm.stopSpin();
     }
