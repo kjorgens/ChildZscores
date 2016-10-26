@@ -133,6 +133,11 @@
       vm.spinneractive = false;
     });
 
+    function whenDoneUp() {
+      PouchService.newSyncFrom('https://' + vm.syncStuff.entity + '@' +
+          vm.syncStuff.url + '/' + vm.stakeDB, replicateDown, replicateErrorDown, whenDoneDown);
+    }
+
     function whenDoneDown() {
       find();
       vm.stopSpin();
