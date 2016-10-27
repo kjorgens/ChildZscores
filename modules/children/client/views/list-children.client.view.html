@@ -81,9 +81,9 @@
                           {{'NORMAL_ZSCORE' | translate}} </span>
                 </h4>
                  {{child.gender === 'Boy' ? ('TXT_MALE' | translate) : ('TXT_FEMALE' | translate)}}, {{'BORN' | translate}}
-                <span ng-bind="child.birthDate | date:'mediumDate'"></span>,
-                <!--{{'RECORD_CREATED' | translate}}:-->
-                <!--<span ng-bind="child.created | date:'mediumDate'"></span>-->
+                <span ng-bind="child.birthDate | date:'mediumDate'"></span>
+                <!--{{'SCREENING_DATE' | translate}}:-->
+                <!--<span ng-bind="child.surveyDate | date:'mediumDate'"></span>-->
                 <!--{{'BY' | translate}}-->
                 <!--<span ng-bind="child.interviewer"></span>-->
             </small>

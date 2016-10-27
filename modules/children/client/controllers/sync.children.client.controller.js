@@ -47,7 +47,7 @@
           }, 0);
         };
       }
-    }
+    };
 
     // Called after the user has successfully uploaded
     vm.uploader.onSuccessItem = function(fileItem, response, status, headers) {
@@ -55,15 +55,20 @@
       vm.success = true;
 
       // Populate user object
-      vm.user = Authentication.user = response;
+//      vm.user = Authentication.user = response;
 
       // Clear upload buttons
       cancelUpload();
+ //     vm.syncUpstream();
     }
     vm.uploader.onCancelItem = function(fileItem, response, status, headers) {
       console.info('onCancelItem', fileItem, response, status, headers);
     };
 
+    vm.uploader.onCompleteItem = function(fileItem, response, status, headers) {
+      console.info('onComplete', fileItem, response, status, headers);
+      vm.syncUpstream();
+    };
     // Called after the user has failed to uploaded a new picture
     vm.uploader.onErrorItem = function(fileItem, response, status, headers) {
       // Clear upload buttons
@@ -86,11 +91,8 @@
     // Cancel the upload process
     function cancelUpload() {
       vm.uploader.clearQueue();
-      vm.imageURL = vm.user.profileImageURL;
     }
-    // ChildrenGetSync.get(function(input) {
-    //   vm.syncStuff = input;
-    // });
+
     vm.reportToDownload = '';
     vm.reportName = $stateParams.stakeDB + '.csv';
     vm.reportReady = false;

@@ -489,35 +489,29 @@ function buildObject(input) {
     var screenObj = {zScore: { ha:'',haStatus:'', wa:'',waStatus:'', wl:'', wlStatus:''}};
     var dataBaseObj = [];
     var j;
-    // for (j = 0; j < columnData.data.length; j++) {
-      columnData.data.forEach(function(row){
-        if(row[genderIndex].indexOf('gender') > -1) {
-          console.log('Column titles');
-        } else {
-          childObj.birthDate = row[birthDateIndex];
-          childObj.firstName = row[firstNameIndex];
-          childObj.lastName = row[lastNameIndex];
-          childObj.mother = motherIndex !== 0 ? row[motherIndex] : undefined;
-          childObj.father = fatherIndex !== 0 ? row[fatherIndex] : undefined;
-          childObj.address = addressIndex !== 0 ? row[addressIndex] : undefined;
-          childObj.city = cityIndex !== 0 ? row[cityIndex] : undefined;
-          childObj.ward = wardIndex !== 0 ? row[wardIndex] : undefined;
-          childObj.phone = phoneIndex !== 0 ? row[phoneIndex] : undefined;
-          childObj.monthAge = row[monthAgeIndex];
-          childObj.gender = row[genderIndex];
-          childObj.lds = row[ldsIndex];
-          screenObj.surveyDate = row[surveyDateIndex];
-          screenObj.monthAge = row[monthAgeIndex];
-          screenObj.gender = row[genderIndex];
-          screenObj.weight = row[weightIndex];
-          screenObj.height = row[heightIndex];
-          screenObj.zScore.ha = row[haIndex];
-          screenObj.zScore.wa = row[waIndex];
-          screenObj.zScore.wl = row[whIndex];
+    for (j = 1; j < columnData.data.length; j++) {
+          childObj.birthDate = columnData.data[j][birthDateIndex];
+          childObj.firstName = columnData.data[j][firstNameIndex];
+          childObj.lastName = columnData.data[j][lastNameIndex];
+          childObj.mother = motherIndex !== 0 ? columnData.data[j][motherIndex] : undefined;
+          childObj.father = fatherIndex !== 0 ? columnData.data[j][fatherIndex] : undefined;
+          childObj.address = addressIndex !== 0 ? columnData.data[j][addressIndex] : undefined;
+          childObj.city = cityIndex !== 0 ? columnData.data[j][cityIndex] : undefined;
+          childObj.ward = wardIndex !== 0 ? columnData.data[j][wardIndex] : undefined;
+          childObj.phone = phoneIndex !== 0 ? columnData.data[j][phoneIndex] : undefined;
+          childObj.monthAge = columnData.data[j][monthAgeIndex];
+          childObj.gender = columnData.data[j][genderIndex];
+          childObj.lds = columnData.data[j][ldsIndex];
+          screenObj.surveyDate = columnData.data[j][surveyDateIndex];
+          screenObj.monthAge = columnData.data[j][monthAgeIndex];
+          screenObj.gender = columnData.data[j][genderIndex];
+          screenObj.weight = columnData.data[j][weightIndex];
+          screenObj.height = columnData.data[j][heightIndex];
+          screenObj.zScore.ha = columnData.data[j][haIndex];
+          screenObj.zScore.wa = columnData.data[j][waIndex];
+          screenObj.zScore.wl = columnData.data[j][whIndex];
           dataBaseObj.push (toTheDatabase (input.dataBase, childObj, gradeZScores (screenObj)));
-        }
-      });
-    // }
+    }
     resolve(dataBaseObj).each();
   });
 }
