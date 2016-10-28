@@ -318,14 +318,14 @@ function gradeZScores(screenObj) {
 function saveTheObjects(dataBase, childInfo, screeningInfo) {
   return new Promise(function (resolve, reject) {
     var stakeDb = require('nano')('https://' + process.env.SYNC_ENTITY + '@' + process.env.COUCH_URL + '/' + dataBase);
-    childInfo._id = 'chld_' + dataBase + '_' + moment.now();
+    childInfo._id = 'chld_' + dataBase + '_' + moment();
     stakeDb.insert(childInfo, function (err, childResponse) {
       if (err) {
         console.log(err.message);
         reject(err);
       } else {
         var statusInfo = calculateStatus(screeningInfo);
-        statusInfo.screeningObj._id = 'scr_' + dataBase + '_' + moment.now();
+        statusInfo.screeningObj._id = 'scr_' + dataBase + '_' + moment();
         statusInfo.screeningObj.owner = childResponse.id;
         stakeDb.insert(statusInfo.screeningObj, function (err, scrResponse) {
           if (err) {
@@ -348,37 +348,6 @@ function saveTheObjects(dataBase, childInfo, screeningInfo) {
         });
       }
     });
-  });
-}
-
-function toTheDatabase(dataBase, childObj, screenObj) {
-  return new Promise(function(resolve, reject) {
-    var childInfoObj = {};
-    var newScreenObj = {zScore: { ha:'',haStatus:'', wa:'',waStatus:'', wl:'', wlStatus:''}};
-    childInfoObj.monthAge = childObj.monthAge;
-    childInfoObj.birthDate = childObj.birthDate;
-    childInfoObj.gender = childObj.gender;
-    childInfoObj.firstName = childObj.firstName;
-    childInfoObj.lastName = childObj.lastName;
-    childInfoObj.mother = childObj.mother;
-    childInfoObj.father = childObj.father;
-    childInfoObj.city = childObj.city;
-    childInfoObj.ward = childObj.ward;
-    childInfoObj.phone = childObj.phone;
-    childInfoObj.lds = childObj.lds;
-    childInfoObj.lastScreening = childObj.lastScreening;
-    newScreenObj.surveyDate = screenObj.surveyDate;
-    newScreenObj.zScore.ha = screenObj.zScore.ha;
-    newScreenObj.zScore.haStatus = screenObj.zScore.haStatus;
-    newScreenObj.zScore.wa = screenObj.zScore.wa;
-    newScreenObj.zScore.waStatus = screenObj.zScore.waStatus;
-    newScreenObj.zScore.wlStatus = screenObj.zScore.wlStatus;
-    newScreenObj.zScore.wl = screenObj.zScore.wl;
-    newScreenObj.gender = screenObj.gender;
-    newScreenObj.weight = screenObj.weight;
-    newScreenObj.height = screenObj.height;
-    newScreenObj.monthAge = screenObj.monthAge;
-    resolve(saveTheObjects(dataBase, childInfoObj, newScreenObj));
   });
 }
 
@@ -485,67 +454,69 @@ function buildObject(input) {
       }
     }
 
-    var childObj = {};
-    var screenObj = {zScore: { ha:'',haStatus:'', wa:'',waStatus:'', wl:'', wlStatus:''}};
     var dataBaseObj = [];
     var j;
-    for (j = 1; j < columnData.data.length; j++) {
-          childObj.birthDate = columnData.data[j][birthDateIndex];
-          childObj.firstName = columnData.data[j][firstNameIndex];
-          childObj.lastName = columnData.data[j][lastNameIndex];
-          childObj.mother = motherIndex !== 0 ? columnData.data[j][motherIndex] : undefined;
-          childObj.father = fatherIndex !== 0 ? columnData.data[j][fatherIndex] : undefined;
-          childObj.address = addressIndex !== 0 ? columnData.data[j][addressIndex] : undefined;
-          childObj.city = cityIndex !== 0 ? columnData.data[j][cityIndex] : undefined;
-          childObj.ward = wardIndex !== 0 ? columnData.data[j][wardIndex] : undefined;
-          childObj.phone = phoneIndex !== 0 ? columnData.data[j][phoneIndex] : undefined;
-          childObj.monthAge = columnData.data[j][monthAgeIndex];
-          childObj.gender = columnData.data[j][genderIndex];
-          childObj.lds = columnData.data[j][ldsIndex];
-          screenObj.surveyDate = columnData.data[j][surveyDateIndex];
-          screenObj.monthAge = columnData.data[j][monthAgeIndex];
-          screenObj.gender = columnData.data[j][genderIndex];
-          screenObj.weight = columnData.data[j][weightIndex];
-          screenObj.height = columnData.data[j][heightIndex];
-          screenObj.zScore.ha = columnData.data[j][haIndex];
-          screenObj.zScore.wa = columnData.data[j][waIndex];
-          screenObj.zScore.wl = columnData.data[j][whIndex];
-          dataBaseObj.push (toTheDatabase (input.dataBase, childObj, gradeZScores (screenObj)));
+    for (j = 1; j < columnData.data.length-1; j++) {
+      var childObj = {};
+      var screenObj = {zScore: { ha:'',haStatus:'', wa:'',waStatus:'', wl:'', wlStatus:''}};
+      childObj.birthDate = columnData.data[j][birthDateIndex];
+      childObj.firstName = columnData.data[j][firstNameIndex];
+      childObj.lastName = columnData.data[j][lastNameIndex];
+      childObj.mother = motherIndex !== 0 ? columnData.data[j][motherIndex] : undefined;
+      childObj.father = fatherIndex !== 0 ? columnData.data[j][fatherIndex] : undefined;
+      childObj.address = addressIndex !== 0 ? columnData.data[j][addressIndex] : undefined;
+      childObj.city = cityIndex !== 0 ? columnData.data[j][cityIndex] : undefined;
+      childObj.ward = wardIndex !== 0 ? columnData.data[j][wardIndex] : undefined;
+      childObj.phone = phoneIndex !== 0 ? columnData.data[j][phoneIndex] : undefined;
+      childObj.monthAge = columnData.data[j][monthAgeIndex];
+      childObj.gender = columnData.data[j][genderIndex];
+      childObj.lds = columnData.data[j][ldsIndex];
+      screenObj.surveyDate = columnData.data[j][surveyDateIndex];
+      screenObj.monthAge = columnData.data[j][monthAgeIndex];
+      screenObj.gender = columnData.data[j][genderIndex];
+      screenObj.weight = columnData.data[j][weightIndex];
+      screenObj.height = columnData.data[j][heightIndex];
+      screenObj.zScore.ha = columnData.data[j][haIndex];
+      screenObj.zScore.wa = columnData.data[j][waIndex];
+      screenObj.zScore.wl = columnData.data[j][whIndex];
+      dataBaseObj.push (saveTheObjects(input.dataBase, childObj, gradeZScores(screenObj)));
     }
     resolve(dataBaseObj).each();
   });
 }
 
-function processResults(results) {
-  return new Promise(function(resolve, reject) {
-    resolve(buildObject(results));
-  });
-}
-
 exports.uploadCsv = function (req, res) {
-  function returnOk(){
-    return (res.status(200).send({ message: 'update complete' }));
+  function returnOk() {
+    return (res.status (200).send ({message: 'update complete'}));
   }
-  var upload = csvloader(config.uploads.csvUpload).single('newUploadCsv');
-  var csvUploadFileFilter = require(path.resolve('./config/lib/csvloader.js')).csvUploadFileFilter;
+
+  var upload = csvloader (config.uploads.csvUpload).single ('newUploadCsv');
+  var csvUploadFileFilter = require (path.resolve ('./config/lib/csvloader.js')).csvUploadFileFilter;
 
   // Filtering to upload only images
   upload.fileFilter = csvUploadFileFilter;
 
-  upload(req, res, function (uploadError) {
+  upload (req, res, function (uploadError) {
     if (uploadError) {
-      return res.status(400).send({
+      return res.status (400).send ({
         message: 'Error occurred while uploading csv file'
       });
     } else {
       // parse csv
-      parseCsv(res.req.file.path, function(parsedData) {
-        processResults({ dataBase: req.params.stakeDB, results: parsedData })
-          .then(returnOk);
-      });
+      parseCsv (res.req.file.path, function (parsedData) {
+        buildObject ({dataBase: req.params.stakeDB, results: parsedData})
+            .all ().then (returnOk).catch (function (err) {
+          return res.status (400).send ({
+            message: err.message,
+            name: err.name,
+            stack: err.stack
+          });
+        });
+      })
     }
-  });
+  })
 };
+
 
 exports.listDbs = function(req, res) {
   request.get('https://' + process.env.SYNC_ENTITY + '@' + process.env.COUCH_URL +

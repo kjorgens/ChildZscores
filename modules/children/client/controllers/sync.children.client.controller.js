@@ -58,7 +58,7 @@
 //      vm.user = Authentication.user = response;
 
       // Clear upload buttons
-      cancelUpload();
+ //     cancelUpload();
  //     vm.syncUpstream();
     }
     vm.uploader.onCancelItem = function(fileItem, response, status, headers) {
@@ -67,7 +67,10 @@
 
     vm.uploader.onCompleteItem = function(fileItem, response, status, headers) {
       console.info('onComplete', fileItem, response, status, headers);
-      vm.syncUpstream();
+      vm.onComplete = true;
+      cancelUpload();
+      vm.stopSpin();
+ //     vm.syncUpstream();
     };
     // Called after the user has failed to uploaded a new picture
     vm.uploader.onErrorItem = function(fileItem, response, status, headers) {
@@ -82,9 +85,9 @@
     function uploadExcelCsv() {
       // Clear messages
       vm.success = vm.error = null;
-
+      vm.onComplete = null;
       // Start upload
-
+      vm.startSpin();
       vm.uploader.uploadAll();
     }
 

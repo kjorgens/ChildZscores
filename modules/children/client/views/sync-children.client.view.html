@@ -33,7 +33,7 @@
                 <button class="btn btn-primary" ng-click="vm.uploadExcelCsv();">Upload</button>
                 <button class="btn btn-default" ng-click="vm.cancelUpload();">Cancel</button>
             </div>
-            <div ng-show="vm.success" class="text-center text-success">
+            <div ng-show="vm.complete" class="text-center text-success">
                 <strong>{{cm.fileToUpload}} added to database successfully</strong>
             </div>
             <div ng-show="vm.error" class="text-center text-danger">
