@@ -20,12 +20,11 @@
             </small>
         </a>
     </div>
-    <form class="signin form-horizontal">
+    <form class="signin form-horizontal" ng-show="vm.userIsAdmin">
         <fieldset>
-
             <div class="text-center form-group" ng-hide="vm.uploader.queue.length">
-          <span class="btn btn-default btn-file"><h4          >
-              Upload Excel file, add to database <input type="file" nv-file-select uploader="vm.uploader"></h4>
+          <span class="btn btn-default btn-file">
+              <h4>Upload Excel file, populate database <input type="file" nv-file-select uploader="vm.uploader"></h4>
           </span>
             </div>
             <div class="text-center form-group" ng-show="vm.uploader.queue.length">
@@ -41,7 +40,7 @@
             </div>
         </fieldset>
     </form>
-    <div >
+    <div ng-show="vm.userIsAdmin">
         <a ng-click="vm.deleteLocalDB(vm.stakeDB)">
             <h3><span >Delete local DB {{vm.stakeDB}}</span>
             <i class="glyphicon glyphicon-trash"></i>

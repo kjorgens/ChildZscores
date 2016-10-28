@@ -15,6 +15,12 @@
     Authentication, ChildrenGetSync, usSpinnerService, PouchService, FileUploader, ModalService) {
     var vm = this;
     vm.user = Authentication.user;
+    vm.userIsAdmin = false;
+    vm.user.roles.forEach(function(role){
+      if (role.indexOf('admin') > -1){
+        vm.userIsAdmin = true;
+      }
+    });
     vm.uploadExcelCsv = uploadExcelCsv;
     vm.cancelUpload = cancelUpload;
     // Create file uploader instance
@@ -60,13 +66,19 @@
       // Clear upload buttons
  //     cancelUpload();
  //     vm.syncUpstream();
-    }
+    };
     vm.uploader.onCancelItem = function(fileItem, response, status, headers) {
       console.info('onCancelItem', fileItem, response, status, headers);
     };
 
     vm.uploader.onCompleteItem = function(fileItem, response, status, headers) {
-      console.info('onComplete', fileItem, response, status, headers);
+      if(status !== 200){
+        console.log(status + ' ' + response);
+        vm.reportError('Error uploading to database', response, true);
+      } else {
+        console.log(response);
+      }
+ //     console.info('onComplete', fileItem, response, status, headers);
       vm.onComplete = true;
       cancelUpload();
       vm.stopSpin();

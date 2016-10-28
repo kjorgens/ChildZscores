@@ -13,6 +13,7 @@ var path = require('path'),
   config = require(path.resolve('./config/config')),
   Promise = require('bluebird'),
   errorHandler = require(path.resolve('./modules/core/server/controllers/errors.server.controller'));
+  var errorStack = [];
 
 function getOwnerData(parmObj) {
   return new Promise(function(resolve, reject) {
@@ -318,11 +319,13 @@ function gradeZScores(screenObj) {
 function saveTheObjects(dataBase, childInfo, screeningInfo) {
   return new Promise(function (resolve, reject) {
     var stakeDb = require('nano')('https://' + process.env.SYNC_ENTITY + '@' + process.env.COUCH_URL + '/' + dataBase);
-    childInfo._id = 'chld_' + dataBase + '_' + moment();
+    childInfo._id = 'chld_' + childInfo.firstName + '_' + childInfo.lastName + '_' + dataBase + '_' + moment();
     stakeDb.insert(childInfo, function (err, childResponse) {
       if (err) {
         console.log(err.message);
-        reject(err);
+        errorStack.push(err.message);
+        resolve(err.message);
+//        reject(err);
       } else {
         var statusInfo = calculateStatus(screeningInfo);
         statusInfo.screeningObj._id = 'scr_' + dataBase + '_' + moment();
@@ -330,7 +333,9 @@ function saveTheObjects(dataBase, childInfo, screeningInfo) {
         stakeDb.insert(statusInfo.screeningObj, function (err, scrResponse) {
           if (err) {
             console.log(err.message);
-            reject(err);
+            errorStack.push(err.message);
+            resolve(err.message);
+//            reject(err);
           } else {
             childInfo.lastScreening = scrResponse.id;
             childInfo._rev = childResponse.rev;
@@ -339,7 +344,9 @@ function saveTheObjects(dataBase, childInfo, screeningInfo) {
             stakeDb.insert(childInfo, function (err, response) {
               if (err) {
                 console.log(err.message);
-                reject(err);
+                errorStack.push(err.message);
+                resolve(err.message);
+//                reject(err);
               } else {
                 resolve('update complete');
               }
@@ -471,6 +478,7 @@ function buildObject(input) {
       childObj.monthAge = columnData.data[j][monthAgeIndex];
       childObj.gender = columnData.data[j][genderIndex];
       childObj.lds = columnData.data[j][ldsIndex];
+      childObj.idGroup = columnData.data[j][idGroupIndex];
       screenObj.surveyDate = columnData.data[j][surveyDateIndex];
       screenObj.monthAge = columnData.data[j][monthAgeIndex];
       screenObj.gender = columnData.data[j][genderIndex];
@@ -487,6 +495,9 @@ function buildObject(input) {
 
 exports.uploadCsv = function (req, res) {
   function returnOk() {
+    if(errorStack.length > 0){
+      return (res.status (400).send ({message: errorStack.join()}));
+    }
     return (res.status (200).send ({message: 'update complete'}));
   }
 
