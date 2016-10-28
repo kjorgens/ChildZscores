@@ -328,7 +328,7 @@ function saveTheObjects(dataBase, childInfo, screeningInfo) {
 //        reject(err);
       } else {
         var statusInfo = calculateStatus(screeningInfo);
-        statusInfo.screeningObj._id = 'scr_' + dataBase + '_' + moment();
+        statusInfo.screeningObj._id = 'scr_' + dataBase + '_' + screeningObj.monthAge + '_' + moment();
         statusInfo.screeningObj.owner = childResponse.id;
         stakeDb.insert(statusInfo.screeningObj, function (err, scrResponse) {
           if (err) {
