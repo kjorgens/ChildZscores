@@ -30,6 +30,9 @@ exports.invokeRolesPolicies = function () {
       resources: '/upload/:stakeDB',
       permissions: '*'
     }, {
+      resources: '/updateviews/:stakeDB',
+      permissions: '*'
+    }, {
       resources: '/stakes',
       permissions: ['get']
     }, {

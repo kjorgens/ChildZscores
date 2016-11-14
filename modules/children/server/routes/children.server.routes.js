@@ -31,6 +31,9 @@ module.exports = function (app) {
   router.route('/upload/:stakeDB')
       .post(passport.authenticate('jwt', { session: false }), children.uploadCsv);
 
+  router.route('/updateviews/:stakeDB')
+      .get(passport.authenticate('jwt', { session: false }), children.checkUpdateViews);
+
   router.route('/remoteDBList')
       .get(childrenPolicy.isAllowed, children.listDbs);
 

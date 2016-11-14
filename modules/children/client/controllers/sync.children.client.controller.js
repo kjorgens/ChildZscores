@@ -9,10 +9,10 @@
       .controller('ChildrenSyncController', ChildrenSyncController);
 
   ChildrenSyncController.$inject = ['$rootScope', '$window', '$timeout', '$scope', '$state', '$stateParams', 'ChildrenReport',
-    'Authentication', 'ChildrenGetSync', 'usSpinnerService', 'PouchService', 'FileUploader', 'ModalService'];
+    'Authentication', 'ChildrenGetSync', 'usSpinnerService', 'PouchService', 'FileUploader', 'ModalService', 'ChildrenViews'];
 
   function ChildrenSyncController($rootScope, $window, $timeout, $scope, $state, $stateParams, ChildrenReport,
-    Authentication, ChildrenGetSync, usSpinnerService, PouchService, FileUploader, ModalService) {
+    Authentication, ChildrenGetSync, usSpinnerService, PouchService, FileUploader, ModalService, ChildrenViews) {
     var vm = this;
     vm.user = Authentication.user;
     vm.userIsAdmin = false;
@@ -23,6 +23,7 @@
     });
     vm.uploadExcelCsv = uploadExcelCsv;
     vm.cancelUpload = cancelUpload;
+    // vm.updateViews = updateViews;
     // Create file uploader instance
     vm.uploader = new FileUploader({
       url: 'api/children/upload/' + $stateParams.stakeDB,
@@ -94,14 +95,7 @@
     }
 
     // Change user profile picture
-    function uploadExcelCsv() {
-      // Clear messages
-      vm.success = vm.error = null;
-      vm.onComplete = null;
-      // Start upload
-      vm.startSpin();
-      vm.uploader.uploadAll();
-    }
+
 
     // Cancel the upload process
     function cancelUpload() {
@@ -229,6 +223,24 @@
         sortField = 'lastName';
       }
       ChildrenReport.get({ stakeDB: vm.stakeDB, filter: filter, sortField: sortField }, returnReport, getCsvError);
+    }
+
+    function viewUpdateComplete(){
+      console.log('couch view update complete');
+        // Clear messages
+        vm.success = vm.error = null;
+        vm.onComplete = null;
+        // Start upload
+        vm.uploader.uploadAll();
+     }
+
+    function viewUpdateError(err){
+      console.log('couch view update error');
+    }
+
+    function uploadExcelCsv() {
+      vm.startSpin();
+      ChildrenViews.get({ stakeDB: vm.stakeDB }, viewUpdateComplete, viewUpdateError);
     }
 
     vm.reportError = function (title, error, notifyKarl) {

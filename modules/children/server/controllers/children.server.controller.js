@@ -15,6 +15,108 @@ var path = require('path'),
   errorHandler = require(path.resolve('./modules/core/server/controllers/errors.server.controller'));
   var errorStack = [];
 
+var filterList = [
+  {
+    "_id": "_design/filter_ddocs",
+    "filters": {
+      "ddocs": "function(doc, req) {if(doc._id[0] != '_') {return true} else {return false}  }"
+    }
+  },
+];
+
+var viewList = [
+  {
+    "_id": "_design/children_list",
+    "views": {
+      "screen": {
+        "map": "function(doc){if(doc.firstName){emit(doc)}}"
+      }
+    }
+  },
+  {
+    "_id": "_design/name_search",
+    "views": {
+      "find_by_name": {
+        "map": "function(doc){emit([doc.firstName, doc.lastName], doc)}"
+      }
+    }
+  },
+  {
+    "_id": "_design/scr_list",
+    "views": {
+      "screen": {
+        "map": "function(doc){if(doc.owner){emit(doc)}}"
+      }
+    }
+  },
+  {
+    "_id": "_design/screen_search",
+    "views": {
+      "find_by_owner": {
+        "map": "function(doc){emit([doc.owner, doc.surveyDate], doc)}"
+      }
+    }
+  },
+  {
+    "_id": "_design/zscore_kids",
+    "views": {
+      "screen": {
+        "map": "function(doc){if(doc.zScore.ha < -2 || doc.zScore.wa < -2 || doc.zScore.wl < -2){emit(doc)}}"
+      }
+    }
+  }
+];
+
+function validateView(type, stakeDB, view) {
+  return new Promise(function(resolve,reject) {
+    var stakeDb = require ('nano') ('https://' + process.env.SYNC_ENTITY + '@' + process.env.COUCH_URL + '/' + stakeDB);
+    var viewObject;
+    if(~type.indexOf('view')){
+      viewObject = {_id: view._id, views: view.views};
+    }
+    if(~type.indexOf('filter')){
+      viewObject = {_id: view._id, filters: view.filters};
+    }
+    stakeDb.get(view._id, function(err, body) {
+      if (err) {
+        stakeDb.insert(viewObject, function(err, response) {
+          if (err) {
+            console.log(err.message);
+            reject(err.message);
+          } else {
+            console.log('view ' + view._id + ' created in ' + stakeDB);
+            resolve('view ' + view._id + ' created in ' + stakeDB);
+          }
+        });
+      } else {
+        console.log('view exists or error');
+        resolve(view._id + ' already exists');
+      }
+    })
+  })
+}
+
+exports.checkUpdateViews = function (req, res) {
+  var toCheck = [];
+    viewList.forEach (function (view) {
+      toCheck.push (validateView ('view', req.params.stakeDB, view));
+    });
+    filterList.forEach (function (filter) {
+      toCheck.push (validateView ('filter', req.params.stakeDB, filter));
+    });
+    function returnOk(input) {
+       return (res.status (200).send ({message: input}));
+    }
+    var allViews = Promise.all(toCheck);
+    allViews.then(returnOk).catch (function (err) {
+      return res.status (400).send ({
+        message: err.message,
+        name: err.name,
+        stack: err.stack
+      });
+    });
+};
+
 function getOwnerData(parmObj) {
   return new Promise(function(resolve, reject) {
     var couchURL;
@@ -146,7 +248,7 @@ function addLineToStack(parmObj) {
     }
     var dataObj = {
       childId: parmObj.ownerInfo._id,
-      gender: parmObj.screenInfo.gender,
+      gender: parmObj.screenInfo.gender[0].toUpperCase() + parmObj.screenInfo.gender[1],
       firstName: parmObj.ownerInfo.firstName,
       lastName: parmObj.ownerInfo.lastName,
       birthDate: parmObj.ownerInfo.birthDate,
@@ -245,35 +347,6 @@ exports.getCountryList = function(req, res) {
   });
 };
 
-function infoToCouch (dataBase, record) {
-  return new Promise(function(resolve, reject) {
-    var stakeDb = require('nano')('https://' + process.env.SYNC_ENTITY + '@' + process.env.COUCH_URL + dataBase);
-    stakeDb.insert({ _id: 'scr_' + dataBase + '_' + moment.now() }, function(err, response) {
-      if (err) {
-        console.log(err.message);
-        reject(err.message);
-      } else {
-        stakeDb.insert({ _id: 'chld_' }, function(err, response) {
-          if (err) {
-            console.log(err.message);
-            reject(err.message);
-          } else {
-            console.log('child record saved');
-          }
-        });
-        console.log('screening added to ' + dataBase);
-        resolve('created');
-      }
-    });
-  });
-}
-
-// function locateOwner(data) {
-//   return new Promise(function(resolve, reject) {
-//     var stakeDb = require('nano')('https://' + process.env.SYNC_ENTITY + '@' + process.env.COUCH_URL + dataBase);
-//   });
-// }
-
 function parseCsv(input, cb) {
   fs.rename(input, input + '.csv', function(err) {
     if (err) {
@@ -316,46 +389,83 @@ function gradeZScores(screenObj) {
   return(screenObj);
 }
 
-function saveTheObjects(dataBase, childInfo, screeningInfo) {
-  return new Promise(function (resolve, reject) {
+function saveScreening(dataBase, childInfo, screeningInfo) {
+  return new Promise(function(resolve,reject){
+    var statusInfo = calculateStatus(screeningInfo);
     var stakeDb = require('nano')('https://' + process.env.SYNC_ENTITY + '@' + process.env.COUCH_URL + '/' + dataBase);
-    childInfo._id = 'chld_' + childInfo.firstName + '_' + childInfo.lastName + '_' + dataBase + '_' + moment();
-    stakeDb.insert(childInfo, function (err, childResponse) {
+    // screeningInfo._id = 'scr_' + childInfo.firstName.replace(' ','_') + '_' + dataBase + '_' + moment();
+    screeningInfo._id = 'scr_' + '_' + dataBase + '_' + moment();
+    screeningInfo.owner = childInfo._id;
+    stakeDb.insert(screeningInfo, function (err, scrResponse) {
       if (err) {
-        console.log(err.message);
-        errorStack.push(err.message);
-        resolve(err.message);
-//        reject(err);
-      } else {
-        var statusInfo = calculateStatus(screeningInfo);
-        statusInfo.screeningObj._id = 'scr_' + dataBase + '_' + screeningObj.monthAge + '_' + moment();
-        statusInfo.screeningObj.owner = childResponse.id;
-        stakeDb.insert(statusInfo.screeningObj, function (err, scrResponse) {
-          if (err) {
-            console.log(err.message);
-            errorStack.push(err.message);
-            resolve(err.message);
+        console.log (err.message);
+        errorStack.push (screeningObj.owner);
+        errorStack.push (err.message);
+        resolve (err.message);
 //            reject(err);
-          } else {
-            childInfo.lastScreening = scrResponse.id;
-            childInfo._rev = childResponse.rev;
-            childInfo.zscoreStatus = statusInfo.zscoreStatus;
-            childInfo.statusColor = statusColor(statusInfo.zscoreStatus);
-            stakeDb.insert(childInfo, function (err, response) {
-              if (err) {
-                console.log(err.message);
-                errorStack.push(err.message);
-                resolve(err.message);
-//                reject(err);
-              } else {
-                resolve('update complete');
-              }
-            });
-          }
-        });
+      } else {
+        childInfo.lastScreening = childInfo._id;
+        childInfo._rev = childInfo._rev;
+        childInfo.zscoreStatus = statusInfo.zscoreStatus;
+        childInfo.statusColor = statusColor (statusInfo.zscoreStatus);
+        resolve (updateChildObject (dataBase, childInfo));
       }
-    });
+    })
+  })
+}
+
+function updateChildObject(dataBase, childInfo) {
+  return new Promise(function (resolve,reject){
+    var stakeDb = require('nano')('https://' + process.env.SYNC_ENTITY + '@' + process.env.COUCH_URL + '/' + dataBase);
+    stakeDb.insert (childInfo, function (err, childResponse) {
+      if (err) {
+        console.log (err.message);
+        errorStack.push ('updating ' + childInfo.firstName + ' ' + childInfo.lastName);
+        errorStack.push (err.message);
+        resolve (err.message);
+//      reject(err);
+      } else {
+        if (childResponse.ok) {
+          resolve('update complete');
+        } else {
+          console.log (err.message);
+          errorStack.push (childInfo.firstName + ' ' + childInfo.lastName);
+          errorStack.push (err.message);
+          resolve (err.message);
+        }
+      }
+    })
   });
+}
+
+function saveTheObjects(dataBase, childInfo, screeningInfo) {
+  return new Promise(function (resolve,reject){
+    var stakeDb = require('nano')('https://' + process.env.SYNC_ENTITY + '@' + process.env.COUCH_URL + '/' + dataBase);
+ //   childInfo._id = 'chld_' + childInfo.firstName.replace(' ','_') + '_' + dataBase + '_' + moment ();
+    childInfo._id = 'chld_' + dataBase + '_' + moment ();
+    stakeDb.insert (childInfo, function (err, childResponse) {
+      if (err) {
+        console.log (err.message);
+        errorStack.push (childInfo.firstName + ' ' + childInfo.lastName);
+        errorStack.push (err.message);
+        resolve (err.message);
+//      reject(err);
+      } else {
+       if (childResponse.ok) {
+          var childObj = {};
+          childObj = childInfo;
+          childObj._rev = childResponse.rev;
+          // existingChildren.push (childObj);
+          resolve(isScreeningDuplicate(dataBase, childObj, screeningInfo));
+        } else {
+          console.log (err.message);
+          errorStack.push (childInfo.firstName + ' ' + childInfo.lastName);
+          errorStack.push (err.message);
+          resolve (err.message);
+        }
+      }
+    })
+  })
 }
 
 function calculateStatus(screeningObj) {
@@ -388,12 +498,71 @@ function statusColor(status) {
   }
 }
 
-function buildObject(input) {
+function childInDatabase(dataBase, childInfo, screeningInfo) {
+  return new Promise (function (resolve, reject) {
+
+    var stakeDb = require('nano')('https://' + process.env.SYNC_ENTITY + '@' + process.env.COUCH_URL + '/' + dataBase);
+    stakeDb.view('name_search', 'find_by_name', { key: [ childInfo.firstName, childInfo.lastName], include_docs: true}, function(error, response) {
+      if (!error) {
+        if (response.rows.length === 0) {
+          resolve (saveTheObjects(dataBase, childInfo, screeningInfo));
+        } else {
+          childInfo = response.rows[0].doc;
+          resolve (isScreeningDuplicate(dataBase, childInfo, screeningInfo));
+        }
+      } else {
+        var msg = '';
+        var myError = new Error ({name: '', errors: [], message: ''});
+        myError.name = 'database error';
+        if (error) {
+          myError.message = error;
+          myError.name = 'database error';
+          reject (myError);
+        } else {
+          var reasons = JSON.parse (response.body);
+          myError.message = msg;
+          reject (myError);
+        }
+      }
+    });
+  });
+}
+
+function isScreeningDuplicate(dataBase, childInfo, screeningInfo) {
+  return new Promise (function (resolve, reject) {
+    var stakeDb = require('nano')('https://' + process.env.SYNC_ENTITY + '@' + process.env.COUCH_URL + '/' + dataBase);
+    stakeDb.view('screen_search', 'find_by_owner', { key: [ childInfo._id, screeningInfo.surveyDate], include_docs: true}, function(error, response) {
+      if (!error) {
+        if (response.rows.length === 0) {
+          resolve (saveScreening(dataBase, childInfo, screeningInfo));
+        } else {
+          childInfo = response.rows[0].doc;
+          resolve ('duplicate screening, not added');
+        }
+      } else {
+        var msg = '';
+        var myError = new Error ({name: '', errors: [], message: ''});
+        myError.name = 'database error';
+        if (error) {
+          myError.message = error;
+          myError.name = 'database error';
+          reject (myError);
+        } else {
+          var reasons = JSON.parse (response.body);
+          myError.message = msg;
+          reject (myError);
+        }
+      }
+    });
+  });
+}
+
+function buildObject(dataBase, input) {
   return new Promise(function(resolve, reject) {
     var i = 0;
     var k = 0;
-    var columnData = input.results;
-    var colIndexes = Object.keys(columnData.data[0]);
+    var columnData = input.data;
+    var colIndexes = Object.keys(columnData[0]);
     var firstNameIndex = 0;
     var lastNameIndex = 0;
     var birthDateIndex = 0;
@@ -415,79 +584,80 @@ function buildObject(input) {
     var surveyDateIndex = 0;
     var statusIndex = 0;
 
-    for (i = 1; i < columnData.data[0].length; i++) {
-      if (~columnData.data[0][i].indexOf('firstName')) {
+    for (i = 1; i < columnData[0].length; i++) {
+      if (~columnData[0][i].toLowerCase().indexOf('firstname')) {
         firstNameIndex = i;
-      } else if (~columnData.data[0][i].indexOf('lastName')) {
+      } else if (~columnData[0][i].toLowerCase().indexOf('lastname')) {
         lastNameIndex = i;
-      } else if (~columnData.data[0][i].indexOf('mother')) {
+      } else if (~columnData[0][i].toLowerCase().indexOf('mother')) {
         motherIndex = i;
-      } else if (~columnData.data[0][i].indexOf('father')) {
+      } else if (~columnData[0][i].toLowerCase().indexOf('father')) {
         fatherIndex = i;
-      } else if (~columnData.data[0][i].indexOf('birthdate')) {
+      } else if (~columnData[0][i].toLowerCase().indexOf('birthdate')) {
         birthDateIndex = i;
-      } else if (~columnData.data[0][i].indexOf('address')) {
+      } else if (~columnData[0][i].toLowerCase().indexOf('address')) {
         addressIndex = i;
-      } else if (~columnData.data[0][i].indexOf('city')) {
+      } else if (~columnData[0][i].toLowerCase().indexOf('city')) {
         cityIndex = i;
-      } else if (~columnData.data[0][i].indexOf('ward')) {
+      } else if (~columnData[0][i].toLowerCase().indexOf('ward')) {
         wardIndex = i;
-      } else if (~columnData.data[0][i].indexOf('phone')) {
+      } else if (~columnData[0][i].toLowerCase().indexOf('phone')) {
         phoneIndex = i;
-      } else if (~columnData.data[0][i].indexOf('age')) {
+      } else if (~columnData[0][i].toLowerCase().indexOf('age')) {
         monthAgeIndex = i;
-      } else if (~columnData.data[0][i].indexOf('gender')) {
+      } else if (~columnData[0][i].toLowerCase().indexOf('gender')) {
         genderIndex = i;
-      } else if (~columnData.data[0][i].indexOf('weight')) {
+      } else if (~columnData[0][i].toLowerCase().indexOf('weight')) {
         weightIndex = i;
-      } else if (~columnData.data[0][i].indexOf('height')) {
+      } else if (~columnData[0][i].toLowerCase().indexOf('height')) {
         heightIndex = i;
-      } else if (~columnData.data[0][i].indexOf('ha')) {
+      } else if (~columnData[0][i].toLowerCase().indexOf('ha')) {
         haIndex = i;
-      } else if (~columnData.data[0][i].indexOf('wa')) {
+      } else if (~columnData[0][i].toLowerCase().indexOf('wa')) {
         waIndex = i;
-      } else if (~columnData.data[0][i].indexOf('wh')) {
+      } else if (~columnData[0][i].toLowerCase().indexOf('wh')) {
         whIndex = i;
-      } else if (~columnData.data[0][i].indexOf('lds')) {
+      } else if (~columnData[0][i].toLowerCase().indexOf('lds')) {
         ldsIndex = i;
-      } else if (~columnData.data[0][i].indexOf('screenDate')) {
+      } else if (~columnData[0][i].toLowerCase().indexOf('screendate')) {
         surveyDateIndex = i;
-      } else if (~columnData.data[0][i].indexOf('idGroup')) {
+      } else if (~columnData[0][i].toLowerCase().indexOf('idgroup')) {
         idGroupIndex = i;
-      } else if (~columnData.data[0][i].indexOf('status')) {
+      } else if (~columnData[0][i].toLowerCase().indexOf('status')) {
         statusIndex = i;
       }else {
-        console.log(columnData.data[0][i]);
+        console.log(columnData[0][i]);
       }
     }
 
     var dataBaseObj = [];
     var j;
-    for (j = 1; j < columnData.data.length-1; j++) {
+    for (j = 1; j < columnData.length-1; j++) {
       var childObj = {};
       var screenObj = {zScore: { ha:'',haStatus:'', wa:'',waStatus:'', wl:'', wlStatus:''}};
-      childObj.birthDate = columnData.data[j][birthDateIndex];
-      childObj.firstName = columnData.data[j][firstNameIndex];
-      childObj.lastName = columnData.data[j][lastNameIndex];
-      childObj.mother = motherIndex !== 0 ? columnData.data[j][motherIndex] : undefined;
-      childObj.father = fatherIndex !== 0 ? columnData.data[j][fatherIndex] : undefined;
-      childObj.address = addressIndex !== 0 ? columnData.data[j][addressIndex] : undefined;
-      childObj.city = cityIndex !== 0 ? columnData.data[j][cityIndex] : undefined;
-      childObj.ward = wardIndex !== 0 ? columnData.data[j][wardIndex] : undefined;
-      childObj.phone = phoneIndex !== 0 ? columnData.data[j][phoneIndex] : undefined;
-      childObj.monthAge = columnData.data[j][monthAgeIndex];
-      childObj.gender = columnData.data[j][genderIndex];
-      childObj.lds = columnData.data[j][ldsIndex];
-      childObj.idGroup = columnData.data[j][idGroupIndex];
-      screenObj.surveyDate = columnData.data[j][surveyDateIndex];
-      screenObj.monthAge = columnData.data[j][monthAgeIndex];
-      screenObj.gender = columnData.data[j][genderIndex];
-      screenObj.weight = columnData.data[j][weightIndex];
-      screenObj.height = columnData.data[j][heightIndex];
-      screenObj.zScore.ha = columnData.data[j][haIndex];
-      screenObj.zScore.wa = columnData.data[j][waIndex];
-      screenObj.zScore.wl = columnData.data[j][whIndex];
-      dataBaseObj.push (saveTheObjects(input.dataBase, childObj, gradeZScores(screenObj)));
+      childObj.birthDate = columnData[j][birthDateIndex];
+      childObj.firstName = columnData[j][firstNameIndex];
+      childObj.lastName = columnData[j][lastNameIndex];
+      childObj.mother = motherIndex !== 0 ? columnData[j][motherIndex] : undefined;
+      childObj.father = fatherIndex !== 0 ? columnData[j][fatherIndex] : undefined;
+      childObj.address = addressIndex !== 0 ? columnData[j][addressIndex] : undefined;
+      childObj.city = cityIndex !== 0 ? columnData[j][cityIndex] : undefined;
+      childObj.ward = wardIndex !== 0 ? columnData[j][wardIndex] : undefined;
+      childObj.phone = phoneIndex !== 0 ? columnData[j][phoneIndex] : undefined;
+      childObj.monthAge = columnData[j][monthAgeIndex];
+      childObj.gender = columnData[j][genderIndex];
+      childObj.lds = columnData[j][ldsIndex];
+      childObj.idGroup = columnData[j][idGroupIndex];
+
+      screenObj.surveyDate = columnData[j][surveyDateIndex];
+      screenObj.monthAge = columnData[j][monthAgeIndex];
+      screenObj.gender = columnData[j][genderIndex];
+      screenObj.weight = columnData[j][weightIndex];
+      screenObj.height = columnData[j][heightIndex];
+      screenObj.zScore.ha = columnData[j][haIndex];
+      screenObj.zScore.wa = columnData[j][waIndex];
+      screenObj.zScore.wl = columnData[j][whIndex];
+      dataBaseObj.push (childInDatabase(dataBase, childObj, gradeZScores(screenObj)));
     }
     resolve(dataBaseObj).each();
   });
@@ -515,7 +685,7 @@ exports.uploadCsv = function (req, res) {
     } else {
       // parse csv
       parseCsv (res.req.file.path, function (parsedData) {
-        buildObject ({dataBase: req.params.stakeDB, results: parsedData})
+          buildObject(req.params.stakeDB, parsedData)
             .all ().then (returnOk).catch (function (err) {
           return res.status (400).send ({
             message: err.message,
@@ -527,7 +697,6 @@ exports.uploadCsv = function (req, res) {
     }
   })
 };
-
 
 exports.listDbs = function(req, res) {
   request.get('https://' + process.env.SYNC_ENTITY + '@' + process.env.COUCH_URL +
