@@ -81,8 +81,10 @@ function validateView(type, stakeDB, view) {
       if (err) {
         stakeDb.insert(viewObject, function(err, response) {
           if (err) {
+            var msg = '';
+            var updateError = new Error(err.message);
             console.log(err.message);
-            reject(err.message);
+            reject(updateError);
           } else {
             console.log('view ' + view._id + ' created in ' + stakeDB);
             resolve('view ' + view._id + ' created in ' + stakeDB);
@@ -399,7 +401,7 @@ function saveScreening(dataBase, childInfo, screeningInfo) {
     stakeDb.insert(screeningInfo, function (err, scrResponse) {
       if (err) {
         console.log (err.message);
-        errorStack.push (screeningObj.owner);
+        errorStack.push (screeningInfo.owner);
         errorStack.push (err.message);
         resolve (err.message);
 //            reject(err);

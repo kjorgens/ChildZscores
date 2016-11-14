@@ -83,7 +83,7 @@
       vm.onComplete = true;
       cancelUpload();
       vm.stopSpin();
- //     vm.syncUpstream();
+      syncUpstream();
     };
     // Called after the user has failed to uploaded a new picture
     vm.uploader.onErrorItem = function(fileItem, response, status, headers) {
@@ -235,7 +235,9 @@
      }
 
     function viewUpdateError(err){
+      vm.stopSpin();
       console.log('couch view update error');
+      vm.reportError('couch view update error', err.data.message, true);
     }
 
     function uploadExcelCsv() {
