@@ -9,6 +9,7 @@ var path = require('path'),
   fs = require('fs'),
   csvParse = require('babyparse'),
   moment = require('moment'),
+  uuid = require('uuid4'),
   csvloader = require('multer'),
   config = require(path.resolve('./config/config')),
   Promise = require('bluebird'),
@@ -396,7 +397,7 @@ function saveScreening(dataBase, childInfo, screeningInfo) {
     var statusInfo = calculateStatus(screeningInfo);
     var stakeDb = require('nano')('https://' + process.env.SYNC_ENTITY + '@' + process.env.COUCH_URL + '/' + dataBase);
     // screeningInfo._id = 'scr_' + childInfo.firstName.replace(' ','_') + '_' + dataBase + '_' + moment();
-    screeningInfo._id = 'scr_' + '_' + dataBase + '_' + moment();
+    screeningInfo._id = 'scr_' + '_' + dataBase + '_' + uuid();
     screeningInfo.owner = childInfo._id;
     stakeDb.insert(screeningInfo, function (err, scrResponse) {
       if (err) {
@@ -444,7 +445,7 @@ function saveTheObjects(dataBase, childInfo, screeningInfo) {
   return new Promise(function (resolve,reject){
     var stakeDb = require('nano')('https://' + process.env.SYNC_ENTITY + '@' + process.env.COUCH_URL + '/' + dataBase);
  //   childInfo._id = 'chld_' + childInfo.firstName.replace(' ','_') + '_' + dataBase + '_' + moment ();
-    childInfo._id = 'chld_' + dataBase + '_' + moment ();
+    childInfo._id = 'chld_' + dataBase + '_' + uuid();
     stakeDb.insert (childInfo, function (err, childResponse) {
       if (err) {
         console.log (err.message);
