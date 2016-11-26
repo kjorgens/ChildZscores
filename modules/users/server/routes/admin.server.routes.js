@@ -10,7 +10,7 @@ var adminPolicy = require('../policies/admin.server.policy'),
 
 module.exports = function (app) {
   // User route registration first. Ref: #713
-  var router = express.Router();
+  var router = new express.Router();
 //  require('./users.server.routes.js')(app);
 
   // Set JWT Auth for all Admin Routes

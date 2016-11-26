@@ -38,8 +38,8 @@
                         {{'W_H' | translate}}:  <span  ng-bind="survey.zScore.wl | number:2"></span>
                     </li>
                 </h4>
-                {{'SCREENING_DONE_BY' | translate}}
-                <span ng-bind="survey.interviewer"></span>
+                {{'SCREENING_DATE' | translate}}
+                <span ng-bind="survey.surveyDate | date:'mediumDate'"></span>
             </small>
         </a>
         </div>

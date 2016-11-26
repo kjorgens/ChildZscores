@@ -9,7 +9,7 @@ var passport = require('passport'),
   children = require('../controllers/children.server.controller');
 
 module.exports = function (app) {
-  var router = express.Router();
+  var router = new express.Router();
 
   // sync db routes
   router.route('/sync')
@@ -25,11 +25,14 @@ module.exports = function (app) {
 
   // retrieve countries route
   router.route('/countries')
-      .get(childrenPolicy.isAllowed, children.getCountryList);
+      .get(children.getCountryList);
 
   // retrieve countries route
-  router.route('/upload')
-      .post(children.uploadCsv);
+  router.route('/upload/:stakeDB')
+      .post(passport.authenticate('jwt', { session: false }), children.uploadCsv);
+
+  router.route('/updateviews/:stakeDB')
+      .get(passport.authenticate('jwt', { session: false }), children.checkUpdateViews);
 
   router.route('/remoteDBList')
       .get(childrenPolicy.isAllowed, children.listDbs);
