@@ -1,0 +1,202 @@
+<section>
+  <div class="page-header" style="margin-top: 6em">
+
+    <!--<div class='btn-toolbar pull-right'>-->
+    <!--<div class="btn-group" ng-if="vm.child._id">-->
+    <!--<a class="btn btn-primary" ui-sref="children.view({childId: vm.child._id})"-->
+    <!--&gt;Cancel</a>-->
+    <!--</div>-->
+    <!--<div class="btn-group" ng-if="!vm.child._id">-->
+    <!--<a class="btn btn-primary"-->
+    <!--ui-sref="children.list({stakeDB: vm.selectedDB, stakeName: vm.selectedStake})">Cancel</a>-->
+    <!--</div>-->
+    <!--</div>-->
+    <h3 style="margin-top: 2em">{{vm.child._id ? vm.edit_existing : vm.add_new}}</h3>
+    <h3>
+      <span><a
+        ui-sref="children.list({stakeDB: vm.selectedDB, stakeName: vm.selectedStake})">{{'CANCEL' | translate}}</a></span>
+    </h3>
+  </div>
+  <h3 style="margin-top: 1em" ng-if="vm.form.childForm.$valid">
+        <span><a ng-click="vm.create(vm.form.childForm.$valid)">
+            {{vm.child._id ? vm.update : vm.createRec }}{{'CHILD_RECORD' | translate}} <i
+          class="glyphicon glyphicon-export"></i></a></span>
+  </h3>
+  <div class="col-md-12">
+    <form name="vm.form.childForm" class="form-horizontal" ng-submit="vm.create(vm.form.childForm.$valid)"
+          novalidate>
+      <fieldset>
+        <div class="CreateChildFormContainer">
+          <!-- <div class="form-group float-left">
+               &lt;!&ndash;<div ng-class="{'has-error':(!vm.genderIsValid)}">
+                   <label for="vm.child.gender" class="col-sm-2 control-label">{{'GENDER' | translate}}</label>
+                   <div class="col-sm-4">
+                       <select  ng-change="vm.checkGenderIsValid()" class="form-control"
+                                ng-model="vm.child.gender"
+                                id="vm.child.gender"
+                                ng-options="gender.value as gender.translationId | translate for gender in vm.genders"
+                                required>
+                       </select>
+                       <div class="validationMessage" ng-if="!vm.genderIsValid"><p>{{'GENDER_REQUIRED' | translate}}
+                       </p></div>
+                   </div>&ndash;&gt;
+                   &lt;!&ndash;<div class="col-sm-3">&ndash;&gt;
+                   &lt;!&ndash;<button type="button" class="btn btn-primary" ng-model="vm.child.gender" uib-btn-checkbox btn-checkbox-true="Girl" btn-checkbox-false="Boy">&ndash;&gt;
+                       &lt;!&ndash;{{'GENDER' | translate}}&ndash;&gt;
+                   &lt;!&ndash;</button>&ndash;&gt;
+                   &lt;!&ndash;</div>&ndash;&gt;
+               </div>-->
+          <div ng-class="{'has-error':(!vm.membershipIsValid)}">
+            <label for="vm.child.memberStatus" class="col-sm-2 control-label">{{'LDS_MEMBER' | translate}}</label>
+            <div class="col-sm-4">
+              <select ng-change="vm.checkMembershipIsValid()" class="form-control"
+                      ng-model="vm.child.memberStatus"
+                      id="vm.child.memberStatus"
+                      ng-options="yesno.value as yesno.translationId | translate for yesno in vm.yesNo"
+                      required>
+              </select>
+              <div class="validationMessage" ng-if="!vm.membershipIsValid"><p>{{'MEMBER_STATUS_REQUIRED' | translate}}
+              </p></div>
+            </div>
+            <!--<div class="col-sm-3">-->
+            <!--<button type="button" class="btn btn-primary" ng-model="vm.child.memberStatus" uib-btn-checkbox btn-checkbox-true="Yes" btn-checkbox-false="No">-->
+            <!--{{'LDS_MEMBER' | translate}}-->
+            <!--</button>-->
+            <!--</div>-->
+            <!--</div>-->
+          </div>
+          <div class="form-group float-left">
+            <div ng-class="{'has-error':(!vm.firstNameIsValid)}">
+              <label for="vm.child.firstName" class="col-sm-2 control-label">{{'FIRST_NAME' | translate}}</label>
+              <div class="col-sm-4">
+                <input class="form-control required" type="text" ng-blur="vm.checkFirstNameIsValid()"
+                       ng-model="vm.child.firstName" id="vm.child.firstName"
+                       placeholder="{{'FIRST_NAME' | translate}}"
+                       required>
+                <div class="validationMessage" ng-if="!vm.firstNameIsValid"><p>{{'REQUIRED' | translate}}
+                </p></div>
+              </div>
+            </div>
+            <div ng-class="{'has-error':(!vm.lastNameIsValid)}">
+              <label for="vm.child.lastName" class="col-sm-2 control-label">{{'LAST_NAME' | translate}}</label>
+              <div class="col-sm-4">
+                <input type="input" class="form-control required" ng-blur="vm.checkLastNameIsValid()"
+                       ng-model="vm.child.lastName"
+                       id="vm.child.lastName"
+                       placeholder="{{'LAST_NAME' | translate}}"
+                       required>
+                <div class="validationMessage" ng-if="!vm.lastNameIsValid"><p>{{'REQUIRED' | translate}}
+                </p></div>
+              </div>
+            </div>
+          </div>
+          <div class="form-group float-left">
+            <div ng-class="{'has-error':(!vm.ageIsValid)}">
+              <label for="vm.child.monthAge" class="col-sm-2 control-label">{{'AGE_IN_MONTHS' | translate}}</label>
+              <div class="col-sm-4">
+                <input class="form-control" type="number" ng-blur="vm.checkEnteredAgeIsValid()"
+                       ng-model="vm.child.monthAge" id="vm.child.monthAge" required>
+                <div class="validationMessage" ng-if="!vm.ageIsValid"><p>{{'AGE_BIRTHDATE' | translate}}
+                </p></div>
+              </div>
+            </div>
+            <div ng-class="{'has-error':(!vm.ageIsValid)}">
+              <label for="vm.child.birthDate" class="col-sm-2 control-label">{{'BIRTHDATE' | translate}}</label>
+              <div class="col-sm-4">
+                <input type="date" id="vm.child.birthDate" ng-blur="vm.checkAgeIsValid()" class="form-control"
+                       ng-model="vm.child.birthDate"
+                       is-open="status.opened"
+                       min="2010-1-1" max="9999-12-31"
+                       required>
+                <div class="validationMessage" ng-if="!vm.ageIsValid"><p>{{'AGE_BIRTHDATE' | translate}}
+                </p></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- <div class="form-group">
+               <label for="vm.child.mother" class="col-sm-2 control-label">{{'MOTHER' | translate}}</label>
+               <div class="col-sm-4">
+                   <input type="input" class="form-control"
+                          ng-model="vm.child.mother" id="vm.child.mother"
+                          placeholder="{{'MOTHER' | translate}}">
+               </div>
+               <label for="vm.child.father" class="col-sm-2 control-label">{{'FATHER' | translate}}</label>
+               <div class="col-sm-4">
+                   <input type="input" class="form-control"
+                          ng-model="vm.child.father" id="vm.child.father"
+                          placeholder="{{'FATHER' | translate}}">
+               </div>
+           </div>-->
+          <div class="form-group">
+            <label for="vm.child.address" class="col-sm-2 control-label">{{'STREET_ADDRESS' | translate}}</label>
+            <div class="col-sm-4">
+              <input type="input" class="form-control"
+                     ng-model="vm.child.address" id="vm.child.address"
+                     placeholder="{{'STREET_ADDRESS' | translate}}">
+            </div>
+            <label for="vm.child.city" class="col-sm-2 control-label">{{'CITY' | translate}}</label>
+            <div class="col-sm-4">
+              <input type="input" class="form-control"
+                     ng-model="vm.child.city" id="vm.child.city"
+                     placeholder="{{'CITY' | translate}}">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="vm.child.idGroup" class="col-sm-2 control-label">{{'ID_GROUP' | translate}}</label>
+            <div class="col-sm-4">
+              <input type="input" class="form-control"
+                     ng-model="vm.child.idGroup" id="vm.child.idGroup"
+                     placeholder="{{'ID_GROUP' | translate}}">
+            </div>
+            <label for="vm.child.ward" class="col-sm-2 control-label">{{'WARD' | translate}}</label>
+            <div class="col-sm-4">
+              <input type="input" class="form-control"
+                     ng-model="vm.child.ward" id="vm.child.ward"
+                     placeholder="{{'WARD' | translate}}">
+            </div>
+          </div>
+          <div class="form-group">
+            <div>
+              <label for="vm.child.phone" class="col-sm-2 control-label">{{'TELEPHONE_NUMBER' | translate}}</label>
+              <div class="col-sm-4">
+                <input class="form-control" type="tel"
+                       ng-model="vm.child.phone" id="vm.child.phone">
+                <div></div>
+              </div>
+            </div>
+            <label for="vm.child.comments" class="col-sm-2 control-label">{{'COMMENTS' | translate}}</label>
+            <div class="col-sm-4">
+                                <textarea class="form-control" ng-model="vm.child.comments" id="vm.child.comments"
+                                          placeholder="{{'COMMENTS' | translate}}"></textarea>
+            </div>
+          </div>
+          <div class="form-group">
+            <div ng-class="{'has-error':(!vm.genderIsValid)}">
+
+              <!--<div class="col-sm-4 right-side-child">-->
+              <!--<div style="margin-top:4%;">-->
+              <!--<button type="submit" class="btn btn-primary">{{vm.child._id ? 'Update' : 'Create'}}-->
+              <!--</button>-->
+              <!--</div>-->
+              <!--</div>-->
+              <!--</div>-->
+            </div>
+          </div>
+        </div>
+      </fieldset>
+    </form>
+
+  </div>
+  <h3 style="margin-top: 1em" ng-if="vm.form.childForm.$valid">
+        <span><a ng-click="vm.create(vm.form.childForm.$valid)">
+           {{vm.child._id ? vm.update : vm.createRec}}{{'CHILD_RECORD' | translate}} <i
+          class="glyphicon glyphicon-export"></i></a></span>
+  </h3>
+  <!--<div class="panel-footer">-->
+  <!--<div class="pull-right">-->
+  <!--<button type="submit" class="btn btn-primary" ng-click="vm.create(vm.form.childForm.$valid)">{{vm.child._id ? 'Update' : 'Create'}}-->
+  <!--</button>-->
+  <!--</div>-->
+  <!--</div>-->
+</section>
