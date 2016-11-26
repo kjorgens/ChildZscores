@@ -5,9 +5,14 @@
       .module('children.updateviews')
       .factory('ChildrenViews', ChildrenViews);
 
-  ChildrenViews.$inject = ['$resource', '$rootScope'];
+  ChildrenViews.$inject = ['$http'];
 
-  function ChildrenViews($resource, $rootScope) {
-    return $resource('api/children/updateviews/:stakeDB');
+  function ChildrenViews($http) {
+    var factory = {};
+    factory.updateViews = function(stakeDB)
+    {
+      return $http.get('api/children/updateviews/' + stakeDB);
+    };
+    return factory;
   }
 }());

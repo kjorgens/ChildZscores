@@ -107,11 +107,11 @@ exports.checkUpdateViews = function (req, res) {
     filterList.forEach (function (filter) {
       toCheck.push (validateView ('filter', req.params.stakeDB, filter));
     });
-    function returnOk(input) {
-       return (res.status (200).send ({message: input}));
-    }
+
     var allViews = Promise.all(toCheck);
-    allViews.then(returnOk).catch (function (err) {
+    allViews.then(function(input){
+      return (res.status (200).send ({message: input}));
+    }).catch (function (err) {
       return res.status (400).send ({
         message: err.message,
         name: err.name,
@@ -120,7 +120,7 @@ exports.checkUpdateViews = function (req, res) {
     });
 };
 
-function getLastScreeningData(parmObj) {
+function getLastScreeningData(ownerInfo, stakeDB, sortField) {
   return new Promise(function(resolve, reject) {
     var couchURL;
     if (process.env.COUCH_URL.indexOf('localhost') > -1) {
@@ -128,112 +128,41 @@ function getLastScreeningData(parmObj) {
     } else {
       couchURL = 'https://' + process.env.SYNC_ENTITY + '@' + process.env.COUCH_URL + '/';
     }
-    var screenData = parmObj.screenInfo.key.lastScreening;
-    var sortField = parmObj.sort;
-    request.get(couchURL + parmObj.stakeDB + '/' +
-        parmObj.screenInfo.key.owner, function (error, response, body) {
+    request.get(couchURL + stakeDB + '/' +
+        ownerInfo.lastScreening, function (error, response, body) {
       if (!error && response.statusCode === 200) {
-        var ownerInfo = JSON.parse(body);
-        parmObj.ownerInfo = ownerInfo;
-        parmObj.screenInfo = screenData;
-        resolve(addLineToStack(parmObj));
-      } else {
-        var msg = '';
-        var myError = new Error();
-        myError.name = screenData._id;
-        if (error) {
-          myError.message = error;
-          myError.name = 'database error';
-          reject(myError);
-        } else {
-          var reasons = JSON.parse(response.body);
-          var msg = 'Database Error: ' + response.statusCode + ': ' + response.statusMessage + '  Error:' + reasons.error + ' Reason: ' + reasons.reason;
-          myError.message = msg;
-          reject(myError);
+        try {
+          var screeningInfo = JSON.parse(body);
+        } catch(e){
+          console.log('parse problem');
         }
-      }
-    });
-  });
-}
-function getOwnerData(parmObj) {
-  return new Promise(function(resolve, reject) {
-    var couchURL;
-    if (process.env.COUCH_URL.indexOf('localhost') > -1) {
-      couchURL = 'http://' + process.env.COUCH_URL + '/';
-    } else {
-      couchURL = 'https://' + process.env.SYNC_ENTITY + '@' + process.env.COUCH_URL + '/';
-    }
-    var screenData = parmObj.screenInfo.key;
-    var sortField = parmObj.sort;
-    request.get(couchURL + parmObj.stakeDB + '/' +
-        parmObj.screenInfo.key.owner, function (error, response, body) {
-      if (!error && response.statusCode === 200) {
-        var ownerInfo = JSON.parse(body);
-        parmObj.ownerInfo = ownerInfo;
-        parmObj.screenInfo = screenData;
-        resolve(addLineToStack(parmObj));
-      } else {
-        var msg = '';
-        var myError = new Error();
-        myError.name = screenData._id;
-        if (error) {
-          myError.message = error;
-          myError.name = 'database error';
-          reject(myError);
-        } else {
-          var reasons = JSON.parse(response.body);
-          var msg = 'Database Error: ' + response.statusCode + ': ' + response.statusMessage + '  Error:' + reasons.error + ' Reason: ' + reasons.reason;
-          myError.message = msg;
-          reject(myError);
+
+        // screenInfo = screeningInfo;
+        if(ownerInfo === undefined || screeningInfo === undefined){
+          console.log('what happened');
         }
+        resolve(addLineToStack( ownerInfo, screeningInfo, sortField, stakeDB));
+      } else if (!error) {
+        resolve();
+      } else  {
+          var msg = '';
+          var myError = new Error();
+          myError.name = screenData._id;
+          if (error) {
+            myError.message = error;
+            myError.name = 'database error';
+            reject(myError);
+          } else {
+            var reasons = JSON.parse(response.body);
+            var msg = 'Database Error: ' + response.statusCode + ': ' + response.statusMessage + '  Error:' + reasons.error + ' Reason: ' + reasons.reason;
+            myError.message = msg;
+            reject(myError);
+          }
       }
     });
   });
 }
 
-function pullSaveScreenData(parmObj) {
-  return new Promise(function(resolve, reject) {
-    var couchURL;
-    var ddoc = parmObj.filter.indexOf('all') > -1 ? 'scr_list' : 'zscore_kids';
-    if (process.env.COUCH_URL.indexOf('localhost') > -1) {
-      couchURL = 'http://' + process.env.COUCH_URL + '/';
-    } else {
-      couchURL = 'https://' + process.env.SYNC_ENTITY + '@' + process.env.COUCH_URL + '/';
-    }
-    request.get(couchURL + parmObj.stakeDB +
-        '/_design/' + ddoc + '/_view/screen', function(error, response, body) {
-      if (!error && response.statusCode === 200) {
-        var jsonObj = JSON.parse(body);
-        if (jsonObj.total_rows === 0) {
-          var emptyError = new Error();
-          emptyError.name = 'Empty database';
-          emptyError.message = 'No entries in ' + parmObj.stakeDB + ', Sync first?';
-          reject(emptyError);
-        }
-        var screenList = [];
-        jsonObj.rows.forEach(function(screening) {
-          parmObj.screenInfo = screening;
-          screenList.push(getOwnerData(parmObj));
-        });
-        resolve(screenList);
-      } else {
-        var msg = '';
-        var myError = new Error({name:'',errors:[],message:''});
-        myError.name = 'database error';
-        if (error) {
-          myError.message = error;
-          myError.name = 'database error';
-          reject(myError);
-        } else {
-          var reasons = JSON.parse(response.body);
-  //        myError.push('Database Error: ' + response.statusCode + ': ' + response.statusMessage + '  Error:' + reasons.error + ' Reason: ' + reasons.reason);
-          myError.message = msg;
-          reject(myError);
-        }
-      }
-    });
-  });
-}
 function buildOutputFromLastScreening(parmObj) {
   return new Promise(function(resolve, reject) {
     var couchURL;
@@ -255,10 +184,22 @@ function buildOutputFromLastScreening(parmObj) {
         }
         var childrenList = [];
         jsonObj.rows.forEach(function(child) {
-          parmObj.ownerInfo = child;
-          childrenList.push(getLastScreeningData(parmObj));
+          if (child.key.lastScreening && (Object.getOwnPropertyNames(child.key.lastScreening).length > 0) && child.key) {
+            childrenList.push (getLastScreeningData (child.key, parmObj.stakeDB, parmObj.sortField));
+          }
+          else {
+            console.log('problem here');
+          }
         });
-        resolve(childrenList);
+        if(childrenList.length === 0){
+          var msg = '';
+          var myError = new Error({name:'',errors:[],message:''});
+            myError.message = 'No Screenings entered.';
+            myError.name = 'Children in database ' + parmObj.stakeDB + ' contain no screenings ';
+            reject(myError);
+        } else {
+          resolve (childrenList);
+        }
       } else {
         var msg = '';
         var myError = new Error({name:'',errors:[],message:''});
@@ -296,80 +237,86 @@ function writeTheFile(input) {
 function collectEm(sortedList) {
   return new Promise(function(resolve, reject) {
     var writeStack = '';
+    var count = 0;
     sortedList.forEach(function(line) {
-      writeStack += line.dataLine;
+      count++;
+      if(line === undefined){
+        console.log('problem!');
+      } else {
+        writeStack += line.dataLine;
+      }
     });
     resolve({ data: writeStack, dbId: sortedList[0].stakeDB });
   });
 }
 
-function addLineToStack(parmObj) {
+function addLineToStack(ownerInfo, screenInfo, sortField, stakeDB) {
   return new Promise(function (resolve, reject) {
-    var cleanAddr;
-    if (parmObj.ownerInfo.address !== undefined && parmObj.ownerInfo.address.indexOf(',') > -1) {
-      parmObj.ownerInfo.address = parmObj.ownerInfo.address.replace(/,/g, ' ');
+    if (ownerInfo.address !== undefined && ownerInfo.address.indexOf(',') > -1) {
+      ownerInfo.address = ownerInfo.address.replace(/,/g, ' ');
     }
-    if (parmObj.ownerInfo.mother !== undefined && parmObj.ownerInfo.mother.indexOf(',') > -1) {
-      parmObj.ownerInfo.mother = parmObj.ownerInfo.mother.replace(/,/g, ' ');
+    if (ownerInfo.mother !== undefined && ownerInfo.mother.indexOf(',') > -1) {
+      ownerInfo.mother = ownerInfo.mother.replace(/,/g, ' ');
     }
-    if (parmObj.ownerInfo.father !== undefined && parmObj.ownerInfo.father.indexOf(',') > -1) {
-      parmObj.ownerInfo.father = parmObj.ownerInfo.father.replace(/,/g, ' ');
+    if (ownerInfo.father !== undefined && ownerInfo.father.indexOf(',') > -1) {
+      ownerInfo.father = ownerInfo.father.replace(/,/g, ' ');
     }
-    if (parmObj.ownerInfo.city !== undefined && parmObj.ownerInfo.city.indexOf(',') > -1) {
-      parmObj.ownerInfo.city = parmObj.ownerInfo.city.replace(/,/g, ' ');
+    if (ownerInfo.city !== undefined && ownerInfo.city.indexOf(',') > -1) {
+      ownerInfo.city = ownerInfo.city.replace(/,/g, ' ');
     }
-    if (parmObj.ownerInfo.ward !== undefined && parmObj.ownerInfo.ward.indexOf(',') > -1) {
-      parmObj.ownerInfo.ward = parmObj.ownerInfo.ward.replace(/,/g, ' ');
+    if (ownerInfo.ward !== undefined && ownerInfo.ward.indexOf(',') > -1) {
+      ownerInfo.ward = ownerInfo.ward.replace(/,/g, ' ');
     }
-    if (parmObj.ownerInfo.firstName !== undefined && parmObj.ownerInfo.firstName.indexOf(',') > -1) {
-      parmObj.ownerInfo.firstName = parmObj.ownerInfo.firstName.replace(/,/g, ' ');
+    if (ownerInfo.firstName !== undefined && ownerInfo.firstName.indexOf(',') > -1) {
+      ownerInfo.firstName = ownerInfo.firstName.replace(/,/g, ' ');
     }
-    if (parmObj.ownerInfo.lastName !== undefined && parmObj.ownerInfo.lastName.indexOf(',') > -1) {
-      parmObj.ownerInfo.lastName = parmObj.ownerInfo.lastName.replace(/,/g, ' ');
+    if (ownerInfo.lastName !== undefined && ownerInfo.lastName.indexOf(',') > -1) {
+      ownerInfo.lastName = ownerInfo.lastName.replace(/,/g, ' ');
     }
     var dataObj = {
-      childId: parmObj.ownerInfo._id,
-      gender: parmObj.screenInfo.gender[0].toUpperCase() + parmObj.screenInfo.gender[1],
-      firstName: parmObj.ownerInfo.firstName,
-      lastName: parmObj.ownerInfo.lastName,
-      birthDate: parmObj.ownerInfo.birthDate,
-      idGroup: parmObj.ownerInfo.idGroup || '',
-      mother: parmObj.ownerInfo.mother || '',
-      father: parmObj.ownerInfo.father || '',
-      city: parmObj.ownerInfo.city || '',
-      phone: parmObj.ownerInfo.phone || '',
-      address: parmObj.ownerInfo.address || '',
-      ward: parmObj.ownerInfo.ward || '',
-      memberStatus: parmObj.ownerInfo.memberStatus || '',
-      lastScreening: parmObj.ownerInfo.lastScreening,
-      weight: parmObj.screenInfo.weight,
-      height: parmObj.screenInfo.height,
-      age: parmObj.screenInfo.monthAge,
-      ha: parmObj.screenInfo.zScore.ha,
-      wa: parmObj.screenInfo.zScore.wa,
-      wl: parmObj.screenInfo.zScore.wl,
-      surveyDate: parmObj.screenInfo.surveyDate,
-      screenId: parmObj.screenInfo._id
+      childId: ownerInfo._id,
+      gender: screenInfo.gender[0].toUpperCase() + screenInfo.gender.substr(1),
+      firstName: ownerInfo.firstName,
+      lastName: ownerInfo.lastName,
+      birthDate: ownerInfo.birthDate,
+      idGroup: ownerInfo.idGroup || '',
+      mother: ownerInfo.mother || '',
+      father: ownerInfo.father || '',
+      city: ownerInfo.city || '',
+      phone: ownerInfo.phone || '',
+      address: ownerInfo.address || '',
+      ward: ownerInfo.ward || '',
+      memberStatus: ownerInfo.memberStatus || '',
+      lastScreening: ownerInfo.lastScreening,
+      weight: screenInfo.weight,
+      height: screenInfo.height,
+      age: screenInfo.monthAge,
+      ha: screenInfo.zScore.ha,
+      wa: screenInfo.zScore.wa,
+      wl: screenInfo.zScore.wl,
+      surveyDate: screenInfo.surveyDate,
+      screenId: screenInfo._id
     };
     var zscoreStatus = '';
-    if (parmObj.screenInfo.zScore.wl < -2) {
+    if (screenInfo.zScore.wl < -2) {
       zscoreStatus = 'Acute: supplements required';
-    } else if ((parmObj.screenInfo.zScore.ha < -2 || parmObj.screenInfo.zScore.wa < -2) && dataObj.age > 6 && dataObj.age < 36) {
+    } else if ((screenInfo.zScore.ha < -2 || screenInfo.zScore.wa < -2) && dataObj.age > 6 && dataObj.age < 36) {
       zscoreStatus = 'Acute: supplements required';
-    } else if ((parmObj.screenInfo.zScore.ha < -2 || parmObj.screenInfo.zScore.wa < -2) && dataObj.age > 36 && dataObj.age < 48) {
+    } else if ((screenInfo.zScore.ha < -2 || screenInfo.zScore.wa < -2) && dataObj.age > 36 && dataObj.age < 48) {
       zscoreStatus = 'Micro nutrients required';
-    } else if (parmObj.screenInfo.zScore.ha < -1 ||
-         parmObj.screenInfo.zScore.wa < -1 ||
-         parmObj.screenInfo.zScore.wl < -1) {
+    } else if (screenInfo.zScore.ha < -1 ||
+         screenInfo.zScore.wa < -1 ||
+         screenInfo.zScore.wl < -1) {
       zscoreStatus = 'At Risk: Come to next screening';
     } else {
       zscoreStatus = 'Normal';
     }
+
     var dataLine = dataObj.childId + ',' + dataObj.gender + ',' + dataObj.firstName + ',' + dataObj.lastName + ',' + dataObj.birthDate +
         ',' + dataObj.idGroup + ',' + dataObj.mother + ',' + dataObj.father + ',' + dataObj.phone + ',' + dataObj.address +
         ',' + dataObj.city + ',' + dataObj.ward + ',' + dataObj.memberStatus + ',' + dataObj.surveyDate + ',' + dataObj.weight + ',' + dataObj.height +
         ',' + dataObj.age + ',' + dataObj.ha + ',' + dataObj.wa + ',' + dataObj.wl + ',' + zscoreStatus + '\n';
-    resolve({ data: dataObj, dataLine: dataLine, stakeDB: parmObj.stakeDB, sortField: parmObj.sortField });
+    resolve({ data: dataObj, dataLine: dataLine, stakeDB: stakeDB, sortField: sortField });
   });
 }
 
@@ -393,21 +340,22 @@ function sortEm(listIn) {
 
 exports.createCSVFromDB = function (req, res) {
   function reportCSVComplete(input) {
-    res.status(200).send({
+    return res.status(200).send({
       message: 'files/' + req.params.stakeDB + '.csv'
     });
   }
   var parmObj = { stakeDB: req.params.stakeDB, filter: req.params.filter, sortField: req.params.sortField, screenInfo: {} };
-  pullSaveScreenData(parmObj)
+  buildOutputFromLastScreening(parmObj)
   .all().then(sortEm)
   .then(collectEm)
-  .then(writeTheFile).catch(function(err) {
+  .then(writeTheFile)
+  .then(reportCSVComplete).catch(function(err) {
     return res.status(400).send({
       message: err.message,
       name: err.name,
       stack: err.stack
     });
-  }).then(reportCSVComplete);
+  });
 };
 
 exports.getSyncURL = function(req, res) {

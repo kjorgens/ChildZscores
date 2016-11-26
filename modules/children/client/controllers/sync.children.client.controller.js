@@ -207,6 +207,10 @@
       console.log(input);
     }
 
+    function genReport(input){
+      ChildrenReport.get(input, returnReport, getCsvError);
+    }
+
     function getCsvError(error) {
       vm.stopSpin();
       console.log(error.data.message);
@@ -222,7 +226,9 @@
       if (sortField === undefined) {
         sortField = 'lastName';
       }
-      ChildrenReport.get({ stakeDB: vm.stakeDB, filter: filter, sortField: sortField }, returnReport, getCsvError);
+      var sortParam = { stakeDB: vm.stakeDB, filter: filter, sortField: sortField };
+ //     ChildrenViews.get(sortParam, genReport(sortParam), getCsvError);
+      ChildrenViews.updateViews(vm.stakeDB).then(genReport(sortParam), getCsvError);
     }
 
     function viewUpdateComplete(){
@@ -242,7 +248,7 @@
 
     function uploadExcelCsv() {
       vm.startSpin();
-      ChildrenViews.get({ stakeDB: vm.stakeDB }, viewUpdateComplete, viewUpdateError);
+      ChildrenViews.updateViews(vm.stakeDB).then( viewUpdateComplete, viewUpdateError);
     }
 
     vm.reportError = function (title, error, notifyKarl) {
