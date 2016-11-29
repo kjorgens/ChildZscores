@@ -162,7 +162,85 @@ function getLastScreeningData(ownerInfo, stakeDB, sortField) {
     });
   });
 }
+function getOwnerData(parmObj) {
+  return new Promise(function(resolve, reject) {
+    var couchURL;
+    if (process.env.COUCH_URL.indexOf('localhost') > -1) {
+      couchURL = 'http://' + process.env.COUCH_URL + '/';
+    } else {
+      couchURL = 'https://' + process.env.SYNC_ENTITY + '@' + process.env.COUCH_URL + '/';
+    }
+    var screenData = parmObj.screenInfo.key;
+    var sortField = parmObj.sort;
+    request.get(couchURL + parmObj.stakeDB + '/' +
+        parmObj.screenInfo.key.owner, function (error, response, body) {
+      if (!error && response.statusCode === 200) {
+        var ownerInfo = JSON.parse(body);
+        parmObj.ownerInfo = ownerInfo;
+        parmObj.screenInfo = screenData;
+        resolve(addLineToStack(ownerInfo, screenData, sortField, parmObj.stakeDB));
+      } else {
+        var msg = '';
+        var myError = new Error();
+        myError.name = screenData._id;
+        if (error) {
+          myError.message = error;
+          myError.name = 'database error';
+          reject(myError);
+        } else {
+          var reasons = JSON.parse(response.body);
+          var msg = 'Database Error: ' + response.statusCode + ': ' + response.statusMessage + '  Error:' + reasons.error + ' Reason: ' + reasons.reason;
+          myError.message = msg;
+          reject(myError);
+        }
+      }
+    });
+  });
+}
 
+function pullSaveScreenData(parmObj) {
+  return new Promise(function(resolve, reject) {
+    var couchURL;
+    var ddoc = parmObj.filter.indexOf('all') > -1 ? 'scr_list' : 'zscore_kids';
+    if (process.env.COUCH_URL.indexOf('localhost') > -1) {
+      couchURL = 'http://' + process.env.COUCH_URL + '/';
+    } else {
+      couchURL = 'https://' + process.env.SYNC_ENTITY + '@' + process.env.COUCH_URL + '/';
+    }
+    request.get(couchURL + parmObj.stakeDB +
+        '/_design/' + ddoc + '/_view/screen', function(error, response, body) {
+      if (!error && response.statusCode === 200) {
+        var jsonObj = JSON.parse(body);
+        if (jsonObj.total_rows === 0) {
+          var emptyError = new Error();
+          emptyError.name = 'Empty database';
+          emptyError.message = 'No entries in ' + parmObj.stakeDB + ', Sync first?';
+          reject(emptyError);
+        }
+        var screenList = [];
+        jsonObj.rows.forEach(function(screening) {
+          parmObj.screenInfo = screening;
+          screenList.push(getOwnerData(parmObj));
+        });
+        resolve(screenList);
+      } else {
+        var msg = '';
+        var myError = new Error({name:'',errors:[],message:''});
+        myError.name = 'database error';
+        if (error) {
+          myError.message = error;
+          myError.name = 'database error';
+          reject(myError);
+        } else {
+          var reasons = JSON.parse(response.body);
+  //        myError.push('Database Error: ' + response.statusCode + ': ' + response.statusMessage + '  Error:' + reasons.error + ' Reason: ' + reasons.reason);
+          myError.message = msg;
+          reject(myError);
+        }
+      }
+    });
+  });
+}
 function buildOutputFromLastScreening(parmObj) {
   return new Promise(function(resolve, reject) {
     var couchURL;
@@ -345,7 +423,7 @@ exports.createCSVFromDB = function (req, res) {
     });
   }
   var parmObj = { stakeDB: req.params.stakeDB, filter: req.params.filter, sortField: req.params.sortField, screenInfo: {} };
-  buildOutputFromLastScreening(parmObj)
+  pullSaveScreenData(parmObj)
   .all().then(sortEm)
   .then(collectEm)
   .then(writeTheFile)
