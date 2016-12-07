@@ -359,9 +359,9 @@
         var zscoreStatus = '';
         if (screeningObj.zScore.wl < -2) {
           zscoreStatus = 'Acute: supplements required';
-        } else if ((screeningObj.zScore.ha < -2 || screeningObj.zScore.wa < -2) && screeningObj.age > 6 && screeningObj.age < 36) {
+        } else if ((screeningObj.zScore.ha < -2 || screeningObj.zScore.wa < -2) && screeningObj.monthAge > 6 && screeningObj.monthAge < 36) {
           zscoreStatus = 'Acute: supplements required';
-        } else if ((screeningObj.zScore.ha < -2 || screeningObj.zScore.wa < -2) && screeningObj.age > 36 && screeningObj.age < 48) {
+        } else if ((screeningObj.zScore.ha < -2 || screeningObj.zScore.wa < -2) && screeningObj.monthAge > 36 && screeningObj.montAge < 48) {
           zscoreStatus = 'Micro nutrients required';
         } else if (screeningObj.zScore.ha < -1 ||
             screeningObj.zScore.wa < -1 ||
