@@ -34,7 +34,7 @@
     });
     // Set file uploader image filter
     vm.uploader.filters.push({
-      name: 'imageFilter',
+      name: 'csvFilter',
       fn: function (item, options) {
         var type = '|' + item.type.slice(item.type.lastIndexOf('/') + 1) + '|';
         return '|csv|'.indexOf(type) !== -1;
