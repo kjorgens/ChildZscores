@@ -15,13 +15,12 @@
           template: '<ui-view/>'
         })
         .state('children.list', {
-          url: '/list/:stakeDB/:stakeName',
+          url: '/list/:stakeDB/:stakeName/:searchFilter/:colorFilter/:screenType',
           templateUrl: 'modules/children/client/views/list-children.client.view.html',
           controller: 'ChildrenListController',
           controllerAs: 'vm',
           resolve: {
-    //        childResolve: listChildren
-            childResolve: initLocalDb
+            childResolve: listChildren
           },
           data: {
 
@@ -93,7 +92,7 @@
           }
         })
         .state('children.stake', {
-          url: '/stakes/:country',
+          url: 'list/stakes/:country',
           templateUrl: 'modules/children/client/views/stakes.client.view.html',
           controller: 'ChildrenStakeController',
           controllerAs: 'vm',
@@ -172,30 +171,60 @@
           data: {
 
           }
-        });
+        })
+        .state('children.editMother', {
+          url: '/mothers/:motherId',
+          templateUrl: 'modules/children/client/views/form-mother.client.view.html',
+          controller: 'WomenCreateController',
+          controllerAs: 'vm',
+          resolve: {
+            MotherResolve: getMother
+          },
+          data: {}
+        })
+        .state('children.listMothers', {
+          url: '/mothers/list/:stakeDB/:stakeName/:screenType',
+          templateUrl: 'modules/children/client/views/list-mothers.client.view.html',
+          controller: 'MotherController',
+          controllerAs: 'vm',
+          resolve: {
+            MotherResolve: getMotherList
+          },
+          data: {
+
+          }
+        })
+        .state('children.createMother', {
+          url: '/mothers/create/:stakeDB/:stakeName/:screenType',
+          templateUrl: 'modules/children/client/views/form-mother.client.view.html',
+          controller: 'WomenCreateController',
+          controllerAs: 'vm',
+          resolve: {
+            MotherResolve: newMother
+          },
+          data: {
+          }
+        })
+     ;
   }
 
   listChildren.$inject = ['$stateParams', 'PouchService'];
   function listChildren($stateParams, PouchService) {
-    PouchService.createDatabase($stateParams.stakeDB);
-    // PouchService.createIndex('firstName');
-    // PouchService.createIndex('lastName');
-    // PouchService.createIndex('owner');
-    // PouchService.createIndex('surveyDate');
-    // PouchService.createIndex('ward');
-    return PouchService.queryChildPromise();
+   return(PouchService.createDatabase($stateParams.stakeDB,PouchService.findChildren));
+  }
+
+  getMotherList.$inject = ['$stateParams', 'PouchService'];
+  function getMotherList($stateParams, PouchService) {
+    if(~$stateParams.screenType.indexOf('pregnant')) {
+      return(PouchService.createDatabase($stateParams.stakeDB,PouchService.findPregnantWomen));
+    } else if(~$stateParams.screenType.indexOf('nursing')) {
+      return(PouchService.createDatabase($stateParams.stakeDB,PouchService.findNursingMothers));
+    }
   }
 
   listWards.$inject = ['$stateParams', 'PouchService'];
   function listWards($stateParams, PouchService) {
-    PouchService.createDatabase($stateParams.stakeDB);
-    return PouchService.queryWardPromise({ wardId: $stateParams.wardId });
-  }
-
-  initLocalDb.$inject = ['$stateParams', 'PouchService'];
-  function initLocalDb($stateParams, PouchService) {
-    PouchService.createDatabase($stateParams.stakeDB);
-    return PouchService.initLocalDb();
+    return(PouchService.createDatabase($stateParams.stakeDB,PouchService.queryWardPromise, $stateParams.wardId));
   }
 
   listCountries.$inject = ['$stateParams', 'ChildrenStakes'];
@@ -213,10 +242,22 @@
     if ($stateParams.childId === '') {
       return PouchService;
     } else {
-      return PouchService.getOnePromise({
+      return PouchService.getOneChild({
         childId: $stateParams.childId
       });     // .$promise;
     }
+  }
+
+  newMother.$inject = ['$stateParams', 'PouchService'];
+  function newMother($stateParams, PouchService) {
+    return PouchService;
+  }
+
+  getMother.$inject = ['$stateParams', 'PouchService'];
+  function getMother($stateParams, PouchService) {
+      return PouchService.getOneMother({
+        motherId: $stateParams.motherId
+      });
   }
 
   getSyncInfo.$inject = ['$stateParams', 'ChildrenGetSync', 'Authentication'];
@@ -229,7 +270,7 @@
     if ($stateParams.surveyId === undefined) {
       return PouchService;
     } else {
-      return PouchService.getOnePromise({
+      return PouchService.getOneChild({
         childId: $stateParams.surveyId
       });
     }

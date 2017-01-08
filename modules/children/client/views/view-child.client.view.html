@@ -1,8 +1,8 @@
 <section>
     <div class="page-header" style="margin-top: 6em">
-        <h4>
-            <span><a ui-sref="children.list({stakeDB: vm.selectedDB, stakeName:vm.selectedStake})">{{vm.selectedStake}} <i class="glyphicon glyphicon-list"></i></a></span>
-        </h4>
+        <h3>
+            <span><a ui-sref="children.list({stakeDB: vm.selectedDB, stakeName:vm.selectedStake, searchFilter: '', colorFilter: '', screenType: 'children'})">{{vm.selectedStake}} <i class="glyphicon glyphicon-list"></i></a></span>
+        </h3>
         <h3>
             {{vm.child.firstName}} {{vm.child.lastName}}
             <span><a ui-sref="children.edit({childId: vm.child._id,surveyId:''})">   <i class="glyphicon glyphicon-edit"></i></a></span>
@@ -18,10 +18,9 @@
     </div>
     <small>
         <a ng-repeat="survey in vm.surveys"
-           ui-sref="children.editsurvey({ surveyId:survey._id, childId:vm.child._id})" class="list-group-item clearfix">
-            <small class="list-group-item-text ZscoreListContainer">
-                <h4>{{'AGE' | translate}} <span ng-bind="survey.monthAge "></span>
-                    , {{'HEIGHT' | translate}}
+           ui-sref="children.editsurvey({ surveyId:survey._id, childId:vm.child._id})" class="list-group-item clearfix" ng-class="survey.colorStatus">
+            <small class="list-group-item-text ZscoreListContainer ">
+                <h4>{{'AGE' | translate}} <span ng-bind="survey.monthAge "></span>, {{'HEIGHT' | translate}}
                     <span ng-bind="survey.height | number:2 "></span>, {{'WEIGHT' | translate}}
                     <span ng-bind="survey.weight | number:2 "></span></h4>
                 <h4>{{'Z_SCORES' | translate}}:

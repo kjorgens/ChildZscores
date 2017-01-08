@@ -5,9 +5,11 @@
     .module('children')
     .controller('SurveyController', SurveyController);
 
-  SurveyController.$inject = ['$rootScope', '$scope', '$state', '$timeout', '$translate', 'moment', 'surveyResolve', 'Authentication', 'ZScores', 'PouchService', 'ModalService'];
+  SurveyController.$inject = ['$rootScope', '$scope', '$state', '$timeout', '$translate', '$window', 'moment',
+    'surveyResolve', 'Authentication', 'ZScores', 'PouchService', 'ModalService'];
 
-  function SurveyController($rootScope, $scope, $state, $timeout, $translate, moment, survey, Authentication, ZScores, PouchService, ModalService) {
+  function SurveyController($rootScope, $scope, $state, $timeout, $translate, $window, moment,
+     survey, Authentication, ZScores, PouchService, ModalService) {
     var vm = this;
     $translate.use($rootScope.SelectedLanguage);
     vm.survey = survey;
@@ -30,6 +32,10 @@
         vm.invalidFields = true;
       }
     }
+
+    vm.goBack = function(){
+      $window.history.back();
+    };
 
     if (vm.survey._id) {
   //    vm.ageIsValid = true;
@@ -161,6 +167,7 @@
       months = screenDate.diff(bday, 'months', true);
       if (months > 60) {
         vm.ageIsValid = false;
+        vm.reportError('Too old ', 'Child has graduated', false);
       } else {
         vm.ageIsValid = true;
         vm.survey.monthAge = months.toFixed(2);

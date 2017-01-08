@@ -31,7 +31,7 @@
           PouchService.remove(toRemove, removeResponse, removeError);
         });
         PouchService.remove(child, removeResponse, removeError);
-        $state.go('children.list', { stakeDB: vm.selectedDB, stakeName: vm.selectedStake });
+        $state.go('children.list', { stakeDB: vm.selectedDB, stakeName: vm.selectedStake, screenType: 'children', searchFilter: '', colorFilter: '' });
       }
     }
 

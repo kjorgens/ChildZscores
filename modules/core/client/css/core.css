@@ -71,6 +71,18 @@ a:hover .header-profile-image {
     font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif;
 }
 
+.CreateMotherFormContainer {
+    color: black;
+    background-color: #f9b35d;
+    border-radius: 5px;
+    padding: 5%;
+    padding-top: -2%;
+    font-size: 16px;
+    font-weight: lighter;
+    border: 1px solid #CFD3D3;
+    font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif;
+}
+
 .CreateChildContainer {
   background-color: black;
   height: 100%;
@@ -103,27 +115,71 @@ a:hover .header-profile-image {
   text-align: center;
 }
 
+.bs-toggles{
+    margin: 20px;
+}
 .required input:after { content:"*"; }
 
 .normalZscore {
   color: green;
 }
 
+.normalZscoreBackground {
+    background-color: #e3f9e6;
+}
 .marginalZscore {
   color: orange;
 }
-
+.marginalZscoreBackground {
+    background-color: #ffebca;
+}
 .dangerZscore {
   background-color: black;
   color: white;
+}
+
+.stakeSelector{
+    background-color: #f9f3b2;
+}
+
+.pregnantWoman {
+    background-color: #bfd4cb;
 }
 
 .redZoneZscore {
   color: red;
 }
 
+.childrenSelect{
+  background-color: #74d2de;
+}
+
+.nursingMothersSelect{
+    background-color: #ceaec8;
+}
+
+.pregnantMothersSelect{
+    background-color: #d9f9c4;
+}
+
+.redZoneZscoreBackground {
+    background-color: #ffd5d1;
+}
+
 .lower {
   text-transform: lowercase;
+}
+
+.childItem {
+    /*content: "bob bot";*/
+    /*position: absolute;*/
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 1;
+    /*background-image: url('bolivia.png');*/
+    opacity: 0.25;
 }
 
 .select_list{

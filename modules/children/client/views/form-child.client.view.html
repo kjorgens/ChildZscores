@@ -1,25 +1,10 @@
 <section>
     <div class="page-header" style="margin-top: 6em">
-
-        <!--<div class='btn-toolbar pull-right'>-->
-            <!--<div class="btn-group" ng-if="vm.child._id">-->
-                <!--<a class="btn btn-primary" ui-sref="children.view({childId: vm.child._id})"-->
-                <!--&gt;Cancel</a>-->
-            <!--</div>-->
-            <!--<div class="btn-group" ng-if="!vm.child._id">-->
-                <!--<a class="btn btn-primary"-->
-                   <!--ui-sref="children.list({stakeDB: vm.selectedDB, stakeName: vm.selectedStake})">Cancel</a>-->
-            <!--</div>-->
-        <!--</div>-->
         <h3 style="margin-top: 2em">{{vm.child._id ? vm.edit_existing : vm.add_new}}</h3>
         <h3>
-            <span><a ui-sref="children.list({stakeDB: vm.selectedDB, stakeName: vm.selectedStake})">{{'CANCEL' | translate}}</a></span>
+            <span><a ui-sref="children.list({stakeDB: vm.selectedDB, stakeName: vm.selectedStake, searchFilter: '', colorFilter: '', screenType: 'children' })">{{'CANCEL' | translate}}</a></span>
         </h3>
     </div>
-    <!--<h3 style="margin-top: 1em" ng-if="vm.form.childForm.$valid">-->
-        <!--<span><a ng-click="vm.create(vm.form.childForm.$valid)">-->
-            <!--{{vm.child._id ? vm.update : vm.createRec }}{{'CHILD_RECORD' | translate}} <i class="glyphicon glyphicon-export"></i></a></span>-->
-    <!--</h3>-->
     <div ng-if="vm.invalidFields" >
         <h2 style="margin-top: 1em">
             <span ><a class="validateError">
@@ -50,11 +35,6 @@
                                 <div class="validationMessage" ng-if="vm.genderIsValid === false"><p>{{'GENDER_REQUIRED' | translate}}
                                 </p></div>
                             </div>
-                            <!--<div class="col-sm-3">-->
-                            <!--<button type="button" class="btn btn-primary" ng-model="vm.child.gender" uib-btn-checkbox btn-checkbox-true="Girl" btn-checkbox-false="Boy">-->
-                                <!--{{'GENDER' | translate}}-->
-                            <!--</button>-->
-                            <!--</div>-->
                         </div>
                         <div ng-class="{'has-error':(vm.membershipIsValid === false)}">
                             <label for="vm.child.memberStatus" class="col-sm-2 control-label">{{'LDS_MEMBER' | translate}}</label>
@@ -68,11 +48,6 @@
                                 <div class="validationMessage" ng-if="vm.membershipIsValid === false"><p>{{'MEMBER_STATUS_REQUIRED' | translate}}
                                 </p></div>
                             </div>
-                            <!--<div class="col-sm-3">-->
-                            <!--<button type="button" class="btn btn-primary" ng-model="vm.child.memberStatus" uib-btn-checkbox btn-checkbox-true="Yes" btn-checkbox-false="No">-->
-                                <!--{{'LDS_MEMBER' | translate}}-->
-                            <!--</button>-->
-                            <!--</div>-->
                         </div>
                     </div>
                     <div class="form-group float-left">
@@ -184,23 +159,12 @@
                   <div class="form-group">
                     <div ng-class="{'has-error':(!vm.genderIsValid)}">
 
-                      <!--<div class="col-sm-4 right-side-child">-->
-                        <!--<div style="margin-top:4%;">-->
-                          <!--<button type="submit" class="btn btn-primary">{{vm.child._id ? 'Update' : 'Create'}}-->
-                          <!--</button>-->
-                        <!--</div>-->
-                      <!--</div>-->
                     </div>
                   </div>
                 </div>
             </fieldset>
         </form>
-
     </div>
-    <!--<h3 style="margin-top: 1em" ng-if="vm.form.childForm.$valid">-->
-        <!--<span><a ng-click="vm.create(vm.form.childForm.$valid)">-->
-           <!--{{vm.child._id ? vm.update : vm.createRec}}{{'CHILD_RECORD' | translate}} <i class="glyphicon glyphicon-export"></i></a></span>-->
-    <!--</h3>-->
     <div ng-if="vm.invalidFields" >
         <h2 style="margin-top: 1em">
             <span ><a class="validateError">
@@ -213,10 +177,4 @@
                {{'UPDATE' | translate}} <i class="glyphicon glyphicon-export"></i></a></span>
         </h3>
     </div>
-    <!--<div class="panel-footer">-->
-        <!--<div class="pull-right">-->
-            <!--<button type="submit" class="btn btn-primary" ng-click="vm.create(vm.form.childForm.$valid)">{{vm.child._id ? 'Update' : 'Create'}}-->
-            <!--</button>-->
-        <!--</div>-->
-    <!--</div>-->
 </section>

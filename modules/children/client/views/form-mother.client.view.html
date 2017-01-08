@@ -1,0 +1,143 @@
+<section>
+  <div class="page-header" style="margin-top: 6em">
+    <h3 style="margin-top: 2em">{{vm.mother._id ? vm.edit_existing : vm.nursingMother ? vm.add_nursing :vm.add_pregnant}}</h3>
+    <h3>
+      <span><a ng-click="vm.goBack()">{{'CANCEL' | translate}}</a></span>
+    </h3>
+  </div>
+  <div ng-if="vm.invalidFields" >
+    <h2 style="margin-top: 1em">
+            <span ><a class="validateError">
+               {{'INVALID_FIELDS' | translate}} </a></span>
+    </h2>
+  </div>
+  <div>
+    <h3 style="margin-top: 1em">
+            <span><a ng-click="vm.create(vm.form.motherForm.$valid)">
+               {{'UPDATE' | translate}} <i class="glyphicon glyphicon-export"></i></a></span>
+    </h3>
+  </div>
+  <div class="col-md-12">
+    <form name="vm.form.motherForm" class="form-horizontal" ng-submit="vm.create(vm.form.motherForm.$valid)"
+          novalidate>
+      <fieldset>
+        <div class="CreateMotherFormContainer">
+          <div class="form-group float-left">
+            <div ng-class="{'has-error':(vm.firstNameIsValid === false)}">
+              <label for="vm.mother.firstName" class="col-sm-2 control-label">{{'FIRST_NAME' | translate}}</label>
+              <div class="col-sm-4">
+                <input class="form-control required" type="text" ng-blur="vm.checkFirstNameIsValid()"
+                       ng-model="vm.mother.firstName" id="vm.mother.firstName"
+                       placeholder="{{'FIRST_NAME' | translate}}"
+                       required>
+                <div class="validationMessage" ng-if="vm.firstNameIsValid === false"><p>{{'REQUIRED' | translate}}
+                </p></div>
+              </div>
+            </div>
+            <div ng-class="{'has-error':(vm.lastNameIsValid === false)}">
+              <label for="vm.mother.lastName" class="col-sm-2 control-label">{{'LAST_NAME' | translate}}</label>
+              <div class="col-sm-4">
+                <input type="input" class="form-control required" ng-blur="vm.checkLastNameIsValid()"
+                       ng-model="vm.mother.lastName"
+                       id="vm.mother.lastName"
+                       placeholder="{{'LAST_NAME' | translate}}"
+                       required>
+                <div class="validationMessage" ng-if="vm.lastNameIsValid === false"><p>{{'REQUIRED' | translate}}
+                </p></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group float-left">
+            <div ng-class="{'has-error':(vm.membershipIsValid === false)}">
+              <label for="vm.mother.memberStatus" class="col-sm-2 control-label">{{'LDS_MEMBER' | translate}}</label>
+              <div class="col-sm-4">
+                <select ng-change="vm.checkMembershipIsValid()" class="form-control"
+                        ng-model="vm.mother.memberStatus"
+                        id="vm.mother.memberStatus"
+                        ng-options="yesno.value as yesno.translationId | translate for yesno in vm.yesNo"
+                        required>
+                </select>
+                <div class="validationMessage" ng-if="vm.membershipIsValid === false"><p>{{'MEMBER_STATUS_REQUIRED' | translate}}
+                </p></div>
+              </div>
+            </div>
+            <div ng-if="!vm.nursingMother">
+            <div ng-class="{'has-error':(vm.deliveryDateIsValid === false)}">
+              <label for="vm.mother.deliveryDate" class="col-sm-2 control-label">{{'EXPECTED_DELIVERY_DATE' | translate}}</label>
+              <div class="col-sm-4">
+                <input type="date" id="vm.mother.deliveryDate" ng-blur="vm.checkDeliveryDateIsValid()" class="form-control"
+                       ng-model="vm.mother.deliveryDate"
+                       placeholder="{{'EXPECTED_DELIVERY_DATE' | translate}}"
+                       required>
+                <div class="validationMessage" ng-if="vm.deliveryDateIsValid === false"><p>{{'REQUIRED' | translate}}
+                </p></div>
+              </div>
+            </div>
+            </div>
+            <div ng-if="vm.nursingMother">
+            <div ng-class="{'has-error':(vm.childsBirthDate === false)}">
+              <label for="vm.mother.childsBirthDate" class="col-sm-2 control-label">{{'NURSING_CHILD_AGE' | translate}}</label>
+              <div class="col-sm-4">
+                <input type="date" id="vm.mother.childsBirthDate" ng-blur="vm.childsBirthDateIsValid()" class="form-control"
+                     ng-model="vm.mother.childsBirthDate"
+                     placeholder="{{'NURSING_CHILD_AGE' | translate}}"
+                     required>
+                <div class="validationMessage" ng-if="vm.childsBirthDateIsValid === false"><p>{{'REQUIRED' | translate}}
+               </p></div>
+             </div>
+            </div>
+            </div>
+          </div>
+          <div class="form-group float-left">
+            <label for="vm.mother.ward" class="col-sm-2 control-label">{{'WARD' | translate}}</label>
+            <div class="col-sm-4">
+              <input type="input" class="form-control"
+                     ng-model="vm.mother.ward" id="vm.mother.ward"
+                     placeholder="{{'WARD' | translate}}">
+            </div>
+            <label for="vm.mother.city" class="col-sm-2 control-label">{{'CITY' | translate}}</label>
+            <div class="col-sm-4">
+              <input type="input" class="form-control"
+                     ng-model="vm.mother.city" id="vm.mother.city"
+                     placeholder="{{'CITY' | translate}}">
+            </div>
+          </div>
+          <div class="form-group float-left">
+              <label for="vm.mother.address" class="col-sm-2 control-label">{{'STREET_ADDRESS' | translate}}</label>
+              <div class="col-sm-4">
+                <input type="input" class="form-control"
+                       ng-model="vm.mother.address" id="vm.mother.address"
+                       placeholder="{{'STREET_ADDRESS' | translate}}">
+              </div>
+            <label for="vm.mother.phone" class="col-sm-2 control-label">{{'TELEPHONE_NUMBER' | translate}}</label>
+            <div class="col-sm-4">
+              <input class="form-control" type="tel"
+                     ng-model="vm.mother.phone" id="vm.mother.phone">
+              <div></div>
+            </div>
+          </div>
+          <div class="form-group">
+            <div>
+
+            </div>
+            <label for="vm.mother.comments" class="col-sm-2 control-label">{{'COMMENTS' | translate}}</label>
+            <div class="col-sm-4">
+                                <textarea class="form-control" ng-model="vm.mother.comments" id="vm.mother.comments"
+                                          placeholder="{{'COMMENTS' | translate}}"></textarea>
+            </div>
+          </div>
+        </div>
+      </fieldset>
+    </form>
+  </div>
+  <div ng-if="vm.invalidFields" >
+    <h2 style="margin-top: 1em">
+            <span ><a class="validateError">
+               {{'INVALID_FIELDS' | translate}} </a></span>
+    </h2>
+  </div>
+  <h5 ng-if="vm.editMother">
+    <span><a ng-click="vm.remove(vm.mother)">{{'DELETE_THIS_RECORD' | translate}} <i class="glyphicon glyphicon-trash"></i></a></span>
+  </h5>
+</section>
