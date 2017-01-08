@@ -4,17 +4,17 @@
  * Module dependencies.
  */
 var path = require('path'),
-  mongoose = require('mongoose'),
-  request = require('request'),
-  fs = require('fs'),
-  csvParse = require('babyparse'),
-  moment = require('moment'),
-  uuid = require('uuid4'),
-  csvloader = require('multer'),
-  config = require(path.resolve('./config/config')),
-  Promise = require('bluebird'),
-  errorHandler = require(path.resolve('./modules/core/server/controllers/errors.server.controller'));
-  var errorStack = [];
+    mongoose = require('mongoose'),
+    request = require('request'),
+    fs = require('fs'),
+    csvParse = require('babyparse'),
+    moment = require('moment'),
+    uuid = require('uuid4'),
+    csvloader = require('multer'),
+    config = require(path.resolve('./config/config')),
+    Promise = require('bluebird'),
+    errorHandler = require(path.resolve('./modules/core/server/controllers/errors.server.controller'));
+var errorStack = [];
 
 var filterList = [
   {
@@ -101,23 +101,23 @@ function validateView(type, stakeDB, view) {
 
 exports.checkUpdateViews = function (req, res) {
   var toCheck = [];
-    viewList.forEach (function (view) {
-      toCheck.push (validateView ('view', req.params.stakeDB, view));
-    });
-    filterList.forEach (function (filter) {
-      toCheck.push (validateView ('filter', req.params.stakeDB, filter));
-    });
+  viewList.forEach (function (view) {
+    toCheck.push (validateView ('view', req.params.stakeDB, view));
+  });
+  filterList.forEach (function (filter) {
+    toCheck.push (validateView ('filter', req.params.stakeDB, filter));
+  });
 
-    var allViews = Promise.all(toCheck);
-    allViews.then(function(input){
-      return (res.status (200).send ({message: input}));
-    }).catch (function (err) {
-      return res.status (400).send ({
-        message: err.message,
-        name: err.name,
-        stack: err.stack
-      });
+  var allViews = Promise.all(toCheck);
+  allViews.then(function(input){
+    return (res.status (200).send ({message: input}));
+  }).catch (function (err) {
+    return res.status (400).send ({
+      message: err.message,
+      name: err.name,
+      stack: err.stack
     });
+  });
 };
 function getOwnerData(parmObj) {
   return new Promise(function(resolve, reject) {
@@ -223,19 +223,19 @@ function getLastScreeningData(ownerInfo, stakeDB, sortField) {
       } else if (!error) {
         resolve();
       } else  {
-          var msg = '';
-          var myError = new Error();
-          myError.name = screenData._id;
-          if (error) {
-            myError.message = error;
-            myError.name = 'database error';
-            reject(myError);
-          } else {
-            var reasons = JSON.parse(response.body);
-            var msg = 'Database Error: ' + response.statusCode + ': ' + response.statusMessage + '  Error:' + reasons.error + ' Reason: ' + reasons.reason;
-            myError.message = msg;
-            reject(myError);
-          }
+        var msg = '';
+        var myError = new Error();
+        myError.name = screenData._id;
+        if (error) {
+          myError.message = error;
+          myError.name = 'database error';
+          reject(myError);
+        } else {
+          var reasons = JSON.parse(response.body);
+          var msg = 'Database Error: ' + response.statusCode + ': ' + response.statusMessage + '  Error:' + reasons.error + ' Reason: ' + reasons.reason;
+          myError.message = msg;
+          reject(myError);
+        }
       }
     });
   });
@@ -272,9 +272,9 @@ function buildOutputFromLastScreening(parmObj) {
         if(childrenList.length === 0){
           var msg = '';
           var myError = new Error({name:'',errors:[],message:''});
-            myError.message = 'No Screenings entered.';
-            myError.name = 'Children in database ' + parmObj.stakeDB + ' contain no screenings ';
-            reject(myError);
+          myError.message = 'No Screenings entered.';
+          myError.name = 'Children in database ' + parmObj.stakeDB + ' contain no screenings ';
+          reject(myError);
         } else {
           resolve (childrenList);
         }
@@ -383,8 +383,8 @@ function addLineToStack(ownerInfo, screenInfo, sortField, stakeDB) {
     } else if ((screenInfo.zScore.ha < -2 || screenInfo.zScore.wa < -2) && dataObj.age > 36 && dataObj.age < 48) {
       zscoreStatus = 'Micro nutrients required';
     } else if (screenInfo.zScore.ha < -1 ||
-         screenInfo.zScore.wa < -1 ||
-         screenInfo.zScore.wl < -1) {
+        screenInfo.zScore.wa < -1 ||
+        screenInfo.zScore.wl < -1) {
       zscoreStatus = 'At Risk: Come to next screening';
     } else {
       zscoreStatus = 'Normal';
@@ -549,7 +549,7 @@ function updateChildObject(dataBase, childInfo) {
 function saveTheObjects(dataBase, childInfo, screeningInfo) {
   return new Promise(function (resolve,reject){
     var stakeDb = require('nano')('https://' + process.env.SYNC_ENTITY + '@' + process.env.COUCH_URL + '/' + dataBase);
- //   childInfo._id = 'chld_' + childInfo.firstName.replace(' ','_') + '_' + dataBase + '_' + moment ();
+    //   childInfo._id = 'chld_' + childInfo.firstName.replace(' ','_') + '_' + dataBase + '_' + moment ();
     childInfo._id = 'chld_' + dataBase + '_' + uuid();
     stakeDb.insert (childInfo, function (err, childResponse) {
       if (err) {
@@ -559,7 +559,7 @@ function saveTheObjects(dataBase, childInfo, screeningInfo) {
         resolve (err.message);
 //      reject(err);
       } else {
-       if (childResponse.ok) {
+        if (childResponse.ok) {
           var childObj = {};
           childObj = childInfo;
           childObj._rev = childResponse.rev;
@@ -577,21 +577,21 @@ function saveTheObjects(dataBase, childInfo, screeningInfo) {
 }
 
 function calculateStatus(screeningObj) {
-    var zscoreStatus = '';
-    if (screeningObj.zScore.wl < -2) {
-      zscoreStatus = 'Acute: supplements required';
-    } else if ((screeningObj.zScore.ha < -2 || screeningObj.zScore.wa < -2) && screeningObj.age > 6 && screeningObj.age < 36) {
-      zscoreStatus = 'Acute: supplements required';
-    } else if ((screeningObj.zScore.ha < -2 || screeningObj.zScore.wa < -2) && screeningObj.age > 36 && screeningObj.age < 48) {
-      zscoreStatus = 'Micro nutrients required';
-    } else if (screeningObj.zScore.ha < -1 ||
-        screeningObj.zScore.wa < -1 ||
-        screeningObj.zScore.wl < -1) {
-      zscoreStatus = 'At Risk: Come to next screening';
-    } else {
-      zscoreStatus = 'Normal';
-    }
-    return({ screeningObj: screeningObj, zscoreStatus: zscoreStatus });
+  var zscoreStatus = '';
+  if (screeningObj.zScore.wl < -2) {
+    zscoreStatus = 'Acute: supplements required';
+  } else if ((screeningObj.zScore.ha < -2 || screeningObj.zScore.wa < -2) && screeningObj.age > 6 && screeningObj.age < 36) {
+    zscoreStatus = 'Acute: supplements required';
+  } else if ((screeningObj.zScore.ha < -2 || screeningObj.zScore.wa < -2) && screeningObj.age > 36 && screeningObj.age < 48) {
+    zscoreStatus = 'Micro nutrients required';
+  } else if (screeningObj.zScore.ha < -1 ||
+      screeningObj.zScore.wa < -1 ||
+      screeningObj.zScore.wl < -1) {
+    zscoreStatus = 'At Risk: Come to next screening';
+  } else {
+    zscoreStatus = 'Normal';
+  }
+  return({ screeningObj: screeningObj, zscoreStatus: zscoreStatus });
 }
 
 function statusColor(status) {
@@ -793,7 +793,7 @@ exports.uploadCsv = function (req, res) {
     } else {
       // parse csv
       parseCsv (res.req.file.path, function (parsedData) {
-          buildObject(req.params.stakeDB, parsedData)
+        buildObject(req.params.stakeDB, parsedData)
             .all ().then (returnOk).catch (function (err) {
           return res.status (400).send ({
             message: err.message,
