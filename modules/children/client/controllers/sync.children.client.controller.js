@@ -16,6 +16,7 @@
     var vm = this;
     vm.user = Authentication.user;
     vm.userIsAdmin = false;
+    vm.goBack = goBack;
     vm.user.roles.forEach(function(role){
       if (role.indexOf('admin') > -1){
         vm.userIsAdmin = true;
@@ -34,7 +35,7 @@
     });
     // Set file uploader image filter
     vm.uploader.filters.push({
-      name: 'imageFilter',
+      name: 'csvFilter',
       fn: function (item, options) {
         var type = '|' + item.type.slice(item.type.lastIndexOf('/') + 1) + '|';
         return '|csv|'.indexOf(type) !== -1;
@@ -72,6 +73,10 @@
       console.info('onCancelItem', fileItem, response, status, headers);
     };
 
+    function goBack(){
+      $window.history.back();
+    }
+
     vm.uploader.onCompleteItem = function(fileItem, response, status, headers) {
       if(status !== 200){
         console.log(status + ' ' + response);
@@ -92,7 +97,7 @@
 
       // Show error message
       vm.error = response.message;
-    }
+    };
 
     // Change user profile picture
 
@@ -106,13 +111,14 @@
     vm.reportName = $stateParams.stakeDB + '.csv';
     vm.reportReady = false;
     vm.stakeDB = $stateParams.stakeDB;
+    vm.stakeDB = localStorage.getItem('selectedDBName');
     vm.selectedStake = localStorage.getItem('selectedStake');
     vm.selectedCountry = localStorage.getItem('selectedCountry');
     vm.selectedCountryImage = localStorage.getItem('selectedCountryImage');
     // vm.filterSelect = 'All Children';
     vm.authentication = Authentication;
 
-    vm.selectedStake = $stateParams.stakeName;
+    //vm.selectedStake = $stateParams.stakeName;
     //   vm.selectedCountryObject = sessionStorage.getItem('selectedCountryObject');
     vm.createReport = createReport;
     vm.syncUpstream = syncUpstream;
@@ -151,9 +157,10 @@
 
     function whenDoneDown() {
       find();
-      vm.stopSpin();
+      // vm.stopSpin();
       console.log('couchdb sync complete');
-      $state.go('children.list', { stakeDB: vm.stakeDB, stakeName: vm.selectedStake });
+      goBack();
+  //    $state.go('children.list', { stakeDB: vm.stakeDB, stakeName: vm.selectedStake, searchFilter: '', colorFilter: '' });
     }
 
     function replicateUp (input) {

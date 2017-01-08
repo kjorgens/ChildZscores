@@ -16,12 +16,17 @@
     var localDbList;
     var currentDbName;
     var pouchIndexes = [
-      'firstName', 'lastName', 'owner', 'surveyDate', 'ward'
+      'surveyDate', 'firstName', 'zscoreStatus', 'lastName', 'owner',  'ward',
+       'deliveryDate', 'childsBirthDate', 'lastScreening'
     ];
-    factory.createDatabase = function (dbName) {
-      currentDbName = dbName;
-      database = pouchDB(dbName);
-      factory.ddocFilter();
+    factory.createDatabase = function (dbName, queryFunction, queryParams) {
+      if(database && ~database.name.indexOf(dbName)){
+        return queryFunction(queryParams);
+      } else {
+        currentDbName = dbName;
+        database = pouchDB (dbName);
+        return (factory.ddocFilter ().then (factory.initLocalDb ()).then (queryFunction));
+      }
     };
 
     factory.createCountryDatabase = function () {
@@ -31,59 +36,40 @@
     factory.destroyDatabase = function (dbName) {
       database = pouchDB(dbName);
       database.destroy();
+      database.name = '';
     };
 
     factory.ddocFilter = function() {
-      var deferred = $q.defer();
-      database.get('_design/filter_ddocs')
-          .then(function (response) {
-            deferred.resolve('found');
-          }).catch(function(err) {
-            database.put(
+      return  $q(function(resolve,reject) {
+        database.get('_design/filter_ddocs')
+            .then(function (response) {
+              resolve('filter found');
+            }).catch(function(err) {
+              database.put(
               {
                 _id: '_design/filter_ddocs',
                 filters:
-                {
-                  'ddocs': 'function(doc, req) {if(doc._id[0] != \'_\') {return true} else {return false}  }'
-                }
+                    {
+                      'ddocs': 'function(doc, req) {if(doc._id[0] != \'_\') {return true} else {return false}  }'
+                    }
               }).then(function(response) {
-                console.log('filter created');
-                deferred.resolve('filter created');
-              }).catch(function(err) {
-                console.log(err.message);
-                deferred.reject(err.message);
-              });
+            console.log('filter created');
+            resolve('filter created');
+          }).catch(function(err) {
+            console.log(err.message);
+            reject(err.message);
           });
+        });
+      })
     };
 
     factory.initLocalDb = function() {
-      var deferred = $q.defer();
-      var indexFunctions = [];
-      angular.forEach(pouchIndexes, function(index) {
-        indexFunctions.push(database.createIndex({ index: { fields: [index] } }));
-      });
-      $q.all(indexFunctions)
-      .then(
-          function(results) {
-            deferred.resolve(results);
-          },
-          function(errors) {
-            deferred.reject(errors);
-          },
-          function(updates) {
-            deferred.update(updates);
-          });
-      return deferred.promise;
+       var indexFunctions = [];
+       angular.forEach (pouchIndexes, function (index) {
+         indexFunctions.push (database.createIndex ({index: {fields: [index]}}));
+       });
+       return ($q.all(indexFunctions));
     };
-
-    // factory.getAllDbsLocal = function(callback) {
-    //   pouchDB.allDbs(function(err, dbs) {
-    //     if (err) {
-    //       var error = err;
-    //     }
-    //     callback(dbs);
-    //   });
-    // };
 
     factory.putStakesLocal = function (countryObj, callback, errCallback) {
       var newObj = {};
@@ -163,53 +149,19 @@
           });
     };
 
-
-    // factory.getDbListRemote = function (callback, errorCallback, nextState) {
-    //   countryDataBase.sync('https://syncuser:mZ7K3AldcIzO@database.liahonakids.org:5984/country_list').$promise
-    //       .then(function (response) {
-    //         // Do something with the response
-    //         callback(response);
-    //       })
-    //       .catch(function (error) {
-    //         // Do something with the error
-    //         errorCallback(error);
-    //       })
-    //       .finally(function () {
-    //         nextState();
-    //         // Do something when everything is done
-    //       });
-    // };
-
     factory.createIndex = function (indexName, callback, errCallback) {
-      return database.createIndex({ index: {
-        fields: [indexName]
-      }
-    });
-
-//      database.createIndex
-      //   index: {
-      //     fields: [indexName]
-      //   }
-      // }).then(function (result) {
-      //   callback(result);
-      // }).catch(function (err) {
-      //   errCallback(err);
-      // });
-    };
-
-    factory.queryChildPromise = function () {
-      var findObj = {
-        selector: { firstName: { $gt: null } },
-        sort: ['firstName']
-      };
-      return (factory.initLocalDb().then(database.find(findObj)));
- //     return database.find(findObj);
+      return database.createIndex(
+          { index:
+              {
+                fields: [indexName]
+              }
+          }
+      );
     };
 
     factory.queryByWardPromise = function (wardId) {
       var findObj = {
         selector: { ward: { $eq: wardId } },
-        sort: ['firstName']
       };
       return database.find(findObj);
     };
@@ -220,7 +172,7 @@
           ward: { $eq: wardName },
           firstName: { $gt: null }
         },
-        sort: ['firstName']
+        // sort: ['firstName']
       };
       return database.find(findObj)
           .then(function(response) {
@@ -230,10 +182,32 @@
             errorCallBack(error);
           });
     };
+
+    factory.findChildren = function () {
+        var params = {
+          selector: {lastScreening: {$gt: null}},
+        };
+        return database.find (params);
+    };
+
+    factory.findPregnantWomen = function () {
+      var params = {
+        selector: { deliveryDate: { $exists: true } }
+      };
+      return database.find(params);
+    };
+
+    factory.findNursingMothers = function () {
+      var params = {
+        selector: { childsBirthDate: { $gt: null } }
+      };
+      return database.find(params);
+    };
+
     factory.queryChildren = function (callback, callbackError) {
       return database.find({
         selector: { firstName: { $gt: null } },
-        sort: ['firstName']
+        // sort: ['firstName']
       })
       .then(function (response) {
             // Do something with the response
@@ -244,6 +218,24 @@
         callbackError(error);
       });
     };
+
+    // factory.getByStatus = function (status, callback, callbackError) {
+    //   return database.find({
+    //     selector: {
+    //       owner: { $eq: childId },
+    //       surveyDate: { $gt: null }
+    //     },
+    //     sort: [{ surveyDate: 'desc' }]
+    //   })
+    //       .then(function (response) {
+    //         // Do something with the response
+    //         callback(response);
+    //       })
+    //       .catch(function (error) {
+    //         // Do something with the error
+    //         callbackError(error);
+    //       });
+    // };
 
     factory.getSurveys = function (childId, callback, callbackError) {
       return database.find({
@@ -306,23 +298,27 @@
           });
     };
 
-    factory.getOnePromise = function (doc) {
+    factory.getOneChild = function (doc) {
       return database.get(doc.childId);
     };
 
-    factory.getOne = function (doc) {
-      database.get(doc.childId)
-          .then(function (response) {
-            // Do something with the response
-            return response;
-          })
-          .catch(function (error) {
-            // Do something with the error
-          })
-          .finally(function () {
-            // Do something when everything is done
-          });
+    factory.getOneMother = function (doc) {
+      return database.get(doc.motherId);
     };
+
+    // factory.getOne = function (doc) {
+    //   database.get(doc.childId)
+    //       .then(function (response) {
+    //         // Do something with the response
+    //         return response;
+    //       })
+    //       .catch(function (error) {
+    //         // Do something with the error
+    //       })
+    //       .finally(function () {
+    //         // Do something when everything is done
+    //       });
+    // };
 
     factory.query = function (qFunction, callback, errorCallback) {
       database.query(qFunction)
@@ -359,9 +355,9 @@
         var zscoreStatus = '';
         if (screeningObj.zScore.wl < -2) {
           zscoreStatus = 'Acute: supplements required';
-        } else if ((screeningObj.zScore.ha < -2 || screeningObj.zScore.wa < -2) && screeningObj.age > 6 && screeningObj.age < 36) {
+        } else if ((screeningObj.zScore.ha < -2 || screeningObj.zScore.wa < -2) && screeningObj.monthAge > 6 && screeningObj.monthAge < 36) {
           zscoreStatus = 'Acute: supplements required';
-        } else if ((screeningObj.zScore.ha < -2 || screeningObj.zScore.wa < -2) && screeningObj.age > 36 && screeningObj.age < 48) {
+        } else if ((screeningObj.zScore.ha < -2 || screeningObj.zScore.wa < -2) && screeningObj.monthAge > 36 && screeningObj.monthAge < 48) {
           zscoreStatus = 'Micro nutrients required';
         } else if (screeningObj.zScore.ha < -1 ||
             screeningObj.zScore.wa < -1 ||
@@ -417,6 +413,33 @@
       });
     }
 
+    factory.calcSurveyStatus = function(screeningObj){
+      var zscoreStatus = '';
+
+      if (screeningObj.zScore.wl < -2) {
+        zscoreStatus = 'redZoneZscoreBackground';
+      } else if ((screeningObj.zScore.ha < -2 || screeningObj.zScore.wa < -2) && screeningObj.monthAge > 6 && screeningObj.monthAge < 36) {
+        zscoreStatus = 'redZoneZscoreBackground';
+      } else if ((screeningObj.zScore.ha < -2 || screeningObj.zScore.wa < -2) && screeningObj.monthAge > 36 && screeningObj.monthAge < 48) {
+        zscoreStatus = 'redZoneZscoreBackground';
+      } else if (screeningObj.zScore.ha < -1 ||
+          screeningObj.zScore.wa < -1 ||
+          screeningObj.zScore.wl < -1) {
+        zscoreStatus = 'marginalZscoreBackground';
+      } else {
+        zscoreStatus = 'normalZscoreBackground';
+      }
+      return zscoreStatus;
+    };
+
+    factory.statusColor = function(status){
+      return statusColor(status);
+    };
+
+    factory.statusColorBackground = function(status){
+      return statusColorBackground(status);
+    };
+
     factory.addScreening = function (screening, childId, callBack, errCallback) {
       getScreeningInfo({ screening: screening.id, child: childId })
             .then(calculateStatus)
@@ -446,6 +469,7 @@
       database.put(childInfo)
           .then(function (response) {
             // Do something with the response
+
             callback(response);
           })
           .catch(function (error) {
@@ -466,6 +490,20 @@
           })
           .catch(function (error) {
             // Do something with the error
+          })
+          .finally(function () {
+            // Do something when everything is done
+          });
+    };
+
+    factory.updateMother = function (motherInfo, callback, errorCallback) {
+      //     childInfo._id = uuid4.generate ();
+      database.put(motherInfo)
+          .then(function (response) {
+            callback(response);
+          })
+          .catch(function (error) {
+            errorCallback(error);
           })
           .finally(function () {
             // Do something when everything is done

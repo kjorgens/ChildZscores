@@ -3,12 +3,11 @@
         <div class="row">
             <div class="col-md-4" class="pull-left">
                 <!--<img src={{vm.selectedCountryImage}}>-->
-                <h4>
+                <h3>
                     <span><a ui-sref="children.stake({country: vm.selectedCountry})">{{vm.selectedCountry}} <i
                             class="glyphicon glyphicon-list"></i>  {{vm.selectedStake}}</a></span>
-
-                </h4>
-                <h4>
+                </h3>
+                <h3>
                     <div ng-if="vm.onLine">
                         <a ui-sref="children.sync({stakeDB: vm.selectedStakeDB, stakeName:vm.selectedStake})">{{'SYNC_OR_REPORT' | translate }}
                             <!--<i class="glyphicon glyphicon-refresh"></i>-->
@@ -28,13 +27,9 @@
                     <div ng-if="!vm.onLine">
                         {{vm.selectedStake}}
                     </div>
-                </h4>
+                </h3>
                 <h4 ng-if="vm.wardList">
                     {{'SELECT_WARD' | translate}}
-                    <!--<div data-ng-if="vm.selectedWard">-->
-                    <!--<a ui-sref="children.wards({stake:vm.selectedStake})">{{vm.selectedWard}} Ward <i class="glyphicon glyphicon-list"></i></a>-->
-                    <!--</div>-->
-                    <!--<div data-ng-if="!vm.selectedWard">-->
                     <select  ng-change="vm.selectWard()" class="form-control"
                              ng-model="vm.selectedWard"
                              id="selectedWard"
@@ -42,12 +37,28 @@
                              required>
                         <option value="">{{'ALL_WARDS' | translate }}</option>
                     </select>
-
-                    <!--</div>-->
                 </h4>
                 <h3 >
                    <a id="addChild" ui-sref="children.create({ward:vm.selectedWard.wardName})">{{'ADD_NEW_CHILD' | translate}} <i class="glyphicon glyphicon-plus"></i></a>
                 </h3>
+            </div>
+            <div ng-if="vm.childList.length > 0">
+                <div class="bs-toggles">
+                    <div data-toggle="buttons">
+                        <button ng-show="vm.childFilter !== 'r'" class="btn {vm.filterDangerFlag ? btn-danger : btn-default} btn-lg"  ng-click="vm.filterDanger()">{{'ACUTE' | translate}}></button>
+                        <button ng-show="vm.childFilter !== 'w'" class="btn btn-warning btn-lg" ng-click="vm.filterWarning()">{{'AT_RISK' | translate}}></button>
+                        <button ng-show="vm.childFilter !== 'n'" class="btn btn-success btn-lg" ng-click="vm.filterSuccess()">{{'NORMAL_ZSCORE' | translate}}></button>
+                        <button ng-show="vm.childFilter !== 'a'" class="btn btn-default btn-lg" ng-click="vm.filterNone()">{{'ALL_CHILDREN' | translate}}></button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4" style="margin-top: 2em" ng-if="vm.childList.length > 0">
+                <input class="form-control col-md-4" type="text"  data-ng-model="vm.searchString" placeholder="Search"  ng-keyup="vm.searchStarted($event)" autoFocus/>
+                <div ng-if="vm.searchString.length > 0">
+                    <label class="btn btn-default btn-sm">
+                        <a   ng-click="vm.clearSearch()"/>Clear Search
+                    </label>
+                </div>
             </div>
         </div>
     </div>
@@ -65,38 +76,36 @@
         </div>
     </div>
     <div class="list-group">
-        <a ng-repeat="child in vm.childList.docs" ui-sref="children.view({childId: child._id})" class="list-group-item">
+        <a ng-repeat="child in vm.childList" ui-sref="children.view({childId: child._id})" >
+            <div class="list-group-item list-group-item-action" ng-if="child.display === true" ng-class="child.backGroundColor">
             <small class="list-group-item-text">
                 <h3><span ng-bind="child.firstName"></span>
                     <span ng-bind="child.lastName"></span></h3>
                 <h4 ng-if="child.statusColor">
-                    {{'ZSCORE_STATUS' | translate}}:
-                    <span ng-class="child.statusColor" ng-if="child.zscoreStatus === 'Acute: supplements required'">
+                    {{child.monthAge<60 ? ('ZSCORE_STATUS' | translate) : ('CHILD_GRADUATED' | translate)}}:
+                    <span ng-class="child.statusColor" ng-if="child.zscoreStatus === 'Acute: supplements required' && child.monthAge<60">
                           {{'ACUTE_ZSCORE' | translate}} </span>
-                    <span ng-class="child.statusColor" ng-if="child.zscoreStatus === 'Micro nutrients required'">
+                    <span ng-class="child.statusColor" ng-if="child.zscoreStatus === 'Micro nutrients required' && child.monthAge<60">
                           {{'MICRO_NUTRITION_ZSCORE' | translate}} </span>
-                    <span ng-class="child.statusColor" ng-if="child.zscoreStatus === 'At Risk: Come to next screening'">
+                    <span ng-class="child.statusColor" ng-if="child.zscoreStatus === 'At Risk: Come to next screening' && child.monthAge<60">
                           {{'AT_RISK_ZSCORE' | translate}} </span>
-                    <span ng-class="child.statusColor" ng-if="child.zscoreStatus === 'Normal'">
+                    <span ng-class="child.statusColor" ng-if="child.zscoreStatus === 'Normal' && child.monthAge<60">
                           {{'NORMAL_ZSCORE' | translate}} </span>
                 </h4>
                  {{child.gender === 'Boy' ? ('TXT_MALE' | translate) : ('TXT_FEMALE' | translate)}}, {{'BORN' | translate}}
                 <span ng-bind="child.birthDate | date:'mediumDate'"></span>
-                <!--{{'SCREENING_DATE' | translate}}:-->
-                <!--<span ng-bind="child.surveyDate | date:'mediumDate'"></span>-->
-                <!--{{'BY' | translate}}-->
-                <!--<span ng-bind="child.interviewer"></span>-->
             </small>
+            </div>
         </a>
     </div>
     <span us-spinner="{radius:30, width:8, length: 16}" spinner-key="spinner-sync" spinner-theme="bigBlue"></span>
     <h4>
-        <div ng-if="vm.onLine && !vm.childList.docs.length" class="alert alert-warning text-center">
+        <div ng-if="vm.onLine && !vm.childList.length" class="alert alert-warning text-center">
             {{'NO_CHILDREN_LISTED' | translate}} <a ui-sref="children.sync({stakeDB: vm.selectedStakeDB, stakeName:vm.selectedStake})">{{'SYNC' | translate}}
             <i class="glyphicon glyphicon-refresh"></i></a> or <a ui-sref="children.create({ward:'none'})">{{'ADD_NEW_CHILD' | translate}} <i
                 class="glyphicon glyphicon-plus"></i></a>
         </div>
-        <div ng-if="!vm.onLine && !vm.childList.docs.length" class="alert alert-warning text-center">
+        <div ng-if="!vm.onLine && !vm.childList.length" class="alert alert-warning text-center">
            {{'NO_CHILDREN_LISTED' | translate}} <a ui-sref="children.create({ward:'none'})">{{'ADD_NEW_CHILD' | translate}} <i class="glyphicon glyphicon-plus"></i></a>
         </div>
     </h4>

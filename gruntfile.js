@@ -111,7 +111,7 @@ module.exports = function (grunt) {
         files: [
  //         {src: ['.ebextensions/01-ebextensions.config'], dest: '/'},
  //         {src: ['.ebextensions/03-nginx.config'], dest: '/'},
-          { src: ['files'], dest: '/' },
+          { src: ['files/*'], dest: '/' },
           { src: ['package.json'], dest: '/' },
           { src: ['.ebextensions/01-nginx.config'], dest: '/' },
  //         { src: ['.ebextensions/00-npm-script'], dest: '/' },
@@ -327,7 +327,7 @@ module.exports = function (grunt) {
   grunt.registerTask('test', ['env:test', 'lint', 'mkdir:upload', 'copy:localConfig', 'server', 'mochaTest', 'karma:unit', 'protractor']);
   grunt.registerTask('test:server', ['env:test', 'lint', 'server', 'mochaTest']);
   grunt.registerTask('test:client', ['env:test', 'lint', 'karma:unit']);
-  grunt.registerTask('test:e2e', ['env:test', 'lint', 'dropdb', 'server', 'protractor']);
+  grunt.registerTask('test:e2e', ['env:test', 'dropdb', 'server', 'protractor']);
   // Run project coverage
   grunt.registerTask('coverage', ['env:test', 'lint', 'mocha_istanbul:coverage', 'karma:unit']);
 

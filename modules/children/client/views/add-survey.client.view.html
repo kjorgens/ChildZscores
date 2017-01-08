@@ -1,31 +1,5 @@
 <section>
     <div class="page-header" style="margin-top: 4em">
-        <!--<img src={{vm.selectedCountryImage}}>-->
-        <!--&lt;!&ndash;<h3>{{vm.selectedCountry}}</h3>&ndash;&gt;-->
-        <!--&lt;!&ndash;<h3>{{vm.selectedStake}}</h3>&ndash;&gt;-->
-        <!--<h4>-->
-            <!--<span><a ui-sref="children.stake({country: vm.selectedCountry})">{{vm.selectedCountry}}</a></span>-->
-            <!--<i class="glyphicon glyphicon-list"></i>-->
-        <!--</h4>-->
-        <!--<h4>-->
-            <!--<span><a ui-sref="children.list({stakeDB: vm.selectedDB, stakeName:vm.selectedStake})">{{vm.selectedStake}}</a></span>-->
-            <!--<i class="glyphicon glyphicon-list"></i>-->
-        <!--</h4>-->
-        <!--<h3>-->
-            <!--<span><a ui-sref="children.edit({childId: vm.child._id,surveyId:''})">{{vm.child.firstName}}{{vm.child.lastName}}</a></span>-->
-            <!--<i class="glyphicon glyphicon-edit"></i>-->
-        <!--</h3>-->
-
-        <!--<div class='btn-toolbar pull-right'>-->
-            <!--<div class="btn-group">-->
-                <!--<a class="btn btn-primary" ui-sref="children.view({childId: vm.child._id})">Cancel</a>-->
-            <!--</div>-->
-            <!--<a class="btn btn-primary" ng-click="vm.remove(vm.survey)">-->
-                <!--Remove-->
-                <!--<i class="glyphicon glyphicon-trash"></i>-->
-            <!--</a>-->
-        <!--</div>-->
-
         <h4 class="list-group-item-heading">
             <h3><span ng-bind="vm.child.firstName"></span>
             <span ng-bind="vm.child.lastName"></span>
@@ -39,13 +13,7 @@
         <h3>
             <span><a ui-sref="children.view({childId: vm.child._id})">{{'CANCEL' | translate}}</a></span>
         </h3>
-
-
     </div>
-    <!--<h3 ng-if="vm.childHeightIsValid && vm.childWeightIsValid" >-->
-                        <!--<span><a ng-click="vm.addSurvey(vm.form.surveyForm.$valid)">{{vm.child._id ? vm.updateMsg : vm.createMsg}} {{'CHILD_RECORD' | translate}} <i-->
-                                <!--class="glyphicon glyphicon-export"></i></a></span>-->
-    <!--</h3>-->
     <div ng-if="vm.invalidFields" >
         <h2 style="margin-top: 1em">
             <span ng-class="validateError"><a class="validateError">
@@ -100,26 +68,10 @@
                                    ng-model="vm.surveyDate"
                                    is-open="status.opened" required>
                         </div>
-
-
                     </div>
-                    <!--<h3 ng-if="vm.childHeightIsValid && vm.childWeightIsValid" >-->
-                        <!--<span><a ng-click="vm.addSurvey(vm.form.surveyForm.$valid)">{{vm.child._id ? 'Update ' : 'Create '}}Child Record <i-->
-                                <!--class="glyphicon glyphicon-export"></i></a></span>-->
-                    <!--</h3>-->
-                    <!--<div class="col-sm-4" style="text-align: center">-->
-                    <!--<div style="margin-top:4%;">-->
-                    <!--<button type="submit" class="btn btn-primary">{{vm.survey._id ? 'Update' : 'Create'}}-->
-                    <!--</button>-->
-                    <!--</div>-->
-                    <!--</div>-->
-                    <!--<video id="video" width="640" height="480" autoplay></video>-->
-                    <!--<button id="snap">Snap Photo</button>-->
-                    <!--<canvas id="canvas" width="640" height="480"></canvas>-->
                 </div>
             </fieldset>
         </form>
-
     </div>
     <h5 ng-if="vm.survey._id">
         <span><a ui-sref="children.removeSurvey({ surveyId:vm.survey._id, childId:vm.child._id})">{{'REMOVE_SCREENING' | translate}} <i

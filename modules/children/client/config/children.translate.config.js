@@ -61,6 +61,7 @@
       SELECT_STAKE: 'Select Stake',
       SELECT_WARD: 'Select Ward',
       ALL_WARDS: 'All Wards',
+      ALL_CHILDREN: 'All Children',
       SCREENED_ON: 'Screened on',
       PLEASE_ENTER_VALID_HEIGHT_LT_24: 'Please enter a valid height (45-110cm)',
       PLEASE_ENTER_VALID_HEIGHT_GT_24: 'Please enter a valid height (65-120cm)',
@@ -89,9 +90,23 @@
       SYNC_OR_REPORT: 'Sync database, Report Creation',
       ZSCORE_STATUS: 'ZScore Status',
       ACUTE_ZSCORE: 'Acute: supplements required',
+      ACUTE: 'Acute',
       MICRO_NUTRITION_ZSCORE: 'Micro nutrients required',
       AT_RISK_ZSCORE: 'At Risk: Come to next screening',
-      NORMAL_ZSCORE: 'Normal'
+      AT_RISK: 'At Risk',
+      NORMAL_ZSCORE: 'Normal',
+      MOTHER_RECORD: 'Expectant Mother Record',
+      EDIT_EXISTING_MOTHER: 'Edit Existing Mother',
+      ADD_NURSING_MOTHER: 'Add Nursing Mother',
+      ADD_PREGNANT_WOMAN: 'Add Pregnant Woman',
+      EXPECTED_DELIVERY_DATE: 'Expected Delivery date',
+      NURSING_CHILD_AGE: 'Nursing childs Birthdate',
+      SCREEN_CHILDREN: 'Children',
+      SCREEN_PREGNANT_WOMEN: 'Pregnant Women',
+      SCREEN_NURSING_MOTHERS: 'Nursing Mothers',
+      DELETE_THIS_RECORD: 'Delete this record',
+      CHILD_GRADUATED: 'Child has graduated',
+      EMPTY_LIST: 'Empty list?'
     };
     var translationsES = {
       AGE: 'Edad ( meses )',
@@ -145,6 +160,7 @@
       SELECT_STAKE: 'Seleccionar Stake',
       SELECT_WARD: 'Seleccionar Ward',
       ALL_WARDS: 'todos los Wards',
+      ALL_CHILDREN: 'Todos los niños',
       SCREENED_ON: 'proyectado en',
       PLEASE_ENTER_VALID_HEIGHT_LT_24: 'Por favor, introduzca una altura válida ( 45-110cm )',
       PLEASE_ENTER_VALID_HEIGHT_GT_24: 'Por favor, introduzca una altura válida ( 65-120cm )',
@@ -175,9 +191,23 @@
       SYNC_OR_REPORT: 'base de datos de sincronización , Creación de informes',
       ZSCORE_STATUS: 'zscore Estado',
       ACUTE_ZSCORE: 'agudos: los suplementos necesarios',
+      ACUTE: 'agudos',
       MICRO_NUTRITION_ZSCORE: 'micro nutrientes necesarios',
       AT_RISK_ZSCORE: 'En peligro: Ven a la próxima proyección',
-      NORMAL_ZSCORE: 'normal'
+      AT_RISK: 'En peligro',
+      NORMAL_ZSCORE: 'normal',
+      MOTHER_RECORD: 'Registro de la madre expectante',
+      EDIT_EXISTING_MOTHER: 'Editar la Madre Existente',
+      ADD_NURSING_MOTHER: 'Añadir Madre de Enfermería',
+      ADD_PREGNANT_WOMAN: 'Añadir mujer embarazada',
+      EXPECTED_DELIVERY_DATE: 'Fecha de Entrega Estimada',
+      NURSING_CHILD_AGE: 'Fecha de nacimiento de los hijos de enfermería',
+      SCREEN_CHILDREN: 'Niños',
+      SCREEN_PREGNANT_WOMEN: 'Mujeres embarazadas',
+      SCREEN_NURSING_MOTHERS: 'Madres lactantes',
+      DELETE_THIS_RECORD: 'Eliminar este registro',
+      CHILD_GRADUATED: 'El niño se ha graduado',
+      EMPTY_LIST: '¿Lista vacía?'
     };
     $translateProvider
         .translations('en', translationsEN)
