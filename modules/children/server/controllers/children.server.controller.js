@@ -101,23 +101,23 @@ function validateView(type, stakeDB, view) {
 
 exports.checkUpdateViews = function (req, res) {
   var toCheck = [];
-    viewList.forEach (function (view) {
-      toCheck.push (validateView ('view', req.params.stakeDB, view));
-    });
-    filterList.forEach (function (filter) {
-      toCheck.push (validateView ('filter', req.params.stakeDB, filter));
-    });
+  viewList.forEach (function (view) {
+    toCheck.push (validateView ('view', req.params.stakeDB, view));
+  });
+  filterList.forEach (function (filter) {
+    toCheck.push (validateView ('filter', req.params.stakeDB, filter));
+  });
 
-    var allViews = Promise.all(toCheck);
-    allViews.then(function(input){
-      return (res.status (200).send ({message: input}));
-    }).catch (function (err) {
-      return res.status (400).send ({
-        message: err.message,
-        name: err.name,
-        stack: err.stack
-      });
+  var allViews = Promise.all(toCheck);
+  allViews.then(function(input){
+    return (res.status (200).send ({message: input}));
+  }).catch (function (err) {
+    return res.status (400).send ({
+      message: err.message,
+      name: err.name,
+      stack: err.stack
     });
+  });
 };
 function getOwnerData(parmObj) {
   return new Promise(function(resolve, reject) {
@@ -383,8 +383,8 @@ function addLineToStack(ownerInfo, screenInfo, sortField, stakeDB) {
     } else if ((screenInfo.zScore.ha < -2 || screenInfo.zScore.wa < -2) && dataObj.age > 36 && dataObj.age < 48) {
       zscoreStatus = 'Micro nutrients required';
     } else if (screenInfo.zScore.ha < -1 ||
-         screenInfo.zScore.wa < -1 ||
-         screenInfo.zScore.wl < -1) {
+        screenInfo.zScore.wa < -1 ||
+        screenInfo.zScore.wl < -1) {
       zscoreStatus = 'At Risk: Come to next screening';
     } else {
       zscoreStatus = 'Normal';
