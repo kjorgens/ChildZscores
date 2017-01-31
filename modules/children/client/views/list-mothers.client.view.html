@@ -9,7 +9,7 @@
                 </h3>
                 <h3>
                     <div ng-if="vm.online">
-                        <a ui-sref="children.sync({ stakeDB: vm.selectedDB, stakeName:vm.selectedStake })">{{'SYNC_OR_REPORT' | translate }}
+                        <a ui-sref="children.sync({ stakeDB: vm.selectedDB, stakeName:vm.selectedStake })">{{'SYNC_OR_REPORT' | translate }}</a>
                         <h5>
                             <div ng-if="vm.repUpStats.ok">
                                 Sync up: OK read:{{vm.repUpStats.docs_read}} written:{{vm.repupStats.docs_written}}
@@ -22,9 +22,9 @@
                             </div>
                         </h5>
                     </div>
-                    <div ng-if="!vm.online">
-                        {{vm.selectedStake}}
-                    </div>
+                    <!--<div ng-if="!vm.online">-->
+                        <!--{{vm.selectedStake}}-->
+                    <!--</div>-->
                 </h3>
                 <h3 ng-if="vm.wardList">
                     {{'SELECT_WARD' | translate}}

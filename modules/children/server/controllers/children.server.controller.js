@@ -65,6 +65,22 @@ var viewList = [
         "map": "function(doc){if(doc.zScore.ha < -2 || doc.zScore.wa < -2 || doc.zScore.wl < -2){emit(doc)}}"
       }
     }
+  },
+  {
+    "_id": "_design/pregnant_women",
+    "views": {
+      "screen": {
+        "map": "function(doc){if(doc.deliveryDate){emit(doc)}}"
+      }
+    }
+  },
+  {
+    "_id": "_design/nursing_mothers",
+    "views": {
+      "screen": {
+        "map": "function(doc){if(doc.childsBirthDate){emit(doc)}}"
+      }
+    }
   }
 ];
 
@@ -119,6 +135,13 @@ exports.checkUpdateViews = function (req, res) {
     });
   });
 };
+
+function getWomensData(screenInfo, parmObj){
+  return new Promise(function(resolve,reject){
+    resolve(addWomenToStack(screenInfo, parmObj));
+  })
+}
+
 function getOwnerData(parmObj) {
   return new Promise(function(resolve, reject) {
     var couchURL;
@@ -157,7 +180,15 @@ function getOwnerData(parmObj) {
 function pullSaveScreenData(parmObj) {
   return new Promise(function(resolve, reject) {
     var couchURL;
-    var ddoc = parmObj.filter.indexOf('all') > -1 ? 'scr_list' : 'zscore_kids';
+    var ddoc = 'scr_list';
+    if(~parmObj.filter.indexOf('Pregnant')){
+      ddoc = 'pregnant_women';
+    } else if(~parmObj.filter.indexOf('Nursing')){
+      ddoc = 'nursing_mothers';
+    } else if(~parmObj.filter.indexOf('zscore')){
+      ddoc = 'zscore_kids';
+    }
+ //   var ddoc = parmObj.filter.indexOf('all') > -1 ? 'scr_list' : 'zscore_kids';
     if (process.env.COUCH_URL.indexOf('localhost') > -1) {
       couchURL = 'http://' + process.env.COUCH_URL + '/';
     } else {
@@ -176,7 +207,12 @@ function pullSaveScreenData(parmObj) {
         var screenList = [];
         jsonObj.rows.forEach(function(screening) {
           parmObj.screenInfo = screening;
-          screenList.push(getOwnerData(parmObj));
+          parmObj.type = ddoc;
+          if(~ddoc.indexOf('pregnant') || ~ddoc.indexOf('nursing')){
+            screenList.push(getWomensData(screening.key, parmObj));
+          } else {
+            screenList.push(getOwnerData(parmObj));
+          }
         });
         resolve(screenList);
       } else {
@@ -299,7 +335,12 @@ function buildOutputFromLastScreening(parmObj) {
 
 function writeTheFile(input) {
   return new Promise(function(resolve, reject) {
-    var headerLine = 'id,gender,firstName,lastName,birthdate,idGroup,mother,father,phone,address,city,ward,lds,screenDate,weight,height,age,ha,wa,wh,status\n';
+    var headerLine;
+    if(~input.data.indexOf('mthr')) {
+      headerLine = 'id,firstName,lastName,idGroup,phone,address,city,ward,lds,screenDate,other date\n';
+    } else {
+      headerLine = 'id,gender,firstName,lastName,birthdate,idGroup,mother,father,phone,address,city,ward,lds,screenDate,weight,height,age,ha,wa,wh,status\n';
+    }
     var outPut = headerLine += input.data;
     fs.writeFile('files/' + input.dbId + '.csv', outPut, function (err) {
       if (err) {
@@ -349,7 +390,7 @@ function addLineToStack(ownerInfo, screenInfo, sortField, stakeDB) {
       ownerInfo.firstName = ownerInfo.firstName.replace(/,/g, ' ');
     }
     if (ownerInfo.lastName !== undefined && ownerInfo.lastName.indexOf(',') > -1) {
-      ownerInfo.lastName = ownerInfo.lastName.replace(/,/g, ' ');
+      ownerInfo.lastName = ownerInfo.lastName.replace (/,/g, ' ');
     }
     var dataObj = {
       childId: ownerInfo._id,
@@ -395,6 +436,54 @@ function addLineToStack(ownerInfo, screenInfo, sortField, stakeDB) {
         ',' + dataObj.city + ',' + dataObj.ward + ',' + dataObj.memberStatus + ',' + dataObj.surveyDate + ',' + dataObj.weight + ',' + dataObj.height +
         ',' + dataObj.age + ',' + dataObj.ha + ',' + dataObj.wa + ',' + dataObj.wl + ',' + zscoreStatus + '\n';
     resolve({ data: dataObj, dataLine: dataLine, stakeDB: stakeDB, sortField: sortField });
+  });
+}
+
+function addWomenToStack(input, otherStuff) {
+  var parmObj = input;
+  return new Promise(function (resolve, reject) {
+    if (parmObj.address !== undefined && parmObj.address.indexOf(',') > -1) {
+      parmObj.address = parmObj.address.replace(/,/g, ' ');
+    }
+    if (parmObj.city !== undefined && parmObj.city.indexOf(',') > -1) {
+      parmObj.city = parmObj.city.replace(/,/g, ' ');
+    }
+    if (parmObj.ward !== undefined && parmObj.ward.indexOf(',') > -1) {
+      parmObj.ward = parmObj.ward.replace(/,/g, ' ');
+    }
+    if (parmObj.firstName !== undefined && parmObj.firstName.indexOf(',') > -1) {
+      parmObj.firstName = parmObj.firstName.replace(/,/g, ' ');
+    }
+    if (parmObj.lastName !== undefined && parmObj.lastName.indexOf(',') > -1) {
+      parmObj.lastName = parmObj.lastName.replace(/,/g, ' ');
+    }
+    var dataObj = {
+      childId: parmObj._id,
+      firstName: parmObj.firstName,
+      lastName: parmObj.lastName,
+      city: parmObj.city || '',
+      phone: parmObj.phone || '',
+      address: parmObj.address || '',
+      ward: parmObj.ward || '',
+      memberStatus: parmObj.memberStatus || '',
+      surveyDate: parmObj.created,
+      screenId: parmObj._id
+    };
+    if(parmObj.childsBirthDate){
+      dataObj.childsBirthDate = parmObj.childsBirthDate;
+    } else {
+      dataObj.deliveryDate = parmObj.deliveryDate;
+    }
+
+    var dataLine = dataObj.childId + ',' + dataObj.firstName + ',' + dataObj.lastName + ',' +
+        ',' + dataObj.phone + ',' + dataObj.address +
+        ',' + dataObj.city + ',' + dataObj.ward + ',' + dataObj.memberStatus + ',' + dataObj.surveyDate ;
+    if(parmObj.childsBirthDate){
+      dataLine = dataLine + ',' + dataObj.childsBirthDate + '\n';
+    } else {
+      dataLine = dataLine + ',' + dataObj.deliveryDate + '\n';
+    }
+    resolve({ data: dataObj, dataLine: dataLine, stakeDB: otherStuff.stakeDB, sortField: otherStuff.sortField, type: otherStuff.type});
   });
 }
 

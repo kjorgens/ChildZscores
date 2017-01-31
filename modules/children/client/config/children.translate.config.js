@@ -106,7 +106,10 @@
       SCREEN_NURSING_MOTHERS: 'Nursing Mothers',
       DELETE_THIS_RECORD: 'Delete this record',
       CHILD_GRADUATED: 'Child has graduated',
-      EMPTY_LIST: 'Empty list?'
+      EMPTY_LIST: 'Empty list?',
+      CSV_FILTER: '---Select CSV filter---',
+      ZSCORE_UNDER_2: 'Zscores less than -2',
+      SORT_FIELD: '---Select Sort Field---',
     };
     var translationsES = {
       AGE: 'Edad ( meses )',
@@ -207,7 +210,10 @@
       SCREEN_NURSING_MOTHERS: 'Madres lactantes',
       DELETE_THIS_RECORD: 'Eliminar este registro',
       CHILD_GRADUATED: 'El niño se ha graduado',
-      EMPTY_LIST: '¿Lista vacía?'
+      EMPTY_LIST: '¿Lista vacía?',
+      CSV_FILTER: '---Seleccionar filtro CSV---',
+      ZSCORE_UNDER_2: 'Zscores inferior a -2',
+      SORT_FIELD: '---Seleccionar el campo Ordenar---',
     };
     $translateProvider
         .translations('en', translationsEN)

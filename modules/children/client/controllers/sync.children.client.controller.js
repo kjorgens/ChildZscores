@@ -111,8 +111,9 @@
     vm.reportName = $stateParams.stakeDB + '.csv';
     vm.reportReady = false;
     vm.stakeDB = $stateParams.stakeDB;
-    vm.stakeDB = localStorage.getItem('selectedDBName');
-    vm.selectedStake = localStorage.getItem('selectedStake');
+//    vm.stakeDB = localStorage.getItem('selectedDBName');
+ //   vm.selectedStake = localStorage.getItem('selectedStake');
+    vm.selectedStake = $stateParams.stakeName;
     vm.selectedCountry = localStorage.getItem('selectedCountry');
     vm.selectedCountryImage = localStorage.getItem('selectedCountryImage');
     // vm.filterSelect = 'All Children';

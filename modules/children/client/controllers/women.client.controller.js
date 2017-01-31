@@ -33,9 +33,9 @@
     vm.stakeName = $stateParams.stakeName;
     vm.selectedStake = vm.stakeName;
     vm.selectedDB = vm.stakeDB;
-    vm.selectedStake = localStorage.getItem('selectedStake');
-    vm.selectedDB = sessionStorage.getItem('selectedDBName');
-    vm.selectedWard = localStorage.getItem('selectedWard');
+    // vm.selectedStake = localStorage.getItem('selectedStake');
+    // vm.selectedDB = sessionStorage.getItem('selectedDBName');
+    //vm.selectedWard = localStorage.getItem('selectedWard');
     vm.selectedWard = $stateParams.ward;
     // if(vm.selectedWard.indexOf('All Wards') === -1){
     //   vm.mother.ward = vm.selectedWard;
