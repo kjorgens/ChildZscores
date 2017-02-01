@@ -16,7 +16,7 @@
     var vm = this;
     FilterService.setCurrentScreenType($stateParams.screenType);
     vm.screenType = $stateParams.screenType;
-    vm.childFilter = 'a';
+    vm.childFilter = localStorage.getItem('childFilter') || 'a';
     // vm.findChildren = findChildren;
     // vm.findNursingMothers = findNursingMothers;
     // vm.findPregnantWomen = findPregnantWomen;
@@ -133,6 +133,7 @@
       vm.startSpin();
       vm.childList = FilterService.searchAndFilter(vm.childList, FilterService.currentListFilter(), 'redZoneZscore', 'firstName');
       vm.childFilter = 'r';
+      localStorage.setItem('childFilter','r');
       vm.stopSpin();
       vm.focusSearch++;
     };
@@ -141,6 +142,7 @@
       vm.startSpin();
       vm.childList = FilterService.searchAndFilter(vm.childList, FilterService.currentListFilter(), 'marginalZscore', 'firstName');
       vm.childFilter = 'w';
+      localStorage.setItem('childFilter','w');
       vm.stopSpin();
       vm.focusSearch++;
     };
@@ -149,6 +151,7 @@
       vm.startSpin();
       vm.childList = FilterService.searchAndFilter(vm.childList, FilterService.currentListFilter(), 'normalZscore', 'firstName');
       vm.childFilter = 'n';
+      localStorage.setItem('childFilter','n');
       vm.stopSpin();
       vm.focusSearch++;
     };
@@ -157,6 +160,7 @@
       vm.startSpin();
       vm.childList = FilterService.searchAndFilter(vm.childList, FilterService.currentListFilter(), '', 'firstName');
       vm.childFilter = 'a';
+      localStorage.setItem('childFilter','a');
       vm.stopSpin();
       vm.focusSearch = true;
     };
