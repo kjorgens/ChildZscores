@@ -11,6 +11,7 @@
   function ChildrenStakeController($rootScope, $state, $scope, $window, $translate, FilterService, usSpinnerService,
     ChildrenStakes, $stateParams, PouchService) {
     var vm = this;
+    localStorage.setItem('childFilter', 'a');
     FilterService.setColorFilter('');
     FilterService.setSearchFilter('');
     vm.refreshCountryList = refreshCountryList;
@@ -79,13 +80,13 @@
     function screenPregnantWomen(stakeName, stakeDB) {
       vm.startSpin();
       document.body.scrollTop = document.documentElement.scrollTop = 0;
-      $state.go('children.listMothers', {stakeDB: stakeDB, stakeName: stakeName, searchFilter: '', colorFilter: '', screenType: 'pregnantWomen'});
+      $state.go('children.listMothers', {stakeDB: stakeDB, stakeName: stakeName, searchFilter: '', colorFilter: '', screenType: 'pregnant'});
     }
 
     function screenNursingMothers(stakeName, stakeDB) {
       vm.startSpin();
       document.body.scrollTop = document.documentElement.scrollTop = 0;
-      $state.go('children.listMothers', {stakeDB: stakeDB, stakeName: stakeName, searchFilter: '', colorFilter: '', screenType: 'nursingMothers'});
+      $state.go('children.listMothers', {stakeDB: stakeDB, stakeName: stakeName, searchFilter: '', colorFilter: '', screenType: 'nursing'});
     }
 
     function getStakesDB() {

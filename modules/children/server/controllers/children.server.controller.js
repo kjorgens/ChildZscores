@@ -81,6 +81,14 @@ var viewList = [
         "map": "function(doc){if(doc.childsBirthDate){emit(doc)}}"
       }
     }
+  },
+  {
+    "_id": "_design/scr_owner_search",
+    "views": {
+      "find_by_owner": {
+        "map": "function(doc){emit(doc.owner, doc)}"
+      }
+    }
   }
 ];
 
@@ -160,6 +168,11 @@ function getOwnerData(parmObj) {
         parmObj.screenInfo = screenData;
         resolve(addLineToStack(ownerInfo, screenData, sortField, parmObj.stakeDB));
       } else {
+        if (response.statusCode === 404) {
+          console.log('screening id = ' + screenData._id);
+          console.log('owner id = ' + screenData.owner);
+          resolve();
+        }
         var msg = '';
         var myError = new Error();
         myError.name = screenData._id;
@@ -669,9 +682,9 @@ function calculateStatus(screeningObj) {
     var zscoreStatus = '';
     if (screeningObj.zScore.wl < -2) {
       zscoreStatus = 'Acute: supplements required';
-    } else if ((screeningObj.zScore.ha < -2 || screeningObj.zScore.wa < -2) && screeningObj.age > 6 && screeningObj.age < 36) {
+    } else if ((screeningObj.zScore.ha < -2 || screeningObj.zScore.wa < -2) && screeningObj.monthAge > 6 && screeningObj.monthAge < 36) {
       zscoreStatus = 'Acute: supplements required';
-    } else if ((screeningObj.zScore.ha < -2 || screeningObj.zScore.wa < -2) && screeningObj.age > 36 && screeningObj.age < 48) {
+    } else if ((screeningObj.zScore.ha < -2 || screeningObj.zScore.wa < -2) && screeningObj.monthAge > 36 && screeningObj.monthAge < 48) {
       zscoreStatus = 'Micro nutrients required';
     } else if (screeningObj.zScore.ha < -1 ||
         screeningObj.zScore.wa < -1 ||
@@ -684,11 +697,11 @@ function calculateStatus(screeningObj) {
 }
 
 function statusColor(status) {
-  if (status.indexOf('Acute') > -1) {
+  if (~status.indexOf('Acute')) {
     return 'redZoneZscore';
-  } else if (status.indexOf('Micro') > -1) {
+  } else if (~status.indexOf('Micro')) {
     return 'redZoneZscore';
-  } else if (status.indexOf('Risk') > -1) {
+  } else if (~status.indexOf('Risk')) {
     return 'marginalZscore';
   } else {
     return 'normalZscore';

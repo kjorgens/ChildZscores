@@ -9,7 +9,7 @@
                 </h3>
                 <h3>
                     <div ng-if="vm.online">
-                        <a ui-sref="children.sync({ stakeDB: vm.selectedDB, stakeName:vm.selectedStake })">{{'SYNC_OR_REPORT' | translate }}</a>
+                        <a ui-sref="children.sync({ stakeDB: vm.stakeDB, stakeName:vm.stakeName, screenType: vm.screenType })">{{'SYNC_OR_REPORT' | translate }}</a>
                         <h5>
                             <div ng-if="vm.repUpStats.ok">
                                 Sync up: OK read:{{vm.repUpStats.docs_read}} written:{{vm.repupStats.docs_written}}
@@ -67,7 +67,7 @@
         </div>
     </div>
     <div class="list-group">
-        <a ng-repeat="mother in vm.motherList" ui-sref="children.editMother({ motherId: mother._id })" ng-if="mother.display === true" class="list-group-item pregnantWoman">
+        <a ng-repeat="mother in vm.motherList" ui-sref="children.editMother({ motherId: mother._id, stakeDB: vm.stakeDB, stakeName: vm.stakeName, screenType: vm.screenType })" ng-if="mother.display === true" class="list-group-item pregnantWoman">
             <small class="list-group-item-text">
                 <h3><span ng-bind="mother.firstName"></span>
                     <span ng-bind="mother.lastName"></span></h3>
@@ -89,22 +89,22 @@
     <span us-spinner="{radius:30, width:8, length: 16}" spinner-key="spinner-sync" spinner-theme="bigBlue"></span>
     <h4 ng-if="vm.nursingMother">
         <div ng-if="vm.online && !vm.motherList.length" class="alert alert-warning text-center">
-            {{'EMPTY_LIST' | translate}} <a ui-sref="children.sync({stakeDB: vm.selectedStakeDB, stakeName:vm.selectedStake})">{{'SYNC' | translate}}
-            <i class="glyphicon glyphicon-refresh"></i></a> or <a ui-sref="children.createMother({ stakeDB: vm.stakeDB, stakeName:vm.selectedStake, screenType: 'nursingMother' })">{{'ADD_NURSING_MOTHER' | translate}} <i
+            {{'EMPTY_LIST' | translate}} <a ui-sref="children.sync({stakeDB: vm.selectedStakeDB, stakeName:vm.selectedStake, screenType: vm.screenType})">{{'SYNC' | translate}}
+            <i class="glyphicon glyphicon-refresh"></i></a> or <a ui-sref="children.createMother({ stakeDB: vm.stakeDB, stakeName:vm.selectedStake, screenType: 'nursing' })">{{'ADD_NURSING_MOTHER' | translate}} <i
                 class="glyphicon glyphicon-plus"></i></a>
         </div>
         <div ng-if="!vm.online && !vm.motherList.length" class="alert alert-warning text-center">
-            {{'EMPTY_LIST' | translate}} <a ui-sref="children.createMother({stakeDB: vm.stakeDB, stakeName:vm.selectedStake, screenType: 'nursingMother'})">{{'ADD_NURSING_MOTHER' | translate}} <i class="glyphicon glyphicon-plus"></i></a>
+            {{'EMPTY_LIST' | translate}} <a ui-sref="children.createMother({stakeDB: vm.stakeDB, stakeName:vm.selectedStake, screenType: 'nursing'})">{{'ADD_NURSING_MOTHER' | translate}} <i class="glyphicon glyphicon-plus"></i></a>
         </div>
     </h4>
     <h4 ng-if="!vm.nursingMother">
     <div ng-if="vm.online && !vm.motherList.length" class="alert alert-warning text-center">
-        {{'EMPTY_LIST' | translate}} <a ui-sref="children.sync({stakeDB: vm.selectedStakeDB, stakeName:vm.selectedStake})">{{'SYNC' | translate}}
-        <i class="glyphicon glyphicon-refresh"></i></a> or <a ui-sref="children.createMother({ stakeDB: vm.stakeDB, stakeName:vm.selectedStake, screenType: 'pregnantWoman'} )">{{'ADD_PREGNANT_WOMAN' | translate}} <i
+        {{'EMPTY_LIST' | translate}} <a ui-sref="children.sync({stakeDB: vm.selectedStakeDB, stakeName:vm.selectedStake, screenType: vm.screenType})">{{'SYNC' | translate}}
+        <i class="glyphicon glyphicon-refresh"></i></a> or <a ui-sref="children.createMother({ stakeDB: vm.stakeDB, stakeName:vm.selectedStake, screenType: 'pregnant'} )">{{'ADD_PREGNANT_WOMAN' | translate}} <i
             class="glyphicon glyphicon-plus"></i></a>
     </div>
     <div ng-if="!vm.online && !vm.motherList.length" class="alert alert-warning text-center">
-        {{'EMPTY_LIST' | translate}} <a ui-sref="children.createMother({ stakeDB: vm.stakeDB, stakeName:vm.selectedStake, screenType: 'pregnantWoman'})">{{'ADD_PREGNANT_WOMAN' | translate}} <i class="glyphicon glyphicon-plus"></i></a>
+        {{'EMPTY_LIST' | translate}} <a ui-sref="children.createMother({ stakeDB: vm.stakeDB, stakeName:vm.selectedStake, screenType: 'pregnant'})">{{'ADD_PREGNANT_WOMAN' | translate}} <i class="glyphicon glyphicon-plus"></i></a>
     </div>
     </h4>
 </section>

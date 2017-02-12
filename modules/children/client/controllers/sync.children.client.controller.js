@@ -24,7 +24,6 @@
     });
     vm.uploadExcelCsv = uploadExcelCsv;
     vm.cancelUpload = cancelUpload;
-    // vm.updateViews = updateViews;
     // Create file uploader instance
     vm.uploader = new FileUploader({
       url: 'api/children/upload/' + $stateParams.stakeDB,
@@ -62,19 +61,34 @@
       // Show success message
       vm.success = true;
 
-      // Populate user object
-//      vm.user = Authentication.user = response;
-
-      // Clear upload buttons
- //     cancelUpload();
- //     vm.syncUpstream();
     };
     vm.uploader.onCancelItem = function(fileItem, response, status, headers) {
       console.info('onCancelItem', fileItem, response, status, headers);
     };
 
     function goBack(){
-      $window.history.back();
+      if (~vm.screenType.indexOf('nursing')){
+        $state.go('children.listMothers', {
+          stakeDB: vm.stakeDB,
+          stakeName: vm.selectedStake,
+          screenType: 'nursing',
+          searchFilter: '',
+          colorFilter: '' });
+      } else if(~vm.screenType.indexOf('pregnant')) {
+        $state.go ('children.listMothers', {
+          stakeDB: vm.stakeDB,
+          stakeName: vm.selectedStake,
+          screenType: 'pregnant',
+          searchFilter: '',
+          colorFilter: '' });
+      } else {
+        $state.go('children.list', {
+          stakeDB: vm.stakeDB,
+          stakeName: vm.selectedStake,
+          searchFilter: '',
+          colorFilter: '',
+          screenType: vm.screenType });
+      }
     }
 
     vm.uploader.onCompleteItem = function(fileItem, response, status, headers) {
@@ -111,6 +125,7 @@
     vm.reportName = $stateParams.stakeDB + '.csv';
     vm.reportReady = false;
     vm.stakeDB = $stateParams.stakeDB;
+    vm.screenType = $stateParams.screenType;
 //    vm.stakeDB = localStorage.getItem('selectedDBName');
  //   vm.selectedStake = localStorage.getItem('selectedStake');
     vm.selectedStake = $stateParams.stakeName;

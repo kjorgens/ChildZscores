@@ -40,7 +40,7 @@
           }
         })
         .state('children.sync', {
-          url: '/sync/:stakeDB/:stakeName',
+          url: '/sync/:stakeDB/:stakeName/:screenType',
           templateUrl: 'modules/children/client/views/sync-children.client.view.html',
           controller: 'ChildrenSyncController',
           controllerAs: 'vm',
@@ -173,7 +173,7 @@
           }
         })
         .state('children.editMother', {
-          url: '/mothers/:motherId',
+          url: '/mothers/:motherId/:stakeDB/:stakeName/:screenType',
           templateUrl: 'modules/children/client/views/form-mother.client.view.html',
           controller: 'WomenCreateController',
           controllerAs: 'vm',

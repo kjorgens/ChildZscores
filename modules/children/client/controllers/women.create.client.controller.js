@@ -14,6 +14,7 @@
     vm.nursingMother = false;
     vm.editMother = false;
     vm.selectedStake = $stateParams.stakeName;
+    vm.stakeName = $stateParams.stakeName;
     vm.stakeDB = $stateParams.stakeDB;
     if(mother.hasOwnProperty('_id')) {
       vm.editMother = true;
@@ -25,7 +26,10 @@
     }
 
     vm.goBack = function(){
-      $window.history.back();
+      $state.go('children.listMothers', { stakeDB: vm.stakeDB, stakeName: vm.stakeName,
+        searchFilter: FilterService.currentListFilter(), colorFilter: FilterService.currentColorFilter(),
+        screenType: vm.nursingMother ? 'nursing' : 'pregnant'});
+//      $window.history.back();
     };
 
     vm.newMother = newMother;
@@ -243,9 +247,9 @@
     }
 
     function motherUpdated(mother) {
-      $state.go('children.listMothers', { stakeDB: vm.selectedDB, stakeName: vm.selectedStake,
+      $state.go('children.listMothers', { stakeDB: vm.stakeDB, stakeName: vm.stakeName,
         searchFilter: FilterService.currentListFilter(), colorFilter: FilterService.currentColorFilter(),
-        screenType: vm.nursingMother ? 'nursingMothers' : 'pregnantWomen'});
+        screenType: vm.nursingMother ? 'nursing' : 'pregnant'});
     }
 
     function addedError(error) {
@@ -256,7 +260,7 @@
       vm.mother = motherCreated;
       $state.go('children.listMothers', { stakeDB: vm.stakeDB, stakeName: vm.stakeName,
         searchFilter: FilterService.currentListFilter(), colorFilter: FilterService.currentColorFilter(),
-        screenType: vm.nursingMother ? 'nursingMothers' : 'pregnantWomen'});
+        screenType: vm.nursingMother ? 'nursing' : 'pregnant'});
     }
 
     function errorHandle(error) {
@@ -309,9 +313,9 @@
 
     var removeResponse = function (res) {
       vm.remResponse = res;
-      $state.go('children.listMothers', { stakeDB: vm.selectedDB, stakeName: vm.selectedStake,
+      $state.go('children.listMothers', { stakeDB: vm.stakeDB, stakeName: vm.stakeName,
         searchFilter: FilterService.currentListFilter(), colorFilter: FilterService.currentColorFilter(),
-        screenType: vm.nursingMother ? 'nursingMothers' : 'pregnantWomen'});
+        screenType: vm.nursingMother ? 'nursing' : 'pregnant'});
     };
 
     var removeError = function (error) {

@@ -31,12 +31,14 @@
 
     vm.stakeDB = $stateParams.stakeDB;
     vm.stakeName = $stateParams.stakeName;
+    vm.screenType = $stateParams.screenType;
     vm.selectedStake = vm.stakeName;
     vm.selectedDB = vm.stakeDB;
+    vm.selectedWard = $stateParams.ward;
     // vm.selectedStake = localStorage.getItem('selectedStake');
     // vm.selectedDB = sessionStorage.getItem('selectedDBName');
     //vm.selectedWard = localStorage.getItem('selectedWard');
-    vm.selectedWard = $stateParams.ward;
+
     // if(vm.selectedWard.indexOf('All Wards') === -1){
     //   vm.mother.ward = vm.selectedWard;
     // }
@@ -105,7 +107,7 @@
     };
 
     vm.goSync = function(){
-      $state.go('children.sync', { stakeDB: vm.selectedDB, stakeName: vm.selectedStake });
+      $state.go('children.sync', { stakeDB: vm.selectedDB, stakeName: vm.selectedStake, screenType: vm.screenType});
     };
 
     function performTranslation() {

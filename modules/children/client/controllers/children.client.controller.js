@@ -55,7 +55,8 @@
     });
 
     function goBack(){
-      $window.history.back();
+      $state.go('children.list', { stakeDB: vm.selectedDB, stakeName: vm.selectedStake, screenType: 'children',
+        searchFilter: FilterService.currentListFilter(), colorFilter: FilterService.currentColorFilter()});
     }
 
     function checkAge() {
