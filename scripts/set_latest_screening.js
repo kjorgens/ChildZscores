@@ -38,9 +38,6 @@ function updateDb(screenings) {
   });
 }
 
-function findLatestScreening(){
-
-}
 function getChildRecords(input){
   return new Promise(function(resolve,reject){
     var stakeDb = require('nano')('https://' + process.env.SYNC_ENTITY + '@' + process.env.COUCH_URL + input.db);

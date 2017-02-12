@@ -5,11 +5,19 @@
       .module('children')
       .controller('ChildrenStakeController', ChildrenStakeController);
 
-  ChildrenStakeController.$inject = ['$rootScope', '$scope', '$translate', 'usSpinnerService', 'ChildrenStakes', '$stateParams', 'PouchService'];
+  ChildrenStakeController.$inject = ['$rootScope', '$state', '$scope', '$window', '$translate', 'FilterService', 'usSpinnerService',
+    'ChildrenStakes', '$stateParams', 'PouchService'];
 
-  function ChildrenStakeController($rootScope, $scope, $translate, usSpinnerService, ChildrenStakes, $stateParams, PouchService) {
+  function ChildrenStakeController($rootScope, $state, $scope, $window, $translate, FilterService, usSpinnerService,
+    ChildrenStakes, $stateParams, PouchService) {
     var vm = this;
+    localStorage.setItem('childFilter', 'a');
+    FilterService.setColorFilter('');
+    FilterService.setSearchFilter('');
     vm.refreshCountryList = refreshCountryList;
+    vm.screenPregnantWomen = screenPregnantWomen;
+    vm.screenNursingMothers = screenNursingMothers;
+    vm.screenChildren = screenChildren;
     vm.onLine = navigator.onLine;
     $translate.use($rootScope.SelectedLanguage);
     function findCountry(country) {
@@ -61,6 +69,24 @@
       localStorage.setItem('selectedCountry', vm.selectedCountry.name);
       sessionStorage.getItem('selectedCountryImage', vm.selectedCountry.image);
       localStorage.setItem('selectedCountryImage', vm.selectedCountry.image);
+    }
+
+    function screenChildren(stakeName, stakeDB) {
+      vm.startSpin();
+      document.body.scrollTop = document.documentElement.scrollTop = 0;
+      $state.go('children.list', {stakeDB: stakeDB, stakeName: stakeName, searchFilter: '', colorFilter: '', screenType: 'children'});
+    }
+
+    function screenPregnantWomen(stakeName, stakeDB) {
+      vm.startSpin();
+      document.body.scrollTop = document.documentElement.scrollTop = 0;
+      $state.go('children.listMothers', {stakeDB: stakeDB, stakeName: stakeName, searchFilter: '', colorFilter: '', screenType: 'pregnant'});
+    }
+
+    function screenNursingMothers(stakeName, stakeDB) {
+      vm.startSpin();
+      document.body.scrollTop = document.documentElement.scrollTop = 0;
+      $state.go('children.listMothers', {stakeDB: stakeDB, stakeName: stakeName, searchFilter: '', colorFilter: '', screenType: 'nursing'});
     }
 
     function getStakesDB() {

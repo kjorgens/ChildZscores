@@ -1,11 +1,9 @@
 <section>
     <div class="page-header" style="margin-top: 4em">
-
-<img src={{vm.selectedCountryImage}}>
-            <!--<a ui-sref="children.list({stakeDB: vm.stakeDB, stakeName:vm.selectedStake})"></a>-->
-
+        <h3><img src={{vm.selectedCountryImage}}>
+        <span ng-bind="vm.selectedCountry"></span></h3>
         <h3>
-            <span><a ui-sref="children.list({stakeDB: vm.stakeDB, stakeName:vm.selectedStake})">{{'CANCEL' | translate}}</a></span>
+            <span><a ng-click="vm.goBack()">{{'CANCEL' | translate}}</a></span>
         </h3>
     </div>
     <div class="list-group borderless">
@@ -30,7 +28,6 @@
             <div class="text-center form-group" ng-show="vm.uploader.queue.length">
                 <span><h2>{{vm.fileToUpload}}</h2></span>
                 <button class="btn btn-primary" ng-click="vm.uploadExcelCsv();">Upload</button>
-                <!--<button class="btn btn-primary" ng-click="vm.updateViews();">Update Couch Views</button>-->
                 <button class="btn btn-default" ng-click="vm.cancelUpload();">Cancel</button>
             </div>
             <div ng-show="vm.complete" class="text-center text-success">
@@ -58,23 +55,19 @@
     <h3>
         <div ng-if="!vm.reportReady">
             <select id="filtersSelect" ng-model="vm.filterSelect">
-                <option value="">---Select csv filter---</option>
-                <option value="all">All Children</option>
-                <option value="zscore">Zscores < -2</option>
+                <option value="">{{'CSV_FILTER' | translate}}</option>
+                <option value="all">{{'ALL_CHILDREN' | translate}}</option>
+                <option value="zscore">{{'ZSCORE_UNDER_2' | translate}}</option>
+                <option value="Pregnant">{{'SCREEN_PREGNANT_WOMEN' | translate}}</option>
+                <option value="Nursing">{{'SCREEN_NURSING_MOTHERS' | translate}}</option>
             </select><br>
             <select id="sortSelect" ng-model="vm.sortSelect">
-                <option value="">---Select sort field---</option>
-                <option value="ward">Ward</option>
-                <option value="ha">zscores ha</option>
-                <option value="wa">zscores wa</option>
-                <option value="wl">zscores wh</option>
-                <option value="screenId">screening date</option>
-                <option value="zscore">zscores ha</option>
-                <option value="firstName">first name</option>
-                <option value="lastName">last name</option>
-                <option value="memberStatus">LDS member</option>
-                <option value="mother">mother</option>
-                <option value="father">father</option>
+                <option value="">{{'SORT_FIELD' | translate}}</option>
+                <option value="ward">{{'WARD' | translate}}</option>
+                <option value="screenId">{{'SCREENING_DATE' | translate}}</option>
+                <option value="firstName">{{'FIRST_NAME' | translate}}</option>
+                <option value="lastName">{{'LAST_NAME' | translate}}</option>
+                <option value="memberStatus">{{'LDS_MEMBER' | translate}}</option>
             </select><br>
             <a ng-click="vm.createReport(vm.filterSelect, vm.sortSelect)">
                 <span>{{'GENERATE_REPORT' | translate}} </span>

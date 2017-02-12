@@ -4,17 +4,17 @@
  * Module dependencies.
  */
 var path = require('path'),
-    mongoose = require('mongoose'),
-    request = require('request'),
-    fs = require('fs'),
-    csvParse = require('babyparse'),
-    moment = require('moment'),
-    uuid = require('uuid4'),
-    csvloader = require('multer'),
-    config = require(path.resolve('./config/config')),
-    Promise = require('bluebird'),
-    errorHandler = require(path.resolve('./modules/core/server/controllers/errors.server.controller'));
-var errorStack = [];
+  mongoose = require('mongoose'),
+  request = require('request'),
+  fs = require('fs'),
+  csvParse = require('babyparse'),
+  moment = require('moment'),
+  uuid = require('uuid4'),
+  csvloader = require('multer'),
+  config = require(path.resolve('./config/config')),
+  Promise = require('bluebird'),
+  errorHandler = require(path.resolve('./modules/core/server/controllers/errors.server.controller'));
+  var errorStack = [];
 
 var filterList = [
   {
@@ -63,6 +63,30 @@ var viewList = [
     "views": {
       "screen": {
         "map": "function(doc){if(doc.zScore.ha < -2 || doc.zScore.wa < -2 || doc.zScore.wl < -2){emit(doc)}}"
+      }
+    }
+  },
+  {
+    "_id": "_design/pregnant_women",
+    "views": {
+      "screen": {
+        "map": "function(doc){if(doc.deliveryDate){emit(doc)}}"
+      }
+    }
+  },
+  {
+    "_id": "_design/nursing_mothers",
+    "views": {
+      "screen": {
+        "map": "function(doc){if(doc.childsBirthDate){emit(doc)}}"
+      }
+    }
+  },
+  {
+    "_id": "_design/scr_owner_search",
+    "views": {
+      "find_by_owner": {
+        "map": "function(doc){emit(doc.owner, doc)}"
       }
     }
   }
@@ -119,6 +143,13 @@ exports.checkUpdateViews = function (req, res) {
     });
   });
 };
+
+function getWomensData(screenInfo, parmObj){
+  return new Promise(function(resolve,reject){
+    resolve(addWomenToStack(screenInfo, parmObj));
+  })
+}
+
 function getOwnerData(parmObj) {
   return new Promise(function(resolve, reject) {
     var couchURL;
@@ -137,6 +168,11 @@ function getOwnerData(parmObj) {
         parmObj.screenInfo = screenData;
         resolve(addLineToStack(ownerInfo, screenData, sortField, parmObj.stakeDB));
       } else {
+        if (response.statusCode === 404) {
+          console.log('screening id = ' + screenData._id);
+          console.log('owner id = ' + screenData.owner);
+          resolve();
+        }
         var msg = '';
         var myError = new Error();
         myError.name = screenData._id;
@@ -145,9 +181,9 @@ function getOwnerData(parmObj) {
           myError.name = 'database error';
           reject(myError);
         } else {
-          var reasons = JSON.parse(response.body);
-          var msg = 'Database Error: ' + response.statusCode + ': ' + response.statusMessage + '  Error:' + reasons.error + ' Reason: ' + reasons.reason;
-          myError.message = msg;
+  //        var reasons = JSON.parse(response.body);
+  //        var msg = 'Database Error: ' + response.statusCode + ': ' + response.statusMessage + '  Error:' + reasons.error + ' Reason: ' + reasons.reason;
+  //        myError.message = msg;
           reject(myError);
         }
       }
@@ -157,7 +193,15 @@ function getOwnerData(parmObj) {
 function pullSaveScreenData(parmObj) {
   return new Promise(function(resolve, reject) {
     var couchURL;
-    var ddoc = parmObj.filter.indexOf('all') > -1 ? 'scr_list' : 'zscore_kids';
+    var ddoc = 'scr_list';
+    if(~parmObj.filter.indexOf('Pregnant')){
+      ddoc = 'pregnant_women';
+    } else if(~parmObj.filter.indexOf('Nursing')){
+      ddoc = 'nursing_mothers';
+    } else if(~parmObj.filter.indexOf('zscore')){
+      ddoc = 'zscore_kids';
+    }
+ //   var ddoc = parmObj.filter.indexOf('all') > -1 ? 'scr_list' : 'zscore_kids';
     if (process.env.COUCH_URL.indexOf('localhost') > -1) {
       couchURL = 'http://' + process.env.COUCH_URL + '/';
     } else {
@@ -176,7 +220,12 @@ function pullSaveScreenData(parmObj) {
         var screenList = [];
         jsonObj.rows.forEach(function(screening) {
           parmObj.screenInfo = screening;
-          screenList.push(getOwnerData(parmObj));
+          parmObj.type = ddoc;
+          if(~ddoc.indexOf('pregnant') || ~ddoc.indexOf('nursing')){
+            screenList.push(getWomensData(screening.key, parmObj));
+          } else {
+            screenList.push(getOwnerData(parmObj));
+          }
         });
         resolve(screenList);
       } else {
@@ -223,19 +272,19 @@ function getLastScreeningData(ownerInfo, stakeDB, sortField) {
       } else if (!error) {
         resolve();
       } else  {
-        var msg = '';
-        var myError = new Error();
-        myError.name = screenData._id;
-        if (error) {
-          myError.message = error;
-          myError.name = 'database error';
-          reject(myError);
-        } else {
-          var reasons = JSON.parse(response.body);
-          var msg = 'Database Error: ' + response.statusCode + ': ' + response.statusMessage + '  Error:' + reasons.error + ' Reason: ' + reasons.reason;
-          myError.message = msg;
-          reject(myError);
-        }
+          var msg = '';
+          var myError = new Error();
+          myError.name = screenData._id;
+          if (error) {
+            myError.message = error;
+            myError.name = 'database error';
+            reject(myError);
+          } else {
+            var reasons = JSON.parse(response.body);
+            var msg = 'Database Error: ' + response.statusCode + ': ' + response.statusMessage + '  Error:' + reasons.error + ' Reason: ' + reasons.reason;
+            myError.message = msg;
+            reject(myError);
+          }
       }
     });
   });
@@ -272,9 +321,9 @@ function buildOutputFromLastScreening(parmObj) {
         if(childrenList.length === 0){
           var msg = '';
           var myError = new Error({name:'',errors:[],message:''});
-          myError.message = 'No Screenings entered.';
-          myError.name = 'Children in database ' + parmObj.stakeDB + ' contain no screenings ';
-          reject(myError);
+            myError.message = 'No Screenings entered.';
+            myError.name = 'Children in database ' + parmObj.stakeDB + ' contain no screenings ';
+            reject(myError);
         } else {
           resolve (childrenList);
         }
@@ -299,7 +348,12 @@ function buildOutputFromLastScreening(parmObj) {
 
 function writeTheFile(input) {
   return new Promise(function(resolve, reject) {
-    var headerLine = 'id,gender,firstName,lastName,birthdate,idGroup,mother,father,phone,address,city,ward,lds,screenDate,weight,height,age,ha,wa,wh,status\n';
+    var headerLine;
+    if(~input.data.indexOf('mthr')) {
+      headerLine = 'id,firstName,lastName,idGroup,phone,address,city,ward,lds,screenDate,other date\n';
+    } else {
+      headerLine = 'id,gender,firstName,lastName,birthdate,idGroup,mother,father,phone,address,city,ward,lds,screenDate,weight,height,age,ha,wa,wh,status\n';
+    }
     var outPut = headerLine += input.data;
     fs.writeFile('files/' + input.dbId + '.csv', outPut, function (err) {
       if (err) {
@@ -349,7 +403,7 @@ function addLineToStack(ownerInfo, screenInfo, sortField, stakeDB) {
       ownerInfo.firstName = ownerInfo.firstName.replace(/,/g, ' ');
     }
     if (ownerInfo.lastName !== undefined && ownerInfo.lastName.indexOf(',') > -1) {
-      ownerInfo.lastName = ownerInfo.lastName.replace(/,/g, ' ');
+      ownerInfo.lastName = ownerInfo.lastName.replace (/,/g, ' ');
     }
     var dataObj = {
       childId: ownerInfo._id,
@@ -398,6 +452,54 @@ function addLineToStack(ownerInfo, screenInfo, sortField, stakeDB) {
   });
 }
 
+function addWomenToStack(input, otherStuff) {
+  var parmObj = input;
+  return new Promise(function (resolve, reject) {
+    if (parmObj.address !== undefined && parmObj.address.indexOf(',') > -1) {
+      parmObj.address = parmObj.address.replace(/,/g, ' ');
+    }
+    if (parmObj.city !== undefined && parmObj.city.indexOf(',') > -1) {
+      parmObj.city = parmObj.city.replace(/,/g, ' ');
+    }
+    if (parmObj.ward !== undefined && parmObj.ward.indexOf(',') > -1) {
+      parmObj.ward = parmObj.ward.replace(/,/g, ' ');
+    }
+    if (parmObj.firstName !== undefined && parmObj.firstName.indexOf(',') > -1) {
+      parmObj.firstName = parmObj.firstName.replace(/,/g, ' ');
+    }
+    if (parmObj.lastName !== undefined && parmObj.lastName.indexOf(',') > -1) {
+      parmObj.lastName = parmObj.lastName.replace(/,/g, ' ');
+    }
+    var dataObj = {
+      childId: parmObj._id,
+      firstName: parmObj.firstName,
+      lastName: parmObj.lastName,
+      city: parmObj.city || '',
+      phone: parmObj.phone || '',
+      address: parmObj.address || '',
+      ward: parmObj.ward || '',
+      memberStatus: parmObj.memberStatus || '',
+      surveyDate: parmObj.created,
+      screenId: parmObj._id
+    };
+    if(parmObj.childsBirthDate){
+      dataObj.childsBirthDate = parmObj.childsBirthDate;
+    } else {
+      dataObj.deliveryDate = parmObj.deliveryDate;
+    }
+
+    var dataLine = dataObj.childId + ',' + dataObj.firstName + ',' + dataObj.lastName + ',' +
+        ',' + dataObj.phone + ',' + dataObj.address +
+        ',' + dataObj.city + ',' + dataObj.ward + ',' + dataObj.memberStatus + ',' + dataObj.surveyDate ;
+    if(parmObj.childsBirthDate){
+      dataLine = dataLine + ',' + dataObj.childsBirthDate + '\n';
+    } else {
+      dataLine = dataLine + ',' + dataObj.deliveryDate + '\n';
+    }
+    resolve({ data: dataObj, dataLine: dataLine, stakeDB: otherStuff.stakeDB, sortField: otherStuff.sortField, type: otherStuff.type});
+  });
+}
+
 function sortEm(listIn) {
   return new Promise(function(resolve, reject) {
     listIn.sort(function(x, y) {
@@ -423,8 +525,8 @@ exports.createCSVFromDB = function (req, res) {
     });
   }
   var parmObj = { stakeDB: req.params.stakeDB, filter: req.params.filter, sortField: req.params.sortField, screenInfo: {} };
-//  buildOutputFromLastScreening() child + latest screening
-  pullSaveScreenData(parmObj) //child + all screenings
+ //buildOutputFromLastScreening(parmObj) // child + latest screening
+   pullSaveScreenData(parmObj) //child + all screenings
       .all().then(sortEm)
       .then(collectEm)
       .then(writeTheFile)
@@ -549,7 +651,7 @@ function updateChildObject(dataBase, childInfo) {
 function saveTheObjects(dataBase, childInfo, screeningInfo) {
   return new Promise(function (resolve,reject){
     var stakeDb = require('nano')('https://' + process.env.SYNC_ENTITY + '@' + process.env.COUCH_URL + '/' + dataBase);
-    //   childInfo._id = 'chld_' + childInfo.firstName.replace(' ','_') + '_' + dataBase + '_' + moment ();
+ //   childInfo._id = 'chld_' + childInfo.firstName.replace(' ','_') + '_' + dataBase + '_' + moment ();
     childInfo._id = 'chld_' + dataBase + '_' + uuid();
     stakeDb.insert (childInfo, function (err, childResponse) {
       if (err) {
@@ -559,7 +661,7 @@ function saveTheObjects(dataBase, childInfo, screeningInfo) {
         resolve (err.message);
 //      reject(err);
       } else {
-        if (childResponse.ok) {
+       if (childResponse.ok) {
           var childObj = {};
           childObj = childInfo;
           childObj._rev = childResponse.rev;
@@ -577,29 +679,29 @@ function saveTheObjects(dataBase, childInfo, screeningInfo) {
 }
 
 function calculateStatus(screeningObj) {
-  var zscoreStatus = '';
-  if (screeningObj.zScore.wl < -2) {
-    zscoreStatus = 'Acute: supplements required';
-  } else if ((screeningObj.zScore.ha < -2 || screeningObj.zScore.wa < -2) && screeningObj.age > 6 && screeningObj.age < 36) {
-    zscoreStatus = 'Acute: supplements required';
-  } else if ((screeningObj.zScore.ha < -2 || screeningObj.zScore.wa < -2) && screeningObj.age > 36 && screeningObj.age < 48) {
-    zscoreStatus = 'Micro nutrients required';
-  } else if (screeningObj.zScore.ha < -1 ||
-      screeningObj.zScore.wa < -1 ||
-      screeningObj.zScore.wl < -1) {
-    zscoreStatus = 'At Risk: Come to next screening';
-  } else {
-    zscoreStatus = 'Normal';
-  }
-  return({ screeningObj: screeningObj, zscoreStatus: zscoreStatus });
+    var zscoreStatus = '';
+    if (screeningObj.zScore.wl < -2) {
+      zscoreStatus = 'Acute: supplements required';
+    } else if ((screeningObj.zScore.ha < -2 || screeningObj.zScore.wa < -2) && screeningObj.monthAge > 6 && screeningObj.monthAge < 36) {
+      zscoreStatus = 'Acute: supplements required';
+    } else if ((screeningObj.zScore.ha < -2 || screeningObj.zScore.wa < -2) && screeningObj.monthAge > 36 && screeningObj.monthAge < 48) {
+      zscoreStatus = 'Micro nutrients required';
+    } else if (screeningObj.zScore.ha < -1 ||
+        screeningObj.zScore.wa < -1 ||
+        screeningObj.zScore.wl < -1) {
+      zscoreStatus = 'At Risk: Come to next screening';
+    } else {
+      zscoreStatus = 'Normal';
+    }
+    return({ screeningObj: screeningObj, zscoreStatus: zscoreStatus });
 }
 
 function statusColor(status) {
-  if (status.indexOf('Acute') > -1) {
+  if (~status.indexOf('Acute')) {
     return 'redZoneZscore';
-  } else if (status.indexOf('Micro') > -1) {
+  } else if (~status.indexOf('Micro')) {
     return 'redZoneZscore';
-  } else if (status.indexOf('Risk') > -1) {
+  } else if (~status.indexOf('Risk')) {
     return 'marginalZscore';
   } else {
     return 'normalZscore';
@@ -793,7 +895,7 @@ exports.uploadCsv = function (req, res) {
     } else {
       // parse csv
       parseCsv (res.req.file.path, function (parsedData) {
-        buildObject(req.params.stakeDB, parsedData)
+          buildObject(req.params.stakeDB, parsedData)
             .all ().then (returnOk).catch (function (err) {
           return res.status (400).send ({
             message: err.message,

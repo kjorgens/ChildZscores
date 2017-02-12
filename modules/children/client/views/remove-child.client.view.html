@@ -1,22 +1,8 @@
 <section>
     <div class="page-header" style="margin-top: 4em">
         <img src={{vm.selectedCountryImage}}>
-        <!--<h3>{{vm.selectedCountry}}</h3>-->
-        <!--<h3>{{vm.selectedStake}}</h3>-->
-        <!--<h4>-->
-            <!--<span><a ui-sref="children.stake({country: vm.selectedCountry})">{{vm.selectedCountry}}</a></span>-->
-            <!--<i class="glyphicon glyphicon-list"></i>-->
-        <!--</h4>-->
-        <!--<h4>-->
-            <!--<span><a ui-sref="children.list({stakeDB: vm.selectedDB, stakeName:vm.selectedStake})">{{vm.selectedStake}}</a></span>-->
-            <!--<i class="glyphicon glyphicon-list"></i>-->
-        <!--</h4>-->
-        <!--<h3>-->
-            <!--<span><a ui-sref="children.edit({childId: vm.child._id,surveyId:''})">{{vm.child.firstName}}{{vm.child.lastName}}</a></span>-->
-            <!--<i class="glyphicon glyphicon-edit"></i>-->
-        <!--</h3>-->
         <h3>
-            <span><a ui-sref="children.list({stakeDB: vm.selectedDB, stakeName:vm.selectedStake})">{{'CANCEL' | translate}}</a></span>
+            <span><a ui-sref="children.list({stakeDB: vm.selectedDB, stakeName:vm.selectedStake, searchFilter: '', colorFilter: '', screenType: 'children})">{{'CANCEL' | translate}}</a></span>
         </h3>
     </div>
     <div class="list-group borderless">
@@ -32,11 +18,4 @@
         </a>
     </div>
     <h3>{{'REMOVE_CHILD_MSG' | translate}}</h3>
-    <!--<div class="col-sm-4" style="text-align: center">-->
-    <!--<div style="margin-top:4%;">-->
-    <!--<button type="submit" class="btn btn-primary" ng-click="vm.syncUpstream()">Sync Database-->
-    <!--<i class="glyphicon glyphicon-refresh"></i>-->
-    <!--</button>-->
-    <!--</div>-->
-    <!--</div>-->
 </section>

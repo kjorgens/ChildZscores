@@ -5,11 +5,16 @@
     .module('children')
     .controller('ChildrenController', ChildrenController);
 
-  ChildrenController.$inject = ['$rootScope', '$scope', '$state', '$stateParams', '$translate', 'moment', 'childResolve', 'Authentication', 'ZScores', 'PouchService', 'ModalService'];
+  ChildrenController.$inject = ['$rootScope', '$scope', '$state', '$stateParams', '$translate', '$window',
+    'FilterService', 'moment', 'childResolve', 'Authentication', 'ZScores', 'usSpinnerService', 'PouchService', 'ModalService'];
 
-  function ChildrenController($rootScope, $scope, $state, $stateParams, $translate, moment, child, Authentication, ZScores, PouchService, ModalService) {
+  function ChildrenController($rootScope, $scope, $state, $stateParams, $translate, $window,
+     FilterService, moment, child, Authentication, ZScores, usSpinnerService, PouchService, ModalService) {
     var vm = this;
     var editChild = false;
+    vm.checkAge = checkAge;
+    vm.childTooOld = childTooOld;
+    vm.goBack = goBack;
 
     $translate.use($rootScope.SelectedLanguage);
 
@@ -27,9 +32,49 @@
 //    vm.find();
     vm.genders = [{ value: 'Boy', translationId: 'TXT_MALE' }, { value: 'Girl', translationId: 'TXT_FEMALE' }];
     vm.yesNo = [{ value: 'Yes', translationId: 'YES' }, { value: 'No', translationId: 'NO' }, { value: 'Unknown', translationId: 'UNKNOWN' }];
+    vm.startSpin = function() {
+      if (!vm.spinneractive) {
+        usSpinnerService.spin('spinner-sync');
+      }
+    };
+
+    vm.stopSpin = function() {
+      if (vm.spinneractive) {
+        usSpinnerService.stop('spinner-sync');
+      }
+    };
+
+    vm.spinneractive = false;
+
+    $rootScope.$on('us-spinner:spin', function(event, key) {
+      vm.spinneractive = true;
+    });
+
+    $rootScope.$on('us-spinner:stop', function(event, key) {
+      vm.spinneractive = false;
+    });
+
+    function goBack(){
+      $state.go('children.list', { stakeDB: vm.selectedDB, stakeName: vm.selectedStake, screenType: 'children',
+        searchFilter: FilterService.currentListFilter(), colorFilter: FilterService.currentColorFilter()});
+    }
+
+    function checkAge() {
+      var months;
+      var rightNow = new Date();
+      var currentAgeMonths = moment(rightNow).diff(moment(vm.child.birthDate), 'months');
+      if (currentAgeMonths> 60) {
+        vm.childTooOld();
+ //       vm.startSpin();
+        $state.go('children.list', { stakeDB: vm.selectedDB, stakeName: vm.selectedStake, screenType: 'children',
+          searchFilter: FilterService.currentListFilter(), colorFilter: FilterService.currentColorFilter()});
+      }
+    }
+
     if ($state.params.childId) {
       editChild = true;
       vm.child = child;
+      vm.checkAge();
       vm.ageIsValid = true;
       vm.firstNameIsValid = true;
       vm.lastNameIsValid = true;
@@ -41,7 +86,7 @@
       vm.wardIsValid = true;
 
       vm.child.birthDate = new Date(vm.child.birthDate);
-
+      vm.startSpin();
       PouchService.getSurveys(vm.child._id, setSurveyList, surveyErrors);
     } else {
       vm.child = {};
@@ -94,6 +139,7 @@
         });
     }
 
+
     performTranslation();
     $rootScope.$on('$translateChangeSuccess', function () {
       performTranslation();
@@ -138,6 +184,10 @@
     }
 
     function setSurveyList(surveys) {
+      vm.stopSpin();
+      surveys.docs.forEach(function(survey){
+        survey.colorStatus = PouchService.calcSurveyStatus(survey);
+      });
       $scope.$apply(function () {
         vm.surveys = surveys.docs;
         //       vm.surveys.forEach(function(survey) {
@@ -353,6 +403,7 @@
     }
 
     function childUpdated(child) {
+      vm.startSpin();
       $state.go('children.view', { childId: child.id });
     }
 
@@ -448,7 +499,9 @@
           PouchService.remove(toRemove, removeResponse, removeError);
         });
         PouchService.remove(child, removeResponse, removeError);
-        $state.go('children.list', { stakeDB: vm.selectedDB, stakeName: vm.selectedStake });
+        vm.startSpin();
+        $state.go('children.list', { stakeDB: vm.selectedDB, stakeName: vm.selectedStake, screenType: 'children',
+          searchFilter: FilterService.currentListFilter(), colorFilter: FilterService.currentColorFilter() });
       }
     }
 
@@ -488,6 +541,10 @@
  //     var something = $stateParams;
       PouchService.get({ childId: vm.childId }, getUser, getError);
     }
+
+    function childTooOld() {
+      return ModalService.infoModal('Child is older than 5 years:', 'Child has graduated', '');
+    };
 
     vm.invalidInput = function () {
       return ModalService.infoModal('Input Error:', 'Invalid or Missing data', 'Please correct or enter required fields');
