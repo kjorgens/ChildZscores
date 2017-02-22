@@ -405,6 +405,9 @@ function addLineToStack(ownerInfo, screenInfo, sortField, stakeDB) {
     if (ownerInfo.lastName !== undefined && ownerInfo.lastName.indexOf(',') > -1) {
       ownerInfo.lastName = ownerInfo.lastName.replace (/,/g, ' ');
     }
+    if (ownerInfo.idGroup !== undefined && ownerInfo.idGroup.indexOf(',') > -1) {
+      ownerInfo.idGroup = ownerInfo.idGroup.replace (/,/g, ' ');
+    }
     var dataObj = {
       childId: ownerInfo._id,
       gender: screenInfo.gender[0].toUpperCase() + screenInfo.gender.substr(1),
