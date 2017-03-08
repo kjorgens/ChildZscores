@@ -15,6 +15,7 @@
     vm.checkAge = checkAge;
     vm.childTooOld = childTooOld;
     vm.goBack = goBack;
+    vm.getChildrenList = getChildrenList;
 
     $translate.use($rootScope.SelectedLanguage);
 
@@ -29,7 +30,8 @@
     vm.selectedCountryImage = sessionStorage.getItem('selectedCountryImage');
     vm.online = $rootScope.appOnline;
     vm.interviewer = localStorage.getItem('lastInterviewer');
-//    vm.find();
+
+ //   getChildrenList();
     vm.genders = [{ value: 'Boy', translationId: 'TXT_MALE' }, { value: 'Girl', translationId: 'TXT_FEMALE' }];
     vm.yesNo = [{ value: 'Yes', translationId: 'YES' }, { value: 'No', translationId: 'NO' }, { value: 'Unknown', translationId: 'UNKNOWN' }];
     vm.startSpin = function() {
@@ -114,7 +116,7 @@
     vm.remove = remove;
     vm.create = create;
     vm.update = update;
-    vm.find = find;
+    vm.getChildrenList = getChildrenList;
     vm.findOne = findOne;
     vm.setMonthCount = setMonthCount;
     vm.today = today;
@@ -128,7 +130,8 @@
     vm.checkAllFieldsValid = checkAllFieldsValid;
     function performTranslation() {
       $translate(['BOY', 'GIRL', 'CHILD_RECORD', 'UPDATE', 'CREATE',
-        'EDIT_EXISTING_CHILD', 'ADD_NEW_CHILD']).then(function (translations) {
+        'EDIT_EXISTING_CHILD', 'ADD_NEW_CHILD', 'CHILD_GT_5', 'CHILD_GRAD',
+        'INPUT_ERROR', 'INVALID_DATA', 'PLEASE_CORRECT' ]).then(function (translations) {
           vm.boy = translations.BOY;
           vm.girl = translations.GIRL;
           vm.childRec = translations.CHILD_RECORD;
@@ -136,6 +139,11 @@
           vm.createRec = translations.CREATE;
           vm.edit_existing = translations.EDIT_EXISTING_CHILD;
           vm.add_new = translations.ADD_NEW_CHILD;
+          vm.childGT5 = translations.CHILD_GT_5;
+          vm.childGrad = translations.CHILD_GRAD;
+          vm.inputError = translations.INPUT_ERROR;
+          vm.invalidData = translations.INVALID_DATA;
+          vm.pleaseCorrect = translations.PLEASE_CORRECT;
         });
     }
 
@@ -271,6 +279,9 @@
         vm.firstNameIsValid = false;
       }
       vm.checkAllFieldsValid();
+      // if (FilterService.matchName(FilterService.getCurrentChildList(), {firstName: vm.child.firstName || '_', lastName: vm.child.lastName || '_'})) {
+      //   return ModalService.choiceModal(vm.child.firstName + ' ' + vm.child.lastName + ' exists in database', 'Make a selection', '');
+      // }
     }
 
     function checkLastNameIsValid() {
@@ -282,6 +293,10 @@
         }
       } else {
         vm.lastNameIsValid = false;
+      }
+      var retVal = FilterService.matchName(FilterService.getCurrentChildList(), {firstName: vm.child.firstName || '_', lastName: vm.child.lastName || '_'})
+      if (retVal) {
+        return ModalService.choiceModal(retVal._id, retVal.firstName + ' ' + retVal.lastName + ' ','EXISTS_DATABASE', 'MAKE_SELECTION', '');
       }
       vm.checkAllFieldsValid();
     }
@@ -370,6 +385,9 @@
         }
       }
       vm.checkAllFieldsValid();
+      if (FilterService.matchNameAndAge(FilterService.getCurrentChildList(), {firstName: vm.child.firstName || '_', lastName: vm.child.lastName || '_', monthAge: vm.child.monthAge})) {
+        return ModalService.choiceModal(vm.child._id, vm.child.firstName + ' ' + vm.child.lastName + ' ', 'EXISTS_DATABASE', 'MAKE_SELECTION', '');
+      }
     }
 
     function checkAgeIsValid() {
@@ -382,6 +400,9 @@
         vm.child.monthAge = Number(monthAge.toFixed(2));
       }
       vm.checkAllFieldsValid();
+      if (FilterService.matchNameAndAge(FilterService.getCurrentChildList(), {firstName: vm.child.firstName || '_', lastName: vm.child.lastName || '_', monthAge: vm.child.monthAge})) {
+        return ModalService.choiceModal(vm.child._id, vm.child.firstName + ' ' + vm.child.lastName + ' ', 'EXISTS_DATABASE', 'MAKE_SELECTION', '');
+      }
     }
 
     function ldsMemberChecked() {
@@ -526,8 +547,8 @@
     };
 
     // Find a list of Children
-    function find() {
-      PouchService.getAll(setChildren, listChildrenErrors);
+    function getChildrenList() {
+      PouchService.findChildren().then(setChildren);
     }
 
     var getUser = function (childDoc) {
@@ -542,12 +563,13 @@
       PouchService.get({ childId: vm.childId }, getUser, getError);
     }
 
+
     function childTooOld() {
-      return ModalService.infoModal('Child is older than 5 years:', 'Child has graduated', '');
+      return ModalService.infoModal('CHILD_GT_5' , 'CHILD_GRAD', '');
     };
 
     vm.invalidInput = function () {
-      return ModalService.infoModal('Input Error:', 'Invalid or Missing data', 'Please correct or enter required fields');
+      return ModalService.infoModal('INPUT_ERROR', 'INVALID_DATA', 'PLEASE_CORRECT');
     };
   }
 }());

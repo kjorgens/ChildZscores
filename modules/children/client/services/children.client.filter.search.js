@@ -14,6 +14,15 @@
     var currentScreenType = '';
     var singleChildId = '';
     var displayCount = 0;
+    var currentChildList;
+
+    factory.setCurrentChildList = function(list) {
+      currentChildList = list;
+    };
+
+    factory.getCurrentChildList = function() {
+      return currentChildList;
+    };
 
     factory.getCurrentScreenType = function() {
       return currentScreenType;
@@ -78,6 +87,20 @@
       return moment(new Date()).diff(moment(birthDate), 'months');
     }
 
+    factory.matchName = function (list, currentChild) {
+      return list.find (function(child) {
+        return (~child.firstName.toUpperCase().indexOf(currentChild.firstName.toUpperCase()) &&
+            ~child.lastName.toUpperCase().indexOf(currentChild.lastName.toUpperCase()))
+      })
+    };
+
+    factory.matchNameAndAge = function(list, currentChild) {
+      return list.some (function(child) {
+        return (~child.firstName.toUpperCase().indexOf(currentChild.firstName.toUpperCase()) &&
+        ~child.lastName.toUpperCase().indexOf(currentChild.lastName.toUpperCase()) &&
+        child.monthAge == currentChild.monthAge)
+      })
+    };
 
     factory.searchAndFilter = function (list, searchFilter, colorFilter, sortField) {
       displayCount = 0;

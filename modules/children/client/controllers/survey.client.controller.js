@@ -213,7 +213,7 @@
     }
 
     function updateChildError(err) {
-      vm.reportError('Error updating child ', err.message, true);
+      vm.reportError('ERROR_UPDATING', err.message, true);
     }
 
     function childUpdated(obj) {

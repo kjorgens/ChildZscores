@@ -29,6 +29,27 @@
       return deferred.promise;
     };
 
+    factory.choiceModal = function(childId, childName, title, desc, btnText){
+      var deferred = $q.defer();
+      $uibModal.open({
+        controller: 'ChoiceModalController',
+        templateUrl: 'modules/children/client/templates/choice-modal.html',
+        resolve: {
+          input: function () {
+            return {
+              childId: childId,
+              childName: childName,
+              desc: desc,
+              title: title,
+              btnText: btnText || 'ok',
+              promise: deferred
+            };
+          }
+        }
+      });
+      return deferred.promise;
+    };
+
     factory.confirmModal = function(title, msg, confirm, cancel, cb, conditional) {
       var deferred = $q.defer();
       $uibModal.open({
