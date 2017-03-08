@@ -384,28 +384,28 @@ function collectEm(sortedList) {
 
 function addLineToStack(ownerInfo, screenInfo, sortField, stakeDB) {
   return new Promise(function (resolve, reject) {
-    if (ownerInfo.address !== undefined && ownerInfo.address.indexOf(',') > -1) {
+    if (typeof ownerInfo.address === 'string' && ownerInfo.address.indexOf(',') > -1) {
       ownerInfo.address = ownerInfo.address.replace(/,/g, ' ');
     }
-    if (ownerInfo.mother !== undefined && ownerInfo.mother.indexOf(',') > -1) {
+    if (typeof ownerInfo.mother === 'string' && ownerInfo.mother.indexOf(',') > -1) {
       ownerInfo.mother = ownerInfo.mother.replace(/,/g, ' ');
     }
-    if (ownerInfo.father !== undefined && ownerInfo.father.indexOf(',') > -1) {
+    if (typeof ownerInfo.father === 'string' && ownerInfo.father.indexOf(',') > -1) {
       ownerInfo.father = ownerInfo.father.replace(/,/g, ' ');
     }
-    if (ownerInfo.city !== undefined && ownerInfo.city.indexOf(',') > -1) {
+    if (typeof ownerInfo.city === 'string' && ownerInfo.city.indexOf(',') > -1) {
       ownerInfo.city = ownerInfo.city.replace(/,/g, ' ');
     }
-    if (ownerInfo.ward !== undefined && ownerInfo.ward.indexOf(',') > -1) {
+    if (typeof ownerInfo.ward === 'string' && ownerInfo.ward.indexOf(',') > -1) {
       ownerInfo.ward = ownerInfo.ward.replace(/,/g, ' ');
     }
-    if (ownerInfo.firstName !== undefined && ownerInfo.firstName.indexOf(',') > -1) {
+    if (typeof ownerInfo.firstName === 'string' && ownerInfo.firstName.indexOf(',') > -1) {
       ownerInfo.firstName = ownerInfo.firstName.replace(/,/g, ' ');
     }
-    if (ownerInfo.lastName !== undefined && ownerInfo.lastName.indexOf(',') > -1) {
+    if (typeof ownerInfo.lastName === 'string' && ownerInfo.lastName.indexOf(',') > -1) {
       ownerInfo.lastName = ownerInfo.lastName.replace (/,/g, ' ');
     }
-    if (ownerInfo.idGroup !== undefined && ownerInfo.idGroup.indexOf(',') > -1) {
+    if (typeof ownerInfo.idGroup === 'string' && ownerInfo.idGroup.indexOf(',') > -1) {
       ownerInfo.idGroup = ownerInfo.idGroup.replace (/,/g, ' ');
     }
     var dataObj = {
