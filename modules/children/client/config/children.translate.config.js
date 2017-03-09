@@ -110,6 +110,16 @@
       CSV_FILTER: '---Select CSV filter---',
       ZSCORE_UNDER_2: 'Zscores less than -2',
       SORT_FIELD: '---Select Sort Field---',
+      CONTINUE_ADDING: 'Continue adding child',
+      CHILD_GT_5: 'Child is older than 5 years old',
+      CHILD_GRAD: 'Child has graduated',
+      INPUT_ERROR: 'Input Error:',
+      INVALID_DATA: 'Invalid or missing data',
+      PLEASE_CORRECT: 'Please correct or enter required fields',
+      CLOSE:'Close',
+      ERROR_UPDATING: 'Error updating child ',
+      MAKE_SELECTION: 'Make a selection',
+      EXISTS_DATABASE: ' exists in database'
     };
     var translationsES = {
       AGE: 'Edad ( meses )',
@@ -214,6 +224,16 @@
       CSV_FILTER: '---Seleccionar filtro CSV---',
       ZSCORE_UNDER_2: 'Zscores inferior a -2',
       SORT_FIELD: '---Seleccionar el campo Ordenar---',
+      CONTINUE_ADDING: 'Continuar agregando niño',
+      CHILD_GT_5: 'El niño tiene más de 5 años',
+      CHILD_GRAD: 'El niño se ha graduado',
+      INPUT_ERROR: 'Error de entrada:',
+      INVALID_DATA: 'Datos no válidos o que faltan',
+      PLEASE_CORRECT: 'Corrija o ingrese los campos obligatorios',
+      CLOSE:'Cerca',
+      ERROR_UPDATING: 'Error al actualizar al niño ',
+      MAKE_SELECTION: 'Has una elección',
+      EXISTS_DATABASE: ' Existe en la base de datos'
     };
     $translateProvider
         .translations('en', translationsEN)

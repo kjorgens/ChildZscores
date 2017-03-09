@@ -3,14 +3,16 @@
         <div class="modal-background" >
             <h4>
                 <div class="modal-header">
-                    <div class="modal-title invalidFields">{{title | translate}}</div>
+                    <div class="modal-title invalidFields">{{childName}} {{title | translate}}
+                    </div>
                 </div>
             </h4>
             <div class="modal-body invalidFields">
                 <p>{{desc | translate}}</p>
             </div>
             <div class="modal-footer">
-                <div class="anchor btn btn-primary" ng-click="dismiss()">{{'CLOSE' | translate}}</div>
+                <div class="anchor btn btn-primary" ng-click="newChild()">{{'CONTINUE_ADDING' | translate}}</div>
+                <div class="anchor btn btn-primary" ng-click="existingChild()">{{'ADD_SCREENING' | translate}}</div>
             </div>
         </div>
     </div>

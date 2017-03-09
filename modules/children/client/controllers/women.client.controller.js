@@ -212,7 +212,7 @@
     }
 
     vm.invalidInput = function () {
-      return ModalService.infoModal('Input Error:', 'Invalid or Missing data', 'Please correct or enter required fields');
+      return ModalService.infoModal('INPUT_ERROR', 'INVALID_DATA', 'PLEASE_CORRECT');
     };
 
     // find();

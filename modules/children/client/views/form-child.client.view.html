@@ -23,6 +23,31 @@
             <fieldset>
                 <div class="CreateChildFormContainer">
                     <div class="form-group float-left">
+                        <div class="form-group float-left">
+                            <div ng-class="{'has-error':(vm.firstNameIsValid === false)}">
+                                <label for="vm.child.firstName" class="col-sm-2 control-label">{{'FIRST_NAME' | translate}}</label>
+                                <div class="col-sm-4">
+                                    <input class="form-control required" type="text" ng-blur="vm.checkFirstNameIsValid()"
+                                           ng-model="vm.child.firstName" id="vm.child.firstName"
+                                           placeholder="{{'FIRST_NAME' | translate}}"
+                                           required>
+                                    <div class="validationMessage" ng-if="vm.firstNameIsValid === false"><p>{{'REQUIRED' | translate}}
+                                    </p></div>
+                                </div>
+                            </div>
+                            <div ng-class="{'has-error':(vm.lastNameIsValid === false)}">
+                                <label for="vm.child.lastName" class="col-sm-2 control-label">{{'LAST_NAME' | translate}}</label>
+                                <div class="col-sm-4">
+                                    <input type="input" class="form-control required" ng-blur="vm.checkLastNameIsValid()"
+                                           ng-model="vm.child.lastName"
+                                           id="vm.child.lastName"
+                                           placeholder="{{'LAST_NAME' | translate}}"
+                                           required>
+                                    <div class="validationMessage" ng-if="vm.lastNameIsValid === false"><p>{{'REQUIRED' | translate}}
+                                    </p></div>
+                                </div>
+                            </div>
+                        </div>
                         <div ng-class="{'has-error':(vm.genderIsValid === false)}">
                             <label for="vm.child.gender" class="col-sm-2 control-label">{{'GENDER' | translate}}</label>
                             <div class="col-sm-4">
@@ -50,31 +75,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="form-group float-left">
-                        <div ng-class="{'has-error':(vm.firstNameIsValid === false)}">
-                            <label for="vm.child.firstName" class="col-sm-2 control-label">{{'FIRST_NAME' | translate}}</label>
-                            <div class="col-sm-4">
-                                <input class="form-control required" type="text" ng-blur="vm.checkFirstNameIsValid()"
-                                       ng-model="vm.child.firstName" id="vm.child.firstName"
-                                       placeholder="{{'FIRST_NAME' | translate}}"
-                                       required>
-                                <div class="validationMessage" ng-if="vm.firstNameIsValid === false"><p>{{'REQUIRED' | translate}}
-                                    </p></div>
-                            </div>
-                        </div>
-                        <div ng-class="{'has-error':(vm.lastNameIsValid === false)}">
-                            <label for="vm.child.lastName" class="col-sm-2 control-label">{{'LAST_NAME' | translate}}</label>
-                            <div class="col-sm-4">
-                                <input type="input" class="form-control required" ng-blur="vm.checkLastNameIsValid()"
-                                       ng-model="vm.child.lastName"
-                                       id="vm.child.lastName"
-                                       placeholder="{{'LAST_NAME' | translate}}"
-                                       required>
-                                <div class="validationMessage" ng-if="vm.lastNameIsValid === false"><p>{{'REQUIRED' | translate}}
-                                    </p></div>
-                            </div>
-                        </div>
-                    </div>
+
                     <div class="form-group float-left">
                         <div ng-class="{'has-error':(vm.ageIsValid === false)}">
                             <label for="vm.child.monthAge" class="col-sm-2 control-label">{{'AGE_IN_MONTHS' | translate}}</label>

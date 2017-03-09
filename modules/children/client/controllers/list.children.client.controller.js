@@ -17,31 +17,21 @@
     FilterService.setCurrentScreenType($stateParams.screenType);
     vm.screenType = $stateParams.screenType;
     vm.childFilter = localStorage.getItem('childFilter') || 'a';
-    // vm.findChildren = findChildren;
-    // vm.findNursingMothers = findNursingMothers;
-    // vm.findPregnantWomen = findPregnantWomen;
-//    vm.filterDangerFlag = false;
     vm.searchStarted = searchStarted;
     vm.focusSearch = 1;
     vm.searchString = FilterService.currentListFilter();
     vm.noSelection = FilterService.getCurrentScreenType() === '';
     vm.childList = FilterService.searchAndFilter(childResolve.docs, FilterService.currentListFilter(), FilterService.currentColorFilter(), 'firstName');
     $translate.use($rootScope.SelectedLanguage);
-//    vm.childList = FilterService.searchAndFilter(childResolve.docs,FilterService.currentListFilter(),FilterService.currentColorFilter());
-    // if (FilterService.displayCount() === 1 ){
-    //   $state.go('children.view', { childId: childId });
-    // }
 
     sessionStorage.setItem('selectedStake', $stateParams.stakeName);
- //   localStorage.setItem('selectedWard','All Wards');
     sessionStorage.setItem('selectedDBName', $stateParams.stakeDB);
     localStorage.setItem('selectedStake', $stateParams.stakeName);
     localStorage.setItem('selectedDBName', $stateParams.stakeDB);
+    FilterService.setCurrentChildList(vm.childList);
 
     vm.selectedStake = $stateParams.stakeName;
     vm.selectedStakeDB = $stateParams.stakeDB;
- //   vm.selectedWard = 'All Wards';
- //   getWardList();
 
     function performTranslation() {
       $translate(['BOY', 'GIRL', 'ACUTE_ZSCORE', 'MICRO_NUTRITION_ZSCORE', 'AT_RISK_ZSCORE', 'NORMAL_ZSCORE', 'CHILD_GRADUATED'])
@@ -165,47 +155,14 @@
       vm.focusSearch = true;
     };
 
-    // function setChildren(res) {
-    //   $scope.$apply(function() {
-    //     vm.childList = res.docs;
-    //     FilterService.searchAndFilter(vm.childList, FilterService.currentListFilter(), FilterService.currentColorFilter(), 'firstName');
-    //     vm.stopSpin();
-    //   });
-    // }
     function storeStuff(input) {
       if (input !== null) {
         vm.wardList = input;
-        // vm.wardList.push({ wardName: 'All Wards'} );
-        // vm.selectedWard = vm.wardList[8].wardName;
       }
     }
 
-    // function listChildrenErrors(error) {
-    //   vm.error = error;
-    //   console.log(error);
-    //   vm.stopSpin();
-    // }
-
-    // Find a list of Children
- //    function findChildren () {
- // //     vm.startSpin();
- //      return PouchService.queryChildren(setChildren, listChildrenErrors);
-//    }
-
- //    function findNursingMothers () {
- // //     vm.startSpin();
- //      return PouchService.queryNursingMothers(setChildren, listChildrenErrors);
- //    }
-
-  //   function findPregnantWomen () {
-  // //    vm.startSpin();
-  //     return PouchService.queryPregnantWomen(setChildren, listChildrenErrors);
-  //   }
-
     function selectWard() {
-       // vm.selectedWard = vm.selectedWard;
       if (vm.selectedWard === undefined) {
-      // if(vm.selectedWard.wardName.indexOf('All Wards') > -1){
         return PouchService.queryChildren(setChildren, listChildrenErrors);
       } else {
         localStorage.setItem('selectedWard', vm.selectedWard.wardName);
@@ -216,13 +173,5 @@
     function getWardList() {
       return PouchService.getWardList(localStorage.getItem('selectedCountry'), vm.selectedStake, storeStuff, listChildrenErrors);
     }
-    // if(~vm.screenType.indexOf('children')) {
-    //   vm.findChildren($stateParams);
-    // } else if(~vm.screenType.indexOf('nursingMother')) {
-    //   vm.findNursingMothers($stateParams);
-    // } else if(~vm.screenType.indexOf('pregnantMother')) {
-    //   vm.findPregnantWomen($stateParams);
-    // }
-
   }
 }());
