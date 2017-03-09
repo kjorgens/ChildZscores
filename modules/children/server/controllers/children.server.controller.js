@@ -166,7 +166,7 @@ function getOwnerData(parmObj) {
         var ownerInfo = JSON.parse(body);
         parmObj.ownerInfo = ownerInfo;
         parmObj.screenInfo = screenData;
-        resolve(addLineToStack(ownerInfo, screenData, sortField, parmObj.stakeDB));
+        resolve(addLineToStack(ownerInfo, screenData, parmObj.sortField, parmObj.stakeDB));
       } else {
         if (response.statusCode === 404) {
           console.log('screening id = ' + screenData._id);
