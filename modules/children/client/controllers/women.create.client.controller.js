@@ -208,7 +208,7 @@
     function checkChildsBirthDateIsValid() {
       var rightNow = new Date();
       var childsBirthDate = moment(vm.mother.childsBirthDate).diff(moment(rightNow), 'months');
-      if (childsBirthDate < -36 || childsBirthDate > 0) {
+      if (childsBirthDate < -6 || childsBirthDate > 0) {
         vm.childsBirthDateIsValid = false;
         invalidChildsAge();
       } else {
