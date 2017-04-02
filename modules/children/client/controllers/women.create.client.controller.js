@@ -115,7 +115,7 @@
     vm.checkFirstNameIsValid = checkFirstNameIsValid;
     vm.checkLastNameIsValid = checkLastNameIsValid;
     vm.checkDeliveryDateIsValid = checkDeliveryDateIsValid;
-    vm.childsBirthDateIsValid = childsBirthDateIsValid;
+    vm.checkChildsBirthDateIsValid = checkChildsBirthDateIsValid;
     vm.checkMembershipIsValid = checkMembershipIsValid;
     vm.checkAllFieldsValid = checkAllFieldsValid;
 
@@ -195,20 +195,22 @@
 
     function checkDeliveryDateIsValid() {
       var rightNow = new Date();
-      var deliverDelta = moment(vm.mother.deliverDate).diff(moment(rightNow), 'months');
-      if (deliverDelta > 9 ) {
+      var deliveryDelta = moment(vm.mother.deliveryDate).diff(moment(rightNow), 'months');
+      if (deliveryDelta > 9 || deliveryDelta < -3) {
         vm.deliveryDateIsValid = false;
+        invalidDeliveryDate();
       } else {
         vm.deliveryDateIsValid = true;
       }
       vm.checkAllFieldsValid();
     }
 
-    function childsBirthDateIsValid() {
+    function checkChildsBirthDateIsValid() {
       var rightNow = new Date();
       var childsBirthDate = moment(vm.mother.childsBirthDate).diff(moment(rightNow), 'months');
-      if (childsBirthDate > 36 || childsBirthDate < 0) {
+      if (childsBirthDate < -36 || childsBirthDate > 0) {
         vm.childsBirthDateIsValid = false;
+        invalidChildsAge();
       } else {
         vm.childsBirthDateIsValid = true;
       }
@@ -367,10 +369,12 @@
     //   PouchService.get({ motherId: vm.motherId }, getUser, getError);
     // }
 
-    vm.invalidInput = function () {
-      return ModalService.infoModal('INPUT_ERROR', 'INVALID_DATA', 'PLEASE_CORRECT');
+    function invalidChildsAge() {
+      return ModalService.infoModal('INVALID_CHILDS_BDATE' , 'CORRECT_CHILD_BDATE', '');
     };
-
+    function invalidDeliveryDate() {
+      return ModalService.infoModal('INVALID_DELIVERY_DATE' , 'CORRECT_DELIVERY_DATE', '');
+    };
     // find();
   }
 }());

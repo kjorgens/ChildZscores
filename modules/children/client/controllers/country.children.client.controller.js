@@ -9,6 +9,14 @@
 
   function ChildrenCountryController($rootScope, $scope, $state, $translate, usSpinnerService, ChildrenService, ChildrenStakes, PouchService) {
     var vm = this;
+
+    vm.featurePromptCount = parseInt(localStorage.getItem('featurePromptCount')) || 0;
+    if(vm.featurePromptCount < 3){
+      localStorage.setItem('featurePromptCount',vm.featurePromptCount+1);
+    } else {
+      localStorage.setItem('featurePromptCount',"5");
+    }
+
     vm.refreshCountryList = refreshCountryList;
     vm.onLine = navigator.onLine;
     $translate.use($rootScope.SelectedLanguage);

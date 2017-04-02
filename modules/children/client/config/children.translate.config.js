@@ -119,7 +119,16 @@
       CLOSE:'Close',
       ERROR_UPDATING: 'Error updating child ',
       MAKE_SELECTION: 'Make a selection',
-      EXISTS_DATABASE: ' exists in database'
+      EXISTS_DATABASE: ' exists in database',
+      INVALID_DELIVERY_DATE: 'Invalid delivery date',
+      CORRECT_DELIVERY_DATE: 'Enter correct delivery date',
+      INVALID_CHILDS_BDATE: 'Invalid childs age',
+      CORRECT_CHILD_BDATE: 'Must be 0 to 3 years',
+      NEW_FEATURES: ' New search and filter features: You can now search by typing the name in the search window.' +
+      'If you type the name of an existing child, you will be taken to the screen where you enter a new screening.' +
+      'Search is also performed after you enter first and last names in the new child form.' +
+      'If a match is found, you will be prompted to add a new screening, or continue editing.' +
+      'The filter buttons allow you to view children by status color, or view all children.'
     };
     var translationsES = {
       AGE: 'Edad ( meses )',
@@ -233,7 +242,16 @@
       CLOSE:'Cerca',
       ERROR_UPDATING: 'Error al actualizar al niño ',
       MAKE_SELECTION: 'Has una elección',
-      EXISTS_DATABASE: ' Existe en la base de datos'
+      EXISTS_DATABASE: ' Existe en la base de datos',
+      INVALID_DELIVERY_DATE: 'Fecha de entrega no válida',
+      CORRECT_DELIVERY_DATE: 'Introduzca la fecha de entrega correcta',
+      INVALID_CHILDS_BDATE: 'Edad de los niños no válidos',
+      CORRECT_CHILD_BDATE: 'Debe ser de 0 a 3 años',
+      NEW_FEATURES: ' Nuevas funciones de búsqueda y filtro: Ahora puede buscar escribiendo el nombre en la ventana de búsqueda.' +
+      'Si escribe el nombre de un niño existente, se le llevará a la pantalla para ingresar a una nueva proyección.' +
+      'La búsqueda también se realiza, después de introducir los nombres y apellidos en el formulario nuevo hijo.' +
+      'Si se encuentra una coincidencia, se le pedirá que añada una nueva selección o continúe editando.' +
+      'Los botones de filtro le permiten ver a los niños por color de estado, o ver a todos los niños.'
     };
     $translateProvider
         .translations('en', translationsEN)
