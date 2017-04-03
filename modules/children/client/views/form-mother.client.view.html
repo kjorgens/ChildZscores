@@ -76,10 +76,10 @@
             </div>
             </div>
             <div ng-if="vm.nursingMother">
-            <div ng-class="{'has-error':(vm.childsBirthDate === false)}">
+            <div ng-class="{'has-error':(vm.childsBirthDateIsValid === false)}">
               <label for="vm.mother.childsBirthDate" class="col-sm-2 control-label">{{'NURSING_CHILD_AGE' | translate}}</label>
               <div class="col-sm-4">
-                <input type="date" id="vm.mother.childsBirthDate" ng-blur="vm.childsBirthDateIsValid()" class="form-control"
+                <input type="date" id="vm.mother.childsBirthDate" ng-blur="vm.checkChildsBirthDateIsValid()" class="form-control"
                      ng-model="vm.mother.childsBirthDate"
                      placeholder="{{'NURSING_CHILD_AGE' | translate}}"
                      required>

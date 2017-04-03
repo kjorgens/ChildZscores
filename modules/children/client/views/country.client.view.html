@@ -6,6 +6,11 @@
                   <span><a ng-click="vm.refreshCountryList()">{{'SELECT_COUNTRY' | translate}} <i
                           class="glyphicon glyphicon-refresh"></i></a></span>
             </div>
+            <h3>
+                <div ng-if="vm.featurePromptCount < 3">
+                    {{'NEW_FEATURES' | translate}}
+                </div>
+            </h3>
             <div ng-if="!vm.onLine">
                 {{'SELECT_COUNTRY' | translate}}
             </div>
