@@ -12,6 +12,7 @@
      survey, Authentication, ZScores, PouchService, ModalService) {
     var vm = this;
     $translate.use($rootScope.SelectedLanguage);
+    vm.initialSurvey = false;
     vm.survey = survey;
 
     function checkAllFieldsValid() {
@@ -31,6 +32,19 @@
         vm.allFieldsValid = true;
         vm.invalidFields = true;
       }
+    }
+
+    function getSurveys(surveys) {
+      if( surveys.docs.length === 0) {
+        vm.initialSurvey = true;
+      } else {
+        vm.initialSurvey = false;
+      }
+    }
+
+
+    function surveyErrors(error) {
+      vm.surveyError = error;
     }
 
     vm.goBack = function(){
@@ -53,7 +67,7 @@
       vm.childWeightIsValid = undefined;
       vm.surveyDate = new Date();
     }
-
+    PouchService.getSurveys($state.params.childId, getSurveys, surveyErrors);
     if (navigator.geolocation) {
       console.log('Geolocation is supported!');
     } else {
