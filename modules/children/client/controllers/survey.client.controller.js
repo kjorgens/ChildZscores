@@ -162,7 +162,7 @@
         } else {
           vm.childHeightIsValid = true;
           if (vm.ageIsValid && vm.weightIsValid) {
-            vm.zScoreGetter(vm.survey.gender, vm.ageInMonths || vm.monthAge, vm.survey.height, vm.survey.weight, function (zscore) {
+            vm.zScoreGetter(vm.survey.gender, vm.ageInMonths || vm.monthAge, vm.survey.height, vm.survey.weight, vm.initialSurvey, function (zscore) {
               vm.survey.zScore = zscore;
             });
           }
@@ -196,7 +196,7 @@
         } else {
           vm.childWeightIsValid = true;
           if (vm.ageIsValid && vm.heightIsValid) {
-            vm.zScoreGetter(vm.survey.gender, vm.ageInMonths || vm.monthAge, vm.survey.height, vm.survey.weight, function (zscore) {
+            vm.zScoreGetter(vm.survey.gender, vm.ageInMonths || vm.monthAge, vm.survey.height, vm.survey.weight, vm.initialSurvey, function (zscore) {
               vm.survey.zScore = zscore;
             });
           }
@@ -282,7 +282,7 @@
       }
 
       if (vm.survey._id) {
-        vm.zScoreGetter(vm.child.gender, vm.survey.monthAge, vm.survey.height, vm.survey.weight, function (zscore) {
+        vm.zScoreGetter(vm.child.gender, vm.survey.monthAge, vm.survey.height, vm.survey.weight, vm.initialSurvey, function (zscore) {
           vm.zScore = zscore;
         });
         vm.survey.zScore = vm.zScore;
@@ -292,7 +292,7 @@
         vm.survey._id = undefined;
         var bday = new Date(vm.child.birthDate);
         var zScore = {};
-        vm.zScoreGetter(vm.child.gender, vm.survey.monthAge, vm.survey.height, vm.survey.weight, function (zscore) {
+        vm.zScoreGetter(vm.child.gender, vm.survey.monthAge, vm.survey.height, vm.survey.weight, vm.initialSurvey, function (zscore) {
           vm.zScore = zscore;
         });
 

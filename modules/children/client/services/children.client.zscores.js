@@ -755,7 +755,7 @@
 
   function ZScores() {
     var tableByAge;
-    var getMethod = function (sex, age, height, weight, callback) {
+    var getMethod = function (sex, age, height, weight, firstScreening, callback) {
       var ha,
         wa,
         wl,
@@ -795,9 +795,9 @@
       weightForAge = (Math.pow((Number(weight) / wa.M), wa.L) - 1) / (wa.S * wa.L);
       weightForLength = (Math.pow((Number(weight) / wl.M), wl.L) - 1) / (wl.S * wl.L);
       var zscoreString = 'Age: ' + Number(age).toFixed(2) + ' months,' +
-      '  Z scores: h/a: ' + Number(heightForAge).toFixed(2) + '  w/a: ' +
-      Number(weightForAge).toFixed(2) + '  w/h: ' +
-      Number(weightForLength).toFixed(2);
+        '  Z scores: h/a: ' + Number(heightForAge).toFixed(2) + '  w/a: ' +
+        Number(weightForAge).toFixed(2) + '  w/h: ' +
+        Number(weightForLength).toFixed(2);
       var haStatus = 'normalZscore';
       var waStatus = 'normalZscore';
       var wlStatus = 'normalZscore';
@@ -826,10 +826,80 @@
           }
         }
       }
+
+      var status;
+      var sugAction = [];
+      if (Math.round(age) > 60) {
+        if (weightForLength < -3) {
+          status = 'SEVERE_ACUTE';
+          sugAction.push('SERVERE_REPORT');
+          sugAction.push('SERVERE_VERIFY');
+          sugAction.push('SERVERE_REVIEW');
+          sugAction.push('SERVERE_WEIGH');
+        }
+        else if (weightForLength < -2) {
+          status = 'MODERATE_ACUTE_CHILD';
+          sugAction.push('MODERATE_ACUTE_PROVIDE');
+          sugAction.push('MODERATE_ACUTE_ENCOUARAGE');
+          sugAction.push('MODERATE_ACUTE_REVIEW');
+          sugAction.push('MODERATE_ACUTE_WEIGH');
+        }
+      }
+
+      if (firstScreening) {
+        // if (Math.round(age) > 36) {
+        //     // dont qualify
+        // }else {
+        if (heightForAge < -2 || weightForAge < -2 || weightForLength < -2) {
+          status = 'RED_CHILD';
+          sugAction.push('RED_START');
+          sugAction.push('RED_ENROLL');
+          sugAction.push('RED_INCLUDE');
+        } else if (heightForAge < -1 || weightForAge < -1 || weightForLength < -1) {
+          status = 'ORANGE_CHILD';
+          sugAction.push('ORANGE_ENROLL');
+          sugAction.push('ORANGE_ENCOURAGE');
+        } else if (heightForAge > -1 && weightForAge > -1 && weightForLength > -1) {
+          status = 'GREEN_CHILD';
+          sugAction.push('GREEN_TELL');
+        }
+        // }
+      } else if (Math.round(age) > 6 && Math.round(age) < 36) {
+        if (heightForAge < -2 || weightForAge < -2 || weightForLength < -2) {
+          status = 'RED_CHILD';
+          sugAction.push('PRIOR_UNDERNOURISHED_CONTINUE');
+          sugAction.push('PRIOR_UNDERNOURISHED_REVIEW');
+          sugAction.push('PRIOR_UNDERNOURISHED_INCLUDE_HEALTH');
+          sugAction.push('PRIOR_UNDERNOURISHED_INCLUDE_NEXT');
+        } else if (heightForAge < -1 || weightForAge < -1 || weightForLength < -1) {
+          status = 'ORANGE_CHILD';
+          sugAction.push('PRIOR_ORGANGE_ENROLL');
+          sugAction.push('PRIOR_ORGANGE_ENCOURAGE');
+        } else if (heightForAge > -1 && weightForAge > -1 && weightForLength > -1) {
+          status = 'GREEN_CHILD';
+          sugAction.push('PRIOR_GREEN_TELL');
+        }
+      } else if (Math.round(age) > 36) {
+        if (heightForAge < -2 || weightForAge < -2 || weightForLength < -2) {
+          status = 'RED_CHILD';
+          sugAction.push('PRIOR_UNDERNOURISHED_CONTINUE');
+          sugAction.push('PRIOR_UNDERNOURISHED_REVIEW');
+          sugAction.push('PRIOR_UNDERNOURISHED_INCLUDE_HEALTH');
+          sugAction.push('PRIOR_UNDERNOURISHED_INCLUDE_NEXT');
+        } else if (heightForAge < -1 || weightForAge < -1 || weightForLength < -1) {
+          status = 'ORANGE_CHILD';
+          sugAction.push('PRIOR_ORGANGE_ENROLL');
+          sugAction.push('PRIOR_ORGANGE_ENCOURAGE');
+        } else if (heightForAge > -1 && weightForAge > -1 && weightForLength > -1) {
+          status = 'GREEN_CHILD';
+          sugAction.push('PRIOR_GREEN_TELL');
+        }
+      }
+
       callback({ ha: heightForAge, haStatus: haStatus,
         wa: weightForAge, waStatus: waStatus,
         wl: weightForLength, wlStatus: wlStatus,
-        zscoreString: zscoreString });
+        zscoreString: zscoreString, status: status, actions: sugAction });
     };
     return { getMethod: getMethod };
   }
