@@ -17,6 +17,13 @@
         </h3>
     </div>
     <small>
+        <h4>{{'ACTIONS' | translate}}:
+            <a ng-repeat="action in vm.actions" >
+                  <li>
+                      {{action | translate}}
+                  </li>
+            </a>
+        </h4>
         <a ng-repeat="survey in vm.surveys"
            ui-sref="children.editsurvey({ surveyId:survey._id, childId:vm.child._id})" class="list-group-item clearfix" ng-class="survey.colorStatus">
             <small class="list-group-item-text ZscoreListContainer ">
@@ -39,12 +46,22 @@
                 </h4>
                 {{'SCREENING_DATE' | translate}}
                 <span ng-bind="survey.surveyDate | date:'mediumDate'"></span>
+
               <h4>{{'CURRENT_STATUS' | translate}}:
-
+                <h4 ng-if="child.statusColor">
+                  {{child.monthAge<60 ? ('ZSCORE_STATUS' | translate) : ('CHILD_GRADUATED' | translate)}}:
+                  <span ng-class="child.statusColor" ng-if="child.zscoreStatus === 'Acute: supplements required' && child.monthAge<60">
+                          {{'ACUTE_ZSCORE' | translate}} </span>
+                  <span ng-class="child.statusColor" ng-if="child.zscoreStatus === 'Micro nutrients required' && child.monthAge<60">
+                          {{'MICRO_NUTRITION_ZSCORE' | translate}} </span>
+                  <span ng-class="child.statusColor" ng-if="child.zscoreStatus === 'At Risk: Come to next screening' && child.monthAge<60">
+                          {{'AT_RISK_ZSCORE' | translate}} </span>
+                  <span ng-class="child.statusColor" ng-if="child.zscoreStatus === 'Normal' && child.monthAge<60">
+                          {{'NORMAL_ZSCORE' | translate}} </span>
+                </h4>
               </h4>
-              <h4>{{'ACTIONS' | translate}}
 
-              </h4>
+
             </small>
         </a>
         </div>
