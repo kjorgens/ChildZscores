@@ -17,6 +17,13 @@
         </h3>
     </div>
     <small>
+        <h4>{{'ACTIONS' | translate}}:
+            <a ng-repeat="action in vm.actions" >
+                  <li>
+                      {{action | translate}}
+                  </li>
+            </a>
+        </h4>
         <a ng-repeat="survey in vm.surveys"
            ui-sref="children.editsurvey({ surveyId:survey._id, childId:vm.child._id})" class="list-group-item clearfix" ng-class="survey.colorStatus">
             <small class="list-group-item-text ZscoreListContainer ">
@@ -54,19 +61,7 @@
                 </h4>
               </h4>
 
-              <h4>{{'ACTIONS' | translate}}:
-                <span ng-bind="action in vm.zScore.actions" >
-                  <li>
-                      1
-                  </li>
-                   <li>
-                     2
-                  </li>
-                   <li>
-                     3
-                  </li>
-                </span>
-              </h4>
+
             </small>
         </a>
         </div>
