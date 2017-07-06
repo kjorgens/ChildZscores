@@ -7,7 +7,7 @@ module.exports = {
         // bower:css
         'public/lib/bootstrap/dist/css/bootstrap.css',
         'public/lib/bootstrap/dist/css/bootstrap-theme.css',
-        'public/lib/nv.d3.js/build/nv.d3.css'
+        'public/lib/nvd3/build/nv.d3.min.css'
         // endbower
       ],
       js: [
@@ -34,8 +34,8 @@ module.exports = {
         'public/lib/angular-moment/angular-moment.js',
         'public/lib/angular-translate/angular-translate.js',
         'public/lib/angular-sanitize/angular-sanitize.js',
-        'public/lib/d3/d3.js',
-        'public/lib/nvd3/build/nv.d3.js',
+        'public/lib/d3/d3.min.js',
+        'public/lib/nvd3/build/nv.d3.min.js',
         'public/lib/angular-nvd3/dist/angular-nvd3.min.js'
         // end bower:js
       ],
