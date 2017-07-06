@@ -529,7 +529,7 @@ exports.createCSVFromDB = function (req, res) {
   }
   var parmObj = { stakeDB: req.params.stakeDB, filter: req.params.filter, sortField: req.params.sortField, screenInfo: {} };
  //buildOutputFromLastScreening(parmObj) // child + latest screening
-   pullSaveScreenData(parmObj) //child + all screenings
+  pullSaveScreenData(parmObj) //child + all screenings
       .all().then(sortEm)
       .then(collectEm)
       .then(writeTheFile)

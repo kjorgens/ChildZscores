@@ -2,7 +2,7 @@
 
   'use strict';
 
-  app.registerModule('children', ['angularMoment', 'core', 'pascalprecht.translate', 'ngSanitize']);
+  app.registerModule('children', ['angularMoment', 'core', 'pascalprecht.translate', 'ngSanitize', 'nvd3']);
   app.registerModule('children.services', []);
   app.registerModule('children.autoFocus', []);
   app.registerModule('children.report', []);

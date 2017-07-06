@@ -16,6 +16,9 @@
             <span><a ui-sref="children.newsurvey({childId:vm.child._id})">{{'ADD_SCREENING' | translate}} <i class="glyphicon glyphicon-plus"></i></a></span>
         </h3>
     </div>
+    <div>
+        <nvd3 options="vm.options" data="vm.data" class="with-3d-shadow with-transitions" config="{refreshDataOnly: true, deepWatchData: true}" on-ready="vm.callback">Expecting chart</nvd3>
+    </div>
     <small>
         <h4>{{'ACTIONS' | translate}}:
             <a ng-repeat="action in vm.actions" >

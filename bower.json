@@ -4,7 +4,7 @@
   "homepage": "http://meanjs.org/",
   "license": "MIT",
   "dependencies": {
-    "angular": "~1.5.0",
+    "angular": "~1.6.5",
     "angular-animate": "~1.5.0",
     "angular-bootstrap": "~1.1.2",
     "angular-file-upload": "^2.3.4",
@@ -26,7 +26,8 @@
     "pouchdb-all-dbs": "^1.0.1",
     "angular-translate": "^2.11.0",
     "angular-sanitize": "^1.5.5",
-    "pouchdb": "^6.0.5"
+    "pouchdb": "^6.0.5",
+    "angular-nvd3": "^1.0.9"
   },
   "resolutions": {
     "moment": "^2.15.0",

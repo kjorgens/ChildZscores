@@ -69,6 +69,10 @@
 
     function sortEm(listIn, sortField) {
       listIn.sort(function(x, y) {
+        if(x[sortField] === undefined ||  y[sortField] === undefined){
+          console.log('missing info for ' + x['_id']);
+          return 0;
+        }
         if (x[sortField].toUpperCase() < y[sortField].toUpperCase()) {
           return -1;
         }
