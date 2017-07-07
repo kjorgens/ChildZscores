@@ -847,10 +847,7 @@
       }
 
       if (firstScreening) {
-        // if (Math.round(age) > 36) {
-        //     // dont qualify
-        // }else {
-        if (heightForAge < -2 || weightForAge < -2 || weightForLength < -2) {
+       if (heightForAge < -2 || weightForAge < -2 || weightForLength < -2) {
           status = 'RED_CHILD';
           sugAction.push('RED_START');
           sugAction.push('RED_ENROLL');
@@ -863,7 +860,7 @@
           status = 'GREEN_CHILD';
           sugAction.push('GREEN_TELL');
         }
-        // }
+
       } else if (Math.round(age) > 6 && Math.round(age) < 36) {
         if (heightForAge < -2 || weightForAge < -2 || weightForLength < -2) {
           status = 'RED_CHILD';
@@ -879,6 +876,7 @@
           status = 'GREEN_CHILD';
           sugAction.push('PRIOR_GREEN_TELL');
         }
+
       } else if (Math.round(age) > 36) {
         if (heightForAge < -2 || weightForAge < -2 || weightForLength < -2) {
           status = 'RED_CHILD';

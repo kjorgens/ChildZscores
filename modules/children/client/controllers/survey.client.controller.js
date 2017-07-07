@@ -247,7 +247,8 @@
       vm.newChildError = error;
     }
 
-    function setMonthCount() {
+    function
+    setMonthCount() {
       var months;
       var rightNow = new Date();
       months = moment(new Date()).diff(moment(vm.child.birthDate), 'months');
