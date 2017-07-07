@@ -17,6 +17,7 @@
     vm.goBack = goBack;
     vm.getChildrenList = getChildrenList;
 
+    vm.zScoreGetter = ZScores.getMethod;
     $translate.use($rootScope.SelectedLanguage);
 
     vm.selectedStake = localStorage.getItem('selectedStake');
@@ -198,6 +199,10 @@
       });
       $scope.$apply(function () {
         vm.surveys = surveys.docs;
+        vm.zScoreGetter(vm.child.gender, vm.surveys[0].monthAge, vm.surveys[0].height, vm.surveys[0].weight, vm.surveys.length === 1 ? true : false, function (zscore) {
+          vm.zScore = zscore;
+          vm.actions = zscore.actions;
+        });
         //       vm.surveys.forEach(function(survey) {
         //        if (vm.surveys.length > 0) {
         //          gradeZScores(vm.surveys[0]);
