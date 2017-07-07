@@ -14,6 +14,7 @@
     var editChild = false;
     vm.checkAge = checkAge;
     vm.childTooOld = childTooOld;
+    vm.firstChildTooOld = firstChildTooOld;
     vm.goBack = goBack;
     vm.getChildrenList = getChildrenList;
 
@@ -66,7 +67,7 @@
       var months;
       var rightNow = new Date();
       var currentAgeMonths = moment(rightNow).diff(moment(vm.child.birthDate), 'months');
-      if (currentAgeMonths> 60) {
+      if (currentAgeMonths > 60) {
         vm.childTooOld();
  //       vm.startSpin();
         $state.go('children.list', { stakeDB: vm.selectedDB, stakeName: vm.selectedStake, screenType: 'children',
@@ -378,10 +379,11 @@
     var month = vm.maxDate.getMonth();
     var day = vm.maxDate.getDate();
     vm.minStartDate = new Date(year - 5, month, day);
-
     function checkEnteredAgeIsValid() {
       if (vm.child.monthAge !== undefined) {
-        if (vm.child.monthAge < 1 || vm.child.monthAge > 60) {
+        if (vm.child.monthAge < 1 || vm.child.monthAge > 36) {
+          vm.firstChildTooOld();
+        } else if (vm.child.monthAge > 60) {
           vm.ageIsValid = false;
         } else {
           vm.ageIsValid = true;
@@ -572,6 +574,11 @@
     function childTooOld() {
       return ModalService.infoModal('CHILD_GT_5' , 'CHILD_GRAD', '');
     };
+
+    function firstChildTooOld() {
+      return ModalService.infoModal('CHILD_FIRSTSCEEN_36' , 'CHILD_START_TOO_OLD', '');
+    };
+
 
     vm.invalidInput = function () {
       return ModalService.infoModal('INPUT_ERROR', 'INVALID_DATA', 'PLEASE_CORRECT');
