@@ -70,7 +70,7 @@
     function sortEm(listIn, sortField) {
       listIn.sort(function(x, y) {
         if (x[sortField] === undefined || y[sortField] === undefined) {
-          console.log('missing info for ' + x._id);
+          console.log('missing info for ' + x._id + ' or ' + y._id);
           return 0;
         }
         if (x[sortField].toUpperCase() < y[sortField].toUpperCase()) {
