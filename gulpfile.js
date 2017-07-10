@@ -65,6 +65,7 @@ gulp.task('zipit', function() {
     'modules/**',
     'public/**',
     'build/**',
+    'files/**',
     'scripts/**'
   ], { base: "." })
       .pipe(plugins.plumber())
