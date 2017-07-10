@@ -29,7 +29,10 @@ module.exports = {
         'public/lib/angular-uuid/uuid.min.js',
         'public/lib/angular-ui-router-uib-modal/angular-ui-router-uib-modal.js',
         'public/lib/moment/min/moment.min.js',
-        'public/lib/angular-moment/angular-moment.min.js'
+        'public/lib/angular-moment/angular-moment.min.js',
+        'public/lib/d3/d3.js',
+        'public/lib/nvd3/build/nv.d3.js',
+        'public/lib/angular-nvd3/dist/angular-nvd3.js'
         // end bower:js
       ]
     },

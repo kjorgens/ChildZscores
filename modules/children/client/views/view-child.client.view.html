@@ -25,8 +25,9 @@
         </a>
       </h4>
       <h4>
-        <!--Graph-->
-
+        <div>
+          <nvd3 options="vm.options" data="vm.data" class="with-3d-shadow with-transitions" config="{refreshDataOnly: true, deepWatchData: true}" on-ready="vm.callback"></nvd3>
+        </div>
       </h4>
         <a ng-repeat="survey in vm.surveys"
            ui-sref="children.editsurvey({ surveyId:survey._id, childId:vm.child._id})" class="list-group-item clearfix" ng-class="survey.colorStatus">
