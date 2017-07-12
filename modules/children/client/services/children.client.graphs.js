@@ -423,7 +423,7 @@
         {
           values: zscoreData,
           key: 'Childs Height',
-          color: '#7777ff'
+          color: '#f50fff'
 
         }
       ];
@@ -444,7 +444,7 @@
         {
           values: zscoreData,
           key: 'Childs Weight',
-          color: '#7777ff',
+          color: '#f50fff',
         }
       ];
     };
