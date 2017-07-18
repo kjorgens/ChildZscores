@@ -29,6 +29,7 @@
     var editChild = false;
     vm.checkAge = checkAge;
     vm.childTooOld = childTooOld;
+    //vm.childDoesNotQualify = childDoesNotQualify;
     vm.goBack = goBack;
     vm.getChildrenList = getChildrenList;
 
@@ -72,7 +73,7 @@
       vm.spinneractive = false;
     });
 
-    function goBack(){
+    function goBack() {
       $state.go('children.list', { stakeDB: vm.selectedDB, stakeName: vm.selectedStake, screenType: 'children',
         searchFilter: FilterService.currentListFilter(), colorFilter: FilterService.currentColorFilter()});
     }
