@@ -300,15 +300,15 @@
             }
           },
           xAxis: {
-            axisLabel: 'Childs Age',
+            axisLabel: 'Childs Age (months)',
             tickFormat: function(d){
-              return d3.format('.02f')(d);
+              return d3.format('s')(d);
             }
           },
           yAxis: {
             axisLabel: 'Childs Height (cm)',
             tickFormat: function (d) {
-              return d3.format ('.02f') (d);
+              return d3.format ('s') (d);
             },
             axisLabelDistance: -10
           },
@@ -377,7 +377,7 @@
           yAxis: {
             axisLabel: 'Childs Weight (kg)',
             tickFormat: function (d) {
-              return d3.format ('.02f') (d);
+              return d3.format ('s') (d);
             },
             axisLabelDistance: -10
           },

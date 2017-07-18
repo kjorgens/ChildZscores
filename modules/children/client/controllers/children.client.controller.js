@@ -81,11 +81,13 @@
       var months;
       var rightNow = new Date();
       var currentAgeMonths = moment(rightNow).diff(moment(vm.child.birthDate), 'months');
-      if (currentAgeMonths> 60) {
+      if (currentAgeMonths > 60) {
         vm.childTooOld();
  //       vm.startSpin();
         $state.go('children.list', { stakeDB: vm.selectedDB, stakeName: vm.selectedStake, screenType: 'children',
-          searchFilter: FilterService.currentListFilter(), colorFilter: FilterService.currentColorFilter()});
+          searchFilter: FilterService.currentListFilter(), colorFilter: FilterService.currentColorFilter() });
+      } else if (currentAgeMonths > 36) {
+        childDoesNotQualify();
       }
     }
 
@@ -405,7 +407,9 @@
       if (vm.child.monthAge !== undefined) {
         if (vm.child.monthAge < 1 || vm.child.monthAge > 60) {
           vm.ageIsValid = false;
-        } else {
+        } else if (vm.child.monthAge > 36) {
+          childDoesNotQualify();
+        }else {
           vm.ageIsValid = true;
           vm.child.birthDate = new Date(year, month - vm.child.monthAge, day);
           vm.ageIsValid = true;
@@ -592,7 +596,11 @@
 
 
     function childTooOld() {
-      return ModalService.infoModal('CHILD_GT_5' , 'CHILD_GRAD', '');
+      return ModalService.infoModal('CHILD_GT_5', 'CHILD_GRAD', '');
+    };
+
+    function childDoesNotQualify() {
+      return ModalService.infoModal('CHILD_36', 'CHILD_START_TOO_OLD', '');
     };
 
     vm.invalidInput = function () {
