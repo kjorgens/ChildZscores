@@ -25,8 +25,18 @@
         </a>
       </h4>
       <h4>
-        <div>
-          <nvd3 options="vm.options" data="vm.dataHeight" class="with-3d-shadow with-transitions" config="{refreshDataOnly: true, deepWatchData: true}" on-ready="vm.callback"></nvd3>
+        <div style="height:10px;"></div>
+        <div class="container">
+          <div class="row">
+            <div>
+              <nvd3 options="vm.optionsHeight" data="vm.dataHeight" class="with-3d-shadow with-transitions" config="{refreshDataOnly: true, deepWatchData: true}" on-ready="vm.callback"></nvd3>
+            </div>
+            <div style="height:20px;"></div>
+            <div>
+              <nvd3 options="vm.optionsWeight" data="vm.dataWeight" class="with-3d-shadow with-transitions" config="{refreshDataOnly: true, deepWatchData: true}" on-ready="vm.callback"></nvd3>
+            </div>
+            <div style="height:20px;"></div>
+          </div>
         </div>
       </h4>
         <a ng-repeat="survey in vm.surveys"

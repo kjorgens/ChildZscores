@@ -2,15 +2,15 @@
   'use strict';
 
   var heightGirls = [
-    { x: 1,  y: 46.1 },
-    { x: 2,  y: 50.8 },
-    { x: 3,  y: 54.4 },
-    { x: 4,  y: 57.3 },
-    { x: 5,  y: 61.7 },
-    { x: 6,  y: 63.3 },
-    { x: 7,  y: 64.8 },
-    { x: 8,  y: 66.2 },
-    { x: 9,  y: 67.5 },
+    { x: 1, y: 46.1 },
+    { x: 2, y: 50.8 },
+    { x: 3, y: 54.4 },
+    { x: 4, y: 57.3 },
+    { x: 5, y: 61.7 },
+    { x: 6, y: 63.3 },
+    { x: 7, y: 64.8 },
+    { x: 8, y: 66.2 },
+    { x: 9, y: 67.5 },
     { x: 10, y: 68.7 },
     { x: 11, y: 69.9 },
     { x: 12, y: 71 },
@@ -65,15 +65,15 @@
   ];
 
   var weightGirls = [
-    { x: 1,  y: 3.4 },
-    { x: 2,  y: 4.3 },
-    { x: 3,  y: 5 },
-    { x: 4,  y: 5.6 },
-    { x: 5,  y: 6 },
-    { x: 6,  y: 6.4 },
-    { x: 7,  y: 6.7 },
-    { x: 8,  y: 6.9 },
-    { x: 9,  y: 7.1 },
+    { x: 1, y: 3.4 },
+    { x: 2, y: 4.3 },
+    { x: 3, y: 5 },
+    { x: 4, y: 5.6 },
+    { x: 5, y: 6 },
+    { x: 6, y: 6.4 },
+    { x: 7, y: 6.7 },
+    { x: 8, y: 6.9 },
+    { x: 9, y: 7.1 },
     { x: 10, y: 7.4 },
     { x: 11, y: 7.6 },
     { x: 12, y: 7.7 },
@@ -128,15 +128,15 @@
   ];
 
   var heightGirlsLow = [
-    { x: 1,  y: 45.4 },
-    { x: 2,  y: 49.8 },
-    { x: 3,  y: 53 },
-    { x: 4,  y: 55.6 },
-    { x: 5,  y: 59.6 },
-    { x: 6,  y: 61.2 },
-    { x: 7,  y: 62.7 },
-    { x: 8,  y: 64 },
-    { x: 9,  y: 65.3 },
+    { x: 1, y: 45.4 },
+    { x: 2, y: 49.8 },
+    { x: 3, y: 53 },
+    { x: 4, y: 55.6 },
+    { x: 5, y: 59.6 },
+    { x: 6, y: 61.2 },
+    { x: 7, y: 62.7 },
+    { x: 8, y: 64 },
+    { x: 9, y: 65.3 },
     { x: 10, y: 66.5 },
     { x: 11, y: 67.7 },
     { x: 12, y: 68.9 },
@@ -191,15 +191,15 @@
   ];
 
   var weightGirlsLow = [
-    { x: 1,  y: 3.2 },
-    { x: 2,  y: 3.9 },
-    { x: 3,  y: 4.5 },
-    { x: 4,  y: 5 },
-    { x: 5,  y: 5.4 },
-    { x: 6,  y: 5.7 },
-    { x: 7,  y: 6 },
-    { x: 8,  y: 6.3 },
-    { x: 9,  y: 6.5 },
+    { x: 1, y: 3.2 },
+    { x: 2, y: 3.9 },
+    { x: 3, y: 4.5 },
+    { x: 4, y: 5 },
+    { x: 5, y: 5.4 },
+    { x: 6, y: 5.7 },
+    { x: 7, y: 6 },
+    { x: 8, y: 6.3 },
+    { x: 9, y: 6.5 },
     { x: 10, y: 6.7 },
     { x: 11, y: 6.9 },
     { x: 12, y: 7 },
@@ -257,6 +257,7 @@
       .module('children.graphService')
       .factory('GraphService', GraphService);
 
+
   GraphService.$inject = [];
 
   function GraphService() {
@@ -267,8 +268,9 @@
       return {
         chart: {
           type: 'scatterChart',
-          yDomain: [ 45, 110 ],
-          height: 450,
+          yDomain: [45, 110],
+          height: 350,
+          width: 550,
           scatter: {
             onlyCircles: false
           },
@@ -287,33 +289,33 @@
           useInteractiveGuideline: true,
           dispatch: {
             stateChange: function (e) {
-              console.log ("stateChange");
+              console.log('stateChange');
             },
             changeState: function (e) {
-              console.log ("changeState");
+              console.log('changeState');
             },
             tooltipShow: function (e) {
-              console.log ("tooltipShow");
+              console.log('tooltipShow');
             },
             tooltipHide: function (e) {
-              console.log ("tooltipHide");
+              console.log('tooltipHide');
             }
           },
           xAxis: {
             axisLabel: 'Childs Age (months)',
-            tickFormat: function(d){
+            tickFormat: function(d) {
               return d3.format('s')(d);
             }
           },
           yAxis: {
             axisLabel: 'Childs Height (cm)',
             tickFormat: function (d) {
-              return d3.format ('s') (d);
+              return d3.format('s')(d);
             },
             axisLabelDistance: -10
           },
           callback: function (chart) {
-            console.log ("!!! lineChart callback !!!");
+            console.log('!!! lineChart callback !!!');
           }
         },
         title: {
@@ -342,8 +344,9 @@
     factory.setupWeightChart = function () {
       return {
         chart: {
-          type: 'lineChart',
-          height: 450,
+          type: 'scatterChart',
+          height: 350,
+          width: 550,
           margin: {
             top: 20,
             right: 20,
@@ -359,35 +362,36 @@
           useInteractiveGuideline: true,
           dispatch: {
             stateChange: function (e) {
-              console.log ("stateChange");
+              console.log('stateChange');
             },
             changeState: function (e) {
-              console.log ("changeState");
+              console.log('changeState');
             },
             tooltipShow: function (e) {
-              console.log ("tooltipShow");
+              console.log('tooltipShow');
             },
             tooltipHide: function (e) {
-              console.log ("tooltipHide");
+              console.log('tooltipHide');
             }
           },
           xAxis: {
-            axisLabel: 'Childs Age'
+            axisLabel: 'Childs Age (months)'
           },
           yAxis: {
             axisLabel: 'Childs Weight (kg)',
             tickFormat: function (d) {
-              return d3.format ('s') (d);
+              return d3.format('s')(d);
             },
             axisLabelDistance: -10
           },
           callback: function (chart) {
-            console.log ("!!! lineChart callback !!!");
+            console.log('!!! lineChart callback !!!');
           }
         },
         title: {
           enable: true,
-          text: 'Children Growth Chart Weight '
+          text: 'Children Growth Chart Weight ',
+          // color: 'Purple'
         },
         subtitle: {
           enable: false,
@@ -411,9 +415,9 @@
     factory.getChartDataHeight = function(zscoreData) {
       return [
         {
-          values: heightGirls,      //values - represents the array of {x,y} data points
-          key: 'Expected Height', //key  - the name of the series.
-          color: '#2ca02c'  //color - optional: choose your own line color.
+          values: heightGirls,      // values - represents the array of {x,y} data points
+          key: 'Expected Height', // key  - the name of the series.
+          color: '#2ca02c'  // color - optional: choose your own line color.
         },
         {
           values: heightGirlsLow,
@@ -432,19 +436,19 @@
     factory.getChartDataWeight = function(zscoreData) {
       return [
         {
-          values: weightGirls,      //values - represents the array of {x,y} data points
-          key: 'Expected Weight', //key  - the name of the series.
-          color: '#2ca02c'  //color - optional: choose your own line color.
+          values: weightGirls,      // values - represents the array of {x,y} data points
+          key: 'Expected Weight', // key  - the name of the series.
+          color: 'blue'  // color - optional: choose your own line color.
         },
         {
           values: weightGirlsLow,
           key: 'Expected Weight Low',
-          color: '#ff7f0e'
+          color: 'red'
         },
         {
           values: zscoreData,
           key: 'Childs Weight',
-          color: '#f50fff',
+          color: 'Black',
         }
       ];
     };
@@ -467,5 +471,7 @@
 
     return factory;
   }
+
+
 }());
 

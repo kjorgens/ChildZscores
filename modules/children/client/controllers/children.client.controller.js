@@ -18,14 +18,15 @@
     vm.zscoreWl = [];
 
     vm.callback = callback;
-    vm.options = GraphService.setupHeightChart();
+    vm.optionsHeight = GraphService.setupHeightChart();
+    vm.optionsWeight = GraphService.setupWeightChart();
 
     function callback(scope, element) {
       var api = scope.api;
       var chart = scope.chart;
       var svg = scope.svg;
     }
-
+//var getMethod(firstScreening);
     var editChild = false;
     vm.checkAge = checkAge;
     vm.childTooOld = childTooOld;
@@ -87,7 +88,7 @@
  //       vm.startSpin();
         $state.go('children.list', { stakeDB: vm.selectedDB, stakeName: vm.selectedStake, screenType: 'children',
           searchFilter: FilterService.currentListFilter(), colorFilter: FilterService.currentColorFilter() });
-      } else if (currentAgeMonths > 36) {
+      } else if (vm.initialScreening && currentAgeMonths > 36) {
         childDoesNotQualify();
       }
     }
@@ -212,6 +213,9 @@
 
     function setSurveyList(surveys) {
       vm.stopSpin();
+      if ( surveys.docs.length === 1) {
+        vm.initialScreening = true;
+      }
       surveys.docs.forEach(function(survey){
         survey.colorStatus = PouchService.calcSurveyStatus(survey);
         vm.zscoreHa.push({x: survey.monthAge, y: survey.height, size: 10, shape: 'diamond'});
