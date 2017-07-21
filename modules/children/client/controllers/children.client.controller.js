@@ -412,7 +412,9 @@
       if (vm.child.monthAge !== undefined) {
         if (vm.child.monthAge < 1 || vm.child.monthAge > 60) {
           vm.ageIsValid = false;
-        } else {
+        } else if (vm.child.monthAge > 36) {
+          childDoesNotQualify();
+        }else {
           vm.ageIsValid = true;
           vm.child.birthDate = new Date(year, month - vm.child.monthAge, day);
           vm.ageIsValid = true;
