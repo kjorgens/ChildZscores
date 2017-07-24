@@ -88,22 +88,22 @@
     }
 
     function checkAge (birthDate) {
-      return moment(new Date()).diff(moment(birthDate), 'months');
+      return moment(new Date()).diff(new Date(birthDate), 'months');
     }
 
     factory.matchName = function (list, currentChild) {
       return list.find (function(child) {
         return (~child.firstName.toUpperCase().indexOf(currentChild.firstName.toUpperCase()) &&
-            ~child.lastName.toUpperCase().indexOf(currentChild.lastName.toUpperCase()))
-      })
+            ~child.lastName.toUpperCase().indexOf(currentChild.lastName.toUpperCase()));
+      });
     };
 
     factory.matchNameAndAge = function(list, currentChild) {
       return list.some (function(child) {
         return (~child.firstName.toUpperCase().indexOf(currentChild.firstName.toUpperCase()) &&
         ~child.lastName.toUpperCase().indexOf(currentChild.lastName.toUpperCase()) &&
-        child.monthAge == currentChild.monthAge)
-      })
+        child.monthAge == currentChild.monthAge);
+      });
     };
 
     factory.searchAndFilter = function (list, searchFilter, colorFilter, sortField) {

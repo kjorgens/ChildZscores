@@ -5,9 +5,9 @@
       .module('children')
       .controller('ChildrenCountryController', ChildrenCountryController);
 
-  ChildrenCountryController.$inject = ['$rootScope', '$scope', '$state', '$translate', 'usSpinnerService', 'ChildrenService', 'ChildrenStakes', 'PouchService'];
+  ChildrenCountryController.$inject = ['$rootScope', '$translate', 'usSpinnerService', 'ChildrenStakes', 'PouchService'];
 
-  function ChildrenCountryController($rootScope, $scope, $state, $translate, usSpinnerService, ChildrenService, ChildrenStakes, PouchService) {
+  function ChildrenCountryController($rootScope, $translate, usSpinnerService, ChildrenStakes, PouchService) {
     var vm = this;
 
     vm.featurePromptCount = parseInt(localStorage.getItem('featurePromptCount')) || 0;

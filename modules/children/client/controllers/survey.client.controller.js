@@ -5,10 +5,10 @@
     .module('children')
     .controller('SurveyController', SurveyController);
 
-  SurveyController.$inject = ['$rootScope', '$scope', '$state', '$timeout', '$translate', '$window', 'moment',
+  SurveyController.$inject = ['$rootScope', '$scope', '$state', '$translate', '$window', 'moment',
     'surveyResolve', 'Authentication', 'ZScores', 'PouchService', 'ModalService'];
 
-  function SurveyController($rootScope, $scope, $state, $timeout, $translate, $window, moment,
+  function SurveyController($rootScope, $scope, $state, $translate, $window, moment,
      survey, Authentication, ZScores, PouchService, ModalService) {
     var vm = this;
     $translate.use($rootScope.SelectedLanguage);

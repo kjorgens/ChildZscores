@@ -5,11 +5,13 @@
  */
 var passport = require('passport'),
   JwtStrategy = require('passport-jwt').Strategy,
+  ExtractJwt = require('passport-jwt').ExtractJwt,
   User = require('mongoose').model('User');
 
 module.exports = function (config) {
 
   var opts = {};
+  opts.jwtFromRequest = ExtractJwt.fromAuthHeader();
   opts.secretOrKey = config.jwt.secret;
   // opts.issuer = "accounts.examplesoft.com";
   // opts.audience = "yoursite.net";

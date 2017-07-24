@@ -8,17 +8,17 @@
       .module('children')
       .controller('ChildrenSyncController', ChildrenSyncController);
 
-  ChildrenSyncController.$inject = ['$rootScope', '$window', '$timeout', '$scope', '$state', '$stateParams', 'ChildrenReport',
+  ChildrenSyncController.$inject = ['$rootScope', '$window', '$timeout', '$state', '$stateParams', 'ChildrenReport',
     'Authentication', 'ChildrenGetSync', 'usSpinnerService', 'PouchService', 'FileUploader', 'ModalService', 'ChildrenViews'];
 
-  function ChildrenSyncController($rootScope, $window, $timeout, $scope, $state, $stateParams, ChildrenReport,
+  function ChildrenSyncController($rootScope, $window, $timeout, $state, $stateParams, ChildrenReport,
     Authentication, ChildrenGetSync, usSpinnerService, PouchService, FileUploader, ModalService, ChildrenViews) {
     var vm = this;
     vm.user = Authentication.user;
     vm.userIsAdmin = false;
     vm.goBack = goBack;
-    vm.user.roles.forEach(function(role){
-      if (role.indexOf('admin') > -1){
+    vm.user.roles.forEach(function(role) {
+      if (role.indexOf('admin') > -1) {
         vm.userIsAdmin = true;
       }
     });

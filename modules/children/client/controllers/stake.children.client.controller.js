@@ -5,10 +5,10 @@
       .module('children')
       .controller('ChildrenStakeController', ChildrenStakeController);
 
-  ChildrenStakeController.$inject = ['$rootScope', '$state', '$scope', '$window', '$translate', 'FilterService', 'usSpinnerService',
+  ChildrenStakeController.$inject = ['$rootScope', '$state', '$translate', 'FilterService', 'usSpinnerService',
     'ChildrenStakes', '$stateParams', 'PouchService'];
 
-  function ChildrenStakeController($rootScope, $state, $scope, $window, $translate, FilterService, usSpinnerService,
+  function ChildrenStakeController($rootScope, $state, $translate, FilterService, usSpinnerService,
     ChildrenStakes, $stateParams, PouchService) {
     var vm = this;
     localStorage.setItem('childFilter', 'a');
