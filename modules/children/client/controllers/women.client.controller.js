@@ -6,10 +6,10 @@
       .controller('MotherController', MotherController);
 
   MotherController.$inject = ['$rootScope', '$scope', '$state', '$stateParams', '$translate', '$location', 'FilterService',
-    'moment', 'MotherResolve', 'Authentication', 'PouchService', 'ModalService'];
+    'MotherResolve', 'Authentication', 'PouchService', 'ModalService'];
 
   function MotherController($rootScope, $scope, $state, $stateParams, $translate, $location, FilterService,
-     moment, mothers, Authentication, PouchService, ModalService) {
+     mothers, Authentication, PouchService, ModalService) {
 
     var vm = this;
 

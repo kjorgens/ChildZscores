@@ -5,9 +5,9 @@
       .module('children')
       .controller('ChildrenModalController', ChildrenModalController);
 
-  ChildrenModalController.$inject = ['$scope', '$uibModalInstance'];
+  ChildrenModalController.$inject = ['$uibModalInstance'];
 
-  function ChildrenModalController($scope, $uibModalInstance) {
+  function ChildrenModalController($uibModalInstance) {
     var vm = this;
 
     vm.dismiss = function () {

@@ -5,9 +5,9 @@
       .module('children.getsync')
       .factory('ChildrenGetSync', ChildrenGetSync);
 
-  ChildrenGetSync.$inject = ['$resource', '$rootScope'];
+  ChildrenGetSync.$inject = ['$resource'];
 
-  function ChildrenGetSync($resource, $rootScope) {
+  function ChildrenGetSync($resource) {
     return $resource('api/children/sync');
   }
 }());
