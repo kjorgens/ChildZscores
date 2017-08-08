@@ -5,9 +5,9 @@
       .module('children.report')
       .factory('ChildrenReport', ChildrenReport);
 
-  ChildrenReport.$inject = ['$resource', '$rootScope'];
+  ChildrenReport.$inject = ['$resource'];
 
-  function ChildrenReport($resource, $rootScope) {
+  function ChildrenReport($resource) {
     return $resource('api/children/report/:stakeDB/:filter/:sortField');
   }
 }());

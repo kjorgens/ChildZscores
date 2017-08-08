@@ -5,9 +5,9 @@
       .module('children')
       .controller('ChildrenRemoveController', ChildrenRemoveController);
 
-  ChildrenRemoveController.$inject = ['$state', '$rootScope', '$scope', '$stateParams', 'childRemove', 'PouchService'];
+  ChildrenRemoveController.$inject = ['$state', '$scope', '$stateParams', 'childRemove', 'PouchService'];
 
-  function ChildrenRemoveController($state, $rootScope, $scope, $stateParams, childRemove, PouchService) {
+  function ChildrenRemoveController($state, $scope, $stateParams, childRemove, PouchService) {
     var vm = this;
     vm.child_id = $stateParams.childId;
     vm.child = childRemove;

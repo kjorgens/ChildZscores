@@ -6,9 +6,9 @@
     .module('children.pouchService')
     .factory('PouchService', PouchService);
 
-  PouchService.$inject = ['$q', 'pouchDB', 'uuid4', 'moment'];
+  PouchService.$inject = ['$q', 'pouchDB', 'moment'];
 
-  function PouchService($q, pouchDB, uuid4, moment) {
+  function PouchService($q, pouchDB, moment) {
     var factory = {};
     var database;
     var countryDataBase;
@@ -16,8 +16,8 @@
     var localDbList;
     var currentDbName;
     var pouchIndexes = [
-      'surveyDate', 'firstName', 'zscoreStatus', 'lastName', 'owner',  'ward',
-       'deliveryDate', 'childsBirthDate', 'lastScreening'
+      'surveyDate', 'firstName', 'zscoreStatus', 'lastName', 'owner', 'ward',
+      'deliveryDate', 'childsBirthDate', 'lastScreening'
     ];
     factory.createDatabase = function (dbName, queryFunction, queryParams) {
       if(database && ~database.name.indexOf(dbName)){

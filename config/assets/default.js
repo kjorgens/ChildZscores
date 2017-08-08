@@ -6,7 +6,8 @@ module.exports = {
       css: [
         // bower:css
         'public/lib/bootstrap/dist/css/bootstrap.css',
-        'public/lib/bootstrap/dist/css/bootstrap-theme.css'
+        'public/lib/bootstrap/dist/css/bootstrap-theme.css',
+        'public/lib/nvd3/build/nv.d3.css'
         // endbower
       ],
       js: [
@@ -17,7 +18,7 @@ module.exports = {
         'public/lib/angular-messages/angular-messages.js',
         'public/lib/angular-ui-router/release/angular-ui-router.js',
         'public/lib/spin.js/spin.js',
-        'public/lib/angular-spinner/angular-spinner.js',
+        'public/lib/angular-spinner/dist/angular-spinner.js',
         'public/lib/angular-ui-utils/ui-utils.js',
         'public/lib/angular-bootstrap/ui-bootstrap-tpls.js',
         'public/lib/angular-file-upload/dist/angular-file-upload.js',
@@ -26,13 +27,14 @@ module.exports = {
         'public/lib/pouchdb-all-dbs/dist/pouchdb.all-dbs.js',
         'public/lib/pouchdb-find/dist/pouchdb.find.js',
         'public/lib/angular-pouchdb/angular-pouchdb.js',
-        'public/lib/angular-uuid/uuid.js',
         'public/lib/angular-ui-router-uib-modal/angular-ui-router-uib-modal.js',
         'public/lib/moment/moment.js',
-        // 'public/lib/angular-i18n/angular-locale_es.js',
         'public/lib/angular-moment/angular-moment.js',
         'public/lib/angular-translate/angular-translate.js',
-        'public/lib/angular-sanitize/angular-sanitize.js'
+        'public/lib/angular-sanitize/angular-sanitize.js',
+        'public/lib/d3/d3.js',
+        'public/lib/nvd3/build/nv.d3.js',
+        'public/lib/angular-nvd3/dist/angular-nvd3.js'
         // end bower:js
       ],
       tests: ['public/lib/angular-mocks/angular-mocks.js']
