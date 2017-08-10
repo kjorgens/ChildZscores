@@ -6,6 +6,7 @@
   "dependencies": {
     "angular": "latest",
     "angular-animate": "latest",
+    "angular-bootstrap": "^2.5.0",
     "angular-file-upload": "^2.5.0",
     "angular-messages": "latest",
     "angular-mocks": "latest",

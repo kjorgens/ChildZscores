@@ -20,7 +20,7 @@
       'deliveryDate', 'childsBirthDate', 'lastScreening'
     ];
     factory.createDatabase = function (dbName, queryFunction, queryParams) {
-      if(database && ~database.name.indexOf(dbName)){
+      if (database && ~database.name.indexOf(dbName)){
         return queryFunction(queryParams);
       } else {
         currentDbName = dbName;
@@ -60,15 +60,15 @@
             reject(err.message);
           });
         });
-      })
+      });
     };
 
     factory.initLocalDb = function() {
-       var indexFunctions = [];
-       angular.forEach (pouchIndexes, function (index) {
-         indexFunctions.push (database.createIndex ({index: {fields: [index]}}));
-       });
-       return ($q.all(indexFunctions));
+      var indexFunctions = [];
+      angular.forEach (pouchIndexes, function (index) {
+        indexFunctions.push (database.createIndex ({index: {fields: [index]}}));
+      });
+      return ($q.all(indexFunctions));
     };
 
     factory.putStakesLocal = function (countryObj, callback, errCallback) {
@@ -110,19 +110,22 @@
     };
 
     factory.getCountriesLocal = function (callback, errCallback) {
+      if (countryDataBase === undefined) {
+        countryDataBase = pouchDB('country_list');
+      }
       countryDataBase.get('liahona_kids_countries_stakes')
-      // countryDataBase.allDocs({ include_docs: true, attachments: true })
       .then(function (response) {
-      // Do something with the response
         callback(response);
       })
       .catch(function(error) {
-      // Do something with the error
         errCallback(error);
       });
     };
 
     factory.getWardList = function (countryName, stakeName, callback, errCallback) {
+      if (countryDataBase === undefined) {
+        countryDataBase = pouchDB('country_list');
+      }
       countryDataBase.get('liahona_kids_countries_stakes')
           .then(function (response) {
             response.countries.forEach(function(country) {

@@ -45,6 +45,7 @@ self.addEventListener('install', function (event) {
       '/public/dist/application.min.js',
       '/public/dist/application.min.css',
       '/public/lib/angular/angular.min.js',
+      '/public/lib/angular/ui-bootstrap.min.js',
       '/public/lib/angular-resource/angular-resource.min.js',
       '/public/lib/angular-animate/angular-animate.min.js',
       '/public/lib/angular-messages/angular-messages.min.js',

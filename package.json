@@ -35,6 +35,7 @@
     "cookie-parser": "~1.4.1",
     "crypto": "0.0.3",
     "express": "~4.13.4",
+    "express-hbs": "^1.0.4",
     "express-session": "~1.13.0",
     "file-stream-rotator": "~0.0.6",
     "forever": "~0.15.1",
@@ -69,8 +70,8 @@
     "serve-favicon": "~2.3.0",
     "socket.io": "~1.4.5",
     "swig": "~1.4.2",
-    "validator": "~5.1.0",
-    "uuid4": "~1.0.0"
+    "uuid4": "~1.0.0",
+    "validator": "~5.1.0"
   },
   "devDependencies": {
     "coveralls": "~2.11.6",
