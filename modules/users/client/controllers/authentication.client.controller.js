@@ -5,9 +5,9 @@
     .module('users')
     .controller('AuthenticationController', AuthenticationController);
 
-  AuthenticationController.$inject = ['$scope', '$state', '$http', '$location', '$window', 'ChildrenStakes', 'Authentication', 'PouchService', 'PasswordValidator'];
+  AuthenticationController.$inject = ['$scope', '$state', '$http', '$location', '$window', '$stateParams', 'ChildrenStakes', 'Authentication', 'PouchService', 'PasswordValidator'];
 
-  function AuthenticationController($scope, $state, $http, $location, $window, ChildrenStakes, Authentication, PouchService, PasswordValidator) {
+  function AuthenticationController($scope, $state, $http, $location, $window, $stateParams, ChildrenStakes, Authentication, PouchService, PasswordValidator) {
     var vm = this;
 
     vm.authentication = Authentication;
@@ -47,15 +47,16 @@
         return false;
       }
 
-      $http.post('/api/auth/signup', vm.credentials).success(function (response) {
+      $http.post('/api/auth/signup', vm.credentials).then(function (response) {
         // If successful we assign the response to the global user model
 
-        Authentication.login(response.user, response.token);
+        Authentication.login(response.data.user, response.data.token);
         populateLocalDB();
         // And redirect to the previous or home page
-        $state.go($state.previous.state.name || 'home', $state.previous.params);
-      }).error(function (response) {
-        vm.error = response.message;
+        $state.go('home');
+ //       $state.go($state.previous.state.name || 'home', $state.previous.params);
+      }).catch(function (response) {
+        vm.error = response.data.message;
       });
     }
 
@@ -68,16 +69,17 @@
         return false;
       }
 
-      $http.post('/api/auth/signin', vm.credentials).success(function (response) {
+      $http.post('/api/auth/signin', vm.credentials).then(function (response) {
         // If successful we assign the response to the global user model
 
-        Authentication.login(response.user, response.token);
-        localStorage.setItem('lastInterviewer', response.user.displayName);
+        Authentication.login(response.data.user, response.data.token);
+        localStorage.setItem('lastInterviewer', response.data.user.displayName);
         // And redirect to the previous or home page
         populateLocalDB();
-        $state.go($state.previous.state.name || 'home', $state.previous.params);
-      }).error(function (response) {
-        vm.error = response.message;
+        $window.history.back();
+ //       $state.go($state.previous.state.name || 'home', $state.previous.params);
+      }).catch(function (response) {
+        vm.error = response.data.message;
       });
     }
 

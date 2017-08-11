@@ -5,18 +5,35 @@
     .module('children')
     .controller('ChildrenController', ChildrenController);
 
-  ChildrenController.$inject = ['$rootScope', '$scope', '$state', '$stateParams', '$translate', '$window',
+  ChildrenController.$inject = ['$rootScope', '$scope', '$state', '$stateParams', '$translate', '$window', 'GraphService',
     'FilterService', 'moment', 'childResolve', 'Authentication', 'ZScores', 'usSpinnerService', 'PouchService', 'ModalService'];
 
-  function ChildrenController($rootScope, $scope, $state, $stateParams, $translate, $window,
+  function ChildrenController($rootScope, $scope, $state, $stateParams, $translate, $window, GraphService,
      FilterService, moment, child, Authentication, ZScores, usSpinnerService, PouchService, ModalService) {
     var vm = this;
+    vm.options = {};
+    vm.data = {};
+    vm.zscoreHa = [];
+    vm.zscoreWa = [];
+    vm.zscoreWH = [];
+
+    vm.callback = callback;
+    vm.optionsHeight = GraphService.setupHeightChart();
+    vm.optionsWeight = GraphService.setupWeightChart();
+
+    function callback(scope, element) {
+      var api = scope.api;
+      var chart = scope.chart;
+      var svg = scope.svg;
+    }
+
     var editChild = false;
     vm.checkAge = checkAge;
     vm.childTooOld = childTooOld;
     vm.goBack = goBack;
     vm.getChildrenList = getChildrenList;
 
+    vm.zScoreGetter = ZScores.getMethod;
     $translate.use($rootScope.SelectedLanguage);
 
     vm.selectedStake = localStorage.getItem('selectedStake');
@@ -56,20 +73,22 @@
       vm.spinneractive = false;
     });
 
-    function goBack(){
+    function goBack() {
       $state.go('children.list', { stakeDB: vm.selectedDB, stakeName: vm.selectedStake, screenType: 'children',
-        searchFilter: FilterService.currentListFilter(), colorFilter: FilterService.currentColorFilter()});
+        searchFilter: FilterService.currentListFilter(), colorFilter: FilterService.currentColorFilter() });
     }
 
     function checkAge() {
       var months;
       var rightNow = new Date();
       var currentAgeMonths = moment(rightNow).diff(moment(vm.child.birthDate), 'months');
-      if (currentAgeMonths> 60) {
+      if (currentAgeMonths > 60) {
         vm.childTooOld();
  //       vm.startSpin();
         $state.go('children.list', { stakeDB: vm.selectedDB, stakeName: vm.selectedStake, screenType: 'children',
-          searchFilter: FilterService.currentListFilter(), colorFilter: FilterService.currentColorFilter()});
+          searchFilter: FilterService.currentListFilter(), colorFilter: FilterService.currentColorFilter() });
+      } else if (vm.initialScreening && currentAgeMonths > 36) {
+        childDoesNotQualify();
       }
     }
 
@@ -193,16 +212,24 @@
 
     function setSurveyList(surveys) {
       vm.stopSpin();
+      if ( surveys.docs.length === 1) {
+        vm.initialScreening = true;
+      }
       surveys.docs.forEach(function(survey){
         survey.colorStatus = PouchService.calcSurveyStatus(survey);
+        vm.zscoreHa.push({ x: survey.monthAge, y: survey.height, size: 10, shape: 'diamond' });
+        vm.zscoreWa.push({ x: survey.monthAge, y: survey.weight, size: 10, shape: 'diamond' });
+        vm.zscoreWH.push({ x: survey.height, y: survey.weight, size: 10, shape: 'diamond' });
       });
       $scope.$apply(function () {
         vm.surveys = surveys.docs;
-        //       vm.surveys.forEach(function(survey) {
-        //        if (vm.surveys.length > 0) {
-        //          gradeZScores(vm.surveys[0]);
-        //        }
-        //       });
+        vm.zScoreGetter(vm.child.gender, vm.surveys[0].monthAge, vm.surveys[0].height, vm.surveys[0].weight, vm.surveys.length === 1 ? true : false, function (zscore) {
+          vm.zScore = zscore;
+          vm.actions = zscore.actions;
+        });
+        vm.dataHeight = GraphService.getChartDataHeight(vm.zscoreHa);
+        vm.dataWeight = GraphService.getChartDataWeight(vm.zscoreWa);
+        vm.dataHeightWeight = GraphService.getChartDataHeightWeight(vm.zscoreWH);
       });
     }
 
@@ -378,7 +405,9 @@
       if (vm.child.monthAge !== undefined) {
         if (vm.child.monthAge < 1 || vm.child.monthAge > 60) {
           vm.ageIsValid = false;
-        } else {
+        } else if (vm.child.monthAge > 36) {
+          childDoesNotQualify();
+        }else {
           vm.ageIsValid = true;
           vm.child.birthDate = new Date(year, month - vm.child.monthAge, day);
           vm.ageIsValid = true;
@@ -563,10 +592,13 @@
       PouchService.get({ childId: vm.childId }, getUser, getError);
     }
 
-
     function childTooOld() {
-      return ModalService.infoModal('CHILD_GT_5' , 'CHILD_GRAD', '');
-    };
+      return ModalService.infoModal('CHILD_GT_5', 'CHILD_GRAD', '');
+    }
+
+    function childDoesNotQualify() {
+      return ModalService.infoModal('CHILD_36', 'CHILD_START_TOO_OLD', '');
+    }
 
     vm.invalidInput = function () {
       return ModalService.infoModal('INPUT_ERROR', 'INVALID_DATA', 'PLEASE_CORRECT');

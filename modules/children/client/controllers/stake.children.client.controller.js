@@ -5,16 +5,16 @@
       .module('children')
       .controller('ChildrenStakeController', ChildrenStakeController);
 
-  ChildrenStakeController.$inject = ['$rootScope', '$state', '$scope', '$window', '$translate', 'FilterService', 'usSpinnerService',
+  ChildrenStakeController.$inject = ['$rootScope', '$state', '$translate', 'FilterService', 'usSpinnerService',
     'ChildrenStakes', '$stateParams', 'PouchService'];
 
-  function ChildrenStakeController($rootScope, $state, $scope, $window, $translate, FilterService, usSpinnerService,
+  function ChildrenStakeController($rootScope, $state, $translate, FilterService, usSpinnerService,
     ChildrenStakes, $stateParams, PouchService) {
     var vm = this;
     localStorage.setItem('childFilter', 'a');
     FilterService.setColorFilter('');
     FilterService.setSearchFilter('');
-    vm.refreshCountryList = refreshCountryList;
+    // vm.refreshCountryList = refreshCountryList;
     vm.screenPregnantWomen = screenPregnantWomen;
     vm.screenNursingMothers = screenNursingMothers;
     vm.screenChildren = screenChildren;
@@ -23,13 +23,13 @@
     function findCountry(country) {
       return country.name === $stateParams.country;
     }
-    function returnFromPut(input) {
-      vm.stopSpin();
-      console.log(input);
-    }
+    // function returnFromPut(input) {
+    //   vm.stopSpin();
+    //   console.log(input);
+    // }
     function handleError(input) {
       console.log(input + ' attempt to retrieve info remote');
-      getStakesDB();
+      // getStakesDB();
       vm.stopSpin();
     }
     vm.startSpin = function() {
@@ -52,16 +52,16 @@
     $rootScope.$on('us-spinner:stop', function(event, key) {
       vm.spinneractive = false;
     });
-    function refreshCountryList() {
-      vm.startSpin();
-      ChildrenStakes.get(function(retVal) {
-        vm.liahonaStakes = retVal;
-        PouchService.createCountryDatabase();
-        PouchService.putStakesLocal(retVal, returnFromPut, handleError);
-      });
-    }
+    // function refreshCountryList() {
+    //   vm.startSpin();
+    //   ChildrenStakes.get(function(retVal) {
+    //     vm.liahonaStakes = retVal;
+    //     PouchService.createCountryDatabase();
+    //     PouchService.putStakesLocal(retVal, returnFromPut, handleError);
+    //   });
+    // }
     function storeDbList(input) {
-      //     sessionStorage.setItem('liahonaStakesObject', input);
+          // sessionStorage.setItem('liahonaStakesObject', input);
       vm.liahonaStakes = input;
       vm.selectedCountry = vm.liahonaStakes.countries.find(findCountry);
       localStorage.setItem(vm.selectedCountry, 'selectedCountry');
@@ -89,16 +89,16 @@
       $state.go('children.listMothers', {stakeDB: stakeDB, stakeName: stakeName, searchFilter: '', colorFilter: '', screenType: 'nursing'});
     }
 
-    function getStakesDB() {
-      if (navigator.onLine) {
-        ChildrenStakes.get(function(retVal) {
-          vm.liahonaStakes = retVal;
-          PouchService.createCountryDatabase();
-          PouchService.putStakesLocal(retVal, returnFromPut, handleError);
-        });
-      }
-    }
-    PouchService.createCountryDatabase();
+    // function getStakesDB() {
+    //   if (navigator.onLine) {
+    //     ChildrenStakes.get(function(retVal) {
+    //       vm.liahonaStakes = retVal;
+    //       PouchService.createCountryDatabase();
+    //       PouchService.putStakesLocal(retVal, returnFromPut, handleError);
+    //     });
+    //   }
+    // }
+    // PouchService.createCountryDatabase();
     PouchService.getCountriesLocal(storeDbList, handleError);
   }
 }());

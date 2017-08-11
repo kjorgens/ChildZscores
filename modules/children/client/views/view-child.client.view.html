@@ -4,19 +4,41 @@
             <span><a ui-sref="children.list({stakeDB: vm.selectedDB, stakeName:vm.selectedStake, searchFilter: '', colorFilter: '', screenType: 'children'})">{{vm.selectedStake}} <i class="glyphicon glyphicon-list"></i></a></span>
         </h3>
         <h3>
-            {{vm.child.firstName}} {{vm.child.lastName}}
-            <span><a ui-sref="children.edit({childId: vm.child._id,surveyId:''})">   <i class="glyphicon glyphicon-edit"></i></a></span>
-        </h3>
-        {{'BIRTHDATE' | translate}}
-        <span ng-bind="vm.child.birthDate | date:'mediumDate'"></span>
-        <h3>
             <a ui-sref="children.create({ward:vm.selectedWard.wardName})">{{'ADD_NEW_CHILD' | translate}} <i class="glyphicon glyphicon-plus"></i></a>
         </h3>
         <h3>
             <span><a ui-sref="children.newsurvey({childId:vm.child._id})">{{'ADD_SCREENING' | translate}} <i class="glyphicon glyphicon-plus"></i></a></span>
         </h3>
+      <h1>
+        {{vm.child.firstName}} {{vm.child.lastName}}
+        <span><a ui-sref="children.edit({childId: vm.child._id,surveyId:''})">   <i class="glyphicon glyphicon-edit"></i></a></span>
+      </h1>
+      {{'BIRTHDATE' | translate}}
+      <span ng-bind="vm.child.birthDate | date:'mediumDate'"></span>
     </div>
     <small>
+      <h4>{{'ACTIONS' | translate}}:
+        <a ng-repeat="action in vm.actions" >
+          <li>
+            {{action | translate}}
+          </li>
+        </a>
+      </h4>
+      <h4>
+        <div style="height:10px;"></div>
+        <div class="container">
+          <div class="row">
+            <div>
+              <nvd3 options="vm.optionsHeight" data="vm.dataHeight" class="with-3d-shadow with-transitions" config="{refreshDataOnly: true, deepWatchData: true}" on-ready="vm.callback"></nvd3>
+            </div>
+            <div style="height:20px;"></div>
+            <div>
+              <nvd3 options="vm.optionsWeight" data="vm.dataWeight" class="with-3d-shadow with-transitions" config="{refreshDataOnly: true, deepWatchData: true}" on-ready="vm.callback"></nvd3>
+            </div>
+            <div style="height:20px;"></div>
+          </div>
+        </div>
+      </h4>
         <a ng-repeat="survey in vm.surveys"
            ui-sref="children.editsurvey({ surveyId:survey._id, childId:vm.child._id})" class="list-group-item clearfix" ng-class="survey.colorStatus">
             <small class="list-group-item-text ZscoreListContainer ">
