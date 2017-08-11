@@ -14,6 +14,7 @@ module.exports = {
         // bower:js
         'public/lib/angular/angular.js',
         'public/lib/angular-bootstrap/ui-bootstrap.js',
+        'public/lib/angular-bootstrap/ui-bootstrap-tpls.js',
         'public/lib/angular-resource/angular-resource.js',
         'public/lib/angular-animate/angular-animate.js',
         'public/lib/angular-messages/angular-messages.js',
@@ -65,7 +66,6 @@ module.exports = {
     templates: ['build/templates.js']
   },
   server: {
-    gruntConfig: ['gruntfile.js'],
     gulpConfig: ['gulpfile.js'],
     allJS: ['server.js', 'config/**/*.js', 'modules/*/server/**/*.js'],
     models: 'modules/*/server/models/**/*.js',

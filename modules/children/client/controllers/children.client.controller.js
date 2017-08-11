@@ -15,7 +15,7 @@
     vm.data = {};
     vm.zscoreHa = [];
     vm.zscoreWa = [];
-    vm.zscoreWl = [];
+    vm.zscoreWH = [];
 
     vm.callback = callback;
     vm.optionsHeight = GraphService.setupHeightChart();
@@ -26,7 +26,7 @@
       var chart = scope.chart;
       var svg = scope.svg;
     }
-//var getMethod(firstScreening);
+
     var editChild = false;
     vm.checkAge = checkAge;
     vm.childTooOld = childTooOld;
@@ -73,16 +73,16 @@
       vm.spinneractive = false;
     });
 
-    function goBack(){
+    function goBack() {
       $state.go('children.list', { stakeDB: vm.selectedDB, stakeName: vm.selectedStake, screenType: 'children',
-        searchFilter: FilterService.currentListFilter(), colorFilter: FilterService.currentColorFilter()});
+        searchFilter: FilterService.currentListFilter(), colorFilter: FilterService.currentColorFilter() });
     }
 
     function checkAge() {
       var months;
       var rightNow = new Date();
       var currentAgeMonths = moment(rightNow).diff(moment(vm.child.birthDate), 'months');
-      if (currentAgeMonths> 60) {
+      if (currentAgeMonths > 60) {
         vm.childTooOld();
  //       vm.startSpin();
         $state.go('children.list', { stakeDB: vm.selectedDB, stakeName: vm.selectedStake, screenType: 'children',
@@ -217,8 +217,9 @@
       }
       surveys.docs.forEach(function(survey){
         survey.colorStatus = PouchService.calcSurveyStatus(survey);
-        vm.zscoreHa.push({x: survey.monthAge, y: survey.height, size: 10, shape: 'diamond'});
-        vm.zscoreWa.push({x: survey.monthAge, y: survey.weight, size: 10, shape: 'diamond'});
+        vm.zscoreHa.push({ x: survey.monthAge, y: survey.height, size: 10, shape: 'diamond' });
+        vm.zscoreWa.push({ x: survey.monthAge, y: survey.weight, size: 10, shape: 'diamond' });
+        vm.zscoreWH.push({ x: survey.height, y: survey.weight, size: 10, shape: 'diamond' });
       });
       $scope.$apply(function () {
         vm.surveys = surveys.docs;
@@ -228,14 +229,7 @@
         });
         vm.dataHeight = GraphService.getChartDataHeight(vm.zscoreHa);
         vm.dataWeight = GraphService.getChartDataWeight(vm.zscoreWa);
-
-
-
-        //       vm.surveys.forEach(function(survey) {
-        //        if (vm.surveys.length > 0) {
-        //          gradeZScores(vm.surveys[0]);
-        //        }
-        //       });
+        vm.dataHeightWeight = GraphService.getChartDataHeightWeight(vm.zscoreWH);
       });
     }
 
@@ -598,14 +592,13 @@
       PouchService.get({ childId: vm.childId }, getUser, getError);
     }
 
-
     function childTooOld() {
       return ModalService.infoModal('CHILD_GT_5', 'CHILD_GRAD', '');
-    };
+    }
 
     function childDoesNotQualify() {
       return ModalService.infoModal('CHILD_36', 'CHILD_START_TOO_OLD', '');
-    };
+    }
 
     vm.invalidInput = function () {
       return ModalService.infoModal('INPUT_ERROR', 'INVALID_DATA', 'PLEASE_CORRECT');

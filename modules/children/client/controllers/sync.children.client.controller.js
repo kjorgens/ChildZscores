@@ -19,7 +19,7 @@
     vm.goBack = goBack;
 
     if (vm.user === null) {
-      // reportError('Login required for syncing', 'Please log in', false);
+      reportError('Login required for syncing', 'Please log in', false);
       // $window.history.pushState();
       $state.go('authentication.signin');
     } else {
