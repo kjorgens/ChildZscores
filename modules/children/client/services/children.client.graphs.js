@@ -127,7 +127,7 @@
     { x: 60, y: 14.1 }
   ];
 
-  var heightGirlsLow = [
+  var heightBoys = [
     { x: 1, y: 45.4 },
     { x: 2, y: 49.8 },
     { x: 3, y: 53 },
@@ -190,7 +190,7 @@
     { x: 60, y: 99.9 }
   ];
 
-  var weightGirlsLow = [
+  var weightBoys = [
     { x: 1, y: 3.2 },
     { x: 2, y: 3.9 },
     { x: 3, y: 4.5 },
@@ -251,6 +251,132 @@
     { x: 58, y: 13.5 },
     { x: 59, y: 13.6 },
     { x: 60, y: 13.7 }
+  ];
+
+  var weightPerHeightGirls = [
+    { x: 46.1, y: 3.4 },
+    { x: 50.8, y: 4.3 },
+    { x: 54.4, y: 5 },
+    { x: 57.3, y: 5.6 },
+    { x: 61.7, y: 6 },
+    { x: 63.3, y: 6.4 },
+    { x: 64.8, y: 6.7 },
+    { x: 66.2, y: 6.9 },
+    { x: 67.5, y: 7.1 },
+    { x: 68.7, y: 7.4 },
+    { x: 69.9, y: 7.6 },
+    { x: 71, y: 7.7 },
+    { x: 72.1, y: 7.9 },
+    { x: 73.1, y: 8.1 },
+    { x: 74.1, y: 8.3 },
+    { x: 75, y: 8.4 },
+    { x: 76, y: 8.6 },
+    { x: 76.9, y: 8.8 },
+    { x: 77.7, y: 8.9 },
+    { x: 78.6, y: 9.1 },
+    { x: 79.4, y: 9.2 },
+    { x: 80.2, y: 9.4 },
+    { x: 81, y: 9.5 },
+    { x: 81.4, y: 9.7 },
+    { x: 81.7, y: 9.8 },
+    { x: 82.5, y: 10 },
+    { x: 83.1, y: 10.1 },
+    { x: 83.8, y: 10.2 },
+    { x: 84.5, y: 10.4 },
+    { x: 85.1, y: 10.5 },
+    { x: 85.7, y: 10.7 },
+    { x: 86.4, y: 10.8 },
+    { x: 86.9, y: 10.9 },
+    { x: 87.5, y: 11 },
+    { x: 88.1, y: 11.2 },
+    { x: 88.7, y: 11.3 },
+    { x: 89.2, y: 11.4 },
+    { x: 89.8, y: 11.5 },
+    { x: 90.3, y: 11.6 },
+    { x: 90.9, y: 11.8 },
+    { x: 91.4, y: 11.9 },
+    { x: 91.9, y: 12 },
+    { x: 92.4, y: 12.1 },
+    { x: 93, y: 12.2 },
+    { x: 93.5, y: 12.4 },
+    { x: 94, y: 12.5 },
+    { x: 94.4, y: 12.6 },
+    { x: 94.9, y: 12.7 },
+    { x: 95.4, y: 12.8 },
+    { x: 95.9, y: 12.9 },
+    { x: 96.4, y: 13.1 },
+    { x: 96.9, y: 13.2 },
+    { x: 97.4, y: 13.3 },
+    { x: 97.8, y: 13.4 },
+    { x: 98.3, y: 13.5 },
+    { x: 98.8, y: 13.6 },
+    { x: 99.3, y: 13.7 },
+    { x: 99.7, y: 13.8 },
+    { x: 100.2, y: 14 },
+    { x: 100.7, y: 14.1 }
+  ];
+
+  var weightPerHeightBoys = [
+    { x: 45.5, y: 3.2 },
+    { x: 49.8, y: 3.9 },
+    { x: 53, y: 4.5 },
+    { x: 55.6, y: 5 },
+    { x: 59.6, y: 5.4 },
+    { x: 61.2, y: 5.7 },
+    { x: 62.7, y: 6 },
+    { x: 64, y: 6.3 },
+    { x: 65.3, y: 6.5 },
+    { x: 66.5, y: 6.7 },
+    { x: 67.7, y: 6.9 },
+    { x: 68.9, y: 7 },
+    { x: 70, y: 7.2 },
+    { x: 71, y: 7.4 },
+    { x: 72, y: 7.6 },
+    { x: 73, y: 7.7 },
+    { x: 74, y: 7.9 },
+    { x: 74.9, y: 8.1 },
+    { x: 75.8, y: 8.2 },
+    { x: 76.7, y: 8.4 },
+    { x: 77.5, y: 8.6 },
+    { x: 78.4, y: 8.7 },
+    { x: 79.2, y: 8.9 },
+    { x: 79.7, y: 9 },
+    { x: 80, y: 9.2 },
+    { x: 80.8, y: 9.4 },
+    { x: 81.5, y: 9.5 },
+    { x: 82.2, y: 9.7 },
+    { x: 82.9, y: 9.8 },
+    { x: 83.6, y: 10 },
+    { x: 84.3, y: 10.1 },
+    { x: 84.9, y: 10.3 },
+    { x: 85.6, y: 10.4 },
+    { x: 86.2, y: 10.5 },
+    { x: 86.8, y: 10.7 },
+    { x: 87.4, y: 10.8 },
+    { x: 88, y: 10.9 },
+    { x: 88.6, y: 11.1 },
+    { x: 89.2, y: 11.2 },
+    { x: 89.8, y: 11.3 },
+    { x: 90.4, y: 11.5 },
+    { x: 90.9, y: 11.6 },
+    { x: 91.5, y: 11.7 },
+    { x: 92, y: 11.8 },
+    { x: 92.5, y: 12 },
+    { x: 93.1, y: 12.1 },
+    { x: 93.6, y: 12.2 },
+    { x: 94.1, y: 12.3 },
+    { x: 94.6, y: 12.4 },
+    { x: 95.1, y: 12.6 },
+    { x: 95.6, y: 12.7 },
+    { x: 96.1, y: 12.8 },
+    { x: 96.6, y: 12.9 },
+    { x: 97.1, y: 13 },
+    { x: 97.7, y: 13.2 },
+    { x: 98.1, y: 13.3 },
+    { x: 98.5, y: 13.4 },
+    { x: 99, y: 13.5 },
+    { x: 99.5, y: 13.6 },
+    { x: 99.9, y: 13.7 }
   ];
 
   angular
@@ -412,42 +538,133 @@
       };
     };
 
-    factory.getChartDataHeight = function(zscoreData) {
+    factory.setupWeightPerHeightChart = function () {
+      return {
+        chart: {
+          type: 'scatterChart',
+          height: 350,
+          width: 550,
+          margin: {
+            top: 20,
+            right: 20,
+            bottom: 40,
+            left: 55
+          },
+          x: function (d) {
+            return d.x;
+          },
+          y: function (d) {
+            return d.y;
+          },
+          useInteractiveGuideline: true,
+          dispatch: {
+            stateChange: function (e) {
+              console.log('stateChange');
+            },
+            changeState: function (e) {
+              console.log('changeState');
+            },
+            tooltipShow: function (e) {
+              console.log('tooltipShow');
+            },
+            tooltipHide: function (e) {
+              console.log('tooltipHide');
+            }
+          },
+          xAxis: {
+            axisLabel: 'Childs Height(cm)'
+          },
+          yAxis: {
+            axisLabel: 'Childs Weight(kg)',
+            tickFormat: function (d) {
+              return d3.format('s')(d);
+            },
+            axisLabelDistance: -10
+          },
+          callback: function (chart) {
+            console.log('!!! lineChart callback !!!');
+          }
+        },
+        title: {
+          enable: true,
+          text: 'Weight/Height',
+          // color: 'Purple'
+        },
+        subtitle: {
+          enable: false,
+          // text: 'Subtitle for simple line chart. Lorem ipsum dolor sit amet, at eam blandit sadipscing, vim adhuc sanctus disputando ex, cu usu affert alienum urbanitas.',
+          css: {
+            'text-align': 'center',
+            'margin': '10px 13px 0px 7px'
+          }
+        },
+        caption: {
+          enable: false,
+          html: '<b>Figure 1.</b> Lorem ipsum dolor sit amet, at eam blandit sadipscing, <span style="text-decoration: underline;">vim adhuc sanctus disputando ex</span>, cu usu affert alienum urbanitas. <i>Cum in purto erat, mea ne nominavi persecuti reformidans.</i> Docendi blandit abhorreant ea has, minim tantas alterum pro eu. <span style="color: darkred;">Exerci graeci ad vix, elit tacimates ea duo</span>. Id mel eruditi fuisset. Stet vidit patrioque in pro, eum ex veri verterem abhorreant, id unum oportere intellegam nec<sup>[1, <a href="https://github.com/krispo/angular-nvd3" target="_blank">2</a>, 3]</sup>.',
+          css: {
+            'text-align': 'justify',
+            'margin': '10px 13px 0px 7px'
+          }
+        }
+      };
+    };
+
+    factory.getChartDataHeight = function(zscoreData, gender) {
       return [
         {
-          values: heightGirls,      // values - represents the array of {x,y} data points
+          values: gender === "Boy" ? heightBoys : heightGirls,      // values - represents the array of {x,y} data points
           key: 'Expected Height', // key  - the name of the series.
-          color: '#2ca02c'  // color - optional: choose your own line color.
+          color: 'Purple'  // color - optional: choose your own line color.
         },
-        {
-          values: heightGirlsLow,
-          key: 'Expected Height Low',
-          color: '#ff7f0e'
-        },
+        // {
+        //   values: heightGirls,
+        //   key: 'Expected Height Low',
+        //   color: '#ff7f0e'
+        // },
         {
           values: zscoreData,
           key: 'Childs Height',
-          color: '#f50fff'
+          color: 'Black'
 
         }
       ];
     };
 
-    factory.getChartDataWeight = function(zscoreData) {
+    factory.getChartDataWeight = function(zscoreData, gender) {
       return [
         {
-          values: weightGirls,      // values - represents the array of {x,y} data points
+          values: gender === "Boy" ? weightBoys : weightGirls,      // values - represents the array of {x,y} data points
           key: 'Expected Weight', // key  - the name of the series.
           color: 'blue'  // color - optional: choose your own line color.
         },
-        {
-          values: weightGirlsLow,
-          key: 'Expected Weight Low',
-          color: 'red'
-        },
+        // {
+        //   values: weightGirls,
+        //   key: 'Expected Weight Low',
+        //   color: 'red'
+        // },
         {
           values: zscoreData,
           key: 'Childs Weight',
+          color: 'Black'
+        }
+      ];
+    };
+
+    factory.getChartDataWeightPerHeight = function(zscoreData, gender) {
+      return [
+        {
+          values: gender === "Boy" ? weightPerHeightBoys : weightPerHeightGirls,       //values - represents the array of {x,y} data points
+          key: 'Expected Weight/Height', // key  - the name of the series.
+          color: '#cc0000'  // color - optional: choose your own line color.
+        },
+        // {
+        //   values: weightPerHeightGirls,
+        //   key: 'Expected Weight Low',
+        //   color: 'red'
+        // },
+        {
+          values: zscoreData,
+          key: 'Zscore',
           color: 'Black',
         }
       ];
@@ -457,16 +674,24 @@
       return heightGirls;
     };
 
-    factory.getGirlsHeightLow = function() {
-      return heightGirlsLow;
+    factory.getBoysHeight = function() {
+      return heightBoys;
     };
 
     factory.getGirlsWeight = function() {
       return weightGirls;
     };
 
-    factory.getGirlsHeightLow = function() {
-      return weightGirlsLow;
+    factory.getBoysHeight = function() {
+      return weightBoys;
+    };
+
+    factory.getGirlsWeightPerHeight = function() {
+      return weightPerHeightGirls;
+    };
+
+    factory.getBoysWeightPerHeight = function() {
+      return weightPerHeightBoys;
     };
 
     return factory;

@@ -15,11 +15,12 @@
     vm.data = {};
     vm.zscoreHa = [];
     vm.zscoreWa = [];
-    vm.zscoreWl = [];
+    vm.zscoreWH = [];
 
     vm.callback = callback;
     vm.optionsHeight = GraphService.setupHeightChart();
     vm.optionsWeight = GraphService.setupWeightChart();
+    vm.optionsWeightPerHeight = GraphService.setupWeightPerHeightChart();
 
     function callback(scope, element) {
       var api = scope.api;
@@ -219,6 +220,7 @@
         survey.colorStatus = PouchService.calcSurveyStatus(survey);
         vm.zscoreHa.push({x: survey.monthAge, y: survey.height, size: 10, shape: 'diamond'});
         vm.zscoreWa.push({x: survey.monthAge, y: survey.weight, size: 10, shape: 'diamond'});
+        vm.zscoreWH.push({x: survey.height, y: survey.weight, size: 10, shape: 'diamond'});
       });
       $scope.$apply(function () {
         vm.surveys = surveys.docs;
@@ -226,8 +228,9 @@
           vm.zScore = zscore;
           vm.actions = zscore.actions;
         });
-        vm.dataHeight = GraphService.getChartDataHeight(vm.zscoreHa);
-        vm.dataWeight = GraphService.getChartDataWeight(vm.zscoreWa);
+        vm.dataHeight = GraphService.getChartDataHeight(vm.zscoreHa, vm.child.gender);
+        vm.dataWeight = GraphService.getChartDataWeight(vm.zscoreWa, vm.child.gender);
+        vm.dataWeightPerHeight = GraphService.getChartDataWeightPerHeight(vm.zscoreWH, vm.child.gender);
 
 
 
