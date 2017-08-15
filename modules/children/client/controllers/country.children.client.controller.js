@@ -71,10 +71,11 @@
           PouchService.createCountryDatabase();
           PouchService.putStakesLocal(retVal, returnFromPut, handleSaveLocalError);
         });
+      } else {
+        PouchService.getCountriesLocal(storeDbList, handleError);
       }
     }
-    PouchService.createCountryDatabase();
-    PouchService.getCountriesLocal(storeDbList, handleError);
+    getStakesDB();
   }
 }());
 

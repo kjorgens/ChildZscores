@@ -13,6 +13,8 @@ module.exports = {
       js: [
         // bower:js
         'public/lib/angular/angular.min.js',
+        'public/lib/angular-bootstrap/ui-bootstrap.min.js',
+        'public/lib/angular-bootstrap/ui-bootstrap-tpls.min.js',
         'public/lib/angular-resource/angular-resource.min.js',
         'public/lib/angular-animate/angular-animate.min.js',
         'public/lib/angular-messages/angular-messages.min.js',

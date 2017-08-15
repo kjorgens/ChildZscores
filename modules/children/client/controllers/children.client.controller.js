@@ -74,16 +74,16 @@
       vm.spinneractive = false;
     });
 
-    function goBack(){
+    function goBack() {
       $state.go('children.list', { stakeDB: vm.selectedDB, stakeName: vm.selectedStake, screenType: 'children',
-        searchFilter: FilterService.currentListFilter(), colorFilter: FilterService.currentColorFilter()});
+        searchFilter: FilterService.currentListFilter(), colorFilter: FilterService.currentColorFilter() });
     }
 
     function checkAge() {
       var months;
       var rightNow = new Date();
       var currentAgeMonths = moment(rightNow).diff(moment(vm.child.birthDate), 'months');
-      if (currentAgeMonths> 60) {
+      if (currentAgeMonths > 60) {
         vm.childTooOld();
  //       vm.startSpin();
         $state.go('children.list', { stakeDB: vm.selectedDB, stakeName: vm.selectedStake, screenType: 'children',
@@ -218,9 +218,9 @@
       }
       surveys.docs.forEach(function(survey){
         survey.colorStatus = PouchService.calcSurveyStatus(survey);
-        vm.zscoreHa.push({x: survey.monthAge, y: survey.height, size: 10, shape: 'diamond'});
-        vm.zscoreWa.push({x: survey.monthAge, y: survey.weight, size: 10, shape: 'diamond'});
-        vm.zscoreWH.push({x: survey.height, y: survey.weight, size: 10, shape: 'diamond'});
+        vm.zscoreHa.push({ x: survey.monthAge, y: survey.height, size: 10, shape: 'diamond' });
+        vm.zscoreWa.push({ x: survey.monthAge, y: survey.weight, size: 10, shape: 'diamond' });
+        vm.zscoreWH.push({ x: survey.height, y: survey.weight, size: 10, shape: 'diamond' });
       });
       $scope.$apply(function () {
         vm.surveys = surveys.docs;

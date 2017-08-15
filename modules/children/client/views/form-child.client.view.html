@@ -21,13 +21,13 @@
         <form name="vm.form.childForm" class="form-horizontal" ng-submit="vm.create(vm.form.childForm.$valid)"
               novalidate>
             <fieldset>
-                <div class="CreateChildFormContainer">
-                    <div class="form-group float-left">
+                <div class="CreateChildFormContainer" >
+                    <div class="form-group float-left" style="margin-top:1em">
                         <div class="form-group float-left">
                             <div ng-class="{'has-error':(vm.firstNameIsValid === false)}">
                                 <label for="vm.child.firstName" class="col-sm-2 control-label">{{'FIRST_NAME' | translate}}</label>
                                 <div class="col-sm-4">
-                                    <input class="form-control required" type="text" ng-blur="vm.checkFirstNameIsValid()"
+                                    <input class="form-control required" type="input" ng-blur="vm.checkFirstNameIsValid()"
                                            ng-model="vm.child.firstName" id="vm.child.firstName"
                                            placeholder="{{'FIRST_NAME' | translate}}"
                                            required>

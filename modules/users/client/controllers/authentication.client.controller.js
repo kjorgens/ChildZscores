@@ -5,9 +5,9 @@
     .module('users')
     .controller('AuthenticationController', AuthenticationController);
 
-  AuthenticationController.$inject = ['$scope', '$state', '$http', '$location', '$window', 'ChildrenStakes', 'Authentication', 'PouchService', 'PasswordValidator'];
+  AuthenticationController.$inject = ['$scope', '$state', '$http', '$location', '$window', '$stateParams', 'ChildrenStakes', 'Authentication', 'PouchService', 'PasswordValidator'];
 
-  function AuthenticationController($scope, $state, $http, $location, $window, ChildrenStakes, Authentication, PouchService, PasswordValidator) {
+  function AuthenticationController($scope, $state, $http, $location, $window, $stateParams, ChildrenStakes, Authentication, PouchService, PasswordValidator) {
     var vm = this;
 
     vm.authentication = Authentication;
@@ -76,7 +76,7 @@
         localStorage.setItem('lastInterviewer', response.data.user.displayName);
         // And redirect to the previous or home page
         populateLocalDB();
-        $state.go('home');
+        $window.history.back();
  //       $state.go($state.previous.state.name || 'home', $state.previous.params);
       }).catch(function (response) {
         vm.error = response.data.message;

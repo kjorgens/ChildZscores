@@ -8,20 +8,28 @@
       .module('children')
       .controller('ChildrenSyncController', ChildrenSyncController);
 
-  ChildrenSyncController.$inject = ['$rootScope', '$window', '$timeout', '$state', '$stateParams', 'ChildrenReport',
+  ChildrenSyncController.$inject = ['$rootScope', '$window', '$timeout', '$state', '$stateParams', 'ChildrenReport', 'FilterService',
     'Authentication', 'ChildrenGetSync', 'usSpinnerService', 'PouchService', 'FileUploader', 'ModalService', 'ChildrenViews'];
 
-  function ChildrenSyncController($rootScope, $window, $timeout, $state, $stateParams, ChildrenReport,
+  function ChildrenSyncController($rootScope, $window, $timeout, $state, $stateParams, ChildrenReport, FilterService,
     Authentication, ChildrenGetSync, usSpinnerService, PouchService, FileUploader, ModalService, ChildrenViews) {
     var vm = this;
     vm.user = Authentication.user;
     vm.userIsAdmin = false;
     vm.goBack = goBack;
-    vm.user.roles.forEach(function(role) {
-      if (role.indexOf('admin') > -1) {
-        vm.userIsAdmin = true;
-      }
-    });
+
+    if (vm.user === null) {
+      reportError('Login required for syncing', 'Please log in', false);
+      // $window.history.pushState();
+      $state.go('authentication.signin');
+    } else {
+      vm.user.roles.forEach(function(role) {
+        if (role.indexOf('admin') > -1) {
+          vm.userIsAdmin = true;
+        }
+      });
+    }
+
     vm.uploadExcelCsv = uploadExcelCsv;
     vm.cancelUpload = cancelUpload;
     // Create file uploader instance
@@ -274,9 +282,11 @@
       ChildrenViews.updateViews(vm.stakeDB).then( viewUpdateComplete, viewUpdateError);
     }
 
-    vm.reportError = function (title, error, notifyKarl) {
+    function reportError(title, error, notifyKarl) {
       return ModalService.infoModal(title + ' :\n', error + (notifyKarl ? '\n Please contact kjorgens@yahoo.com' : ''));
-    };
+    }
+
+    vm.reportError = reportError;
 //    createReport();
   }
 }());
