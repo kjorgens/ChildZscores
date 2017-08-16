@@ -216,7 +216,7 @@
       if ( surveys.docs.length === 1) {
         vm.initialScreening = true;
       }
-      surveys.docs.forEach(function(survey){
+      surveys.docs.forEach(function(survey) {
         survey.colorStatus = PouchService.calcSurveyStatus(survey);
         vm.zscoreHa.push({ x: survey.monthAge, y: survey.height, size: 10, shape: 'diamond' });
         vm.zscoreWa.push({ x: survey.monthAge, y: survey.weight, size: 10, shape: 'diamond' });

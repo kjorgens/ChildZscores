@@ -671,38 +671,38 @@
     };
 
     function getGirlsHeight(survey) {
-      var startHa = survey[0].monthAge - 5;
-      var endHa = survey[survey.length].monthAge + 5;
+      var startHa = survey[0].x - 5;
+      var endHa = survey[survey.length].x + 5;
       return heightGirls.slice(startHa, endHa);
     };
 
     function getBoysHeight(survey) {
-      var startHa = survey[0].monthAge - 5;
-      var endHa = survey[survey.length].monthAge + 5;
+      var startHa = survey[0].x - 5;
+      var endHa = survey[survey.length].x + 5;
       return heightBoys.slice(startHa, endHa);
     };
 
     function getGirlsWeight(survey) {
-      var startWa = survey[0].monthAge - 5;
-      var endWa = survey[survey.length].monthAge + 5;
+      var startWa = survey[0].x - 5;
+      var endWa = survey[survey.length].x + 5;
       return weightGirls.slice(startWa, endWa);
     };
 
     function getBoysWeight(survey) {
-      var startWa = survey[0].monthAge - 5;
-      var endWa = survey[survey.length].monthAge + 5;
+      var startWa = survey[0].x - 5;
+      var endWa = survey[survey.length].x + 5;
       return weightBoys.slice(startWa, endWa);
     };
 
     function getGirlsWeightPerHeight(survey) {
-      var startWH = survey[0].monthAge - 5;
-      var endWH = survey[survey.length].monthAge + 5;
+      var startWH = survey[0].x - 5;
+      var endWH = survey[survey.length].x + 5;
       return weightPerHeightGirls.slice(startWH, endWH);
     };
 
     function getBoysWeightPerHeight(survey) {
-      var startWH = survey[0].monthAge - 5;
-      var endWH = survey[survey.length].monthAge + 5;
+      var startWH = survey[0].x - 5;
+      var endWH = survey[survey.length].x + 5;
       return weightPerHeightBoys.slice(startWH, endWH);
     };
 
