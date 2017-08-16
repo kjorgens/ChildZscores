@@ -222,6 +222,7 @@
         vm.zscoreWa.push({ x: survey.monthAge, y: survey.weight, size: 10, shape: 'diamond' });
         vm.zscoreWH.push({ x: survey.height, y: survey.weight, size: 10, shape: 'diamond' });
       });
+
       $scope.$apply(function () {
         vm.surveys = surveys.docs;
         vm.zScoreGetter(vm.child.gender, vm.surveys[0].monthAge, vm.surveys[0].height, vm.surveys[0].weight, vm.surveys.length === 1 ? true : false, function (zscore) {
@@ -231,9 +232,6 @@
         vm.dataHeight = GraphService.getChartDataHeight(vm.zscoreHa, vm.child.gender);
         vm.dataWeight = GraphService.getChartDataWeight(vm.zscoreWa, vm.child.gender);
         vm.dataWeightPerHeight = GraphService.getChartDataWeightPerHeight(vm.zscoreWH, vm.child.gender);
-
-
-
         //       vm.surveys.forEach(function(survey) {
         //        if (vm.surveys.length > 0) {
         //          gradeZScores(vm.surveys[0]);

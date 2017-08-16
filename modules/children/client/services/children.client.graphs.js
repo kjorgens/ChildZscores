@@ -542,8 +542,8 @@
       return {
         chart: {
           type: 'scatterChart',
-          height: 350,
-          width: 550,
+          height: 100,
+          width: 225,
           margin: {
             top: 20,
             right: 20,
@@ -612,7 +612,7 @@
     factory.getChartDataHeight = function(zscoreData, gender) {
       return [
         {
-          values: gender === "Boy" ? heightBoys : heightGirls,      // values - represents the array of {x,y} data points
+          values: gender === "Boy" ? getBoysHeight(zscoreData) : getGirlsHeight(zscoreData),      // values - represents the array of {x,y} data points
           key: 'Expected Height', // key  - the name of the series.
           color: 'Purple'  // color - optional: choose your own line color.
         },
@@ -633,7 +633,7 @@
     factory.getChartDataWeight = function(zscoreData, gender) {
       return [
         {
-          values: gender === "Boy" ? weightBoys : weightGirls,      // values - represents the array of {x,y} data points
+          values: gender === "Boy" ? getBoysWeight(zscoreData) : getGirlsWeight(zscoreData),      // values - represents the array of {x,y} data points
           key: 'Expected Weight', // key  - the name of the series.
           color: 'blue'  // color - optional: choose your own line color.
         },
@@ -653,7 +653,7 @@
     factory.getChartDataWeightPerHeight = function(zscoreData, gender) {
       return [
         {
-          values: gender === "Boy" ? weightPerHeightBoys : weightPerHeightGirls,       //values - represents the array of {x,y} data points
+          values: gender === "Boy" ? getBoysWeightPerHeight(zscoreData) : getGirlsWeightPerHeight(zscoreData),       //values - represents the array of {x,y} data points
           key: 'Expected Weight/Height', // key  - the name of the series.
           color: '#cc0000'  // color - optional: choose your own line color.
         },
@@ -665,33 +665,45 @@
         {
           values: zscoreData,
           key: 'Zscore',
-          color: 'Black',
+          color: 'Black'
         }
       ];
     };
 
-    factory.getGirlsHeight = function() {
-      return heightGirls;
+    function getGirlsHeight(survey) {
+      var startHa = survey[0].monthAge - 5;
+      var endHa = survey[survey.length].monthAge + 5;
+      return heightGirls.slice(startHa, endHa);
     };
 
-    factory.getBoysHeight = function() {
-      return heightBoys;
+    function getBoysHeight(survey) {
+      var startHa = survey[0].monthAge - 5;
+      var endHa = survey[survey.length].monthAge + 5;
+      return heightBoys.slice(startHa, endHa);
     };
 
-    factory.getGirlsWeight = function() {
-      return weightGirls;
+    function getGirlsWeight(survey) {
+      var startWa = survey[0].monthAge - 5;
+      var endWa = survey[survey.length].monthAge + 5;
+      return weightGirls.slice(startWa, endWa);
     };
 
-    factory.getBoysHeight = function() {
-      return weightBoys;
+    function getBoysWeight(survey) {
+      var startWa = survey[0].monthAge - 5;
+      var endWa = survey[survey.length].monthAge + 5;
+      return weightBoys.slice(startWa, endWa);
     };
 
-    factory.getGirlsWeightPerHeight = function() {
-      return weightPerHeightGirls;
+    function getGirlsWeightPerHeight(survey) {
+      var startWH = survey[0].monthAge - 5;
+      var endWH = survey[survey.length].monthAge + 5;
+      return weightPerHeightGirls.slice(startWH, endWH);
     };
 
-    factory.getBoysWeightPerHeight = function() {
-      return weightPerHeightBoys;
+    function getBoysWeightPerHeight(survey) {
+      var startWH = survey[0].monthAge - 5;
+      var endWH = survey[survey.length].monthAge + 5;
+      return weightPerHeightBoys.slice(startWH, endWH);
     };
 
     return factory;
