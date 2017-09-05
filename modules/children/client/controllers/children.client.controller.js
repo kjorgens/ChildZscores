@@ -218,9 +218,9 @@
       }
       surveys.docs.forEach(function(survey) {
         survey.colorStatus = PouchService.calcSurveyStatus(survey);
-        vm.zscoreHa.push({ x: survey.monthAge, y: survey.height, size: 10, shape: 'diamond' });
-        vm.zscoreWa.push({ x: survey.monthAge, y: survey.weight, size: 10, shape: 'diamond' });
-        vm.zscoreWH.push({ x: survey.height, y: survey.weight, size: 10, shape: 'diamond' });
+        vm.zscoreHa.push({ x: survey.monthAge, y: survey.height, size: 1, shape: 'diamond' });
+        vm.zscoreWa.push({ x: survey.monthAge, y: survey.weight, size: 1, shape: 'diamond' });
+        vm.zscoreWH.push({ x: survey.height, y: survey.weight, size: 1, shape: 'diamond' });
       });
 
       $scope.$apply(function () {

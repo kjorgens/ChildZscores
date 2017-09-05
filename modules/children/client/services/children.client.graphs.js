@@ -395,8 +395,8 @@
         chart: {
           type: 'scatterChart',
           yDomain: [45, 110],
-          height: 350,
-          width: 550,
+          height: 200,
+          width: 400,
           scatter: {
             onlyCircles: false
           },
@@ -446,7 +446,7 @@
         },
         title: {
           enable: true,
-          text: 'Children Growth Chart Height'
+          text: 'Minimum Healthy Height'
         },
         subtitle: {
           enable: false,
@@ -471,8 +471,8 @@
       return {
         chart: {
           type: 'scatterChart',
-          height: 350,
-          width: 550,
+          height: 200,
+          width: 400,
           margin: {
             top: 20,
             right: 20,
@@ -516,7 +516,7 @@
         },
         title: {
           enable: true,
-          text: 'Children Growth Chart Weight ',
+          text: 'Minimum Healthy Height ',
           // color: 'Purple'
         },
         subtitle: {
@@ -542,8 +542,8 @@
       return {
         chart: {
           type: 'scatterChart',
-          height: 100,
-          width: 225,
+          height: 200,
+          width: 400,
           margin: {
             top: 20,
             right: 20,
@@ -587,7 +587,7 @@
         },
         title: {
           enable: true,
-          text: 'Weight/Height',
+          text: 'Minimum Healthy Weight/Height',
           // color: 'Purple'
         },
         subtitle: {
@@ -672,38 +672,38 @@
 
     function getGirlsHeight(survey) {
       var startHa = survey[0].x - 5;
-      var endHa = survey[survey.length].x + 5;
-      return heightGirls.slice(startHa, endHa);
+      var endHa = survey[0].x + 5;
+      return heightGirls; //.slice(startHa, endHa);
     };
 
     function getBoysHeight(survey) {
       var startHa = survey[0].x - 5;
-      var endHa = survey[survey.length].x + 5;
-      return heightBoys.slice(startHa, endHa);
+      var endHa = survey[0].x + 5;
+      return heightBoys; //.slice(startHa, endHa);
     };
 
     function getGirlsWeight(survey) {
       var startWa = survey[0].x - 5;
-      var endWa = survey[survey.length].x + 5;
-      return weightGirls.slice(startWa, endWa);
+      var endWa = survey[survey.length - 1].x + 5;
+      return weightGirls; //.slice(startWa, endWa);
     };
 
     function getBoysWeight(survey) {
       var startWa = survey[0].x - 5;
-      var endWa = survey[survey.length].x + 5;
-      return weightBoys.slice(startWa, endWa);
+      var endWa = survey[survey.length - 1].x + 5;
+      return weightBoys;  //.slice(startWa, endWa);
     };
 
     function getGirlsWeightPerHeight(survey) {
       var startWH = survey[0].x - 5;
-      var endWH = survey[survey.length].x + 5;
-      return weightPerHeightGirls.slice(startWH, endWH);
+      var endWH = survey[survey.length - 1].x + 5;
+      return weightPerHeightGirls; //.slice(startWH, endWH);
     };
 
     function getBoysWeightPerHeight(survey) {
       var startWH = survey[0].x - 5;
-      var endWH = survey[survey.length].x + 5;
-      return weightPerHeightBoys.slice(startWH, endWH);
+      var endWH = survey[survey.length - 1].x + 5;
+      return weightPerHeightBoys; //.slice(startWH, endWH)
     };
 
     return factory;
