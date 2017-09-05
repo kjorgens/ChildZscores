@@ -847,9 +847,6 @@
       }
 
       if (firstScreening) {
-        // if (Math.round(age) > 36) {
-        //     // dont qualify
-        // }else {
         if (heightForAge < -2 || weightForAge < -2 || weightForLength < -2) {
           status = 'RED_CHILD';
           sugAction.push('RED_START');
@@ -864,6 +861,8 @@
           sugAction.push('GREEN_TELL');
         }
         // }
+      } else if (Math.round(age) < 6) {
+        sugAction.push('UNDER_6_MONTHS');
       } else if (Math.round(age) > 6 && Math.round(age) < 36) {
         if (heightForAge < -2 || weightForAge < -2 || weightForLength < -2) {
           status = 'RED_CHILD';

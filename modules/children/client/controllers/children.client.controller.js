@@ -20,13 +20,14 @@
     vm.callback = callback;
     vm.optionsHeight = GraphService.setupHeightChart();
     vm.optionsWeight = GraphService.setupWeightChart();
+    vm.optionsWeightPerHeight = GraphService.setupWeightPerHeightChart();
 
     function callback(scope, element) {
       var api = scope.api;
       var chart = scope.chart;
       var svg = scope.svg;
     }
-
+//var getMethod(firstScreening);
     var editChild = false;
     vm.checkAge = checkAge;
     vm.childTooOld = childTooOld;
@@ -215,21 +216,27 @@
       if ( surveys.docs.length === 1) {
         vm.initialScreening = true;
       }
-      surveys.docs.forEach(function(survey){
+      surveys.docs.forEach(function(survey) {
         survey.colorStatus = PouchService.calcSurveyStatus(survey);
-        vm.zscoreHa.push({ x: survey.monthAge, y: survey.height, size: 10, shape: 'diamond' });
-        vm.zscoreWa.push({ x: survey.monthAge, y: survey.weight, size: 10, shape: 'diamond' });
-        vm.zscoreWH.push({ x: survey.height, y: survey.weight, size: 10, shape: 'diamond' });
+        vm.zscoreHa.push({ x: survey.monthAge, y: survey.height, size: 1, shape: 'diamond' });
+        vm.zscoreWa.push({ x: survey.monthAge, y: survey.weight, size: 1, shape: 'diamond' });
+        vm.zscoreWH.push({ x: survey.height, y: survey.weight, size: 1, shape: 'diamond' });
       });
+
       $scope.$apply(function () {
         vm.surveys = surveys.docs;
         vm.zScoreGetter(vm.child.gender, vm.surveys[0].monthAge, vm.surveys[0].height, vm.surveys[0].weight, vm.surveys.length === 1 ? true : false, function (zscore) {
           vm.zScore = zscore;
           vm.actions = zscore.actions;
         });
-        vm.dataHeight = GraphService.getChartDataHeight(vm.zscoreHa);
-        vm.dataWeight = GraphService.getChartDataWeight(vm.zscoreWa);
-        vm.dataHeightWeight = GraphService.getChartDataHeightWeight(vm.zscoreWH);
+        vm.dataHeight = GraphService.getChartDataHeight(vm.zscoreHa, vm.child.gender);
+        vm.dataWeight = GraphService.getChartDataWeight(vm.zscoreWa, vm.child.gender);
+        vm.dataWeightPerHeight = GraphService.getChartDataWeightPerHeight(vm.zscoreWH, vm.child.gender);
+        //       vm.surveys.forEach(function(survey) {
+        //        if (vm.surveys.length > 0) {
+        //          gradeZScores(vm.surveys[0]);
+        //        }
+        //       });
       });
     }
 
@@ -591,6 +598,7 @@
  //     var something = $stateParams;
       PouchService.get({ childId: vm.childId }, getUser, getError);
     }
+
 
     function childTooOld() {
       return ModalService.infoModal('CHILD_GT_5', 'CHILD_GRAD', '');
