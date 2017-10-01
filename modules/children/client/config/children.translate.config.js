@@ -49,6 +49,8 @@
       PRIOR_ORGANGE_ENROLL: 'Enroll the caregiver in health lessons',
       PRIOR_ORGANGE_ENCOURAGE: 'Encourage the child to come to the next screening',
       PRIOR_GREEN_TELL: 'Tell caregiver the child is welcome to come to the next screening and they can attend the health lesson if they would like',
+      RESCREEN_ONE_MONTH: 'Rescreen in one month',
+      REVIEW_HEALTH_LESSONS: 'Review 5 areas of healthy behavior from the health lessons to see if the family can make improvements',
 
       SCREENING_DONE_BY: 'Screening done by',
       ADD_SCREENING: 'Add Screening',
@@ -206,6 +208,8 @@
       PRIOR_ORGANGE_ENROLL: 'Inscribir al cuidador en las lecciones de salud',
       PRIOR_ORGANGE_ENCOURAGE: 'Anime al niño a que venga a la siguiente cribado',
       PRIOR_GREEN_TELL: 'Diga al cuidador que el niño es bienvenido a venir a la siguiente pantalla y ellos pueden asistir a la lección de salud si les gustaría',
+      RESCREEN_ONE_MONTH: 'Restablecer en un mes',
+      REVIEW_HEALTH_LESSONS: 'Repase 5 áreas de comportamiento saludable de las lecciones de salud para ver si la familia puede hacer mejoras',
 
       SCREENING_DONE_BY: 'el cribado realizado por',
       REMOVE_CHILD_RECORD: 'Retire registro hijo',

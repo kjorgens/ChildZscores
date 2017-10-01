@@ -414,7 +414,7 @@
           vm.ageIsValid = false;
         } else if (vm.child.monthAge > 36) {
           childDoesNotQualify();
-        }else {
+        } else {
           vm.ageIsValid = true;
           vm.child.birthDate = new Date(year, month - vm.child.monthAge, day);
           vm.ageIsValid = true;

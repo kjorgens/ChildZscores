@@ -516,7 +516,7 @@
         },
         title: {
           enable: true,
-          text: 'Minimum Healthy Height ',
+          text: 'Minimum Healthy Weight ',
           // color: 'Purple'
         },
         subtitle: {
@@ -613,7 +613,7 @@
       return [
         {
           values: gender === "Boy" ? getBoysHeight(zscoreData) : getGirlsHeight(zscoreData),      // values - represents the array of {x,y} data points
-          key: 'Expected Height', // key  - the name of the series.
+          key: 'Height/Age Curve', // key  - the name of the series.
           color: 'Purple'  // color - optional: choose your own line color.
         },
         // {
@@ -625,7 +625,6 @@
           values: zscoreData,
           key: 'Childs Height',
           color: 'Black'
-
         }
       ];
     };
@@ -634,7 +633,7 @@
       return [
         {
           values: gender === "Boy" ? getBoysWeight(zscoreData) : getGirlsWeight(zscoreData),      // values - represents the array of {x,y} data points
-          key: 'Expected Weight', // key  - the name of the series.
+          key: 'Weight/Age Curve', // key  - the name of the series.
           color: 'blue'  // color - optional: choose your own line color.
         },
         // {
@@ -644,7 +643,7 @@
         // },
         {
           values: zscoreData,
-          key: 'Childs Weight',
+          key: 'Childs Weight Curve',
           color: 'Black'
         }
       ];
@@ -654,7 +653,7 @@
       return [
         {
           values: gender === "Boy" ? getBoysWeightPerHeight(zscoreData) : getGirlsWeightPerHeight(zscoreData),       //values - represents the array of {x,y} data points
-          key: 'Expected Weight/Height', // key  - the name of the series.
+          key: 'Weight/Height Curve', // key  - the name of the series.
           color: '#cc0000'  // color - optional: choose your own line color.
         },
         // {
