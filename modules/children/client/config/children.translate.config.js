@@ -52,6 +52,21 @@
       RESCREEN_ONE_MONTH: 'Rescreen in one month',
       REVIEW_HEALTH_LESSONS: 'Review 5 areas of healthy behavior from the health lessons to see if the family can make improvements',
 
+      MIN_HEALTH_HEIGHT: 'Minimum Healthy Height',
+      CHILD_HEIGHT_GRAPH: 'Child Height (cm)',
+      CHILD_AGE_GRAPH: 'Child Age (months)',
+      HEIGHT_AGE_CURVE: 'Height/Age Curve',
+      CHILD_HEIGHT_KEY: 'Childs Height',
+
+      MIN_HEALTH_WEIGHT: 'Minimum Healthy Weight',
+      CHILD_WEIGHT_GRAPH: 'Child Weight (kg)',
+      WEIGHT_AGE_GRAPH: 'Weight/Age Curve',
+      CHILD_WEIGHT_KEY: 'Childs Weight',
+
+      MIN_HEALTH_WEIGHT_HEIGHT: 'Minimum Healthy Weight/Height',
+      WEIGHT_HEIGHT_GRAPH: 'Weight/Height Curve',
+      ZSCORE: 'Zscore',
+
       SCREENING_DONE_BY: 'Screening done by',
       ADD_SCREENING: 'Add Screening',
       SCREENING_DATE: 'Screening date',
@@ -210,6 +225,21 @@
       PRIOR_GREEN_TELL: 'Diga al cuidador que el niño es bienvenido a venir a la siguiente pantalla y ellos pueden asistir a la lección de salud si les gustaría',
       RESCREEN_ONE_MONTH: 'Restablecer en un mes',
       REVIEW_HEALTH_LESSONS: 'Repase 5 áreas de comportamiento saludable de las lecciones de salud para ver si la familia puede hacer mejoras',
+
+      MIN_HEALTH_HEIGHT: 'Altura mínima saludable',
+      CHILD_HEIGHT_GRAPH: 'Altura del niño (cm)',
+      CHILD_AGE_GRAPH: 'Edad del niño (meses)',
+      HEIGHT_AGE_CURVE: 'Curva Altura/Edad',
+      CHILD_HEIGHT_KEY: 'Altura del niño',
+
+      MIN_HEALTH_WEIGHT: 'Peso mínimo saludable',
+      CHILD_WEIGHT_GRAPH: 'Peso del niño (kg)',
+      WEIGHT_AGE_GRAPH: 'Curva peso/edad',
+      CHILD_WEIGHT_KEY: 'Peso del niño',
+
+      MIN_HEALTH_WEIGHT_HEIGHT: 'Peso / altura mínima saludable',
+      WEIGHT_HEIGHT_GRAPH: 'Curva de peso/altura',
+      ZSCORE: 'Zscore',
 
       SCREENING_DONE_BY: 'el cribado realizado por',
       REMOVE_CHILD_RECORD: 'Retire registro hijo',

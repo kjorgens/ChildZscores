@@ -21,7 +21,7 @@ module.exports = function (app) {
 
   // retrieve stakes route
   router.route('/stakes')
-      .get(children.getCountryList);
+        .get(children.getCountryList);
 
   // retrieve countries route
   router.route('/countries')

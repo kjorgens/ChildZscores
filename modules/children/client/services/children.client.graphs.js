@@ -384,13 +384,26 @@
       .factory('GraphService', GraphService);
 
 
-  GraphService.$inject = [];
+  GraphService.$inject = ['$translate', '$rootScope'];
 
-  function GraphService() {
+  function GraphService($translate, $rootScope) {
 
     var factory = {};
+    // var vm = this;
+    // //var minHealth;
+    // function performTranslation() {
+    //   $translate(['MIN_HEALTH']).then(function (translations) {
+    //     vm.minHealth = translations.MIN_HEALTH;
+    //   });
+    // }
 
-    factory.setupHeightChart = function () {
+   // performTranslation();
+   //  $rootScope.$on('$translateChangeSuccess', function () {
+   //    performTranslation();
+   //  });
+
+    factory.setupHeightChart = function (heatlthHeight, childHeightH, childAgeH) {
+      //performTranslation();
       return {
         chart: {
           type: 'scatterChart',
@@ -428,13 +441,13 @@
             }
           },
           xAxis: {
-            axisLabel: 'Childs Age (months)',
+            axisLabel: (childAgeH),
             tickFormat: function(d) {
               return d3.format('s')(d);
             }
           },
           yAxis: {
-            axisLabel: 'Childs Height (cm)',
+            axisLabel: (childHeightH),
             tickFormat: function (d) {
               return d3.format('s')(d);
             },
@@ -446,7 +459,7 @@
         },
         title: {
           enable: true,
-          text: 'Minimum Healthy Height'
+          text: (heatlthHeight)
         },
         subtitle: {
           enable: false,
@@ -467,7 +480,7 @@
       };
     };
 
-    factory.setupWeightChart = function () {
+    factory.setupWeightChart = function (heatlthWeight, childWeightW, childAgeW) {
       return {
         chart: {
           type: 'scatterChart',
@@ -501,10 +514,10 @@
             }
           },
           xAxis: {
-            axisLabel: 'Childs Age (months)'
+            axisLabel: (childAgeW)
           },
           yAxis: {
-            axisLabel: 'Childs Weight (kg)',
+            axisLabel: (childWeightW),
             tickFormat: function (d) {
               return d3.format('s')(d);
             },
@@ -516,7 +529,7 @@
         },
         title: {
           enable: true,
-          text: 'Minimum Healthy Weight ',
+          text: (heatlthWeight)
           // color: 'Purple'
         },
         subtitle: {
@@ -538,7 +551,7 @@
       };
     };
 
-    factory.setupWeightPerHeightChart = function () {
+    factory.setupWeightPerHeightChart = function (title, weight, height) {
       return {
         chart: {
           type: 'scatterChart',
@@ -572,10 +585,10 @@
             }
           },
           xAxis: {
-            axisLabel: 'Childs Height(cm)'
+            axisLabel: (height)
           },
           yAxis: {
-            axisLabel: 'Childs Weight(kg)',
+            axisLabel: (weight),
             tickFormat: function (d) {
               return d3.format('s')(d);
             },
@@ -587,7 +600,7 @@
         },
         title: {
           enable: true,
-          text: 'Minimum Healthy Weight/Height',
+          text: (title)
           // color: 'Purple'
         },
         subtitle: {
@@ -609,11 +622,11 @@
       };
     };
 
-    factory.getChartDataHeight = function(zscoreData, gender) {
+    factory.getChartDataHeight = function(zscoreData, gender, ageC, age) {
       return [
         {
-          values: gender === "Boy" ? getBoysHeight(zscoreData) : getGirlsHeight(zscoreData),      // values - represents the array of {x,y} data points
-          key: 'Height/Age Curve', // key  - the name of the series.
+          values: gender === 'Boy' ? getBoysHeight(zscoreData) : getGirlsHeight(zscoreData),      // values - represents the array of {x,y} data points
+          key: ageC, // key  - the name of the series.
           color: 'Purple'  // color - optional: choose your own line color.
         },
         // {
@@ -623,7 +636,7 @@
         // },
         {
           values: zscoreData,
-          key: 'Childs Height',
+          key: age,
           color: 'Black'
         }
       ];
@@ -632,7 +645,7 @@
     factory.getChartDataWeight = function(zscoreData, gender) {
       return [
         {
-          values: gender === "Boy" ? getBoysWeight(zscoreData) : getGirlsWeight(zscoreData),      // values - represents the array of {x,y} data points
+          values: gender === 'Boy' ? getBoysWeight(zscoreData) : getGirlsWeight(zscoreData),      // values - represents the array of {x,y} data points
           key: 'Weight/Age Curve', // key  - the name of the series.
           color: 'blue'  // color - optional: choose your own line color.
         },
@@ -652,7 +665,7 @@
     factory.getChartDataWeightPerHeight = function(zscoreData, gender) {
       return [
         {
-          values: gender === "Boy" ? getBoysWeightPerHeight(zscoreData) : getGirlsWeightPerHeight(zscoreData),       //values - represents the array of {x,y} data points
+          values: gender === 'Boy' ? getBoysWeightPerHeight(zscoreData) : getGirlsWeightPerHeight(zscoreData),       // values - represents the array of {x,y} data points
           key: 'Weight/Height Curve', // key  - the name of the series.
           color: '#cc0000'  // color - optional: choose your own line color.
         },
@@ -672,38 +685,38 @@
     function getGirlsHeight(survey) {
       var startHa = survey[0].x - 5;
       var endHa = survey[0].x + 5;
-      return heightGirls; //.slice(startHa, endHa);
-    };
+      return heightGirls; // .slice(startHa, endHa);
+    }
 
     function getBoysHeight(survey) {
       var startHa = survey[0].x - 5;
       var endHa = survey[0].x + 5;
-      return heightBoys; //.slice(startHa, endHa);
-    };
+      return heightBoys; // .slice(startHa, endHa);
+    }
 
     function getGirlsWeight(survey) {
       var startWa = survey[0].x - 5;
       var endWa = survey[survey.length - 1].x + 5;
-      return weightGirls; //.slice(startWa, endWa);
-    };
+      return weightGirls; // .slice(startWa, endWa);
+    }
 
     function getBoysWeight(survey) {
       var startWa = survey[0].x - 5;
       var endWa = survey[survey.length - 1].x + 5;
-      return weightBoys;  //.slice(startWa, endWa);
-    };
+      return weightBoys;  // .slice(startWa, endWa);
+    }
 
     function getGirlsWeightPerHeight(survey) {
       var startWH = survey[0].x - 5;
       var endWH = survey[survey.length - 1].x + 5;
-      return weightPerHeightGirls; //.slice(startWH, endWH);
-    };
+      return weightPerHeightGirls; // .slice(startWH, endWH);
+    }
 
     function getBoysWeightPerHeight(survey) {
       var startWH = survey[0].x - 5;
       var endWH = survey[survey.length - 1].x + 5;
-      return weightPerHeightBoys; //.slice(startWH, endWH)
-    };
+      return weightPerHeightBoys; // .slice(startWH, endWH)
+    }
 
     return factory;
   }
