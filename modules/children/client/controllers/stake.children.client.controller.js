@@ -74,19 +74,19 @@
     function screenChildren(stakeName, stakeDB) {
       vm.startSpin();
       document.body.scrollTop = document.documentElement.scrollTop = 0;
-      $state.go('children.list', {stakeDB: stakeDB, stakeName: stakeName, searchFilter: '', colorFilter: '', screenType: 'children'});
+      $state.go('children.list', { countryName: vm.selectedCountry.name, countryCode: vm.selectedCountry.code, stakeDB: stakeDB, stakeName: stakeName, searchFilter: '', colorFilter: '', screenType: 'children' });
     }
 
     function screenPregnantWomen(stakeName, stakeDB) {
       vm.startSpin();
       document.body.scrollTop = document.documentElement.scrollTop = 0;
-      $state.go('children.listMothers', {stakeDB: stakeDB, stakeName: stakeName, searchFilter: '', colorFilter: '', screenType: 'pregnant'});
+      $state.go('children.listMothers', { stakeDB: stakeDB, stakeName: stakeName, searchFilter: '', colorFilter: '', screenType: 'pregnant' });
     }
 
     function screenNursingMothers(stakeName, stakeDB) {
       vm.startSpin();
       document.body.scrollTop = document.documentElement.scrollTop = 0;
-      $state.go('children.listMothers', {stakeDB: stakeDB, stakeName: stakeName, searchFilter: '', colorFilter: '', screenType: 'nursing'});
+      $state.go('children.listMothers', { stakeDB: stakeDB, stakeName: stakeName, searchFilter: '', colorFilter: '', screenType: 'nursing' });
     }
 
     // function getStakesDB() {

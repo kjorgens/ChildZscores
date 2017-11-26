@@ -817,19 +817,16 @@
       }
       if (weightForLength < -3) {
         wlStatus = 'dangerZscore';
-      } else {
-        if (weightForLength < -2 && weightForLength > -3) {
-          wlStatus = 'redZoneZscore';
-        } else {
-          if (weightForLength < -1 && weightForLength > -2) {
-            wlStatus = 'marginalZscore';
-          }
-        }
+      } else if (weightForLength < -2 && weightForLength > -3) {
+          wlStatus = 'moderateRedZoneZscore';
+      } else if (weightForLength < -1 && weightForLength > -2) {
+          wlStatus = 'marginalZscore';
       }
+
 
       var status;
       var sugAction = [];
-      if (Math.round(age) > 60) {
+      if (Math.round(age) > 48) {
         if (weightForLength < -3) {
           status = 'SEVERE_ACUTE';
           sugAction.push('SERVERE_REPORT');

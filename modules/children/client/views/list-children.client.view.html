@@ -9,7 +9,7 @@
                 </h3>
                 <h3>
                     <div ng-if="vm.onLine">
-                        <a ui-sref="children.sync({stakeDB: vm.selectedStakeDB, stakeName:vm.selectedStake, screenType: vm.screenType})">{{'SYNC_OR_REPORT' | translate }}
+                        <a ui-sref="children.sync({countryName: vm.countryName, countryCode: vm.countryCode, stakeDB: vm.selectedStakeDB, stakeName:vm.selectedStake, screenType: vm.screenType})">{{'SYNC_OR_REPORT' | translate }}
                             <!--<i class="glyphicon glyphicon-refresh"></i>-->
                         </a>
                         <h5>
@@ -82,14 +82,14 @@
                 <h3><span ng-bind="child.firstName"></span>
                     <span ng-bind="child.lastName"></span></h3>
                 <h4 ng-if="child.statusColor">
-                    {{child.monthAge<60 ? ('ZSCORE_STATUS' | translate) : ('CHILD_GRADUATED' | translate)}}:
-                    <span ng-class="child.statusColor" ng-if="child.zscoreStatus === 'Acute: supplements required' && child.monthAge<60">
+                    {{child.monthAge<48 ? ('ZSCORE_STATUS' | translate) : ('CHILD_GRADUATED' | translate)}}:
+                    <span ng-class="child.statusColor" ng-if="child.zscoreStatus === 'Acute: supplements required' && child.monthAge<48">
                           {{'ACUTE_ZSCORE' | translate}} </span>
-                    <span ng-class="child.statusColor" ng-if="child.zscoreStatus === 'Micro nutrients required' && child.monthAge<60">
+                    <span ng-class="child.statusColor" ng-if="child.zscoreStatus === 'Micro nutrients required' && child.monthAge<48">
                           {{'MICRO_NUTRITION_ZSCORE' | translate}} </span>
-                    <span ng-class="child.statusColor" ng-if="child.zscoreStatus === 'At Risk: Come to next screening' && child.monthAge<60">
+                    <span ng-class="child.statusColor" ng-if="child.zscoreStatus === 'At Risk: Come to next screening' && child.monthAge<48">
                           {{'AT_RISK_ZSCORE' | translate}} </span>
-                    <span ng-class="child.statusColor" ng-if="child.zscoreStatus === 'Normal' && child.monthAge<60">
+                    <span ng-class="child.statusColor" ng-if="child.zscoreStatus === 'Normal' && child.monthAge<48">
                           {{'NORMAL_ZSCORE' | translate}} </span>
                 </h4>
                  {{child.gender === 'Boy' ? ('TXT_MALE' | translate) : ('TXT_FEMALE' | translate)}}, {{'BORN' | translate}}

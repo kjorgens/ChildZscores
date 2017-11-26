@@ -1,19 +1,21 @@
+"use strict";
+
 var request = require('request');
 var Promise = require('bluebird');
 
 getdatabaseList()
     .then(updateChildRecords).all()
     // .then(findScreeningings).all()
-    .then(outOfHere).catch(function(err){
+    .then(outOfHere).catch(function(err) {
       console.log("error" + err);
 });
 
-function getdatabaseList(){
-  return new Promise(function(resolve,reject){
+function getdatabaseList() {
+  return new Promise(function(resolve, reject) {
     var stakeList = [];
 
     var countryList = require('nano')('https://' + process.env.COUCH_URL + 'country_list');
-    if(process.env.STAKE_TO_UPDATE){
+    if (process.env.STAKE_TO_UPDATE) {
       stakeList.push (process.env.STAKE_TO_UPDATE);
       resolve(stakeList);
     } else {
@@ -170,40 +172,37 @@ function outOfHere(input){
   console.log("done");
 }
 
-function findScreeningings(input){
-  return new Promise(function(resolve,reject){
-      input.db.view('scr_owner_search', 'find_by_owner', {
-        key: input.child._id,
-        include_docs: true
-      }, function (error, response) {
-        if (!error) {
-          if (response.rows.length === 0) {
-            resolve (updateChildObject (input.db, undefined));
-          } else {
-            var sList = sortByDate (response.rows);
-            input.child.lastScreening = sList[0].doc._id;
-            statusInfo = calculateStatus (sList[0].doc);
-            input.child.zscoreStatus = statusInfo.zscoreStatus;
-            input.child.statusColor = statusColor (statusInfo.zscoreStatus);
-            resolve (updateChildObject (input.db, input.child));
-          }
+function findScreeningings(input) {
+  return new Promise(function(resolve, reject) {
+    input.db.view('scr_owner_search', 'find_by_owner', {
+      key: input.child._id,
+      include_docs: true
+    }, function (error, response) {
+      if (!error) {
+        if (response.rows.length === 0) {
+          resolve(updateChildObject(input.db, undefined));
         } else {
-          var msg = '';
-          var myError = new Error ({name: '', errors: [], message: ''});
-          myError.name = 'database error';
-          if (error) {
-            myError.message = error;
-            myError.name = 'database error';
-            reject (myError);
-          } else {
-            var reasons = JSON.parse (response.body);
-            myError.message = msg;
-            reject (myError);
-          }
+          var sList = sortByDate(response.rows);
+          input.child.lastScreening = sList[0].doc._id;
+          statusInfo = calculateStatus(sList[0].doc);
+          input.child.zscoreStatus = statusInfo.zscoreStatus;
+          input.child.statusColor = statusColor(statusInfo.zscoreStatus);
+          resolve(updateChildObject(input.db, input.child));
         }
-      })
-    })
+      } else {
+        var msg = '';
+        var myError = new Error({name: '', errors: [], message: ''});
+        myError.name = 'database error';
+        if (error) {
+          myError.message = error;
+          myError.name = 'database error';
+          reject(myError);
+        } else {
+          var reasons = JSON.parse(response.body);
+          myError.message = msg;
+          reject(myError);
+        }
+      }
+    });
+  });
 }
-
-
-

@@ -14,6 +14,8 @@
   function ChildrenListController($rootScope, $scope, $state, $stateParams, $window, $translate,
      FilterService, childResolve, usSpinnerService, PouchService) {
     var vm = this;
+    vm.countryCode = $stateParams.countryCode;
+    vm.countryName = $stateParams.countryName;
     FilterService.setCurrentScreenType($stateParams.screenType);
     vm.screenType = $stateParams.screenType;
     vm.childFilter = localStorage.getItem('childFilter') || 'a';

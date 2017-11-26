@@ -15,7 +15,7 @@
           template: '<ui-view/>'
         })
         .state('children.list', {
-          url: '/list/:stakeDB/:stakeName/:searchFilter/:colorFilter/:screenType',
+          url: '/list/:stakeDB/:stakeName/:searchFilter/:colorFilter/:screenType?countryName&countryCode',
           templateUrl: 'modules/children/client/views/list-children.client.view.html',
           controller: 'ChildrenListController',
           controllerAs: 'vm',
@@ -40,7 +40,7 @@
           }
         })
         .state('children.sync', {
-          url: '/sync/:stakeDB/:stakeName/:screenType',
+          url: '/sync/:stakeDB/:stakeName/:screenType?countryName&countryCode&language',
           templateUrl: 'modules/children/client/views/sync-children.client.view.html',
           controller: 'ChildrenSyncController',
           controllerAs: 'vm',
@@ -210,7 +210,7 @@
 
   listChildren.$inject = ['$stateParams', 'PouchService'];
   function listChildren($stateParams, PouchService) {
-   return(PouchService.createDatabase($stateParams.stakeDB,PouchService.findChildren));
+    return (PouchService.createDatabase($stateParams.stakeDB, PouchService.findChildren));
   }
 
   getMotherList.$inject = ['$stateParams', 'PouchService'];

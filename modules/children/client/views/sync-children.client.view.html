@@ -44,10 +44,20 @@
             <i class="glyphicon glyphicon-trash"></i>
             </h3>
         </a>
+        <a ng-click="vm.createReport('listall', vm.sortSelect)">
+            <h3><span> Aggregate csv all countries </span>
+            <i class="glyphicon glyphicon-share"></i>
+            </h3>
+        </a>
+        <a ng-click="vm.createReport(vm.countryCode | lowercase, vm.sortSelect)">
+          <h3><span> Aggregate csv files for {{vm.selectedCountry}}</span>
+            <i class="glyphicon glyphicon-share"></i>
+          </h3>
+        </a>
     </div>
     <h3>
         <div ng-if="vm.reportReady">
-            <a target="_self" ng-href={{vm.reportToDownload}} download={{vm.reportName}}>{{'DOWNLOAD_MSG' |
+            <a target="_self" ng-href={{vm.reportToDownload}} download={{vm.reportToDownload}}>{{'DOWNLOAD_MSG' |
                 translate:vm.reportFileName}} </a>
             <i class="glyphicon glyphicon-download-alt"></i>
         </div>
@@ -57,22 +67,30 @@
             <select id="filtersSelect" ng-model="vm.filterSelect">
                 <option value="">{{'CSV_FILTER' | translate}}</option>
                 <option value="all">{{'ALL_CHILDREN' | translate}}</option>
-                <option value="zscore">{{'ZSCORE_UNDER_2' | translate}}</option>
-                <option value="Pregnant">{{'SCREEN_PREGNANT_WOMEN' | translate}}</option>
-                <option value="Nursing">{{'SCREEN_NURSING_MOTHERS' | translate}}</option>
+                <!--<option value="zscore">{{'ZSCORE_UNDER_2' | translate}}</option>-->
+                <option value="pregnant">{{'SCREEN_PREGNANT_WOMEN' | translate}}</option>
+                <option value="nursing">{{'SCREEN_NURSING_MOTHERS' | translate}}</option>
             </select><br>
             <select id="sortSelect" ng-model="vm.sortSelect">
                 <option value="">{{'SORT_FIELD' | translate}}</option>
                 <option value="ward">{{'WARD' | translate}}</option>
                 <option value="screenId">{{'SCREENING_DATE' | translate}}</option>
-                <option value="firstName">{{'FIRST_NAME' | translate}}</option>
+                <option value="firstName" selected="selected">{{'FIRST_NAME' | translate}}</option>
                 <option value="lastName">{{'LAST_NAME' | translate}}</option>
                 <option value="memberStatus">{{'LDS_MEMBER' | translate}}</option>
             </select><br>
             <a ng-click="vm.createReport(vm.filterSelect, vm.sortSelect)">
                 <span>{{'GENERATE_REPORT' | translate}} </span>
                 <i class="glyphicon glyphicon-share"></i>
-            </a>
+            </a><br><br>
+            <a ng-click="vm.createReport('zscore', vm.sortSelect)">
+                <span>{{'GENERATE_SUPPLEMENT_REPORT' | translate}} </span>
+                <i class="glyphicon glyphicon-share"></i>
+            </a><br><br>
+          <a ng-click="vm.createReport('pregnant', vm.sortSelect)">
+            <span>{{'GENERATE_WOMEN_REPORT' | translate}} </span>
+            <i class="glyphicon glyphicon-share"></i>
+          </a>
         </div>
     </h3>
     <h5>{{'SYNC_MESSAGE' | translate}}</h5>

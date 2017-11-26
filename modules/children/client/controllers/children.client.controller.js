@@ -27,7 +27,7 @@
       var chart = scope.chart;
       var svg = scope.svg;
     }
-//var getMethod(firstScreening);
+    // var getMethod(firstScreening);
     var editChild = false;
     vm.checkAge = checkAge;
     vm.childTooOld = childTooOld;
@@ -151,7 +151,7 @@
     function performTranslation() {
       $translate(['BOY', 'GIRL', 'CHILD_RECORD', 'UPDATE', 'CREATE',
         'EDIT_EXISTING_CHILD', 'ADD_NEW_CHILD', 'CHILD_GT_5', 'CHILD_GRAD',
-        'INPUT_ERROR', 'INVALID_DATA', 'PLEASE_CORRECT' ]).then(function (translations) {
+        'INPUT_ERROR', 'INVALID_DATA', 'PLEASE_CORRECT']).then(function (translations) {
           vm.boy = translations.BOY;
           vm.girl = translations.GIRL;
           vm.childRec = translations.CHILD_RECORD;

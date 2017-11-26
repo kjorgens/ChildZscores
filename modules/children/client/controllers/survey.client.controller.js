@@ -144,9 +144,9 @@
       });
     }
 
-    function surveyErrors(error) {
-      vm.surveyError = error;
-    }
+    // function surveyErrors(error) {
+    //   vm.surveyError = error;
+    // }
 
     vm.zScoreGetter = ZScores.getMethod;
 
