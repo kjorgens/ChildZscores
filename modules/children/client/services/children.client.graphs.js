@@ -642,11 +642,11 @@
       ];
     };
 
-    factory.getChartDataWeight = function(zscoreData, gender) {
+    factory.getChartDataWeight = function(zscoreData, gender, weightC, childW) {
       return [
         {
           values: gender === 'Boy' ? getBoysWeight(zscoreData) : getGirlsWeight(zscoreData),      // values - represents the array of {x,y} data points
-          key: 'Weight/Age Curve', // key  - the name of the series.
+          key: weightC, // key  - the name of the series.
           color: 'blue'  // color - optional: choose your own line color.
         },
         // {
@@ -656,17 +656,17 @@
         // },
         {
           values: zscoreData,
-          key: 'Childs Weight Curve',
+          key: childW,
           color: 'Black'
         }
       ];
     };
 
-    factory.getChartDataWeightPerHeight = function(zscoreData, gender) {
+    factory.getChartDataWeightPerHeight = function(zscoreData, gender, curve) {
       return [
         {
           values: gender === 'Boy' ? getBoysWeightPerHeight(zscoreData) : getGirlsWeightPerHeight(zscoreData),       // values - represents the array of {x,y} data points
-          key: 'Weight/Height Curve', // key  - the name of the series.
+          key: curve, // key  - the name of the series.
           color: '#cc0000'  // color - optional: choose your own line color.
         },
         // {

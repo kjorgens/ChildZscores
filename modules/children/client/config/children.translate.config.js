@@ -226,20 +226,19 @@
       RESCREEN_ONE_MONTH: 'Restablecer en un mes',
       REVIEW_HEALTH_LESSONS: 'Repase 5 áreas de comportamiento saludable de las lecciones de salud para ver si la familia puede hacer mejoras',
 
-      MIN_HEALTH_HEIGHT: 'Altura mínima saludable',
+      MIN_HEALTH_HEIGHT: 'Altura Mínima Saludable',
       CHILD_HEIGHT_GRAPH: 'Altura del niño (cm)',
       CHILD_AGE_GRAPH: 'Edad del niño (meses)',
       HEIGHT_AGE_CURVE: 'Curva Altura/Edad',
       CHILD_HEIGHT_KEY: 'Altura del niño',
 
-      MIN_HEALTH_WEIGHT: 'Peso mínimo saludable',
+      MIN_HEALTH_WEIGHT: 'Peso Mínimo Saludable',
       CHILD_WEIGHT_GRAPH: 'Peso del niño (kg)',
       WEIGHT_AGE_GRAPH: 'Curva peso/edad',
       CHILD_WEIGHT_KEY: 'Peso del niño',
 
-      MIN_HEALTH_WEIGHT_HEIGHT: 'Peso / altura mínima saludable',
+      MIN_HEALTH_WEIGHT_HEIGHT: 'Peso/Altura Mínima Saludable',
       WEIGHT_HEIGHT_GRAPH: 'Curva de peso/altura',
-      ZSCORE: 'Zscore',
 
       SCREENING_DONE_BY: 'el cribado realizado por',
       REMOVE_CHILD_RECORD: 'Retire registro hijo',

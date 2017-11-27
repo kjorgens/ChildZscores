@@ -151,7 +151,8 @@
         'EDIT_EXISTING_CHILD', 'ADD_NEW_CHILD', 'CHILD_GT_5', 'CHILD_GRAD',
         'INPUT_ERROR', 'INVALID_DATA', 'PLEASE_CORRECT', 'MIN_HEALTH_HEIGHT',
          'CHILD_HEIGHT_GRAPH', 'CHILD_AGE_GRAPH', 'HEIGHT_AGE_CURVE', 'CHILD_HEIGHT_KEY',
-          'MIN_HEALTH_WEIGHT', 'CHILD_WEIGHT_GRAPH', 'MIN_HEALTH_WEIGHT_HEIGHT']).then(function (translations) {
+          'MIN_HEALTH_WEIGHT', 'CHILD_WEIGHT_GRAPH', 'MIN_HEALTH_WEIGHT_HEIGHT', 'WEIGHT_AGE_GRAPH',
+          'CHILD_WEIGHT_KEY', 'WEIGHT_HEIGHT_GRAPH']).then(function (translations) {
             vm.boy = translations.BOY;
             vm.girl = translations.GIRL;
             vm.childRec = translations.CHILD_RECORD;
@@ -172,9 +173,15 @@
             vm.optionsHeight = GraphService.setupHeightChart(vm.minHealthH, vm.childHeightH, vm.childAge);
             vm.minHealthW = translations.MIN_HEALTH_WEIGHT;
             vm.childWeightW = translations.CHILD_WEIGHT_GRAPH;
+            vm.weightC = translations.WEIGHT_AGE_GRAPH;
+            vm.weightKey = translations.CHILD_WEIGHT_KEY;
             vm.optionsWeight = GraphService.setupWeightChart(vm.minHealthW, vm.childWeightW, vm.childAge);
             vm.minHealthWH = translations.MIN_HEALTH_WEIGHT_HEIGHT;
+            vm.heightWeightC = translations.WEIGHT_HEIGHT_GRAPH;
             vm.optionsWeightPerHeight = GraphService.setupWeightPerHeightChart(vm.minHealthWH, vm.childWeightW, vm.childHeightH);
+            vm.dataHeight = GraphService.getChartDataHeight(vm.zscoreHa, vm.child.gender, vm.heightAgeC, vm.heightAgeH);
+            vm.dataWeight = GraphService.getChartDataWeight(vm.zscoreWa, vm.child.gender, vm.weightC, vm.weightKey);
+            vm.dataWeightPerHeight = GraphService.getChartDataWeightPerHeight(vm.zscoreWH, vm.child.gender, vm.heightWeightC);
           });
     }
 
@@ -240,9 +247,7 @@
           vm.zScore = zscore;
           vm.actions = zscore.actions;
         });
-        vm.dataHeight = GraphService.getChartDataHeight(vm.zscoreHa, vm.child.gender, vm.heightAgeC, vm.heightAgeH);
-        vm.dataWeight = GraphService.getChartDataWeight(vm.zscoreWa, vm.child.gender);
-        vm.dataWeightPerHeight = GraphService.getChartDataWeightPerHeight(vm.zscoreWH, vm.child.gender);
+        performTranslation();
         //       vm.surveys.forEach(function(survey) {
         //        if (vm.surveys.length > 0) {
         //          gradeZScores(vm.surveys[0]);
