@@ -247,7 +247,7 @@
     function getCsvError(error) {
       vm.stopSpin();
       console.log(error.data.message);
-      vm.reportError('CSV creation error', error.data.name + ' >>> ' + error.data.message, true);
+      vm.reportError('CSV creation error', error.data.name + ': ' + error.data.message, false);
 //      return ModalService.infoModal('some dumb error' + ' :\n', error + (notifyKarl ? '\n Please contact kjorgens@yahoo.com' : ''));
 //      vm.reportError('Download csv error', error.data.error.message, error.data.error.name.indexOf('Empty database') < 0);
     }

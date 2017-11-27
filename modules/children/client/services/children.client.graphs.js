@@ -384,26 +384,13 @@
       .factory('GraphService', GraphService);
 
 
-  GraphService.$inject = ['$translate', '$rootScope'];
+  GraphService.$inject = [];
 
-  function GraphService($translate, $rootScope) {
+  function GraphService() {
 
     var factory = {};
-    // var vm = this;
-    // //var minHealth;
-    // function performTranslation() {
-    //   $translate(['MIN_HEALTH']).then(function (translations) {
-    //     vm.minHealth = translations.MIN_HEALTH;
-    //   });
-    // }
 
-   // performTranslation();
-   //  $rootScope.$on('$translateChangeSuccess', function () {
-   //    performTranslation();
-   //  });
-
-    factory.setupHeightChart = function (heatlthHeight, childHeightH, childAgeH) {
-      //performTranslation();
+    factory.setupHeightChart = function () {
       return {
         chart: {
           type: 'scatterChart',

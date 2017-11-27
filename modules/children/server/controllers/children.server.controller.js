@@ -309,6 +309,9 @@ function getChildAndData(parmObj) {
 function writeBigFile(input) {
   return new Promise(function(resolve, reject) {
     var headerLine;
+    if (Object.keys(input).length === 0) {
+      reject(new Error('Nothing to display, sync and try again?'));
+    }
     headerLine = 'child Index,stake db name,screen Count,id,gender,firstName,lastName,birthdate,idGroup,mother,father,phone,address,city,ward,lds,screenDate,weight,height,age,ha,wa,wh,status\n';
     var outPut = headerLine += input.data;
     fs.writeFile('files/aggregated_list.csv', outPut, function (err) {
@@ -325,12 +328,16 @@ function writeBigFile(input) {
 function writeTheFile(input) {
   return new Promise(function(resolve, reject) {
     var headerLine;
+    if (Object.keys(input).length === 0) {
+      reject(new Error('Nothing to display, sync and try again?'));
+    }
     var currentMonth = moment().month();
     if (~input.filter.indexOf('preg') || ~input.filter.indexOf('nurs')) {
       headerLine = input.language === 'en' ? 'id,firstName,lastName,idGroup,phone,address,city,ward,lds,screenDate,other date\n' :
         'carné de identidad,nombre de pila,apellido,grupo de identificación,teléfono,dirección,ciudad,sala,miembro lds,fecha de la pantalla, otra fecha\n';
     } else if (~input.filter.indexOf('zscore')) {
-      headerLine = input.language === 'en' ? 'firstName,lastName,ward,birthdate,mother,age,sup type,' : 'nombre de pila,apellido,sala,Fecha de nacimiento,madre,anos,tipo de suplemento,' + moment.months(currentMonth % 12) + ',' + moment.months((currentMonth + 1) % 12) + ',' + moment.months((currentMonth + 2) % 12) + ',' + moment.months((currentMonth + 3) % 12) + ',' + moment.months((currentMonth + 4) % 12) + ',' + moment.months((currentMonth + 5) % 12) + '\n';
+      var columns = input.language === 'en' ? 'firstName,lastName,ward,birthdate,mother,age,sup type,' : 'nombre de pila,apellido,sala,Fecha de nacimiento,madre,anos,tipo de suplemento,';
+      headerLine =  columns + moment.months(currentMonth % 12) + ',' + moment.months((currentMonth + 1) % 12) + ',' + moment.months((currentMonth + 2) % 12) + ',' + moment.months((currentMonth + 3) % 12) + ',' + moment.months((currentMonth + 4) % 12) + ',' + moment.months((currentMonth + 5) % 12) + '\n';
     } else {
       headerLine = 'id,gender,firstName,lastName,birthdate,idGroup,mother,father,phone,address,city,ward,lds,screenDate,weight,height,age,ha,wa,wh,status\n';
     }
@@ -360,10 +367,14 @@ function collectAll(dbKids) {
         stakeDB = dbKids.listIn[0].stakeDB;
         filter = dbKids.listIn[0].filter;
         language = dbKids.listIn[0].language;
-      } else {
+      } else if (dbKids.missedList.length > 0) {
         stakeDB = dbKids.missedList[0].stakeDB;
         filter = dbKids.missedList[0].filter;
-        language = dbKids.listIn[0].language;
+        language = dbKids.missedList[0].language;
+      } else if (dbKids.riskList.length > 0) {
+        stakeDB = dbKids.riskList[0].stakeDB;
+        filter = dbKids.riskList[0].filter;
+        language = dbKids.riskList[0].language;
       }
     }
     if (dbKids.listIn.length > 0) {
