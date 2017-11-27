@@ -49,6 +49,23 @@
       PRIOR_ORGANGE_ENROLL: 'Enroll the caregiver in health lessons',
       PRIOR_ORGANGE_ENCOURAGE: 'Encourage the child to come to the next screening',
       PRIOR_GREEN_TELL: 'Tell caregiver the child is welcome to come to the next screening and they can attend the health lesson if they would like',
+      RESCREEN_ONE_MONTH: 'Rescreen in one month',
+      REVIEW_HEALTH_LESSONS: 'Review 5 areas of healthy behavior from the health lessons to see if the family can make improvements',
+
+      MIN_HEALTH_HEIGHT: 'Minimum Healthy Height',
+      CHILD_HEIGHT_GRAPH: 'Child Height (cm)',
+      CHILD_AGE_GRAPH: 'Child Age (months)',
+      HEIGHT_AGE_CURVE: 'Height/Age Curve',
+      CHILD_HEIGHT_KEY: 'Childs Height',
+
+      MIN_HEALTH_WEIGHT: 'Minimum Healthy Weight',
+      CHILD_WEIGHT_GRAPH: 'Child Weight (kg)',
+      WEIGHT_AGE_GRAPH: 'Weight/Age Curve',
+      CHILD_WEIGHT_KEY: 'Childs Weight',
+
+      MIN_HEALTH_WEIGHT_HEIGHT: 'Minimum Healthy Weight/Height',
+      WEIGHT_HEIGHT_GRAPH: 'Weight/Height Curve',
+      ZSCORE: 'Zscore',
 
       SCREENING_DONE_BY: 'Screening done by',
       ADD_SCREENING: 'Add Screening',
@@ -208,6 +225,22 @@
       PRIOR_ORGANGE_ENROLL: 'Inscribir al cuidador en las lecciones de salud',
       PRIOR_ORGANGE_ENCOURAGE: 'Anime al niño a que venga a la siguiente cribado',
       PRIOR_GREEN_TELL: 'Diga al cuidador que el niño es bienvenido a venir a la siguiente pantalla y ellos pueden asistir a la lección de salud si les gustaría',
+      RESCREEN_ONE_MONTH: 'Restablecer en un mes',
+      REVIEW_HEALTH_LESSONS: 'Repase 5 áreas de comportamiento saludable de las lecciones de salud para ver si la familia puede hacer mejoras',
+
+      MIN_HEALTH_HEIGHT: 'Altura Mínima Saludable',
+      CHILD_HEIGHT_GRAPH: 'Altura del niño (cm)',
+      CHILD_AGE_GRAPH: 'Edad del niño (meses)',
+      HEIGHT_AGE_CURVE: 'Curva Altura/Edad',
+      CHILD_HEIGHT_KEY: 'Altura del niño',
+
+      MIN_HEALTH_WEIGHT: 'Peso Mínimo Saludable',
+      CHILD_WEIGHT_GRAPH: 'Peso del niño (kg)',
+      WEIGHT_AGE_GRAPH: 'Curva peso/edad',
+      CHILD_WEIGHT_KEY: 'Peso del niño',
+
+      MIN_HEALTH_WEIGHT_HEIGHT: 'Peso/Altura Mínima Saludable',
+      WEIGHT_HEIGHT_GRAPH: 'Curva de peso/altura',
 
       SCREENING_DONE_BY: 'el cribado realizado por',
       REMOVE_CHILD_RECORD: 'Retire registro hijo',

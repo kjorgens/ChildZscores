@@ -890,6 +890,9 @@
           status = 'GREEN_CHILD';
           sugAction.push('PRIOR_GREEN_TELL');
         }
+      } else if (weightForLength < -3) {
+        sugAction.push('RESCREEN_ONE_MONTH');
+        sugAction.push('REVIEW_HEALTH_LESSONS');
       }
 
       callback({ ha: heightForAge, haStatus: haStatus,

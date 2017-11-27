@@ -25,17 +25,17 @@ module.exports = function (app) {
 
   // retrieve countries route
   router.route('/countries')
-    .get(children.getCountryList);
+      .get(children.getCountryList);
 
   // retrieve countries route
   router.route('/upload/:stakeDB')
-    .post(passport.authenticate('jwt', { session: false }), children.uploadCsv);
+      .post(passport.authenticate('jwt', { session: false }), children.uploadCsv);
 
   router.route('/updateviews/:stakeDB')
-    .get(passport.authenticate('jwt', { session: false }), children.checkUpdateViews);
+      .get(passport.authenticate('jwt', { session: false }), children.checkUpdateViews);
 
   router.route('/remoteDBList')
-    .get(childrenPolicy.isAllowed, children.listDbs);
+      .get(childrenPolicy.isAllowed, children.listDbs);
 
   app.use('/api/children', router);
 };
