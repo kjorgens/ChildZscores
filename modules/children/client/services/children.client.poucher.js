@@ -374,11 +374,7 @@
     }
 
     function statusColor(status) {
-      if (status.indexOf('sam') > -1) {
-        return 'drkGreyZscore';
-      } else if (status.indexOf('mam') > -1) {
-        return 'lightGreyZoneZscore';
-      } else if (status.indexOf('Acute') > -1) {
+      if (status.indexOf('Acute') > -1) {
         return 'redZoneZscore';
       } else if (status.indexOf('Micro') > -1) {
         return 'redZoneZscore';
