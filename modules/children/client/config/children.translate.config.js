@@ -307,7 +307,7 @@
       NEW_SCREENING: 'nueva Proyección',
       GENERATE_REPORT: 'Generar archivo CSV para descargar',
       GENERATE_SUPPLEMENT_REPORT: 'Generar informe de suplemento mensual',
-      GENERATE_WOMEN_REPORT: 'Generar mujer embarazada, Madre de Enfermería menusual',
+      GENERATE_WOMEN_REPORT: 'Generar mujeres embarazadas, informe de madres lactantes',
       DOWNLOAD_MSG: 'Descargar archivo {{reportName}}',
       MEMBER_STATUS_REQUIRED: 'el estado requiere LDS',
       UNKNOWN: 'desconocido',

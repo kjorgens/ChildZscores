@@ -390,7 +390,7 @@
 
     var factory = {};
 
-    factory.setupHeightChart = function () {
+    factory.setupHeightChart = function (heatlthHeight, childHeightH, childAgeH) {
       return {
         chart: {
           type: 'scatterChart',
