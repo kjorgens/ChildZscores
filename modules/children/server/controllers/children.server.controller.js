@@ -428,14 +428,14 @@ function addChildToLine(ownerInfo, screenInfo, sortField, stakeDB, filter, supTy
       resolve({ data: ownerInfo, dataLine: dataLine, stakeDB: stakeDB, sortField: sortField, filter: filter, atRisk: true, language: language });
     } else if (screenInfo === undefined || timeSinceLastScreen > 6) {
       if (timeSinceLastScreen === undefined || timeSinceLastScreen === 100) {
-        var message = language === 'en' ? 'no screenings: possible duplicate?\n' : 'sin proyecciones: posible duplicado?\n';
+        var messageProb = language === 'en' ? ' no screenings: possible duplicate?\n' : ' sin proyecciones: posible duplicado?\n';
         dataLine = ownerInfo.firstName + ',' + ownerInfo.lastName + ',' + ownerInfo.ward + ',' + moment(new Date(ownerInfo.birthDate)).format('YYYY MM DD') +
-          ',' + ownerInfo.mother + ',' + currentAge + ',' + message;
+          ',' + ownerInfo.mother + ',' + currentAge + ',' + messageProb;
       } else {
-        var message = language === 'en' ? '  months since last screening' + ', Child at risk, should come to next screening\n' :
+        var messageRisk = language === 'en' ? '  months since last screening' + ', Child at risk, should come to next screening\n' :
           'meses desde la última evaluación '+', Niño en riesgo, debería pasar a la siguiente evaluación\n';
         dataLine = ownerInfo.firstName + ',' + ownerInfo.lastName + ',' + ownerInfo.ward + ',' + moment(new Date(ownerInfo.birthDate)).format('YYYY MM DD') +
-          ',' + ownerInfo.mother + ',' + currentAge + ',' + timeSinceLastScreen + message;
+          ',' + ownerInfo.mother + ',' + currentAge + ',' + timeSinceLastScreen + messageRisk;
       }
       resolve({ data: ownerInfo, dataLine: dataLine, stakeDB: stakeDB, sortField: sortField, filter: filter, missedScreen: true, language: language });
     } else {
@@ -606,6 +606,21 @@ function sortEm(listIn) {
       listIn.splice(i, 1);
     }
   }
+  missedList.forEach(function(entry, index) {
+    if (entry.data[entry.sortField] === undefined) {
+      missedList[index].data[entry.sortField] = 'unknown';
+    }
+  });
+  atRiskList.forEach(function(entry, index) {
+    if (entry.data[entry.sortField] === undefined) {
+      atRiskList[index].data[entry.sortField] = 'unknown';
+    }
+  });
+  listIn.forEach(function(entry, index) {
+    if (entry.data[entry.sortField] === undefined) {
+      listIn[index].data[entry.sortField] = 'unknown';
+    }
+  });
   listIn.sort(function(x, y) {
     if (x.data[x.sortField].toUpperCase() < y.data[x.sortField].toUpperCase()) {
       return -1;

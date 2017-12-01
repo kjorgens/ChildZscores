@@ -64,13 +64,13 @@
     </h3>
     <h3>
         <div ng-if="!vm.reportReady">
-            <select id="filtersSelect" ng-model="vm.filterSelect">
-                <option value="">{{'CSV_FILTER' | translate}}</option>
-                <option value="all">{{'ALL_CHILDREN' | translate}}</option>
-                <!--<option value="zscore">{{'ZSCORE_UNDER_2' | translate}}</option>-->
-                <option value="pregnant">{{'SCREEN_PREGNANT_WOMEN' | translate}}</option>
-                <option value="nursing">{{'SCREEN_NURSING_MOTHERS' | translate}}</option>
-            </select><br>
+            <!--<select id="filtersSelect" ng-model="vm.filterSelect">-->
+                <!--<option value="">{{'CSV_FILTER' | translate}}</option>-->
+                <!--<option value="all">{{'ALL_CHILDREN' | translate}}</option>-->
+                <!--&lt;!&ndash;<option value="zscore">{{'ZSCORE_UNDER_2' | translate}}</option>&ndash;&gt;-->
+                <!--<option value="pregnant">{{'SCREEN_PREGNANT_WOMEN' | translate}}</option>-->
+                <!--<option value="nursing">{{'SCREEN_NURSING_MOTHERS' | translate}}</option>-->
+            <!--</select><br>-->
             <select id="sortSelect" ng-model="vm.sortSelect">
                 <option value="">{{'SORT_FIELD' | translate}}</option>
                 <option value="ward">{{'WARD' | translate}}</option>
@@ -79,10 +79,11 @@
                 <option value="lastName">{{'LAST_NAME' | translate}}</option>
                 <option value="memberStatus">{{'LDS_MEMBER' | translate}}</option>
             </select><br>
-            <a ng-click="vm.createReport(vm.filterSelect, vm.sortSelect)">
-                <span>{{'GENERATE_REPORT' | translate}} </span>
-                <i class="glyphicon glyphicon-share"></i>
-            </a><br><br>
+            <!--<a ng-click="vm.createReport(vm.filterSelect, vm.sortSelect)">-->
+                <!--<span>{{'GENERATE_REPORT' | translate}} </span>-->
+                <!--<i class="glyphicon glyphicon-share"></i>-->
+            <!--</a>-->
+          <!--<br><br>-->
             <a ng-click="vm.createReport('zscore', vm.sortSelect)">
                 <span>{{'GENERATE_SUPPLEMENT_REPORT' | translate}} </span>
                 <i class="glyphicon glyphicon-share"></i>
