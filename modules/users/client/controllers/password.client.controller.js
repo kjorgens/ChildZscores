@@ -30,15 +30,15 @@
         return false;
       }
 
-      $http.post('/api/auth/forgot', vm.credentials).success(function (response) {
+      $http.post('/api/auth/forgot', vm.credentials).then(function (response) {
         // Show user success message and clear form
         vm.credentials = null;
-        vm.success = response.message;
+        vm.success = response.data.message;
 
-      }).error(function (response) {
+      }).catch(function (response) {
         // Show user error message and clear form
         vm.credentials = null;
-        vm.error = response.message;
+        vm.error = response.data.message;
       });
     }
 
@@ -52,17 +52,17 @@
         return false;
       }
 
-      $http.post('/api/auth/reset/' + $stateParams.token, vm.passwordDetails).success(function (response) {
+      $http.post('/api/auth/reset/' + $stateParams.token, vm.passwordDetails).then(function (response) {
         // If successful show success message and clear form
         vm.passwordDetails = null;
 
         // Attach user profile
-        Authentication.login(response.user, response.token);
+        Authentication.login(response.data.user, response.data.token);
 
         // And redirect to the index page
         $location.path('/password/reset/success');
-      }).error(function (response) {
-        vm.error = response.message;
+      }).catch(function (response) {
+        vm.error = response.data.message;
       });
     }
   }

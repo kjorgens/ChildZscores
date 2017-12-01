@@ -31,7 +31,8 @@ module.exports = {
   // Lusca config
   csrf: {
     csrf: false,
-    csp: { /* Content Security Policy object */},
+    csp: false,
+    reportOnly: false,
     xframe: 'SAMEORIGIN',
     p3p: 'ABCDEF',
     hsts: {

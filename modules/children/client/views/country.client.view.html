@@ -3,7 +3,7 @@
         <img src="modules/core/client/img/brand/logo_small.png">
         <h1>
             <div ng-if="vm.onLine">
-                  <span><a ng-click="vm.refreshCountryList()">{{'SELECT_COUNTRY' | translate}} <i
+                  <span><a ng-click="vm.refreshCountryList()">{{'REFRESH_COUNTRY' | translate}} <i
                           class="glyphicon glyphicon-refresh"></i></a></span>
             </div>
             <h3>
@@ -12,7 +12,7 @@
                 </div>
             </h3>
             <div ng-if="!vm.onLine">
-                {{'SELECT_COUNTRY' | translate}}
+                {{'REFRESH_COUNTRY' | translate}}
             </div>
         </h1>
     </div>

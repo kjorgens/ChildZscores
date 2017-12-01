@@ -2,10 +2,10 @@
   'use strict';
 
   angular
-      .module('children.filterListService')
-      .factory('FilterService', FilterService);
+    .module('children.filterListService')
+    .factory('FilterService', FilterService);
 
-  FilterService.$inject = [ 'moment' ];
+  FilterService.$inject = ['moment'];
 
   function FilterService(moment) {
     var factory = {};
@@ -88,22 +88,22 @@
     }
 
     function checkAge (birthDate) {
-      return moment(new Date()).diff(moment(birthDate), 'months');
+      return moment(new Date()).diff(new Date(birthDate), 'months');
     }
 
     factory.matchName = function (list, currentChild) {
-      return list.find (function(child) {
+      return list.find(function(child) {
         return (~child.firstName.toUpperCase().indexOf(currentChild.firstName.toUpperCase()) &&
-            ~child.lastName.toUpperCase().indexOf(currentChild.lastName.toUpperCase()))
-      })
+            ~child.lastName.toUpperCase().indexOf(currentChild.lastName.toUpperCase()));
+      });
     };
 
     factory.matchNameAndAge = function(list, currentChild) {
-      return list.some (function(child) {
+      return list.some(function(child) {
         return (~child.firstName.toUpperCase().indexOf(currentChild.firstName.toUpperCase()) &&
-        ~child.lastName.toUpperCase().indexOf(currentChild.lastName.toUpperCase()) &&
-        child.monthAge == currentChild.monthAge)
-      })
+          ~child.lastName.toUpperCase().indexOf(currentChild.lastName.toUpperCase()) &&
+          child.monthAge === currentChild.monthAge);
+      });
     };
 
     factory.searchAndFilter = function (list, searchFilter, colorFilter, sortField) {
@@ -111,14 +111,15 @@
       currentSearch = searchFilter;
       currentColorFilter = colorFilter;
       var childId;
-      list.forEach (function (child) {
+      list.forEach(function (child) {
         var currentAge = checkAge(child.birthDate);
-        if(child.statusColor === undefined){
+        if (child.statusColor === undefined) {
           child.statusColor = '';
         }
         child.monthAge = currentAge;
-        if ((currentSearch === '' || child.firstName.toUpperCase().startsWith(currentSearch.toUpperCase()))
-            && (currentColorFilter === '' || ~child.statusColor.indexOf(currentColorFilter)) && (currentAge < 72 || currentAge > 180)) {
+        if ((currentSearch === '' || child.firstName.toUpperCase().startsWith(currentSearch.toUpperCase())) &&
+          (currentColorFilter === '' || ~child.statusColor.indexOf(currentColorFilter)) &&
+          (currentAge < 72 || currentAge > 180)) {
           child.display = true;
           child.backGroundColor = child.statusColor + 'Background';
           displayCount++;

@@ -24,13 +24,13 @@
         return false;
       }
 
-      $http.post('/api/users/password', vm.passwordDetails).success(function (response) {
+      $http.post('/api/users/password', vm.passwordDetails).then(function (response) {
         // If successful show success message and clear form
         $scope.$broadcast('show-errors-reset', 'vm.passwordForm');
         vm.success = true;
         vm.passwordDetails = null;
-      }).error(function (response) {
-        vm.error = response.message;
+      }).catch(function (response) {
+        vm.error = response.data.message;
       });
     }
   }

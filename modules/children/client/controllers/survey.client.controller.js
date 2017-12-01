@@ -5,13 +5,14 @@
     .module('children')
     .controller('SurveyController', SurveyController);
 
-  SurveyController.$inject = ['$rootScope', '$scope', '$state', '$timeout', '$translate', '$window', 'moment',
+  SurveyController.$inject = ['$rootScope', '$scope', '$state', '$translate', '$window', 'moment',
     'surveyResolve', 'Authentication', 'ZScores', 'PouchService', 'ModalService'];
 
-  function SurveyController($rootScope, $scope, $state, $timeout, $translate, $window, moment,
+  function SurveyController($rootScope, $scope, $state, $translate, $window, moment,
      survey, Authentication, ZScores, PouchService, ModalService) {
     var vm = this;
     $translate.use($rootScope.SelectedLanguage);
+    vm.initialSurvey = false;
     vm.survey = survey;
 
     function checkAllFieldsValid() {
@@ -31,6 +32,19 @@
         vm.allFieldsValid = true;
         vm.invalidFields = true;
       }
+    }
+
+    function getSurveys(surveys) {
+      if( surveys.docs.length === 0) {
+        vm.initialSurvey = true;
+      } else {
+        vm.initialSurvey = false;
+      }
+    }
+
+
+    function surveyErrors(error) {
+      vm.surveyError = error;
     }
 
     vm.goBack = function(){
@@ -53,7 +67,7 @@
       vm.childWeightIsValid = undefined;
       vm.surveyDate = new Date();
     }
-
+    PouchService.getSurveys($state.params.childId, getSurveys, surveyErrors);
     if (navigator.geolocation) {
       console.log('Geolocation is supported!');
     } else {
@@ -130,9 +144,9 @@
       });
     }
 
-    function surveyErrors(error) {
-      vm.surveyError = error;
-    }
+    // function surveyErrors(error) {
+    //   vm.surveyError = error;
+    // }
 
     vm.zScoreGetter = ZScores.getMethod;
 
@@ -148,7 +162,7 @@
         } else {
           vm.childHeightIsValid = true;
           if (vm.ageIsValid && vm.weightIsValid) {
-            vm.zScoreGetter(vm.survey.gender, vm.ageInMonths || vm.monthAge, vm.survey.height, vm.survey.weight, function (zscore) {
+            vm.zScoreGetter(vm.survey.gender, vm.ageInMonths || vm.monthAge, vm.survey.height, vm.survey.weight, vm.initialSurvey, function (zscore) {
               vm.survey.zScore = zscore;
             });
           }
@@ -182,7 +196,7 @@
         } else {
           vm.childWeightIsValid = true;
           if (vm.ageIsValid && vm.heightIsValid) {
-            vm.zScoreGetter(vm.survey.gender, vm.ageInMonths || vm.monthAge, vm.survey.height, vm.survey.weight, function (zscore) {
+            vm.zScoreGetter(vm.survey.gender, vm.ageInMonths || vm.monthAge, vm.survey.height, vm.survey.weight, vm.initialSurvey, function (zscore) {
               vm.survey.zScore = zscore;
             });
           }
@@ -268,7 +282,7 @@
       }
 
       if (vm.survey._id) {
-        vm.zScoreGetter(vm.child.gender, vm.survey.monthAge, vm.survey.height, vm.survey.weight, function (zscore) {
+        vm.zScoreGetter(vm.child.gender, vm.survey.monthAge, vm.survey.height, vm.survey.weight, vm.initialSurvey, function (zscore) {
           vm.zScore = zscore;
         });
         vm.survey.zScore = vm.zScore;
@@ -278,7 +292,7 @@
         vm.survey._id = undefined;
         var bday = new Date(vm.child.birthDate);
         var zScore = {};
-        vm.zScoreGetter(vm.child.gender, vm.survey.monthAge, vm.survey.height, vm.survey.weight, function (zscore) {
+        vm.zScoreGetter(vm.child.gender, vm.survey.monthAge, vm.survey.height, vm.survey.weight, vm.initialSurvey, function (zscore) {
           vm.zScore = zscore;
         });
 

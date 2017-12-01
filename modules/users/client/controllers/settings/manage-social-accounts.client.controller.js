@@ -33,12 +33,12 @@
         params: {
           provider: provider
         }
-      }).success(function (response) {
+      }).then(function (response) {
         // If successful show success message and clear form
         vm.success = true;
         vm.user = Authentication.user = response;
-      }).error(function (response) {
-        vm.error = response.message;
+      }).catch(function (response) {
+        vm.error = response.data.message;
       });
     }
   }

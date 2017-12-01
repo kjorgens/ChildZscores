@@ -8,20 +8,30 @@
       .module('children')
       .controller('ChildrenSyncController', ChildrenSyncController);
 
-  ChildrenSyncController.$inject = ['$rootScope', '$window', '$timeout', '$scope', '$state', '$stateParams', 'ChildrenReport',
+  ChildrenSyncController.$inject = ['$rootScope', '$window', '$timeout', '$state', '$stateParams', 'ChildrenReport', 'FilterService',
     'Authentication', 'ChildrenGetSync', 'usSpinnerService', 'PouchService', 'FileUploader', 'ModalService', 'ChildrenViews'];
 
-  function ChildrenSyncController($rootScope, $window, $timeout, $scope, $state, $stateParams, ChildrenReport,
+  function ChildrenSyncController($rootScope, $window, $timeout, $state, $stateParams, ChildrenReport, FilterService,
     Authentication, ChildrenGetSync, usSpinnerService, PouchService, FileUploader, ModalService, ChildrenViews) {
     var vm = this;
+    vm.countryCode = $stateParams.countryCode;
+    vm.countryName = $stateParams.countryName;
     vm.user = Authentication.user;
     vm.userIsAdmin = false;
     vm.goBack = goBack;
-    vm.user.roles.forEach(function(role){
-      if (role.indexOf('admin') > -1){
-        vm.userIsAdmin = true;
-      }
-    });
+
+    if (vm.user === null) {
+      reportError('Login required for syncing', 'Please log in', false);
+      // $window.history.pushState();
+      $state.go('authentication.signin');
+    } else {
+      vm.user.roles.forEach(function(role) {
+        if (role.indexOf('admin') > -1) {
+          vm.userIsAdmin = true;
+        }
+      });
+    }
+
     vm.uploadExcelCsv = uploadExcelCsv;
     vm.cancelUpload = cancelUpload;
     // Create file uploader instance
@@ -134,7 +144,7 @@
     // vm.filterSelect = 'All Children';
     vm.authentication = Authentication;
 
-    //vm.selectedStake = $stateParams.stakeName;
+    // vm.selectedStake = $stateParams.stakeName;
     //   vm.selectedCountryObject = sessionStorage.getItem('selectedCountryObject');
     vm.createReport = createReport;
     vm.syncUpstream = syncUpstream;
@@ -224,37 +234,37 @@
     function returnReport(input) {
       vm.stopSpin();
       vm.reportReady = true;
-      vm.reportToDownload = '/' + input.message;
-      vm.reportName = vm.stakeDB + '.csv';
+      vm.reportToDownload = '/files/' + input.message;
+      vm.reportName = input.message;
       vm.reportFileName = { reportName: vm.reportName };
       console.log(input);
     }
 
-    function genReport(input){
+    function genReport(input) {
       ChildrenReport.get(input, returnReport, getCsvError);
     }
 
     function getCsvError(error) {
       vm.stopSpin();
       console.log(error.data.message);
-      vm.reportError('CSV creation error', error.data.name + ' >>> ' + error.data.message, true);
+      vm.reportError('CSV creation error', error.data.name + ': ' + error.data.message, false);
 //      return ModalService.infoModal('some dumb error' + ' :\n', error + (notifyKarl ? '\n Please contact kjorgens@yahoo.com' : ''));
 //      vm.reportError('Download csv error', error.data.error.message, error.data.error.name.indexOf('Empty database') < 0);
     }
-    function createReport(filter, sortField) {
+    function createReport(filter, sortField, languageId) {
       vm.startSpin();
       if (filter === undefined) {
         filter = 'all';
       }
       if (sortField === undefined) {
-        sortField = 'lastName';
+        sortField = 'firstName';
       }
-      var sortParam = { stakeDB: vm.stakeDB, filter: filter, sortField: sortField };
+      var sortParam = { stakeDB: vm.stakeDB, filter: filter, sortField: sortField, language: $rootScope.SelectedLanguage };
  //     ChildrenViews.get(sortParam, genReport(sortParam), getCsvError);
       ChildrenViews.updateViews(vm.stakeDB).then(genReport(sortParam), getCsvError);
     }
 
-    function viewUpdateComplete(){
+    function viewUpdateComplete() {
       console.log('couch view update complete');
         // Clear messages
         vm.success = vm.error = null;
@@ -263,7 +273,7 @@
         vm.uploader.uploadAll();
      }
 
-    function viewUpdateError(err){
+    function viewUpdateError(err) {
       vm.stopSpin();
       console.log('couch view update error');
       vm.reportError('couch view update error', err.data.message, true);
@@ -271,12 +281,14 @@
 
     function uploadExcelCsv() {
       vm.startSpin();
-      ChildrenViews.updateViews(vm.stakeDB).then( viewUpdateComplete, viewUpdateError);
+      ChildrenViews.updateViews(vm.stakeDB).then(viewUpdateComplete, viewUpdateError);
     }
 
-    vm.reportError = function (title, error, notifyKarl) {
+    function reportError(title, error, notifyKarl) {
       return ModalService.infoModal(title + ' :\n', error + (notifyKarl ? '\n Please contact kjorgens@yahoo.com' : ''));
-    };
+    }
+
+    vm.reportError = reportError;
 //    createReport();
   }
 }());

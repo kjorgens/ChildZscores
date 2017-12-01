@@ -67,7 +67,7 @@
         </div>
     </div>
     <div class="list-group">
-        <a ng-repeat="mother in vm.motherList" ui-sref="children.editMother({ motherId: mother._id, stakeDB: vm.stakeDB, stakeName: vm.stakeName, screenType: vm.screenType })" ng-if="mother.display === true" class="list-group-item pregnantWoman">
+        <a ng-repeat="mother in vm.motherList" ui-sref="children.editMother({ motherId: mother._id, stakeDB: vm.stakeDB, stakeName: vm.stakeName, screenType: vm.screenType })" class="list-group-item pregnantWoman">
             <small class="list-group-item-text">
                 <h3><span ng-bind="mother.firstName"></span>
                     <span ng-bind="mother.lastName"></span></h3>

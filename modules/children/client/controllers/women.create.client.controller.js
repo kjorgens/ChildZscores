@@ -5,10 +5,10 @@
       .module('children')
       .controller('WomenCreateController', WomenCreateController);
 
-  WomenCreateController.$inject = ['$rootScope', '$window', '$scope', '$state', '$stateParams', '$translate', 'FilterService',
+  WomenCreateController.$inject = ['$rootScope', '$scope', '$state', '$stateParams', '$translate', 'FilterService',
     'moment', 'MotherResolve', 'Authentication', 'PouchService', 'ModalService'];
 
-  function WomenCreateController($rootScope, $window, $scope, $state, $stateParams, $translate, FilterService,
+  function WomenCreateController($rootScope, $scope, $state, $stateParams, $translate, FilterService,
     moment, mother, Authentication, PouchService, ModalService) {
     var vm = this;
     vm.nursingMother = false;

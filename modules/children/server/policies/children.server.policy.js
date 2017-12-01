@@ -36,7 +36,7 @@ exports.invokeRolesPolicies = function () {
       resources: '/stakes',
       permissions: ['get']
     }, {
-      resources: '/report/:stakeDB/:filter/:sortField',
+      resources: '/report/:stakeDB/:filter/:sortField/:language',
       permissions: ['*']
     }]
   }, {
@@ -96,7 +96,7 @@ exports.invokeRolesPolicies = function () {
       resources: '/sync',
       permissions: ['get']
     }, {
-      resources: '/report/:stakeDB/:filter/:sortField',
+      resources: '/report/:stakeDB/:filter/:sortField/:language',
       permissions: ['get']
     },
     {

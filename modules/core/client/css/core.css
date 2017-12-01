@@ -123,6 +123,12 @@ a:hover .header-profile-image {
 .normalZscore {
   color: green;
 }
+.lightGreyZoneZscore {
+    color: #D3D3D3
+}
+.drkGreyZscore {
+    color: #2F4F4F
+}
 
 .normalZscoreBackground {
     background-color: #e3f9e6;
@@ -134,10 +140,13 @@ a:hover .header-profile-image {
     background-color: #ffebca;
 }
 .dangerZscore {
-  background-color: black;
+  background-color: #D3D3D3;
   color: white;
 }
-
+.moderateRedZoneZscore {
+  background-color: #2F4F4F;
+  color: white;
+}
 .stakeSelector{
     background-color: #f9f3b2;
 }

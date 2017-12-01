@@ -13,15 +13,15 @@ module.exports = function (app) {
 
   // sync db routes
   router.route('/sync')
-      .get(passport.authenticate('jwt', { session: false }), childrenPolicy.isAllowed, children.getSyncURL);
+    .get(passport.authenticate('jwt', { session: false }), childrenPolicy.isAllowed, children.getSyncURL);
 
   // create .csv report file
-  router.route('/report/:stakeDB/:filter/:sortField')
-      .get(passport.authenticate('jwt', { session: false }), childrenPolicy.isAllowed, children.createCSVFromDB);
+  router.route('/report/:stakeDB/:filter/:sortField/:language')
+    .get(passport.authenticate('jwt', { session: false }), childrenPolicy.isAllowed, children.createCSVFromDB);
 
   // retrieve stakes route
   router.route('/stakes')
-      .get(children.getCountryList);
+    .get(children.getCountryList);
 
   // retrieve countries route
   router.route('/countries')

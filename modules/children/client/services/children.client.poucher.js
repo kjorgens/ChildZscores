@@ -6,9 +6,9 @@
     .module('children.pouchService')
     .factory('PouchService', PouchService);
 
-  PouchService.$inject = ['$q', 'pouchDB', 'uuid4', 'moment'];
+  PouchService.$inject = ['$q', 'pouchDB', 'moment'];
 
-  function PouchService($q, pouchDB, uuid4, moment) {
+  function PouchService($q, pouchDB, moment) {
     var factory = {};
     var database;
     var countryDataBase;
@@ -16,16 +16,16 @@
     var localDbList;
     var currentDbName;
     var pouchIndexes = [
-      'surveyDate', 'firstName', 'zscoreStatus', 'lastName', 'owner',  'ward',
-       'deliveryDate', 'childsBirthDate', 'lastScreening'
+      'surveyDate', 'firstName', 'zscoreStatus', 'lastName', 'owner', 'ward',
+      'deliveryDate', 'childsBirthDate', 'lastScreening'
     ];
     factory.createDatabase = function (dbName, queryFunction, queryParams) {
-      if(database && ~database.name.indexOf(dbName)){
+      if (database && ~database.name.indexOf(dbName)) {
         return queryFunction(queryParams);
       } else {
         currentDbName = dbName;
-        database = pouchDB (dbName);
-        return (factory.ddocFilter ().then (factory.initLocalDb ()).then (queryFunction));
+        database = pouchDB(dbName);
+        return (factory.ddocFilter().then(factory.initLocalDb()).then(queryFunction));
       }
     };
 
@@ -40,35 +40,35 @@
     };
 
     factory.ddocFilter = function() {
-      return  $q(function(resolve,reject) {
+      return $q(function(resolve, reject) {
         database.get('_design/filter_ddocs')
-            .then(function (response) {
-              resolve('filter found');
-            }).catch(function(err) {
-              database.put(
+          .then(function (response) {
+            resolve('filter found');
+          }).catch(function(err) {
+            database.put(
               {
                 _id: '_design/filter_ddocs',
                 filters:
-                    {
-                      'ddocs': 'function(doc, req) {if(doc._id[0] != \'_\') {return true} else {return false}  }'
-                    }
+                {
+                  'ddocs': 'function(doc, req) {if(doc._id[0] != \'_\') {return true} else {return false}  }'
+                }
               }).then(function(response) {
-            console.log('filter created');
-            resolve('filter created');
-          }).catch(function(err) {
-            console.log(err.message);
-            reject(err.message);
+                console.log('filter created');
+                resolve('filter created');
+              }).catch(function(err) {
+                console.log(err.message);
+                reject(err.message);
+              });
           });
-        });
-      })
+      });
     };
 
     factory.initLocalDb = function() {
-       var indexFunctions = [];
-       angular.forEach (pouchIndexes, function (index) {
-         indexFunctions.push (database.createIndex ({index: {fields: [index]}}));
-       });
-       return ($q.all(indexFunctions));
+      var indexFunctions = [];
+      angular.forEach(pouchIndexes, function (index) {
+        indexFunctions.push(database.createIndex({ index: { fields: [index] } }));
+      });
+      return ($q.all(indexFunctions));
     };
 
     factory.putStakesLocal = function (countryObj, callback, errCallback) {
@@ -79,17 +79,15 @@
             newObj._rev = response._rev;
             newObj.countries = countryObj.countries;
             countryDataBase.put(newObj)
-                .then(function (response) {
-                  // Do something with the response
-                  callback(response);
-                })
-                .catch(function (error) {
+              .then(function (response) {
+                // Do something with the response
+                callback(response);
+              }).catch(function (error) {
                   // Do something with the error
-                  errCallback(error);
-                })
-                .finally(function () {
+                errCallback(error);
+              }).finally(function () {
                   // Do something when everything is done
-                });
+              });
           })
           .catch(function (error) {
             newObj._id = 'liahona_kids_countries_stakes';
@@ -110,19 +108,22 @@
     };
 
     factory.getCountriesLocal = function (callback, errCallback) {
+      if (countryDataBase === undefined) {
+        countryDataBase = pouchDB('country_list');
+      }
       countryDataBase.get('liahona_kids_countries_stakes')
-      // countryDataBase.allDocs({ include_docs: true, attachments: true })
       .then(function (response) {
-      // Do something with the response
         callback(response);
       })
       .catch(function(error) {
-      // Do something with the error
         errCallback(error);
       });
     };
 
     factory.getWardList = function (countryName, stakeName, callback, errCallback) {
+      if (countryDataBase === undefined) {
+        countryDataBase = pouchDB('country_list');
+      }
       countryDataBase.get('liahona_kids_countries_stakes')
           .then(function (response) {
             response.countries.forEach(function(country) {
@@ -152,9 +153,9 @@
     factory.createIndex = function (indexName, callback, errCallback) {
       return database.createIndex(
           { index:
-              {
-                fields: [indexName]
-              }
+          {
+            fields: [indexName]
+          }
           }
       );
     };
@@ -184,10 +185,10 @@
     };
 
     factory.findChildren = function () {
-        var params = {
-          selector: {lastScreening: {$gt: null}},
+      var params = {
+          selector: { lastScreening: { $gt: null } },
         };
-        return database.find (params);
+      return database.find(params);
     };
 
     factory.findPregnantWomen = function () {
@@ -351,10 +352,12 @@
     };
 
     function calculateStatus(screeningObj) {
-      return new Promise(function(resolve, reject) {
-        var zscoreStatus = '';
-        if (screeningObj.zScore.wl < -2) {
-          zscoreStatus = 'Acute: supplements required';
+      // return new Promise(function(resolve, reject) {
+      var zscoreStatus = '';
+      if (screeningObj.zScore.wl > -3) {
+          zscoreStatus = 'Acute: sam supplements required';
+        } else if (screeningObj.zScore.wl < -2 && screeningObj.zScore.wl > -3) {
+          zscoreStatus = 'Acute: mam supplements required';
         } else if ((screeningObj.zScore.ha < -2 || screeningObj.zScore.wa < -2) && screeningObj.monthAge > 6 && screeningObj.monthAge < 36) {
           zscoreStatus = 'Acute: supplements required';
         } else if ((screeningObj.zScore.ha < -2 || screeningObj.zScore.wa < -2) && screeningObj.monthAge > 36 && screeningObj.monthAge < 48) {
@@ -366,8 +369,8 @@
         } else {
           zscoreStatus = 'Normal';
         }
-        resolve({ screeningObj: screeningObj, zscoreStatus: zscoreStatus });
-      });
+      return ({ screeningObj: screeningObj, zscoreStatus: zscoreStatus });
+      // });
     }
 
     function statusColor(status) {
@@ -413,7 +416,7 @@
       });
     }
 
-    factory.calcSurveyStatus = function(screeningObj){
+    factory.calcSurveyStatus = function(screeningObj) {
       var zscoreStatus = '';
 
       if (screeningObj.zScore.wl < -2) {
@@ -432,11 +435,11 @@
       return zscoreStatus;
     };
 
-    factory.statusColor = function(status){
+    factory.statusColor = function(status) {
       return statusColor(status);
     };
 
-    factory.statusColorBackground = function(status){
+    factory.statusColorBackground = function(status) {
       return statusColorBackground(status);
     };
 
