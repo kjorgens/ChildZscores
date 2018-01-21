@@ -184,12 +184,12 @@ function listAllChildren(childScreenList) {
   var linesToAdd = [];
   var sortedScreenList = [];
   var noScreenings = 0;
+
   var supType = 'none';
   var tooOld = 0;
   var timeSinceLastScreen;
 
   childScreenList.forEach(function (dataSet) {
-
     if (dataSet[0].data.total_rows > 0) {
       dataSet[0].data.rows.forEach(function (childEntry) {
         var currentAge = moment().diff(moment(new Date(childEntry.key.birthDate)), 'months');
