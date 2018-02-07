@@ -184,11 +184,12 @@ function listAllChildren(childScreenList) {
   var linesToAdd = [];
   var sortedScreenList = [];
   var noScreenings = 0;
-  var supType;
+  var supType = 'none';
   var tooOld = 0;
   var timeSinceLastScreen;
 
   childScreenList.forEach(function (dataSet) {
+
     if (dataSet[0].data.total_rows > 0) {
       dataSet[0].data.rows.forEach(function (childEntry) {
         var currentAge = moment().diff(moment(new Date(childEntry.key.birthDate)), 'months');
@@ -198,27 +199,32 @@ function listAllChildren(childScreenList) {
             if (sortedScreenList.length === 0) {
               noScreenings++;
               linesToAdd.push(addChildToLine(childEntry.key, sortedScreenList[0], dataSet[0].parms.sortField, dataSet[0].parms.stakeDB, dataSet[0].parms.filter, ' ', 100, dataSet[0].language));
-            } else if ((sortedScreenList[0].zScore.ha < -2 || sortedScreenList[0].zScore.wa < -2)) {
-              supType = 'sup';
-              if (currentAge > 36 && currentAge <= 60) {
-                supType = 'mic';
-              }
-              if (sortedScreenList[0].zScore.wl < -2) {
-                supType = 'MAM';
-                if (sortedScreenList[0].zScore.wl < -3) {
-                  supType = 'SAM';
+            } else {
+              supType = 'none';
+              sortedScreenList.forEach(function(screening, index) {
+                // if(childEntry.key.firstName.indexOf('Fernanda Ara') > -1) {
+                //   console.log('Found it');
+                // }
+                if ((screening.zScore.ha > -2 && screening.zScore.ha <-1) || (screening.zScore.wa > -2 && screening.zScore.wa < -1)) {
+                  supType = 'risk';
+                } else if ((screening.zScore.ha < -2 || screening.zScore.wa < -2)) {
+                  supType = 'sup';
+                  if (currentAge > 36 && currentAge <= 60) {
+                    supType = 'mic';
+                  }
+                  if (screening.zScore.wl < -2) {
+                    supType = 'MAM';
+                    if (screening.zScore.wl < -3) {
+                      supType = 'SAM';
+                    }
+                  }
                 }
-              }
+              });
               timeSinceLastScreen = moment().diff(moment(new Date(sortedScreenList[0].surveyDate)), 'months');
-              linesToAdd.push(addChildToLine(childEntry.key, sortedScreenList[0], dataSet[0].parms.sortField, dataSet[0].parms.stakeDB,
-                dataSet[0].parms.filter, supType, timeSinceLastScreen, dataSet[0].parms.language));
-            } else if ((sortedScreenList[0].zScore.ha > -2 && sortedScreenList[0].zScore.ha < -1) ||
-              (sortedScreenList[0].zScore.wa > -2 && sortedScreenList[0].zScore.wa < -1)) {
-              timeSinceLastScreen = moment().diff(moment(new Date(sortedScreenList[0].surveyDate)), 'months');
-              linesToAdd.push(addChildToLine(childEntry.key, sortedScreenList[0], dataSet[0].parms.sortField, dataSet[0].parms.stakeDB,
-                dataSet[0].parms.filter, 'risk', timeSinceLastScreen, dataSet[0].parms.language));
+                linesToAdd.push(addChildToLine(childEntry.key, sortedScreenList[0], dataSet[0].parms.sortField, dataSet[0].parms.stakeDB,
+                  dataSet[0].parms.filter, supType, timeSinceLastScreen, dataSet[0].parms.language));
+               }
             }
-          }
         } else {
           if (dataSet[1].data.total_rows > 0) {
             sortedScreenList = getScreeningsList(childEntry.id, dataSet[1].data.rows);
@@ -359,7 +365,7 @@ function collectAll(dbKids) {
     var stakeDB;
     var filter;
     var language;
-    if (dbKids.listIn.length === 0 && dbKids.missedList.length === 0 && dbKids.riskList.length === 0) {
+    if (dbKids.listIn.length === 0 && dbKids.missedList.length === 0 && dbKids.riskList.length === 0 && dbKids.normalList.length === 0) {
       console.log('nothing to write');
       resolve({});
     } else {
@@ -375,6 +381,10 @@ function collectAll(dbKids) {
         stakeDB = dbKids.riskList[0].stakeDB;
         filter = dbKids.riskList[0].filter;
         language = dbKids.riskList[0].language;
+      } else if (dbKids.normalList.length > 0) {
+        stakeDB = dbKids.normalList[0].stakeDB;
+        filter = dbKids.normalList[0].filter;
+        language = dbKids.normalList[0].language;
       }
     }
     if (dbKids.listIn.length > 0) {
@@ -394,6 +404,11 @@ function collectAll(dbKids) {
     }
     if (dbKids.possibleProblems.length > 0) {
       dbKids.possibleProblems.forEach(function(prob) {
+        writeStack += prob.dataLine;
+      });
+    }
+    if (dbKids.normalList.length > 0) {
+      dbKids.normalList.forEach(function(prob) {
         writeStack += prob.dataLine;
       });
     }
@@ -422,10 +437,16 @@ function addChildToLine(ownerInfo, screenInfo, sortField, stakeDB, filter, supTy
     var currentAge = moment().diff(moment(new Date(ownerInfo.birthDate)), 'months');
     if (supType.indexOf('risk') > -1) {
       var message = language === 'en' ? ' months since last screening, Possible risk, please come to next screening\n' :
-        'meses desde la última evaluación, riesgo posible, venga a la siguiente evaluación\n';
+        ' meses desde la última evaluación, riesgo posible, venga a la siguiente evaluación\n';
       dataLine = ownerInfo.firstName + ',' + ownerInfo.lastName + ',' + ownerInfo.ward + ',' + moment(new Date(ownerInfo.birthDate)).format('YYYY MM DD') +
         ',' + ownerInfo.mother + ',' + currentAge + ',' + timeSinceLastScreen + message;
       resolve({ data: ownerInfo, dataLine: dataLine, stakeDB: stakeDB, sortField: sortField, filter: filter, atRisk: true, language: language });
+    } else if (supType.indexOf('none') > -1) {
+      var message = language === 'en' ? ' months since last screening, normal risk, please come to next screening\n' :
+        ' meses desde la última evaluación, riesgo normal, venga a la siguiente evaluación\n';
+      dataLine = ownerInfo.firstName + ',' + ownerInfo.lastName + ',' + ownerInfo.ward + ',' + moment(new Date(ownerInfo.birthDate)).format('YYYY MM DD') +
+        ',' + ownerInfo.mother + ',' + currentAge + ',' + timeSinceLastScreen + message;
+      resolve({ data: ownerInfo, dataLine: dataLine, stakeDB: stakeDB, sortField: sortField, filter: filter, normalZscore: true, language: language });
     } else if (screenInfo === undefined || timeSinceLastScreen > 6) {
       if (timeSinceLastScreen === undefined || timeSinceLastScreen === 100) {
         var messageProb = language === 'en' ? ' no screenings: possible duplicate?\n' : ' sin proyecciones: posible duplicado?\n';
@@ -433,7 +454,7 @@ function addChildToLine(ownerInfo, screenInfo, sortField, stakeDB, filter, supTy
           ',' + ownerInfo.mother + ',' + currentAge + ',' + messageProb;
       } else {
         var messageRisk = language === 'en' ? '  months since last screening' + ', Child at risk, should come to next screening\n' :
-          'meses desde la última evaluación '+', Niño en riesgo, debería pasar a la siguiente evaluación\n';
+          ' meses desde la última evaluación '+', Niño en riesgo, debería pasar a la siguiente evaluación\n';
         dataLine = ownerInfo.firstName + ',' + ownerInfo.lastName + ',' + ownerInfo.ward + ',' + moment(new Date(ownerInfo.birthDate)).format('YYYY MM DD') +
           ',' + ownerInfo.mother + ',' + currentAge + ',' + timeSinceLastScreen + messageRisk;
       }
@@ -591,6 +612,7 @@ function sortEm(listIn) {
   var missedList = [];
   var atRiskList = [];
   var possibleProb = [];
+  var normalList = [];
   for (var i = listIn.length - 1; i >= 0; i--) {
     if (listIn[i] === undefined) {
       listIn.splice(i, 1);
@@ -603,6 +625,9 @@ function sortEm(listIn) {
       listIn.splice(i, 1);
     } else if (listIn[i].atRisk) {
       atRiskList.push(listIn[i]);
+      listIn.splice(i, 1);
+    } else if (listIn[i].normalZscore) {
+      normalList.push(listIn[i]);
       listIn.splice(i, 1);
     }
   }
@@ -619,6 +644,11 @@ function sortEm(listIn) {
   listIn.forEach(function(entry, index) {
     if (entry.data[entry.sortField] === undefined) {
       listIn[index].data[entry.sortField] = 'unknown';
+    }
+  });
+  normalList.forEach(function(entry, index) {
+    if (entry.data[entry.sortField] === undefined) {
+      normalList[index].data[entry.sortField] = 'unknown';
     }
   });
   listIn.sort(function(x, y) {
@@ -657,7 +687,36 @@ function sortEm(listIn) {
     }
     return 0;
   });
-  return { listIn: listIn, missedList: missedList, riskList: atRiskList, possibleProblems: possibleProb };
+  normalList.sort(function(x, y) {
+    if (x.data[x.sortField].toUpperCase() < y.data[x.sortField].toUpperCase()) {
+      return -1;
+    }
+    if (x.data[x.sortField].toUpperCase() > y.data[x.sortField].toUpperCase()) {
+      return 1;
+    }
+    if (x.data[x.sortField].toUpperCase() === y.data[x.sortField].toUpperCase()) {
+      return 0;
+    }
+    return 0;
+  });
+  normalList.sort(firstNameSort);
+  missedList.sort(firstNameSort);
+  atRiskList.sort(firstNameSort);
+  possibleProb.sort(firstNameSort);
+  return { listIn: listIn, missedList: missedList, riskList: atRiskList, possibleProblems: possibleProb, normalList: normalList};
+}
+
+function firstNameSort(x, y) {
+  if (x.data.firstName.toUpperCase() < y.data.firstName.toUpperCase()) {
+    return -1;
+  }
+  if (x.data.firstName.toUpperCase() > y.data.firstName.toUpperCase()) {
+    return 1;
+  }
+  if (x.data.firstName.toUpperCase() === y.data.firstName.toUpperCase()) {
+    return 0;
+  }
+  return 0;
 }
 
 function dbListToFile(parmObj) {
