@@ -58,9 +58,10 @@ gulp.task('nodemon', function () {
 gulp.task('zipit', function() {
   return gulp.src([
     'package.json',
-    '.ebextensions/01-nginx.config',
+    '.ebextensions/*',
     'server.js',
     'README.md',
+    '.npmrc',
     'config/**',
     'modules/**',
     'public/dist/**',

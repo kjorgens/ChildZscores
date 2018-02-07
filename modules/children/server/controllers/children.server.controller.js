@@ -184,7 +184,6 @@ function listAllChildren(childScreenList) {
   var linesToAdd = [];
   var sortedScreenList = [];
   var noScreenings = 0;
-
   var supType = 'none';
   var tooOld = 0;
   var timeSinceLastScreen;
