@@ -1,4 +1,5 @@
-[![MEAN.JS Logo](http://meanjs.org/img/logo-small.png)](http://meanjs.org/)
+[![test status](http://db83a600.ngrok.io/api/badges/makebadge/testfile.svg?badgeName=A%20Long%20Name&status=success&color=blue)](https:/devdash.vivintsolar.com)
+
 
 [![Gitter](https://badges.gitter.im/Join Chat.svg)](https://gitter.im/meanjs/mean?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Build Status](https://travis-ci.org/meanjs/mean.svg?branch=master)](https://travis-ci.org/meanjs/mean)
