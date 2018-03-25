@@ -1,11 +1,13 @@
-web:
-  image: kjorgensen454/zscorekids
-  cpu_shares: 100
-  mem_limit: 262144000
-  links:
-    - db
-    - couch
-  ports:
+version: '3'
+services:
+  web:
+    image: kjorgensen454/zscorekids
+    cpu_shares: 100
+    mem_limit: 262144000
+    links:
+      - db
+      - couch
+    ports:
     - "3000:80"
   environment:
     NODE_ENV: production

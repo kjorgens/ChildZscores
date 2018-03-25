@@ -341,8 +341,10 @@ function writeTheFile(input) {
       headerLine = input.language === 'en' ? 'id,firstName,lastName,idGroup,phone,address,city,ward,lds,screenDate,other date\n' :
         'carné de identidad,nombre de pila,apellido,grupo de identificación,teléfono,dirección,ciudad,sala,miembro lds,fecha de la pantalla, otra fecha\n';
     } else if (~input.filter.indexOf('zscore')) {
-      var columns = input.language === 'en' ? 'firstName,lastName,ward,birthdate,mother,age,sup type,' : 'nombre de pila,apellido,sala,Fecha de nacimiento,madre,anos,tipo de suplemento,';
-      headerLine =  columns + moment.months(currentMonth % 12) + ',' + moment.months((currentMonth + 1) % 12) + ',' + moment.months((currentMonth + 2) % 12) + ',' + moment.months((currentMonth + 3) % 12) + ',' + moment.months((currentMonth + 4) % 12) + ',' + moment.months((currentMonth + 5) % 12) + '\n';
+//      var columns = input.language === 'en' ? 'firstName,lastName,ward,birthdate,mother,age,sup type,' : 'nombre de pila,apellido,sala,Fecha de nacimiento,madre,anos,tipo de suplemento,';
+//      headerLine =  columns + moment.months(currentMonth % 12) + ',' + moment.months((currentMonth + 1) % 12) + ',' + moment.months((currentMonth + 2) % 12) + ',' + moment.months((currentMonth + 3) % 12) + ',' + moment.months((currentMonth + 4) % 12) + ',' + moment.months((currentMonth + 5) % 12) + '\n';
+      var columns = input.language === 'en' ? '1,2,3,4,5,6,Sup,age,firstName,lastName,ward,mother,' : '1,2,3,4,5,6,Sup,anos,nombre de pila,apellido,sala,madre,';
+      headerLine =  columns + '\n';
     } else {
       headerLine = 'id,gender,firstName,lastName,birthdate,idGroup,mother,father,phone,address,city,ward,lds,screenDate,weight,height,age,ha,wa,wh,status\n';
     }
@@ -437,30 +439,30 @@ function addChildToLine(ownerInfo, screenInfo, sortField, stakeDB, filter, supTy
     if (supType.indexOf('risk') > -1) {
       var message = language === 'en' ? ' months since last screening, Possible risk, please come to next screening\n' :
         ' meses desde la última evaluación, riesgo posible, venga a la siguiente evaluación\n';
-      dataLine = ownerInfo.firstName + ',' + ownerInfo.lastName + ',' + ownerInfo.ward + ',' + moment(new Date(ownerInfo.birthDate)).format('YYYY MM DD') +
-        ',' + ownerInfo.mother + ',' + currentAge + ',' + timeSinceLastScreen + message;
+      dataLine = '' + ',' + ',' + ',' + ',' + ',' + ',' + ',' + currentAge + ',' + ownerInfo.firstName + ',' + ownerInfo.lastName + ',' + ownerInfo.ward +
+        ',' + ownerInfo.mother + ',' + timeSinceLastScreen + message;
       resolve({ data: ownerInfo, dataLine: dataLine, stakeDB: stakeDB, sortField: sortField, filter: filter, atRisk: true, language: language });
     } else if (supType.indexOf('none') > -1) {
       var message = language === 'en' ? ' months since last screening, normal risk, please come to next screening\n' :
         ' meses desde la última evaluación, riesgo normal, venga a la siguiente evaluación\n';
-      dataLine = ownerInfo.firstName + ',' + ownerInfo.lastName + ',' + ownerInfo.ward + ',' + moment(new Date(ownerInfo.birthDate)).format('YYYY MM DD') +
-        ',' + ownerInfo.mother + ',' + currentAge + ',' + timeSinceLastScreen + message;
+      dataLine = '' + ',' + ',' + ',' + ',' + ',' + ',' + ',' + currentAge + ',' + ownerInfo.firstName + ',' + ownerInfo.lastName + ',' + ownerInfo.ward +
+        ',' + ownerInfo.mother + ',' + timeSinceLastScreen + message;
       resolve({ data: ownerInfo, dataLine: dataLine, stakeDB: stakeDB, sortField: sortField, filter: filter, normalZscore: true, language: language });
     } else if (screenInfo === undefined || timeSinceLastScreen > 6) {
       if (timeSinceLastScreen === undefined || timeSinceLastScreen === 100) {
         var messageProb = language === 'en' ? ' no screenings: possible duplicate?\n' : ' sin proyecciones: posible duplicado?\n';
-        dataLine = ownerInfo.firstName + ',' + ownerInfo.lastName + ',' + ownerInfo.ward + ',' + moment(new Date(ownerInfo.birthDate)).format('YYYY MM DD') +
-          ',' + ownerInfo.mother + ',' + currentAge + ',' + messageProb;
+        dataLine = '' + ',' + ',' + ',' + ',' + ',' + ',' + ',' + currentAge + ',' + ownerInfo.firstName + ',' + ownerInfo.lastName + ',' + ownerInfo.ward +
+          ',' + ownerInfo.mother + ',' + messageProb;
       } else {
-        var messageRisk = language === 'en' ? '  months since last screening' + ', Child at risk, should come to next screening\n' :
-          ' meses desde la última evaluación '+', Niño en riesgo, debería pasar a la siguiente evaluación\n';
-        dataLine = ownerInfo.firstName + ',' + ownerInfo.lastName + ',' + ownerInfo.ward + ',' + moment(new Date(ownerInfo.birthDate)).format('YYYY MM DD') +
-          ',' + ownerInfo.mother + ',' + currentAge + ',' + timeSinceLastScreen + messageRisk;
+        var messageRisk = language === 'en' ? '  months since last screening' + ', Child at risk: should come to next screening\n' :
+          ' meses desde la última evaluación '+', Niño en riesgo: debería pasar a la siguiente evaluación\n';
+        dataLine = '' + ',' + ',' + ',' + ',' + ',' + ',' + ',' + currentAge + ',' + ownerInfo.firstName + ',' + ownerInfo.lastName + ',' + ownerInfo.ward +
+          ',' + ownerInfo.mother + ',' + timeSinceLastScreen + messageRisk;
       }
       resolve({ data: ownerInfo, dataLine: dataLine, stakeDB: stakeDB, sortField: sortField, filter: filter, missedScreen: true, language: language });
     } else {
-      dataLine = ownerInfo.firstName + ',' + ownerInfo.lastName + ',' + ownerInfo.ward + ',' + moment(ownerInfo.birthDate).format('YYYY MM DD') +
-        ',' + ownerInfo.mother + ',' + currentAge + ',' + supType + ',[ ]' + ',[ ]' + ',[ ]' + ',[ ]' + ',[ ]' + ',[ ]' + '\n';
+      dataLine = '' + ',' + ',' + ',' + ',' + ',,' + supType + ',' + currentAge + ',' + ownerInfo.firstName + ',' + ownerInfo.lastName +
+        ',' + ownerInfo.ward + ',' + ownerInfo.mother + '\n';
       resolve({ data: ownerInfo, dataLine: dataLine, stakeDB: stakeDB, sortField: sortField, filter: filter, language: language });
     }
   });
