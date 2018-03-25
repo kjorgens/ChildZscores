@@ -39,5 +39,17 @@
     "jquery": {
       "main": []
     }
-  }
+  },
+  "authors": [
+    "karljorgensen <kjorgens>"
+  ],
+  "main": "",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "public/lib",
+    "test",
+    "tests"
+  ]
 }

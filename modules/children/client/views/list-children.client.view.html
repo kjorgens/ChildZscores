@@ -82,7 +82,7 @@
                 <h3><span ng-bind="child.firstName"></span>
                     <span ng-bind="child.lastName"></span></h3>
                 <h4 ng-if="child.statusColor">
-                    {{child.monthAge<48 ? ('ZSCORE_STATUS' | translate) : ('CHILD_GRADUATED' | translate)}}:
+                    {{child.monthAge<60 ? ('ZSCORE_STATUS' | translate) : ('CHILD_GRADUATED' | translate)}}:
                     <span ng-class="child.statusColor" ng-if="child.zscoreStatus === 'Acute: supplements required' && child.monthAge<48">
                           {{'ACUTE_ZSCORE' | translate}} </span>
                     <span ng-class="child.statusColor" ng-if="child.zscoreStatus === 'Micro nutrients required' && child.monthAge<48">

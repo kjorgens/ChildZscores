@@ -114,7 +114,6 @@
     "load-grunt-tasks": "~3.4.1",
     "mock-fs": "~3.7.0",
     "nano": "~6.2.0",
-    "node-inspector": "~0.12.7",
     "range_check": "^1.2.0",
     "run-sequence": "~1.1.5",
     "should": "~8.2.2",
