@@ -184,45 +184,54 @@ function listAllChildren(childScreenList) {
   var linesToAdd = [];
   var sortedScreenList = [];
   var noScreenings = 0;
-
   var supType = 'none';
+  let currentSupType = 'none';
   var tooOld = 0;
   var timeSinceLastScreen;
+  var priorMalnurished = 'no';
 
   childScreenList.forEach(function (dataSet) {
     if (dataSet[0].data.total_rows > 0) {
       dataSet[0].data.rows.forEach(function (childEntry) {
         var currentAge = moment().diff(moment(new Date(childEntry.key.birthDate)), 'months');
+        // if(childEntry.key.firstName.indexOf('Brinley') > -1) {
+        //   console.log('Found it');
+        // }
         if (~dataSet[0].parms.filter.indexOf('zscore')) {
           if (currentAge < 60 && ~childEntry.id.indexOf('chld')) {
             sortedScreenList = getScreeningsList(childEntry.id, dataSet[1].data.rows);
             if (sortedScreenList.length === 0) {
               noScreenings++;
-              linesToAdd.push(addChildToLine(childEntry.key, sortedScreenList[0], dataSet[0].parms.sortField, dataSet[0].parms.stakeDB, dataSet[0].parms.filter, ' ', 100, dataSet[0].language));
+              linesToAdd.push(addChildToLine(childEntry.key, sortedScreenList[0], dataSet[0].parms.sortField, dataSet[0].parms.stakeDB, dataSet[0].parms.filter, ' ', 100, 'no', dataSet[0].language));
             } else {
               supType = 'none';
+              priorMalnurished = 'no';
+              currentSupType = 'none';
               sortedScreenList.forEach(function(screening, index) {
-                // if(childEntry.key.firstName.indexOf('Fernanda Ara') > -1) {
-                //   console.log('Found it');
-                // }
                 if ((screening.zScore.ha > -2 && screening.zScore.ha <-1) || (screening.zScore.wa > -2 && screening.zScore.wa < -1)) {
                   supType = 'risk';
-                } else if ((screening.zScore.ha < -2 || screening.zScore.wa < -2)) {
+                }
+                if ((screening.zScore.ha < -2 || screening.zScore.wa < -2)) {
+                  priorMalnurished = 'yes';
                   supType = 'sup';
                   if (currentAge > 36 && currentAge <= 60) {
                     supType = 'mic';
                   }
-                  if (screening.zScore.wl < -2) {
-                    supType = 'MAM';
-                    if (screening.zScore.wl < -3) {
-                      supType = 'SAM';
-                    }
+                }
+                if (screening.zScore.wl < -2) {
+                  priorMalnurished = 'yes';
+                  supType = 'MAM';
+                  if (screening.zScore.wl < -3) {
+                    supType = 'SAM';
                   }
+                }
+                if (index === 0) {
+                  currentSupType = supType;
                 }
               });
               timeSinceLastScreen = moment().diff(moment(new Date(sortedScreenList[0].surveyDate)), 'months');
                 linesToAdd.push(addChildToLine(childEntry.key, sortedScreenList[0], dataSet[0].parms.sortField, dataSet[0].parms.stakeDB,
-                  dataSet[0].parms.filter, supType, timeSinceLastScreen, dataSet[0].parms.language));
+                  dataSet[0].parms.filter, currentSupType, timeSinceLastScreen, priorMalnurished, dataSet[0].parms.language));
                }
             }
         } else {
@@ -342,8 +351,10 @@ function writeTheFile(input) {
       headerLine = input.language === 'en' ? 'id,firstName,lastName,idGroup,phone,address,city,ward,lds,screenDate,other date\n' :
         'carné de identidad,nombre de pila,apellido,grupo de identificación,teléfono,dirección,ciudad,sala,miembro lds,fecha de la pantalla, otra fecha\n';
     } else if (~input.filter.indexOf('zscore')) {
-      var columns = input.language === 'en' ? 'firstName,lastName,ward,birthdate,mother,age,sup type,' : 'nombre de pila,apellido,sala,Fecha de nacimiento,madre,anos,tipo de suplemento,';
-      headerLine =  columns + moment.months(currentMonth % 12) + ',' + moment.months((currentMonth + 1) % 12) + ',' + moment.months((currentMonth + 2) % 12) + ',' + moment.months((currentMonth + 3) % 12) + ',' + moment.months((currentMonth + 4) % 12) + ',' + moment.months((currentMonth + 5) % 12) + '\n';
+//      var columns = input.language === 'en' ? 'firstName,lastName,ward,birthdate,mother,age,sup type,' : 'nombre de pila,apellido,sala,Fecha de nacimiento,madre,anos,tipo de suplemento,';
+//      headerLine =  columns + moment.months(currentMonth % 12) + ',' + moment.months((currentMonth + 1) % 12) + ',' + moment.months((currentMonth + 2) % 12) + ',' + moment.months((currentMonth + 3) % 12) + ',' + moment.months((currentMonth + 4) % 12) + ',' + moment.months((currentMonth + 5) % 12) + '\n';
+      var columns = input.language === 'en' ? '1,2,3,4,5,6,Sup,age,Prior Sup,firstName,lastName,ward,mother,' : '1,2,3,4,5,6,Sup,anos,Anterior Sup,nombre de pila,apellido,sala,madre,';
+      headerLine =  columns + '\n';
     } else {
       headerLine = 'id,gender,firstName,lastName,birthdate,idGroup,mother,father,phone,address,city,ward,lds,screenDate,weight,height,age,ha,wa,wh,status\n';
     }
@@ -416,7 +427,7 @@ function collectAll(dbKids) {
   });
 }
 
-function addChildToLine(ownerInfo, screenInfo, sortField, stakeDB, filter, supType, timeSinceLastScreen, language) {
+function addChildToLine(ownerInfo, screenInfo, sortField, stakeDB, filter, supType, timeSinceLastScreen, priorMalNurish, language) {
   return new Promise(function (resolve, reject) {
     if (typeof ownerInfo.mother === 'string' && ownerInfo.mother.indexOf(',') > -1) {
       ownerInfo.mother = ownerInfo.mother.replace(/,/g, ' ');
@@ -435,33 +446,34 @@ function addChildToLine(ownerInfo, screenInfo, sortField, stakeDB, filter, supTy
     }
     var dataLine;
     var currentAge = moment().diff(moment(new Date(ownerInfo.birthDate)), 'months');
+    var priorMessage = language === 'en' ? `${ priorMalNurish }` : `${ priorMalNurish === 'yes' ? 'si' : 'no' }`;
     if (supType.indexOf('risk') > -1) {
-      var message = language === 'en' ? ' months since last screening, Possible risk, please come to next screening\n' :
-        ' meses desde la última evaluación, riesgo posible, venga a la siguiente evaluación\n';
-      dataLine = ownerInfo.firstName + ',' + ownerInfo.lastName + ',' + ownerInfo.ward + ',' + moment(new Date(ownerInfo.birthDate)).format('YYYY MM DD') +
-        ',' + ownerInfo.mother + ',' + currentAge + ',' + timeSinceLastScreen + message;
+      var message = language === 'en' ? ` months since last screening\n` :
+        ` meses desde la última evaluación\n`;
+      dataLine = '' + ',' + ',' + ',' + ',' + ',' + ',' + ',' + currentAge + ',' + priorMessage + ',' + ownerInfo.firstName + ',' + ownerInfo.lastName + ',' + ownerInfo.ward +
+        ',' + ownerInfo.mother + ',' + timeSinceLastScreen + message;
       resolve({ data: ownerInfo, dataLine: dataLine, stakeDB: stakeDB, sortField: sortField, filter: filter, atRisk: true, language: language });
     } else if (supType.indexOf('none') > -1) {
-      var message = language === 'en' ? ' months since last screening, normal risk, please come to next screening\n' :
-        ' meses desde la última evaluación, riesgo normal, venga a la siguiente evaluación\n';
-      dataLine = ownerInfo.firstName + ',' + ownerInfo.lastName + ',' + ownerInfo.ward + ',' + moment(new Date(ownerInfo.birthDate)).format('YYYY MM DD') +
-        ',' + ownerInfo.mother + ',' + currentAge + ',' + timeSinceLastScreen + message;
+      var message = language === 'en' ? ` months since last screening\n` :
+        ` meses desde la última evaluación\n`;
+      dataLine = '' + ',' + ',' + ',' + ',' + ',' + ',' + ',' + currentAge + ',' + priorMessage + ',' + ownerInfo.firstName + ',' + ownerInfo.lastName + ',' + ownerInfo.ward +
+        ',' + ownerInfo.mother + ',' + timeSinceLastScreen + message;
       resolve({ data: ownerInfo, dataLine: dataLine, stakeDB: stakeDB, sortField: sortField, filter: filter, normalZscore: true, language: language });
     } else if (screenInfo === undefined || timeSinceLastScreen > 6) {
       if (timeSinceLastScreen === undefined || timeSinceLastScreen === 100) {
         var messageProb = language === 'en' ? ' no screenings: possible duplicate?\n' : ' sin proyecciones: posible duplicado?\n';
-        dataLine = ownerInfo.firstName + ',' + ownerInfo.lastName + ',' + ownerInfo.ward + ',' + moment(new Date(ownerInfo.birthDate)).format('YYYY MM DD') +
-          ',' + ownerInfo.mother + ',' + currentAge + ',' + messageProb;
+        dataLine = '' + ',' + ',' + ',' + ',' + ',' + ',' + ',' + currentAge + ',' + priorMessage + ',' + ownerInfo.firstName + ',' + ownerInfo.lastName + ',' + ownerInfo.ward +
+          ',' + ownerInfo.mother + ',' + messageProb;
       } else {
-        var messageRisk = language === 'en' ? '  months since last screening' + ', Child at risk, should come to next screening\n' :
-          ' meses desde la última evaluación '+', Niño en riesgo, debería pasar a la siguiente evaluación\n';
-        dataLine = ownerInfo.firstName + ',' + ownerInfo.lastName + ',' + ownerInfo.ward + ',' + moment(new Date(ownerInfo.birthDate)).format('YYYY MM DD') +
-          ',' + ownerInfo.mother + ',' + currentAge + ',' + timeSinceLastScreen + messageRisk;
+        var messageRisk = language === 'en' ? `  months since last screening\n` :
+          ` meses desde la última evaluación , Niño en riesgo: debería pasar a la siguiente evaluación\n`;
+        dataLine = '' + ',' + ',' + ',' + ',' + ',' + ',' + ',' + currentAge + ',' + priorMessage + ',' + ownerInfo.firstName + ',' + ownerInfo.lastName + ',' + ownerInfo.ward +
+          ',' + ownerInfo.mother + ',' + timeSinceLastScreen + messageRisk;
       }
       resolve({ data: ownerInfo, dataLine: dataLine, stakeDB: stakeDB, sortField: sortField, filter: filter, missedScreen: true, language: language });
     } else {
-      dataLine = ownerInfo.firstName + ',' + ownerInfo.lastName + ',' + ownerInfo.ward + ',' + moment(ownerInfo.birthDate).format('YYYY MM DD') +
-        ',' + ownerInfo.mother + ',' + currentAge + ',' + supType + ',[ ]' + ',[ ]' + ',[ ]' + ',[ ]' + ',[ ]' + ',[ ]' + '\n';
+      dataLine = '' + ',' + ',' + ',' + ',' + ',,' + supType + ',' + currentAge + ',' + priorMessage + ',' + ownerInfo.firstName + ',' + ownerInfo.lastName +
+        ',' + ownerInfo.ward + ',' + ownerInfo.mother + '\n';
       resolve({ data: ownerInfo, dataLine: dataLine, stakeDB: stakeDB, sortField: sortField, filter: filter, language: language });
     }
   });

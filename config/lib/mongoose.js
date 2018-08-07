@@ -3,7 +3,8 @@
 /**
  * Module dependencies.
  */
-var config = require('../config'),
+var _ = require('lodash'),
+  config = require('../config'),
   chalk = require('chalk'),
   path = require('path'),
   mongoose = require('mongoose');
@@ -22,7 +23,11 @@ module.exports.loadModels = function (callback) {
 module.exports.connect = function (cb) {
   var _this = this;
 
-  var db = mongoose.connect(config.db.uri, config.db.options, function (err) {
+  mongoose.Promise = config.db.promise;
+
+  var options = _.merge(config.db.options || {}, { useMongoClient: true });
+
+  var db = mongoose.connect(config.db.uri, options, function (err) {
     // Log Error
     if (err) {
       console.error(chalk.red('Could not connect to MongoDB!'));
