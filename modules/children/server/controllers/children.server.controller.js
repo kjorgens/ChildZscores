@@ -191,6 +191,7 @@ function listAllChildren(childScreenList) {
   var priorMalnurished = 'no';
 
   childScreenList.forEach(function (dataSet) {
+
     if (dataSet[0].data.total_rows > 0) {
       dataSet[0].data.rows.forEach(function (childEntry) {
         var currentAge = moment().diff(moment(new Date(childEntry.key.birthDate)), 'months');
