@@ -43,6 +43,7 @@
     //   vm.child.ward = vm.selectedWard;
     // }
     vm.selectedCountry = sessionStorage.getItem('selectedCountry');
+    vm.selectedCountryCode = sessionStorage.getItem('selectedCountryCode');
     vm.selectedCountryImage = sessionStorage.getItem('selectedCountryImage');
     vm.online = $rootScope.appOnline;
     vm.interviewer = localStorage.getItem('lastInterviewer');
@@ -243,7 +244,7 @@
 
       $scope.$apply(function () {
         vm.surveys = surveys.docs;
-        vm.zScoreGetter(vm.child.gender, vm.surveys[0].monthAge, vm.surveys[0].height, vm.surveys[0].weight, vm.surveys.length === 1 ? true : false, function (zscore) {
+        vm.zScoreGetter(vm.child.gender, vm.surveys[0].monthAge, vm.surveys[0].height, vm.surveys[0].weight, vm.surveys.length === 1, function (zscore) {
           vm.zScore = zscore;
           vm.actions = zscore.actions;
         });

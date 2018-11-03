@@ -1,6 +1,6 @@
 <section>
     <div class="page-header" style="margin-top: 8em">
-        <img src="modules/core/client/img/brand/logo_small.png">
+        <img src="public/img/brand/logo_small.png">
         <h1>
             <div ng-if="vm.onLine">
                   <span><a ng-click="vm.refreshCountryList()">{{'REFRESH_COUNTRY' | translate}} <i
@@ -17,7 +17,7 @@
         </h1>
     </div>
     <div class="list-group">
-        <a ng-repeat="country in vm.liahonaStakes.countries" ui-sref="children.stake({country: country.name})" class="list-group-item">
+        <a ng-repeat="country in vm.liahonaStakes.countries" ui-sref="children.stake({country: country.name, cCode: country.code})" class="list-group-item">
             <small class="list-group-item-text">
                 <h3>
                     <img ng-src={{country.image}}>

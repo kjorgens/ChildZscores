@@ -160,6 +160,9 @@ module.exports.initHelmetHeaders = function (app) {
  */
 module.exports.initModulesClientRoutes = function (app) {
   // Setting the app router and static folder
+
+  app.use('/service-worker.js', express.static(path.resolve('./public/service-worker.js')));
+
   app.use('/', express.static(path.resolve('./public')));
 
   app.use('/files', express.static(path.resolve('./files')));

@@ -33,10 +33,13 @@ exports.invokeRolesPolicies = function () {
       resources: '/updateviews/:stakeDB',
       permissions: '*'
     }, {
+      resources: '/compactDB/:stakeDB',
+      permissions: '*'
+    }, {
       resources: '/stakes',
       permissions: ['get']
     }, {
-      resources: '/report/:stakeDB/:filter/:sortField/:language',
+      resources: '/report/:stakeDB/:cCode/:scopeType/:sortField/:language/:csvType',
       permissions: ['*']
     }]
   }, {
@@ -96,7 +99,7 @@ exports.invokeRolesPolicies = function () {
       resources: '/sync',
       permissions: ['get']
     }, {
-      resources: '/report/:stakeDB/:filter/:sortField/:language',
+      resources: '/report/:stakeDB/:cCode/:scopeType/:sortField/:language/:csvType',
       permissions: ['get']
     },
     {

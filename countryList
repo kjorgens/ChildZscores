@@ -1,6 +1,6 @@
 {
    "_id": "liahona_kids_countries_stakes",
-   "_rev": "75-ad64c9850f798e7ba3fe031d8c0ba6a9",
+   "_rev": "133-a9975c5b0ea82044161271d371f6282d",
    "countries": [
        {
            "name": "Brazil",
@@ -153,6 +153,10 @@
            "image": "modules/children/client/img/columbia.png",
            "stakes": [
                {
+                   "stakeName": "Baranquilla",
+                   "stakeDB": "baranquilla_col"
+               },
+               {
                    "stakeName": "Buenaventura",
                    "stakeDB": "buenaventura_col"
                },
@@ -161,12 +165,24 @@
                    "stakeDB": "calima_cali_stake_col"
                },
                {
+                   "stakeName": "Cucuta",
+                   "stakeDB": "cucuta_col"
+               },
+               {
+                   "stakeName": "Guajira",
+                   "stakeDB": "guajira_stake_col"
+               },
+               {
                    "stakeName": "Guajira (Rioacha Branch y Maicao Branch of the Santa Marta District)",
                    "stakeDB": "guajira_col"
                },
                {
                    "stakeName": "Itsmina - Choco",
                    "stakeDB": "itsmina_col"
+               },
+               {
+                   "stakeName": "Ipiales",
+                   "stakeDB": "ipiales_col"
                },
                {
                    "stakeName": "Las Tres Fronteras",
@@ -194,7 +210,7 @@
                },
                {
                    "stakeName": "Quibdo - Choco",
-                   "stakeDB": "test_stake_col"
+                   "stakeDB": "quibdo_choco_col"
                },
                {
                    "stakeName": "Santa Marta District ",
@@ -242,6 +258,10 @@
                {
                    "stakeName": "Otavallo Stake",
                    "stakeDB": "otavallo_stake_ecu"
+               },
+               {
+                   "stakeName": "Portoviejo",
+                   "stakeDB": "portoviejo_stake_ecu"
                },
                {
                    "stakeName": "Quito Calderón Stake",
@@ -294,6 +314,10 @@
            "image": "modules/children/client/img/ghana.png",
            "stakes": [
                {
+                   "stakeName": "Ashaiman Stake",
+                   "stakeDB": "ashaiman_stake_gha"
+               },
+               {
                    "stakeName": "Kpong District",
                    "stakeDB": "kpong_district_gha"
                },
@@ -316,6 +340,10 @@
                {
                    "stakeName": "Kasoa Stake",
                    "stakeDB": "kasoa_stake_gha"
+               },
+               {
+                   "stakeName": "Mpinsin Stake",
+                   "stakeDB": "mpinsin_stake_gha"
                },
                {
                    "stakeName": "Ghana test Only",
@@ -436,6 +464,14 @@
            "image": "modules/children/client/img/haiti.png",
            "stakes": [
                {
+                   "stakeName": "Carrefour",
+                   "stakeDB": "carrefour_hti"
+               },
+               {
+                   "stakeName": "Crois -des- Mission",
+                   "stakeDB": "crois_des_mission_hti"
+               },
+               {
                    "stakeName": "Port-au-Prince",
                    "stakeDB": "port_au_prince_hti"
                },
@@ -505,6 +541,52 @@
                {
                    "stakeName": "Honduras test Only",
                    "stakeDB": "test_stake_hnd"
+               }
+           ]
+       },
+       {
+           "name": "Kiribati",
+           "code": "KIR",
+           "image": "modules/children/client/img/kiribati.png",
+           "stakes": [
+               {
+                   "stakeName": "Stake One",
+                   "stakeDB": "stake_one_kir"
+               },
+               {
+                   "stakeName": "Stake Two",
+                   "stakeDB": "stake_two_kir"
+               },
+               {
+                   "stakeName": "Kiribati test Only",
+                   "stakeDB": "test_stake_kir"
+               }
+           ]
+       },
+       {
+           "name": "Madagascar",
+           "code": "MDG",
+           "image": "modules/children/client/img/madagascar.png",
+           "stakes": [
+               {
+                   "stakeName": "Manakimbahiny (Tana 1) Stake",
+                   "stakeDB": "manakimbahiny_mdg"
+               },
+               {
+                   "stakeName": "Ivandry (Tana 2) Stake",
+                   "stakeDB": "ivandry_mdg"
+               },
+               {
+                   "stakeName": "Antsirabe District",
+                   "stakeDB": "antsirabe_mdg"
+               },
+               {
+                   "stakeName": "Tamatave District",
+                   "stakeDB": "tamatave_mdg"
+               },
+               {
+                   "stakeName": "Madagacar test Only",
+                   "stakeDB": "test_stake_mdg"
                }
            ]
        },
@@ -588,7 +670,7 @@
                    "stakeDB": "distrito_boqueron_abundancia_pry"
                },
                {
-                   "stakeName": "Distrito Coronel Oviedo",
+                   "stakeName": "Distrito Caaruazú",
                    "stakeDB": "distrito_coronel_oviedo_pry"
                },
                {
@@ -675,6 +757,10 @@
                    "stakeDB": "juliaca_stake_per"
                },
                {
+                   "stakeName": "La Esperanza",
+                   "stakeDB": "la_esperanza_per"
+               },
+               {
                    "stakeName": "Lima Canto Grande Stake",
                    "stakeDB": "lima_canto_grande_stake_per"
                },
@@ -689,6 +775,10 @@
                {
                    "stakeName": "Nauta Area (Near Iquitos)",
                    "stakeDB": "nauta_area_near_iquitos_per"
+               },
+               {
+                   "stakeName": "Nueva Cajamarca",
+                   "stakeDB": "nueva_cajamarca_per"
                },
                {
                    "stakeName": "Paita District",
@@ -731,6 +821,10 @@
                    "stakeDB": "shilcayo_branch_tarapoto_district_per"
                },
                {
+                   "stakeName": "Tamani",
+                   "stakeDB": "tamani_per"
+               },
+               {
                    "stakeName": "Tres Fronteras",
                    "stakeDB": "tres_fronteras_per"
                },
@@ -745,6 +839,10 @@
                {
                    "stakeName": "Urubamba (Valle Sagrado District)",
                    "stakeDB": "urubamba_valle_sagrado_district_per"
+               },
+               {
+                   "stakeName": "Viru Stake",
+                   "stakeDB": "viru_stake_per"
                },
                {
                    "stakeName": "Yurimaguas Branch (Trarpoto District)",
@@ -782,6 +880,14 @@
                    "stakeDB": "bacolod_south_stake_phl"
                },
                {
+                   "stakeName": "Bacolod North Stake",
+                   "stakeDB": "bacolod_nor_phl"
+               },
+               {
+                   "stakeName": "Bogo District",
+                   "stakeDB": "bogo_district_phl"
+               },
+               {
                    "stakeName": "Bayambang Stake",
                    "stakeDB": "bayambang_stake_phl"
                },
@@ -792,14 +898,6 @@
                {
                    "stakeName": "Binalbagan Stake 2",
                    "stakeDB": "binalbagan_stake_2_phl"
-               },
-               {
-                   "stakeName": "Bacolod North",
-                   "stakeDB": "bacolod_north_phl"
-               },
-               {
-                   "stakeName": "Bogo District",
-                   "stakeDB": "bogo_district_phl"
                },
                {
                    "stakeName": "Bulan District",
@@ -858,7 +956,7 @@
                    "stakeDB": "legazpi_stake_phl"
                },
                {
-                   "stakeName": "Liloan Stake, Cebu Island",
+                   "stakeName": "Liloan Stake Cebu Island",
                    "stakeDB": "liloan_stake_cebu_island_phl"
                },
                {
@@ -866,7 +964,7 @@
                    "stakeDB": "makati_stake_phl"
                },
                {
-                   "stakeName": "Mandaue Stake, Cebu Island",
+                   "stakeName": "Mandaue Stake Cebu Island",
                    "stakeDB": "mandaue_stake_cebu_island_phl"
                },
                {
@@ -916,10 +1014,6 @@
                {
                    "stakeName": "Urdaneta Stake",
                    "stakeDB": "urdaneta_stake_phl"
-               },
-               {
-                   "stakeName": "Philippines test Only",
-                   "stakeDB": "test_stake_phl"
                }
            ]
        },

@@ -28,6 +28,7 @@
 
     sessionStorage.setItem('selectedStake', $stateParams.stakeName);
     sessionStorage.setItem('selectedDBName', $stateParams.stakeDB);
+    localStorage.setItem('selectedCountryCode', $stateParams.countryCode);
     localStorage.setItem('selectedStake', $stateParams.stakeName);
     localStorage.setItem('selectedDBName', $stateParams.stakeDB);
     FilterService.setCurrentChildList(vm.childList);
@@ -73,6 +74,7 @@
     }, false);
 
     vm.selectedCountry = sessionStorage.getItem('selectedCountry');
+    vm.selectedCountryCode = sessionStorage.getItem('selectedCountryCode');
     vm.selectedCountryImage = sessionStorage.getItem('selectedCountryImage');
 
     vm.clearSearch = function(){

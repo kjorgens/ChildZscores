@@ -20,13 +20,15 @@
     vm.refreshCountryList = refreshCountryList;
     vm.onLine = navigator.onLine;
     $translate.use($rootScope.SelectedLanguage);
+
     function storeDbList(input) {
-      vm.liahonaStakes = input;
+      vm.liahonaStakes = input.countries;
       vm.stopSpin();
     }
+
     function returnFromPut(input) {
+      // vm.liahonaStakes = input.countries;
       vm.stopSpin();
-      console.log(input);
     }
 
     function handleSaveLocalError(input) {

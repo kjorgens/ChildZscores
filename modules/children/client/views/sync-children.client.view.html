@@ -44,13 +44,43 @@
             <i class="glyphicon glyphicon-trash"></i>
             </h3>
         </a>
-        <a ng-click="vm.createReport('listall', vm.sortSelect)">
+        <a ng-click="vm.createReport('countries', vm.countryCode, vm.sortSelect, 'all')">
             <h3><span> Aggregate csv all countries </span>
             <i class="glyphicon glyphicon-share"></i>
             </h3>
         </a>
-        <a ng-click="vm.createReport(vm.countryCode | lowercase, vm.sortSelect)">
+        <a ng-click="vm.createReport('country', vm.countryCode, vm.sortSelect, 'all')">
           <h3><span> Aggregate csv files for {{vm.selectedCountry}}</span>
+            <i class="glyphicon glyphicon-share"></i>
+          </h3>
+        </a>
+        <a ng-click="vm.createReport('stake', vm.countryCode, vm.sortSelect, 'all')">
+          <h3><span> Create csv file for {{vm.selectedStake}} </span>
+            <i class="glyphicon glyphicon-share"></i>
+          </h3>
+        </a>
+      <a ng-click="vm.createReport('countries', vm.countryCode, vm.sortSelect, 'sup')">
+        <h3><span> Aggregate supplement report all countries </span>
+          <i class="glyphicon glyphicon-share"></i>
+        </h3>
+      </a>
+      <a ng-click="vm.createReport('country', vm.countryCode, vm.sortSelect, 'sup')">
+        <h3><span> Aggregate supplement report for {{vm.selectedCountry}}</span>
+          <i class="glyphicon glyphicon-share"></i>
+        </h3>
+      </a>
+      <a ng-click="vm.createReport('stake', vm.countryCode, vm.sortSelect, 'sup')">
+        <h3><span> Supplement report for {{vm.selectedStake}} </span>
+          <i class="glyphicon glyphicon-share"></i>
+        </h3>
+      </a>
+        <a ng-click="vm.updateViews(vm.selectedStake)">
+          <h3><span> Update Views {{vm.selectedStake}} </span>
+            <i class="glyphicon glyphicon-share"></i>
+          </h3>
+        </a>
+        <a ng-click="vm.compactDB(vm.selectedStake)">
+          <h3><span> Compact {{vm.selectedStake}} </span>
             <i class="glyphicon glyphicon-share"></i>
           </h3>
         </a>
@@ -79,16 +109,12 @@
                 <option value="lastName">{{'LAST_NAME' | translate}}</option>
                 <option value="memberStatus">{{'LDS_MEMBER' | translate}}</option>
             </select><br>
-            <!--<a ng-click="vm.createReport(vm.filterSelect, vm.sortSelect)">-->
-                <!--<span>{{'GENERATE_REPORT' | translate}} </span>-->
-                <!--<i class="glyphicon glyphicon-share"></i>-->
-            <!--</a>-->
           <!--<br><br>-->
-            <a ng-click="vm.createReport('zscore', vm.sortSelect)">
+            <a ng-click="vm.createReport('stake', vm.countryCode, vm.sortSelect, 'sup')">
                 <span>{{'GENERATE_SUPPLEMENT_REPORT' | translate}} </span>
                 <i class="glyphicon glyphicon-share"></i>
             </a><br><br>
-          <a ng-click="vm.createReport('pregnant', vm.sortSelect)">
+          <a ng-click="vm.createReport('women', vm.countryCode, vm.sortSelect, '')">
             <span>{{'GENERATE_WOMEN_REPORT' | translate}} </span>
             <i class="glyphicon glyphicon-share"></i>
           </a>

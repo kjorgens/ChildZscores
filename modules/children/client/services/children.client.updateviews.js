@@ -9,9 +9,12 @@
 
   function ChildrenViews($http) {
     var factory = {};
-    factory.updateViews = function(stakeDB)
-    {
+    factory.updateViews = function(stakeDB) {
       return $http.get('api/children/updateviews/' + stakeDB);
+    };
+
+    factory.compactDB = function(stakeDB) {
+      return $http.get('api/children/compactDB/' + stakeDB);
     };
     return factory;
   }

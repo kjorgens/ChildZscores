@@ -53,7 +53,7 @@
           }
         })
         .state('children.report', {
-          url: '/report/:stakeDB/:filter/:sortField',
+          url: '/report/:stakeDB/:cCode/:scopeType/:sortField/:language/:csvType',
           templateUrl: 'modules/children/client/views/sync-children.client.view.html',
           controller: 'ChildrenSyncController',
           controllerAs: 'vm',
@@ -96,6 +96,9 @@
           templateUrl: 'modules/children/client/views/stakes.client.view.html',
           controller: 'ChildrenStakeController',
           controllerAs: 'vm',
+          resolve: {
+            countryData: getCountryData
+          },
           data: {
 
           }
@@ -263,6 +266,11 @@
   getSyncInfo.$inject = ['$stateParams', 'ChildrenGetSync', 'Authentication'];
   function getSyncInfo($stateParams, ChildrenGetSync) {
     return ChildrenGetSync.get();
+  }
+
+  getCountryData.$inject = ['$stateParams', 'PouchService'];
+  function getCountryData($stateParams, PouchService) {
+    return PouchService.getCountryData($stateParams.country);
   }
 
   getSurvey.$inject = ['$stateParams', 'PouchService'];

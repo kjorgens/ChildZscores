@@ -918,7 +918,7 @@ describe('User CRUD tests', function () {
 
         agent.post('/api/users/picture')
           .set('Authorization', 'JWT ' + signinRes.body.token)
-          .attach('newProfilePicture', './modules/users/client/img/profile/default.png')
+          .attach('newProfilePicture', './public/img/profile/default.png')
           .send(credentials)
           .expect(200)
           .end(function (userInfoErr, userInfoRes) {
@@ -948,7 +948,7 @@ describe('User CRUD tests', function () {
 
         agent.post('/api/users/picture')
           .set('Authorization', 'JWT ' + signinRes.body.token)
-          .attach('fieldThatDoesntWork', './modules/users/client/img/profile/default.png')
+          .attach('fieldThatDoesntWork', './public/img/profile/default.png')
           .send(credentials)
           .expect(400)
           .end(function (userInfoErr, userInfoRes) {

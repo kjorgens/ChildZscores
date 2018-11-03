@@ -43,6 +43,7 @@
     //   vm.mother.ward = vm.selectedWard;
     // }
     vm.selectedCountry = sessionStorage.getItem('selectedCountry');
+    vm.selectedCountryCode = sessionStorage.getItem('selectedCountryCode');
     vm.selectedCountryImage = sessionStorage.getItem('selectedCountryImage');
     vm.online = $rootScope.appOnline;
     vm.interviewer = localStorage.getItem('lastInterviewer');

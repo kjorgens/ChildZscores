@@ -6,11 +6,15 @@
       .controller('ChildrenStakeController', ChildrenStakeController);
 
   ChildrenStakeController.$inject = ['$rootScope', '$state', '$translate', 'FilterService', 'usSpinnerService',
-    'ChildrenStakes', '$stateParams', 'PouchService'];
+    'countryData', 'ChildrenStakes', '$stateParams'];
 
   function ChildrenStakeController($rootScope, $state, $translate, FilterService, usSpinnerService,
-    ChildrenStakes, $stateParams, PouchService) {
+    countryData, ChildrenStakes, $stateParams) {
     var vm = this;
+    vm.selectedCountry = countryData;
+    sessionStorage.setItem('selectedCountry', vm.selectedCountry.name);
+    localStorage.setItem('selectedCountry', vm.selectedCountry.name);
+    localStorage.setItem('selectecCountryCode', vm.selectedCountry.code);
     localStorage.setItem('childFilter', 'a');
     FilterService.setColorFilter('');
     FilterService.setSearchFilter('');
@@ -64,9 +68,10 @@
           // sessionStorage.setItem('liahonaStakesObject', input);
       vm.liahonaStakes = input;
       vm.selectedCountry = vm.liahonaStakes.countries.find(findCountry);
-      localStorage.setItem(vm.selectedCountry, 'selectedCountry');
+      // localStorage.setItem(vm.selectedCountry, 'selectedCountry');
       sessionStorage.setItem('selectedCountry', vm.selectedCountry.name);
       localStorage.setItem('selectedCountry', vm.selectedCountry.name);
+      localStorage.setItem('selectecCountryCode', vm.selectedCountry.code);
       sessionStorage.getItem('selectedCountryImage', vm.selectedCountry.image);
       localStorage.setItem('selectedCountryImage', vm.selectedCountry.image);
     }
@@ -99,7 +104,7 @@
     //   }
     // }
     // PouchService.createCountryDatabase();
-    PouchService.getCountriesLocal(storeDbList, handleError);
+    // PouchService.getCountriesLocal(storeDbList, handleError);
   }
 }());
 

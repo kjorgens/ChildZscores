@@ -24,7 +24,7 @@
     "sw-toolbox": "^3.6.1",
     "pouchdb-all-dbs": "^1.0.2",
     "angular-translate": "^2.15.2",
-    "angular-sanitize": "latest",
+    "angular-sanitize": "~1.5.11",
     "pouchdb": "^6.3.4",
     "angular-nvd3": "^1.0.9"
   },

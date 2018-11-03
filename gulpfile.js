@@ -4,12 +4,17 @@
  * Module dependencies.
  */
 var _ = require('lodash'),
+  express = require('express'),
   fs = require('fs'),
+  pump = require('pump'),
+  // uglifyes = require('gulp-uglify-es').default,
+  // uglify = require('gulp-uglify'),
   defaultAssets = require('./config/assets/default'),
   testAssets = require('./config/assets/test'),
   glob = require('glob'),
   gulp = require('gulp'),
   zip = require('gulp-vinyl-zip').zip,
+  packageJson = require('./package.json'),
   gulpLoadPlugins = require('gulp-load-plugins'),
   runSequence = require('run-sequence'),
   plugins = gulpLoadPlugins({
@@ -25,8 +30,11 @@ var _ = require('lodash'),
   protractor = require('gulp-protractor').protractor,
   webdriver_update = require('gulp-protractor').webdriver_update,
   webdriver_standalone = require('gulp-protractor').webdriver_standalone,
-  KarmaServer = require('karma').Server;
+  KarmaServer = require('karma').Server,
+  swPrecache = require('./sw-precache.js');
 
+  // const DEV_DIR = 'public';
+  // const DIST_DIR = 'dist/public';
 // Local settings
 var changedTestFiles = [];
 
@@ -76,6 +84,7 @@ gulp.task('zipit', function() {
     'public/lib/angular-bootstrap/ui-bootstrap.min.js',
     'public/lib/angular-bootstrap/ui-bootstrap-tpls.min.js',
     'public/lib/angular-file-upload/dist/angular-file-upload.min.js',
+    'public/lib/jquery/dist/jquery.min.js',
     'public/lib/owasp-password-strength-test/owasp-password-strength-test.js',
     'public/lib/pouchdb/dist/pouchdb.min.js',
     'public/lib/pouchdb-all-dbs/dist/pouchdb.all-dbs.min.js',
@@ -86,6 +95,12 @@ gulp.task('zipit', function() {
     'public/lib/angular-moment/angular-moment.min.js',
     'public/lib/angular-translate/angular-translate.min.js',
     'public/lib/angular-sanitize/angular-sanitize.min.js',
+    'public/lib/angular-ui-validate/dist/validate.min.js',
+    'public/lib/angular-ui-event/dist/event.min.js',
+    'public/lib/angular-ui-inderminate/dist/inderminate.min.js',
+    'public/lib/angular-ui-mask/dist/mask.min.js',
+    'public/lib/angular-ui-scroll/dist/scroll.min.js',
+    'public/lib/angular-ui-scrollpoint/dist/scrollpoint.min.js',
     'public/lib/d3/d3.min.js',
     'public/lib/nvd3/build/nv.d3.min.js',
     'public/lib/angular-nvd3/dist/angular-nvd3.min.js',
@@ -93,12 +108,70 @@ gulp.task('zipit', function() {
     'public/lib/bootstrap/dist/fonts/*',
     'public/lib/bootstrap/dist/css/bootstrap-theme.min.css',
     'public/lib/nvd3/build/nv.d3.min.css',
+    'public/register.js',
+    'public/*.js',
+    'public/img/**/*',
     'files/**',
     'scripts/**'
   ], { base: "." })
       .pipe(plugins.plumber())
       .pipe(zip('liahonaKids.zip'))
       .pipe(gulp.dest('./'));
+});
+
+gulp.task('zipitNew', function() {
+  return gulp.src([
+    '../package.json',
+    '../.ebextensions/*',
+    '../server.js',
+    '../README.md',
+    '../.npmrc',
+    '../config/**',
+    '../modules/**',
+    'public/dist/**',
+    'public/lib/angular/angular.min.js',
+    'public/lib/angular-resource/angular-resource.min.js',
+    'public/lib/angular-animate/angular-animate.min.js',
+    'public/lib/angular-messages/angular-messages.min.js',
+    'public/lib/angular-ui-router/release/angular-ui-router.min.js',
+    'public/lib/spin.js/spin.min.js',
+    'public/lib/angular-spinner/dist/angular-spinner.min.js',
+    'public/lib/angular-ui-utils/ui-utils.min.js',
+    'public/lib/angular-bootstrap/ui-bootstrap.min.js',
+    'public/lib/angular-bootstrap/ui-bootstrap-tpls.min.js',
+    'public/lib/angular-file-upload/dist/angular-file-upload.min.js',
+    'public/lib/jquery/dist/jquery.min.js',
+    'public/lib/owasp-password-strength-test/owasp-password-strength-test.js',
+    'public/lib/pouchdb/dist/pouchdb.min.js',
+    'public/lib/pouchdb-all-dbs/dist/pouchdb.all-dbs.min.js',
+    'public/lib/pouchdb-find/dist/pouchdb.find.min.js',
+    'public/lib/angular-pouchdb/angular-pouchdb.min.js',
+    'public/lib/angular-ui-router-uib-modal/src/angular-ui-router-uib-modal.js',
+    'public/lib/moment/min/moment.min.js',
+    'public/lib/angular-moment/angular-moment.min.js',
+    'public/lib/angular-translate/angular-translate.min.js',
+    'public/lib/angular-sanitize/angular-sanitize.min.js',
+    'public/lib/angular-ui-validate/dist/validate.min.js',
+    'public/lib/angular-ui-event/dist/event.min.js',
+    'public/lib/angular-ui-inderminate/dist/inderminate.min.js',
+    'public/lib/angular-ui-mask/dist/mask.min.js',
+    'public/lib/angular-ui-scroll/dist/scroll.min.js',
+    'public/lib/angular-ui-scrollpoint/dist/scrollpoint.min.js',
+    'public/lib/d3/d3.min.js',
+    'public/lib/nvd3/build/nv.d3.min.js',
+    'public/lib/angular-nvd3/dist/angular-nvd3.min.js',
+    'public/lib/bootstrap/dist/css/bootstrap.min.css',
+    'public/lib/bootstrap/dist/fonts/*',
+    'public/lib/bootstrap/dist/css/bootstrap-theme.min.css',
+    'public/lib/nvd3/build/nv.d3.min.css',
+    'public/register.js',
+    'public/*.js',
+    '../files/**',
+    '../scripts/**'
+  ], { base: "./dist" })
+    .pipe(plugins.plumber())
+    .pipe(zip('liahonaKids.zip'))
+    .pipe(gulp.dest('./'));
 });
 
 gulp.task('node-inspector', function() {
@@ -219,6 +292,17 @@ gulp.task('uglify', function () {
     .pipe(gulp.dest('public/dist'));
 });
 
+gulp.task('uglify-error-debugging', function (cb) {
+  var assets = _.union(
+    defaultAssets.client.js,
+    defaultAssets.client.templates
+  );
+  pump([
+    gulp.src(assets),
+    plugins.uglify(),
+    gulp.dest('dist/')
+  ], cb);
+});
 // CSS minifying task
 gulp.task('cssmin', function () {
   return gulp.src(defaultAssets.client.css)
@@ -481,6 +565,8 @@ gulp.task('test', function (done) {
   runSequence('env:test', 'test:server', 'karma', 'nodemon', 'protractor', done);
 });
 
+
+
 gulp.task('test:server', function (done) {
   runSequence('env:test', ['copyLocalEnvConfig', 'makeUploadsDir', 'dropdb'], 'lint', 'mocha', done);
 });
@@ -523,5 +609,106 @@ gulp.task('prod', function (done) {
 // Run the project in production mode
 gulp.task('zip', function (done) {
   runSequence('build', 'zipit', done);
+});
+
+function runExpress(port, rootDir) {
+  var app = express();
+
+  app.use(express.static(rootDir));
+  app.set('views', path.join(rootDir, 'views'));
+  app.set('view engine', 'jade');
+
+  app.get('/dynamic/:page', function(req, res) {
+    res.render(req.params.page);
+  });
+
+  var server = app.listen(port, function() {
+    var host = server.address().address;
+    var port = server.address().port;
+    console.log('Server running at http://%s:%s', host, port);
+  });
+}
+
+function writeServiceWorkerFile(rootDir, handleFetch, callback) {
+  var config = {
+    cacheId: packageJson.name,
+    /*
+    dynamicUrlToDependencies: {
+      'dynamic/page1': [
+        path.join(rootDir, 'views', 'layout.jade'),
+        path.join(rootDir, 'views', 'page1.jade')
+      ],
+      'dynamic/page2': [
+        path.join(rootDir, 'views', 'layout.jade'),
+        path.join(rootDir, 'views', 'page2.jade')
+      ]
+    },
+    */
+    // If handleFetch is false (i.e. because this is called from generate-service-worker-dev), then
+    // the service worker will precache resources but won't actually serve them.
+    // This allows you to test precaching behavior without worry about the cache preventing your
+    // local changes from being picked up during the development cycle.
+    handleFetch: handleFetch,
+    logger: plugins.util.log,
+    runtimeCaching: [{
+      // See https://github.com/GoogleChrome/sw-toolbox#methods
+      urlPattern: /runtime-caching/,
+      handler: 'cacheFirst',
+      // See https://github.com/GoogleChrome/sw-toolbox#options
+      options: {
+        cache: {
+          maxEntries: 1,
+          name: 'runtime-cache'
+        }
+      }
+    }],
+    staticFileGlobs: [
+      rootDir + '/css/**.css',
+      rootDir + '/**.html',
+      rootDir + '/images/**.*',
+      rootDir + '/js/**.js',
+      rootDir + '../modules/**'
+    ],
+    stripPrefix: rootDir + '/',
+    // verbose defaults to false, but for the purposes of this demo, log more.
+    verbose: true
+  };
+
+  swPrecache.write(path.join(rootDir, 'service-worker.js'), config, callback);
+}
+
+gulp.task('default', ['serve-dist']);
+
+gulp.task('build-sw', function(callback) {
+  runSequence('copy-dev-to-dist', 'generate-service-worker-dist', callback);
+});
+
+gulp.task('clean', function() {
+  del.sync([DIST_DIR]);
+});
+
+gulp.task('serve-dev', ['generate-service-worker-dev'], function() {
+  runExpress(3001, DEV_DIR);
+});
+
+gulp.task('serve-dist', ['build'], function() {
+  runExpress(3000, DIST_DIR);
+});
+
+gulp.task('gh-pages', ['build'], function(callback) {
+  ghPages.publish(path.join(__dirname, DIST_DIR), callback);
+});
+
+gulp.task('generate-service-worker-dev', function(callback) {
+  writeServiceWorkerFile(DEV_DIR, false, callback);
+});
+
+gulp.task('generate-service-worker-dist', function(callback) {
+  writeServiceWorkerFile(DIST_DIR, true, callback);
+});
+
+gulp.task('copy-dev-to-dist', function() {
+  return gulp.src(DEV_DIR + '/**')
+    .pipe(gulp.dest(DIST_DIR));
 });
 

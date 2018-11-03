@@ -29,6 +29,55 @@
       }
     };
 
+    factory.putStakesLocal = function (countryObj, callback, errCallback) {
+      var newObj = {};
+      countryDataBase.get('liahona_kids_countries_stakes')
+        .then(function (response) {
+          newObj._id = response._id;
+          newObj._rev = response._rev;
+          newObj.countries = countryObj.countries;
+          countryDataBase.put(newObj)
+            .then(function (response) {
+              // Do something with the response
+              callback(response);
+            }).catch(function (error) {
+            // Do something with the error
+            errCallback(error);
+          }).finally(function () {
+            // Do something when everything is done
+          });
+        })
+        .catch(function (error) {
+          newObj._id = 'liahona_kids_countries_stakes';
+          newObj.countries = countryObj.countries;
+          countryDataBase.put(newObj)
+            .then(function (response) {
+              // Do something with the response
+              callback(response);
+            })
+            .catch(function (error) {
+              // Do something with the error
+              errCallback(error);
+            })
+            .finally(function () {
+              // Do something when everything is done
+            });
+        });
+    };
+    // factory.putStakesLocal = async function (countryObj, callback) {
+    //   var newObj = {};
+    //   try {
+    //     const countryInfo = await countryDataBase.get('liahona_kids_countries_stakes');
+    //     newObj._id = countryInfo._id;
+    //     newObj._rev = countryInfo._rev;
+    //     newObj.countries = countryObj.countries;
+    //     const putResults = await countryDataBase.put(newObj);
+    //     callback({ countriesID: putResults.id, countries: newObj.countries });
+    //   } catch(err) {
+    //     console.log(err.message);
+    //   }
+    // };
+
     factory.createCountryDatabase = function () {
       countryDataBase = pouchDB('country_list');
     };
@@ -71,41 +120,20 @@
       return ($q.all(indexFunctions));
     };
 
-    factory.putStakesLocal = function (countryObj, callback, errCallback) {
-      var newObj = {};
-      countryDataBase.get('liahona_kids_countries_stakes')
-          .then(function (response) {
-            newObj._id = response._id;
-            newObj._rev = response._rev;
-            newObj.countries = countryObj.countries;
-            countryDataBase.put(newObj)
-              .then(function (response) {
-                // Do something with the response
-                callback(response);
-              }).catch(function (error) {
-                  // Do something with the error
-                errCallback(error);
-              }).finally(function () {
-                  // Do something when everything is done
-              });
-          })
-          .catch(function (error) {
-            newObj._id = 'liahona_kids_countries_stakes';
-            newObj.countries = countryObj.countries;
-            countryDataBase.put(newObj)
-                .then(function (response) {
-                  // Do something with the response
-                  callback(response);
-                })
-                .catch(function (error) {
-                  // Do something with the error
-                  errCallback(error);
-                })
-                .finally(function () {
-                  // Do something when everything is done
-                });
-          });
-    };
+    // async function stakesLocal(countryObj, callback) {
+    //   var newObj = {};
+    //   try {
+    //     const countryInfo = await countryDataBase.get('liahona_kids_countries_stakes');
+    //     newObj._id = countryInfo._id;
+    //     newObj._rev = countryInfo._rev;
+    //     newObj.countries = countryObj.countries;
+    //     const putResults = await countryDataBase.put(newObj);
+    //     callback({ countriesID: putResults.id, countries: newObj.countries });
+    //   } catch(err) {
+    //     console.log(err.message);
+    //   }
+    // }
+
 
     factory.getCountriesLocal = function (callback, errCallback) {
       if (countryDataBase === undefined) {
@@ -118,6 +146,22 @@
       .catch(function(error) {
         errCallback(error);
       });
+    };
+
+    factory.getCountryData = function (countryName) {
+      if (countryDataBase === undefined) {
+        countryDataBase = pouchDB('country_list');
+      }
+      var toReturn = '';
+      return countryDataBase.get('liahona_kids_countries_stakes')
+        .then(function(countryList) {
+          countryList.countries.forEach(function (country) {
+            if (country.name === countryName) {
+              toReturn = country;
+            }
+          });
+          return toReturn;
+        });
     };
 
     factory.getWardList = function (countryName, stakeName, callback, errCallback) {
@@ -184,9 +228,17 @@
           });
     };
 
+    factory.findAndFilterChildren = function() {
+      var params = {
+        selector: { lastScreening: { $gt: null } }
+      };
+      database.find(params)
+        .then(fixScreenings);
+    };
+
     factory.findChildren = function () {
       var params = {
-          selector: { lastScreening: { $gt: null } },
+        selector: { lastScreening: { $gt: null } }
         };
       return database.find(params);
     };
@@ -219,24 +271,6 @@
         callbackError(error);
       });
     };
-
-    // factory.getByStatus = function (status, callback, callbackError) {
-    //   return database.find({
-    //     selector: {
-    //       owner: { $eq: childId },
-    //       surveyDate: { $gt: null }
-    //     },
-    //     sort: [{ surveyDate: 'desc' }]
-    //   })
-    //       .then(function (response) {
-    //         // Do something with the response
-    //         callback(response);
-    //       })
-    //       .catch(function (error) {
-    //         // Do something with the error
-    //         callbackError(error);
-    //       });
-    // };
 
     factory.getSurveys = function (childId, callback, callbackError) {
       return database.find({
@@ -307,20 +341,6 @@
       return database.get(doc.motherId);
     };
 
-    // factory.getOne = function (doc) {
-    //   database.get(doc.childId)
-    //       .then(function (response) {
-    //         // Do something with the response
-    //         return response;
-    //       })
-    //       .catch(function (error) {
-    //         // Do something with the error
-    //       })
-    //       .finally(function () {
-    //         // Do something when everything is done
-    //       });
-    // };
-
     factory.query = function (qFunction, callback, errorCallback) {
       database.query(qFunction)
           .then(function (response) {
@@ -354,7 +374,7 @@
     function calculateStatus(screeningObj) {
       // return new Promise(function(resolve, reject) {
       var zscoreStatus = '';
-      if (screeningObj.zScore.wl > -3) {
+      if (screeningObj.zScore.wl < -3) {
           zscoreStatus = 'Acute: sam supplements required';
         } else if (screeningObj.zScore.wl < -2 && screeningObj.zScore.wl > -3) {
           zscoreStatus = 'Acute: mam supplements required';
@@ -439,26 +459,26 @@
       return statusColor(status);
     };
 
-    factory.statusColorBackground = function(status) {
-      return statusColorBackground(status);
-    };
-
     factory.addScreening = function (screening, childId, callBack, errCallback) {
       getScreeningInfo({ screening: screening.id, child: childId })
-            .then(calculateStatus)
-            .then(updateChildRecord)
-            .then(callBack).catch(function(err) {
-              console.log(err);
-            });
+        .then(calculateStatus)
+        .then(updateChildRecord)
+        .then(callBack).catch(function(err) {
+          console.log(err);
+        });
     };
 
-    factory.updateScreening = function (screening, childId, callBack, errCallback) {
-      getScreeningInfo({ screening: screening.id, child: childId })
+    function fixScreenings(allChildren) {
+      return Promise.all(allChildren.docs.map(function(child) {
+        return getScreeningInfo({ screening: child.lastScreening, child: child._id })
           .then(calculateStatus)
-          .then(updateChildRecord)
-          .then(callBack).catch(function(err) {
-            console.log(err);
-          });
+          .then(updateChildRecord);
+      })).then(function(fixedList) {
+        return database.find({ selector: { lastScreening: { $gt: null } } });
+      });
+    }
+    factory.updateScreenings = function (allChildren) {
+      fixScreenings(allChildren);
     };
 
     factory.insert = function (childInfo, callback, errorCallback) {
@@ -466,9 +486,9 @@
         childInfo._id = childInfo._id + currentDbName + '_' + moment.now();
       }
 
-      if (childInfo._rev) {
-        childInfo._rev = childInfo._rev;
-      }
+      // if (childInfo._rev) {
+      //   childInfo._rev = childInfo._rev;
+      // }
       database.put(childInfo)
           .then(function (response) {
             // Do something with the response
@@ -568,6 +588,12 @@
         // Do something when everything is done
       });
     };
+
+    // factory.compactDB = function(stakeDB) {
+    //   database.compact((error) => {
+    //     console.log(error)
+    //   });
+    // };
 
     factory.replicate = function (upStreamDb, callback, errorCallback, whenDone) {
       database.replicate.to(upStreamDb)

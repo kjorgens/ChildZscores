@@ -5,16 +5,16 @@
   'use strict';
 
   angular
-      .module('children')
-      .controller('ChildrenSyncController', ChildrenSyncController);
+    .module('children')
+    .controller('ChildrenSyncController', ChildrenSyncController);
 
-  ChildrenSyncController.$inject = ['$rootScope', '$window', '$timeout', '$state', '$stateParams', 'ChildrenReport', 'FilterService',
+  ChildrenSyncController.$inject = ['$rootScope', '$window', '$timeout', '$state', '$stateParams', '$http', 'ChildrenReport', 'FilterService',
     'Authentication', 'ChildrenGetSync', 'usSpinnerService', 'PouchService', 'FileUploader', 'ModalService', 'ChildrenViews'];
 
-  function ChildrenSyncController($rootScope, $window, $timeout, $state, $stateParams, ChildrenReport, FilterService,
+  function ChildrenSyncController($rootScope, $window, $timeout, $state, $stateParams, $http, ChildrenReport, FilterService,
     Authentication, ChildrenGetSync, usSpinnerService, PouchService, FileUploader, ModalService, ChildrenViews) {
     var vm = this;
-    vm.countryCode = $stateParams.countryCode;
+    vm.countryCode = $stateParams.cCode;
     vm.countryName = $stateParams.countryName;
     vm.user = Authentication.user;
     vm.userIsAdmin = false;
@@ -34,6 +34,9 @@
 
     vm.uploadExcelCsv = uploadExcelCsv;
     vm.cancelUpload = cancelUpload;
+    vm.updateViews = updateViews;
+    vm.compactDB = compactDB;
+
     // Create file uploader instance
     vm.uploader = new FileUploader({
       url: 'api/children/upload/' + $stateParams.stakeDB,
@@ -70,17 +73,17 @@
     vm.uploader.onSuccessItem = function(fileItem, response, status, headers) {
       // Show success message
       vm.success = true;
-
     };
     vm.uploader.onCancelItem = function(fileItem, response, status, headers) {
       console.info('onCancelItem', fileItem, response, status, headers);
     };
 
-    function goBack(){
+    function goBack() {
       if (~vm.screenType.indexOf('nursing')){
         $state.go('children.listMothers', {
           stakeDB: vm.stakeDB,
           stakeName: vm.selectedStake,
+          cCode: vm.countryCode,
           screenType: 'nursing',
           searchFilter: '',
           colorFilter: '' });
@@ -88,6 +91,7 @@
         $state.go ('children.listMothers', {
           stakeDB: vm.stakeDB,
           stakeName: vm.selectedStake,
+          cCode: vm.countryCode,
           screenType: 'pregnant',
           searchFilter: '',
           colorFilter: '' });
@@ -95,6 +99,7 @@
         $state.go('children.list', {
           stakeDB: vm.stakeDB,
           stakeName: vm.selectedStake,
+          cCode: vm.countryCode,
           searchFilter: '',
           colorFilter: '',
           screenType: vm.screenType });
@@ -140,6 +145,7 @@
  //   vm.selectedStake = localStorage.getItem('selectedStake');
     vm.selectedStake = $stateParams.stakeName;
     vm.selectedCountry = localStorage.getItem('selectedCountry');
+    vm.selectedCountryCode = localStorage.getItem('selectedCountryCode');
     vm.selectedCountryImage = localStorage.getItem('selectedCountryImage');
     // vm.filterSelect = 'All Children';
     vm.authentication = Authentication;
@@ -234,34 +240,48 @@
     function returnReport(input) {
       vm.stopSpin();
       vm.reportReady = true;
-      vm.reportToDownload = '/files/' + input.message;
-      vm.reportName = input.message;
+      vm.reportToDownload = '/files/' + input.data.message;
+      vm.reportName = input.data.message;
       vm.reportFileName = { reportName: vm.reportName };
-      console.log(input);
+      // console.log(input);
     }
 
     function genReport(input) {
-      ChildrenReport.get(input, returnReport, getCsvError);
+      // ChildrenReport.get(input, returnReport, getCsvError);
+      // return $resource('api/children/report/:stakeDB/:cCode/:scopeType/:sortField/:language/:csvType');
+      return $http.get(
+        'api/children/report/' + input.stakeDB + '/' + input.cCode + '/' + input.scopeType + '/' + input.sortField + '/' + input.language + '/' + input.csvType)
+        .then(returnReport, getCsvError);
     }
 
     function getCsvError(error) {
       vm.stopSpin();
-      console.log(error.data.message);
-      vm.reportError('CSV creation error', error.data.name + ': ' + error.data.message, false);
+      console.log(error);
+      vm.reportError('CSV creation error', error.message, false);
 //      return ModalService.infoModal('some dumb error' + ' :\n', error + (notifyKarl ? '\n Please contact kjorgens@yahoo.com' : ''));
 //      vm.reportError('Download csv error', error.data.error.message, error.data.error.name.indexOf('Empty database') < 0);
     }
-    function createReport(filter, sortField, languageId) {
+
+    function createReport(scope, scopeID, sortField, csvType) {
       vm.startSpin();
-      if (filter === undefined) {
-        filter = 'all';
+      if (scope === undefined) {
+        scope = 'stake';
       }
       if (sortField === undefined) {
         sortField = 'firstName';
       }
-      var sortParam = { stakeDB: vm.stakeDB, filter: filter, sortField: sortField, language: $rootScope.SelectedLanguage };
+      var reportParams = { csvType: csvType, stakeDB: vm.stakeDB, scopeType: scope, cCode: vm.selectedCountryCode, sortField: sortField, language: $rootScope.SelectedLanguage };
  //     ChildrenViews.get(sortParam, genReport(sortParam), getCsvError);
-      ChildrenViews.updateViews(vm.stakeDB).then(genReport(sortParam), getCsvError);
+ //      ChildrenViews.updateViews(vm.stakeDB).then(genReport(sortParam), getCsvError);
+      return genReport(reportParams, getCsvError);
+    }
+
+    function updateViews() {
+      ChildrenViews.updateViews(vm.stakeDB);
+    }
+
+    function compactDB() {
+      ChildrenViews.compactDB(vm.stakeDB);
     }
 
     function viewUpdateComplete() {

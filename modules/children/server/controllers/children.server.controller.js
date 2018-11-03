@@ -4,7 +4,7 @@
  * Module dependencies.
  */
 var path = require('path'),
-  mongoose = require('mongoose'),
+  jwt_decode = require('jwt-decode'),
   request = require('request'),
   fs = require('fs'),
   csvParse = require('babyparse'),
@@ -13,7 +13,11 @@ var path = require('path'),
   csvloader = require('multer'),
   config = require(path.resolve('./config/config')),
   Promise = require('bluebird'),
+  _ = require('lodash'),
   errorHandler = require(path.resolve('./modules/core/server/controllers/errors.server.controller'));
+
+var retryLimit = 5;
+
 var errorStack = [];
 
 var filterList = [
@@ -38,7 +42,7 @@ var viewList = [
     '_id': '_design/name_search',
     'views': {
       'find_by_name': {
-        'map': 'function(doc){emit([doc.firstName, doc.lastName], doc)}'
+        'map': 'function(doc){emit([doc.firstName, doc.lastName, doc.birthDate], doc)}'
       }
     }
   },
@@ -90,18 +94,17 @@ var viewList = [
       }
     }
   },
+];
+
+var removeFilterList = [
   {
     '_id': '_design/screenings_search',
-    'views': {
-      'find_by_owner': {
-        'search': 'function(doc){ if (doc.owner) { emit([doc.owner], doc)}}'
-      }
-    }
-  }
+  },
 ];
 
 function validateView(type, stakeDB, view) {
   return new Promise(function(resolve, reject) {
+    console.log('inside validateView');
     var stakeDb = require('nano')('https://' + process.env.SYNC_ENTITY + '@' + process.env.COUCH_URL + '/' + stakeDB);
     var viewObject;
     if (~type.indexOf('view')) {
@@ -124,38 +127,73 @@ function validateView(type, stakeDB, view) {
           }
         });
       } else {
-        // console.log('view exists or error');
-        resolve(view._id + ' already exists');
+        viewObject._rev = body._rev;
+        stakeDb.insert(viewObject, function(err, response) {
+          if (err) {
+            var updateError = new Error(err.message);
+            console.log(err.message);
+            reject(updateError);
+          } else {
+            console.log('view ' + view._id + ' created in ' + stakeDB);
+            resolve('view ' + view._id + ' created in ' + stakeDB);
+          }
+        });
+        resolve(view._id + ' updated');
       }
+    });
+  });
+}
+
+function removeView(type, stakeDB, view) {
+  return new Promise(function (resolve, reject) {
+    var stakeDb = require('nano')('https://' + process.env.SYNC_ENTITY + '@' + process.env.COUCH_URL + '/' + stakeDB);
+
+    stakeDb.get(view._id, function (err, body) {
+      if (!err) {
+        stakeDb.destroy(view._id, body.doc.rev, function (err, response) {
+          if (err) {
+            var updateError = new Error(err.message);
+            console.log(err.message);
+            reject(updateError);
+          } else {
+            console.log('view ' + view._id + ' destroyed ' + stakeDB);
+            resolve('view ' + view._id + ' destroyed in ' + stakeDB);
+          }
+        });
+      }
+      resolve('no view to remove');
     });
   });
 }
 
 exports.checkUpdateViews = function (req, res) {
   var toCheck = [];
+  console.log('inside checkUpdateViews');
   viewList.forEach(function (view) {
     toCheck.push(validateView('view', req.params.stakeDB, view));
   });
   filterList.forEach(function (filter) {
     toCheck.push(validateView('filter', req.params.stakeDB, filter));
   });
+  removeFilterList.forEach(function (filter) {
+    toCheck.push(removeView('remove', req.params.stakeDB, filter));
+  });
 
   var allViews = Promise.all(toCheck);
   allViews.then(function(input) {
     return (res.status(200).send({ message: input }));
-  }).catch(function (err) {
+  }).catch(function (error) {
     return res.status(400).send({
-      message: err.message,
-      name: err.name,
-      stack: err.stack
-    });
+        message: errorHandler.getErrorMessage(error)
+      }
+    );
   });
 };
 
 function getScreeningsList(childId, screeningList) {
   var screenList = [];
   screeningList.forEach(function(screenEntry) {
-    if (~screenEntry.key.owner.indexOf(childId)) {
+    if (screenEntry.key.owner === childId) {
       screenList.push(screenEntry.key);
     }
   });
@@ -179,74 +217,98 @@ function getScreeningsList(childId, screeningList) {
   return screenList;
 }
 
-function listAllChildren(childScreenList) {
-  var count = 0;
-  var linesToAdd = [];
+function splitSups(childScreenList) {
+  const supList = childScreenList.listIn.filter(child => child.data.sup !== 'none' && child.data.sup !== 'risk' && child.data.sinceLastScreen < 6);
+  const others = childScreenList.listIn.filter(child => child.data.sup === 'none' || child.data.sup === 'risk' || child.data.sinceLastScreen > 6);
+  return { listIn: [...supList, ...others] };
+}
+
+function listAllChildren(childScreenList, screenType) {
+  var childCount = 0;
   var sortedScreenList = [];
   var noScreenings = 0;
   var supType = 'none';
-  let currentSupType = 'none';
-  var tooOld = 0;
+  var currentSupType = 'none';
   var timeSinceLastScreen;
   var priorMalnurished = 'no';
+  var lineAccumulator = [];
 
-  childScreenList.forEach(function (dataSet) {
-    if (dataSet[0].data.total_rows > 0) {
-      dataSet[0].data.rows.forEach(function (childEntry) {
-        var currentAge = moment().diff(moment(new Date(childEntry.key.birthDate)), 'months');
-        // if(childEntry.key.firstName.indexOf('Brinley') > -1) {
-        //   console.log('Found it');
-        // }
-        if (~dataSet[0].parms.filter.indexOf('zscore')) {
-          if (currentAge < 60 && ~childEntry.id.indexOf('chld')) {
-            sortedScreenList = getScreeningsList(childEntry.id, dataSet[1].data.rows);
-            if (sortedScreenList.length === 0) {
-              noScreenings++;
-              linesToAdd.push(addChildToLine(childEntry.key, sortedScreenList[0], dataSet[0].parms.sortField, dataSet[0].parms.stakeDB, dataSet[0].parms.filter, ' ', 100, 'no', dataSet[0].language));
-            } else {
-              supType = 'none';
-              priorMalnurished = 'no';
-              currentSupType = 'none';
-              sortedScreenList.forEach(function(screening, index) {
-                if ((screening.zScore.ha > -2 && screening.zScore.ha <-1) || (screening.zScore.wa > -2 && screening.zScore.wa < -1)) {
-                  supType = 'risk';
-                }
-                if ((screening.zScore.ha < -2 || screening.zScore.wa < -2)) {
-                  priorMalnurished = 'yes';
-                  supType = 'sup';
-                  if (currentAge > 36 && currentAge <= 60) {
-                    supType = 'mic';
+  if (childScreenList[0].data.total_rows > 0) {
+    childScreenList[0].data.rows.forEach(function (childEntry) {
+      var currentAge = moment().diff(moment(new Date(childEntry.key.birthDate)), 'months');
+        if (!~childEntry.id.indexOf('mthr')) {
+          if (screenType === 'sup') {
+            if (currentAge < 60 && ~childEntry.id.indexOf('chld')) {
+              sortedScreenList = getScreeningsList(childEntry.id, childScreenList[1].data.rows);
+              if (sortedScreenList.length === 0) {
+                noScreenings++;
+                lineAccumulator.push(addChildToLine(childEntry.key, sortedScreenList[0], childScreenList[0].parms.sortField, childScreenList[0].parms.stakeDB, childScreenList[0].parms.filter, ' ', 100, 'no', childScreenList[0].language));
+              } else {
+                supType = 'none';
+                priorMalnurished = 'no';
+                currentSupType = 'none';
+                sortedScreenList.forEach(function (screening, index) {
+                  // if ((screening.zScore.ha > -2 && screening.zScore.ha < -1) || (screening.zScore.wa > -2 && screening.zScore.wa < -1)) {
+                  //   supType = 'risk';
+                  // }
+                  if ((screening.zScore.ha < -2 || screening.zScore.wa < -2)) {
+                    priorMalnurished = 'yes';
+                    supType = 'sup';
+                    if (currentAge > 36 && currentAge <= 60) {
+                      supType = 'mic';
+                    }
                   }
-                }
-                if (screening.zScore.wl < -2) {
-                  priorMalnurished = 'yes';
-                  supType = 'MAM';
-                  if (screening.zScore.wl < -3) {
-                    supType = 'SAM';
+                  if (screening.zScore.wl < -2) {
+                    priorMalnurished = 'yes';
+                    supType = 'MAM';
+                    if (screening.zScore.wl < -3) {
+                      supType = 'SAM';
+                    }
                   }
-                }
-                if (index === 0) {
-                  currentSupType = supType;
-                }
-              });
-              timeSinceLastScreen = moment().diff(moment(new Date(sortedScreenList[0].surveyDate)), 'months');
-                linesToAdd.push(addChildToLine(childEntry.key, sortedScreenList[0], dataSet[0].parms.sortField, dataSet[0].parms.stakeDB,
-                  dataSet[0].parms.filter, currentSupType, timeSinceLastScreen, priorMalnurished, dataSet[0].parms.language));
-               }
+                  if (index === 0) {
+                    currentSupType = supType;
+                  }
+                });
+                timeSinceLastScreen = moment().diff(moment(new Date(sortedScreenList[0].surveyDate)), 'months');
+
+                lineAccumulator.push(addChildToLine(childEntry.key, sortedScreenList[0], childScreenList[0].parms.sortField, childScreenList[0].parms.stakeDB,
+                  childScreenList[0].parms.filter, currentSupType, timeSinceLastScreen, priorMalnurished, childScreenList[0].parms.language));
+              }
             }
+          } else if (screenType === 'all') {
+            try {
+              if (childScreenList[1].data.total_rows > 0) {
+                sortedScreenList = getScreeningsList(childEntry.id, childScreenList[1].data.rows);
+                let screenCount = 1;
+                sortedScreenList.forEach(function (entry) {
+                  lineAccumulator.push(addLineToStack(childCount, screenCount, childEntry.key, entry, childScreenList[0].parms.sortField, childScreenList[0].stake, childScreenList[0].stakeName, childScreenList[0].parms.language));
+                  childCount++;
+                  screenCount++;
+                });
+              }
+            } catch (err) {
+              console.log(err.message);
+            }
+          }
         } else {
-          if (dataSet[1].data.total_rows > 0) {
-            sortedScreenList = getScreeningsList(childEntry.id, dataSet[1].data.rows);
-            sortedScreenList.forEach(function (entry) {
-              linesToAdd.push(addLineToStack(childEntry.key, entry, dataSet[0].parms.sortField, dataSet[0].stake, dataSet[0].stakeName, dataSet[0].parms.language));
-              count++;
-            });
+          try {
+            if (childScreenList[1].data.total_rows > 0) {
+              sortedScreenList = getScreeningsList(childEntry.id, childScreenList[1].data.rows);
+              let screenCount = 1;
+              sortedScreenList.forEach(function (entry) {
+                lineAccumulator.push(addLineToStack(childCount, screenCount, childEntry.key, entry, childScreenList[0].parms.sortField, childScreenList[0].stake, childScreenList[0].stakeName, childScreenList[0].parms.language));
+                childCount++;
+                screenCount++;
+              });
+            }
+          } catch (err) {
+            console.log(err.message);
           }
         }
-      });
-    }
-  });
-  return linesToAdd;
+    });
+  }
+
+  return lineAccumulator;
 }
 
 function listWomen(womanScreenList) {
@@ -270,7 +332,7 @@ function listWomen(womanScreenList) {
   return linesToAdd;
 }
 
-function dbRequest(stake, stakeName, parmObj, view) {
+function newDBRequest(stake, stakeName, parmObj, view) {
   return new Promise(function(resolve, reject) {
     try {
       var couchURL;
@@ -279,207 +341,154 @@ function dbRequest(stake, stakeName, parmObj, view) {
       } else {
         couchURL = 'https://' + process.env.SYNC_ENTITY + '@' + process.env.COUCH_URL + '/';
       }
-      var newObj = parmObj;
-      request.get(couchURL + stake + '/_design/' + view + '/_view/screen', function (error, response, body) {
+      var newObj = Object.assign({}, parmObj);
+      request.get(couchURL + stake + '/_design/' + view + '/_view/screen', (error, response) => {
         if (!error && response.statusCode === 200) {
           var jsonObj;
           try {
-            jsonObj = JSON.parse(body);
+            jsonObj = JSON.parse(response.body);
             resolve({ stake: stake, stakeName: stakeName, parms: newObj, data: jsonObj, view: view });
           } catch (e) {
-            // console.log('Error JSON.Parse dbRequest');
-            resolve({ stake: stake, stakeName: stakeName, parms: newObj, data: [], view: view });
+             console.log('Error JSON.Parse dbRequest');
+            reject(e);
+            // resolve({ stake: stake, stakeName: stakeName, parms: newObj, data: [], view: view });
           }
-        } else {
-          if (error) {
-            console.log('database error: ' + error.message);
-          } else {
-            if (response.statusCode === 504) {
-              console.log('504 returned accessing ' + stake);
-            }
-            console.log('status code = ' + response.statusCode);
-          }
-          resolve({ stake: stake, stakeName: stakeName, parms: newObj, data: [], view: view });
+        } else if (response.statusCode === 500) {
+          console.log(`${ response.statusCode } returned from couch access ${ stake }`);
+          // resolve({ stake: stake, stakeName: stakeName, parms: newObj, data: {}, view: view });
+          reject(new Error(`${ response.statusCode } returned from couch access ${ stake }`));
         }
       });
-    } catch (e) {
-      console.log('error');
-      resolve({ stake: stake, stakeName: stakeName, parms: parmObj, data: [], view: view });
+    } catch(err) {
+      console.log(err.message);
+      reject(err);
     }
   });
 }
 
 function getWomen(parmObj) {
-  var newObj = parmObj;
+  var newObj = Object.assign({},parmObj);
   var stake = parmObj.stakeDB;
-  return Promise.join(dbRequest(stake, parmObj.stakename, newObj, 'pregnant_women'), dbRequest(stake, parmObj.stakename, newObj, 'nursing_mothers'));
+  return Promise.join(newDBRequest(stake, parmObj.stakename, newObj, 'pregnant_women'), newDBRequest(stake, parmObj.stakename, newObj, 'nursing_mothers'));
 }
 
-function getChildAndData(parmObj) {
-  var newObj = parmObj;
+async function getChildAndData(parmObj) {
+  var newObj = Object.assign({},parmObj);
   var stake = parmObj.stakeDB;
-  return Promise.join(dbRequest(stake, parmObj.stakename, newObj, 'children_list'), dbRequest(stake, parmObj.stakename, newObj, 'scr_list'));
+  return Promise.join(newDBRequest(stake, parmObj.stakename, newObj, 'children_list'), newDBRequest(stake, parmObj.stakename, newObj, 'scr_list'));
 }
 
-function writeBigFile(input) {
-  return new Promise(function(resolve, reject) {
-    var headerLine;
-    if (Object.keys(input).length === 0) {
-      reject(new Error('Nothing to display, sync and try again?'));
-    }
-    headerLine = 'child Index,stake db name,screen Count,id,gender,firstName,lastName,birthdate,idGroup,mother,father,phone,address,city,ward,lds,screenDate,weight,height,age,ha,wa,wh,status\n';
-    var outPut = headerLine += input.data;
-    fs.writeFile('files/aggregated_list.csv', outPut, function (err) {
+async function writeHeader(fileToWrite, headerLine) {
+  return new Promise((resolve, reject) => {
+    fs.writeFile(`files/${ fileToWrite }`, headerLine, (err) => {
       if (err) {
         console.log(err);
         reject(err.message);
       } else {
-        resolve('aggregated_list.csv');
+        console.log('saving header');
+        resolve(fileToWrite);
       }
     });
-  });
+  })
 }
 
-function writeTheFile(input) {
-  return new Promise(function(resolve, reject) {
-    var headerLine;
-    if (Object.keys(input).length === 0) {
-      reject(new Error('Nothing to display, sync and try again?'));
-    }
-    var currentMonth = moment().month();
-    if (~input.filter.indexOf('preg') || ~input.filter.indexOf('nurs')) {
-      headerLine = input.language === 'en' ? 'id,firstName,lastName,idGroup,phone,address,city,ward,lds,screenDate,other date\n' :
-        'carné de identidad,nombre de pila,apellido,grupo de identificación,teléfono,dirección,ciudad,sala,miembro lds,fecha de la pantalla, otra fecha\n';
-    } else if (~input.filter.indexOf('zscore')) {
-//      var columns = input.language === 'en' ? 'firstName,lastName,ward,birthdate,mother,age,sup type,' : 'nombre de pila,apellido,sala,Fecha de nacimiento,madre,anos,tipo de suplemento,';
-//      headerLine =  columns + moment.months(currentMonth % 12) + ',' + moment.months((currentMonth + 1) % 12) + ',' + moment.months((currentMonth + 2) % 12) + ',' + moment.months((currentMonth + 3) % 12) + ',' + moment.months((currentMonth + 4) % 12) + ',' + moment.months((currentMonth + 5) % 12) + '\n';
-      var columns = input.language === 'en' ? '1,2,3,4,5,6,Sup,age,Prior Sup,firstName,lastName,ward,mother,' : '1,2,3,4,5,6,Sup,anos,Anterior Sup,nombre de pila,apellido,sala,madre,';
-      headerLine =  columns + '\n';
-    } else {
-      headerLine = 'id,gender,firstName,lastName,birthdate,idGroup,mother,father,phone,address,city,ward,lds,screenDate,weight,height,age,ha,wa,wh,status\n';
-    }
-    var outPut = headerLine += input.data;
-    fs.writeFile('files/' + input.dbId + '.csv', outPut, function (err) {
+async function appendStake(fileToWrite, data) {
+  return new Promise((resolve, reject) => {
+    fs.appendFile(`files/${ fileToWrite }`, data, (err) => {
       if (err) {
         console.log(err);
         reject(err.message);
-      } else {
-        resolve('files/' + input.dbId + '.csv');
       }
+      resolve(fileToWrite);
     });
   });
 }
 
-function collectAll(dbKids) {
-  return new Promise(function(resolve, reject) {
-    var writeStack = '';
-    var stakeDB;
-    var filter;
-    var language;
-    if (dbKids.listIn.length === 0 && dbKids.missedList.length === 0 && dbKids.riskList.length === 0 && dbKids.normalList.length === 0) {
-      console.log('nothing to write');
-      resolve({});
+function addChildToLine(existingOwnerInfo, screenInfo, sortField, stakeDB, filter, supType, timeSinceLastScreen, priorMalNurish, language) {
+  const ownerInfo = existingOwnerInfo;
+  ownerInfo.sup = supType;
+  ownerInfo.sinceLastScreen = timeSinceLastScreen;
+  if (typeof ownerInfo.mother === 'string' && ownerInfo.mother.indexOf(',') > -1) {
+    ownerInfo.mother = ownerInfo.mother.replace(/,/g, ' ');
+  }
+  if (typeof ownerInfo.firstName === 'string' && ownerInfo.firstName.indexOf(',') > -1) {
+    ownerInfo.firstName = ownerInfo.firstName.replace(/,/g, ' ');
+  }
+  if (typeof ownerInfo.lastName === 'string' && ownerInfo.lastName.indexOf(',') > -1) {
+    ownerInfo.lastName = ownerInfo.lastName.replace(/,/g, ' ');
+  }
+  if (typeof ownerInfo.phone === 'string' && ownerInfo.phone.indexOf(',') > -1) {
+    ownerInfo.phone = ownerInfo.phone.replace(/,/g, ' ');
+  }
+  if (typeof ownerInfo.ward === 'string' && ownerInfo.ward.indexOf(',') > -1) {
+    ownerInfo.ward = ownerInfo.ward.replace(/,/g, ' ');
+  }
+  var dataLine;
+  var currentAge = moment().diff(moment(new Date(ownerInfo.birthDate)), 'months');
+  var priorMessage = language === 'en' ? `${ priorMalNurish }` : `${ priorMalNurish === 'yes' ? 'si' : 'no' }`;
+  if (supType.indexOf('risk') > -1) {
+    var message = language === 'en' ? ` months since last screening\n` :
+      ` meses desde la última evaluación\n`;
+    dataLine = '' + ',' + ',' + ',' + ',' + ',' + ',' + ',' + currentAge + ',' + priorMessage + ',' + ownerInfo.firstName + ',' + ownerInfo.lastName + ',' + ownerInfo.ward +
+      ',' + ownerInfo.mother + ',' + timeSinceLastScreen + message;
+    return ({
+      data: ownerInfo,
+      dataLine: dataLine,
+      stakeDB: stakeDB,
+      sortField: sortField,
+      filter: filter,
+      atRisk: true,
+      language: language
+    });
+  } else if (supType.indexOf('none') > -1) {
+    var message = language === 'en' ? ` months since last screening\n` :
+      ` meses desde la última evaluación\n`;
+    dataLine = '' + ',' + ',' + ',' + ',' + ',' + ',' + ',' + currentAge + ',' + priorMessage + ',' + ownerInfo.firstName + ',' + ownerInfo.lastName + ',' + ownerInfo.ward +
+      ',' + ownerInfo.mother + ',' + timeSinceLastScreen + message;
+    return ({
+      data: ownerInfo,
+      dataLine: dataLine,
+      stakeDB: stakeDB,
+      sortField: sortField,
+      filter: filter,
+      normalZscore: true,
+      language: language
+    });
+  } else if (screenInfo === undefined || timeSinceLastScreen > 6) {
+    if (timeSinceLastScreen === undefined || timeSinceLastScreen === 100) {
+      var messageProb = language === 'en' ? ' no screenings: possible duplicate?\n' : ' sin proyecciones: posible duplicado?\n';
+      dataLine = '' + ',' + ',' + ',' + ',' + ',' + ',' + ',' + currentAge + ',' + priorMessage + ',' + ownerInfo.firstName + ',' + ownerInfo.lastName + ',' + ownerInfo.ward +
+        ',' + ownerInfo.mother + ',' + messageProb;
     } else {
-      if (dbKids.listIn.length > 0) {
-        stakeDB = dbKids.listIn[0].stakeDB;
-        filter = dbKids.listIn[0].filter;
-        language = dbKids.listIn[0].language;
-      } else if (dbKids.missedList.length > 0) {
-        stakeDB = dbKids.missedList[0].stakeDB;
-        filter = dbKids.missedList[0].filter;
-        language = dbKids.missedList[0].language;
-      } else if (dbKids.riskList.length > 0) {
-        stakeDB = dbKids.riskList[0].stakeDB;
-        filter = dbKids.riskList[0].filter;
-        language = dbKids.riskList[0].language;
-      } else if (dbKids.normalList.length > 0) {
-        stakeDB = dbKids.normalList[0].stakeDB;
-        filter = dbKids.normalList[0].filter;
-        language = dbKids.normalList[0].language;
-      }
+      var messageRisk = language === 'en' ? `  months since last screening\n` :
+        ` meses desde la última evaluación , Niño en riesgo: debería pasar a la siguiente evaluación\n`;
+      dataLine = '' + ',' + ',' + ',' + ',' + ',' + ',' + ',' + currentAge + ',' + priorMessage + ',' + ownerInfo.firstName + ',' + ownerInfo.lastName + ',' + ownerInfo.ward +
+        ',' + ownerInfo.mother + ',' + timeSinceLastScreen + messageRisk;
     }
-    if (dbKids.listIn.length > 0) {
-      dbKids.listIn.forEach(function (kid) {
-        writeStack += kid.dataLine;
-      });
-    }
-    if (dbKids.missedList.length > 0) {
-      dbKids.missedList.forEach(function (kid) {
-        writeStack += kid.dataLine;
-      });
-    }
-    if (dbKids.riskList.length > 0) {
-      dbKids.riskList.forEach(function(kid) {
-        writeStack += kid.dataLine;
-      });
-    }
-    if (dbKids.possibleProblems.length > 0) {
-      dbKids.possibleProblems.forEach(function(prob) {
-        writeStack += prob.dataLine;
-      });
-    }
-    if (dbKids.normalList.length > 0) {
-      dbKids.normalList.forEach(function(prob) {
-        writeStack += prob.dataLine;
-      });
-    }
-    resolve({ data: writeStack, dbId: stakeDB, filter: filter, language: language});
-  });
+    return ({
+      data: ownerInfo,
+      dataLine: dataLine,
+      stakeDB: stakeDB,
+      sortField: sortField,
+      filter: filter,
+      missedScreen: true,
+      language: language
+    });
+  } else {
+    dataLine = '' + ',' + ',' + ',' + ',' + ',,' + supType + ',' + currentAge + ',' + priorMessage + ',' + ownerInfo.firstName + ',' + ownerInfo.lastName +
+      ',' + ownerInfo.ward + ',' + ownerInfo.mother + '\n';
+    return ({
+      data: ownerInfo,
+      dataLine: dataLine,
+      stakeDB: stakeDB,
+      sortField: sortField,
+      filter: filter,
+      language: language
+    });
+  }
 }
 
-function addChildToLine(ownerInfo, screenInfo, sortField, stakeDB, filter, supType, timeSinceLastScreen, priorMalNurish, language) {
-  return new Promise(function (resolve, reject) {
-    if (typeof ownerInfo.mother === 'string' && ownerInfo.mother.indexOf(',') > -1) {
-      ownerInfo.mother = ownerInfo.mother.replace(/,/g, ' ');
-    }
-    if (typeof ownerInfo.firstName === 'string' && ownerInfo.firstName.indexOf(',') > -1) {
-      ownerInfo.firstName = ownerInfo.firstName.replace(/,/g, ' ');
-    }
-    if (typeof ownerInfo.lastName === 'string' && ownerInfo.lastName.indexOf(',') > -1) {
-      ownerInfo.lastName = ownerInfo.lastName.replace(/,/g, ' ');
-    }
-    if (typeof ownerInfo.phone === 'string' && ownerInfo.phone.indexOf(',') > -1) {
-      ownerInfo.phone = ownerInfo.phone.replace(/,/g, ' ');
-    }
-    if (typeof ownerInfo.ward === 'string' && ownerInfo.ward.indexOf(',') > -1) {
-      ownerInfo.ward = ownerInfo.ward.replace(/,/g, ' ');
-    }
-    var dataLine;
-    var currentAge = moment().diff(moment(new Date(ownerInfo.birthDate)), 'months');
-    var priorMessage = language === 'en' ? `${ priorMalNurish }` : `${ priorMalNurish === 'yes' ? 'si' : 'no' }`;
-    if (supType.indexOf('risk') > -1) {
-      var message = language === 'en' ? ` months since last screening\n` :
-        ` meses desde la última evaluación\n`;
-      dataLine = '' + ',' + ',' + ',' + ',' + ',' + ',' + ',' + currentAge + ',' + priorMessage + ',' + ownerInfo.firstName + ',' + ownerInfo.lastName + ',' + ownerInfo.ward +
-        ',' + ownerInfo.mother + ',' + timeSinceLastScreen + message;
-      resolve({ data: ownerInfo, dataLine: dataLine, stakeDB: stakeDB, sortField: sortField, filter: filter, atRisk: true, language: language });
-    } else if (supType.indexOf('none') > -1) {
-      var message = language === 'en' ? ` months since last screening\n` :
-        ` meses desde la última evaluación\n`;
-      dataLine = '' + ',' + ',' + ',' + ',' + ',' + ',' + ',' + currentAge + ',' + priorMessage + ',' + ownerInfo.firstName + ',' + ownerInfo.lastName + ',' + ownerInfo.ward +
-        ',' + ownerInfo.mother + ',' + timeSinceLastScreen + message;
-      resolve({ data: ownerInfo, dataLine: dataLine, stakeDB: stakeDB, sortField: sortField, filter: filter, normalZscore: true, language: language });
-    } else if (screenInfo === undefined || timeSinceLastScreen > 6) {
-      if (timeSinceLastScreen === undefined || timeSinceLastScreen === 100) {
-        var messageProb = language === 'en' ? ' no screenings: possible duplicate?\n' : ' sin proyecciones: posible duplicado?\n';
-        dataLine = '' + ',' + ',' + ',' + ',' + ',' + ',' + ',' + currentAge + ',' + priorMessage + ',' + ownerInfo.firstName + ',' + ownerInfo.lastName + ',' + ownerInfo.ward +
-          ',' + ownerInfo.mother + ',' + messageProb;
-      } else {
-        var messageRisk = language === 'en' ? `  months since last screening\n` :
-          ` meses desde la última evaluación , Niño en riesgo: debería pasar a la siguiente evaluación\n`;
-        dataLine = '' + ',' + ',' + ',' + ',' + ',' + ',' + ',' + currentAge + ',' + priorMessage + ',' + ownerInfo.firstName + ',' + ownerInfo.lastName + ',' + ownerInfo.ward +
-          ',' + ownerInfo.mother + ',' + timeSinceLastScreen + messageRisk;
-      }
-      resolve({ data: ownerInfo, dataLine: dataLine, stakeDB: stakeDB, sortField: sortField, filter: filter, missedScreen: true, language: language });
-    } else {
-      dataLine = '' + ',' + ',' + ',' + ',' + ',,' + supType + ',' + currentAge + ',' + priorMessage + ',' + ownerInfo.firstName + ',' + ownerInfo.lastName +
-        ',' + ownerInfo.ward + ',' + ownerInfo.mother + '\n';
-      resolve({ data: ownerInfo, dataLine: dataLine, stakeDB: stakeDB, sortField: sortField, filter: filter, language: language });
-    }
-  });
-}
-
-function addLineToStack(ownerInfo, screenInfo, sortField, stakeDB, stakeName, language) {
+function addLineToStack(childCount, screenCount, ownerInfo, screenInfo, sortField, stakeDB, stakeName, language) {
   if (typeof ownerInfo.address === 'string' && ownerInfo.address.indexOf(',') > -1) {
     ownerInfo.address = ownerInfo.address.replace(/,/g, ' ');
   }
@@ -522,6 +531,7 @@ function addLineToStack(ownerInfo, screenInfo, sortField, stakeDB, stakeName, la
     ward: ownerInfo.ward || '',
     memberStatus: ownerInfo.memberStatus || '',
     lastScreening: ownerInfo.lastScreening,
+    screeningID: screenInfo.id,
     weight: screenInfo.weight,
     height: screenInfo.height,
     age: screenInfo.monthAge,
@@ -531,26 +541,13 @@ function addLineToStack(ownerInfo, screenInfo, sortField, stakeDB, stakeName, la
     surveyDate: screenInfo.surveyDate,
     screenId: screenInfo._id
   };
-  var zscoreStatus = '';
-  if (screenInfo.zScore.wl < -2) {
-    zscoreStatus = 'Acute: supplements required';
-  } else if ((screenInfo.zScore.ha < -2 || screenInfo.zScore.wa < -2) && dataObj.age > 6 && dataObj.age < 36) {
-    zscoreStatus = 'Acute: supplements required';
-  } else if ((screenInfo.zScore.ha < -2 || screenInfo.zScore.wa < -2) && dataObj.age > 36 && dataObj.age < 48) {
-    zscoreStatus = 'Micro nutrients required';
-  } else if (screenInfo.zScore.ha < -1 ||
-        screenInfo.zScore.wa < -1 ||
-        screenInfo.zScore.wl < -1) {
-    zscoreStatus = 'At Risk: Come to next screening';
-  } else {
-    zscoreStatus = 'Normal';
-  }
 
-  var dataLine = dataObj.childId + ',' + dataObj.gender + ',' + dataObj.firstName + ',' + dataObj.lastName + ',' + dataObj.birthDate +
+  const zscoreStatus = calculateStatus(screenInfo);
+   var dataLine = childCount + ',' + stakeDB + ',' + screenCount + ',' + dataObj.childId + ',' + dataObj.gender + ',' + dataObj.firstName + ',' + dataObj.lastName + ',' + dataObj.birthDate +
         ',' + dataObj.idGroup + ',' + dataObj.mother + ',' + dataObj.father + ',' + dataObj.phone + ',' + dataObj.address +
-        ',' + dataObj.city + ',' + dataObj.ward + ',' + dataObj.memberStatus + ',' + dataObj.surveyDate + ',' + dataObj.weight + ',' + dataObj.height +
-        ',' + dataObj.age + ',' + dataObj.ha + ',' + dataObj.wa + ',' + dataObj.wl + ',' + zscoreStatus + '\n';
-  return { data: dataObj, dataLine: dataLine, stakeDB: stakeDB, stakeName: stakeName, sortField: sortField, filter: 'all' };
+        ',' + dataObj.city + ',' + dataObj.ward + ',' + dataObj.memberStatus + ',' + dataObj.screenId + ',' + dataObj.surveyDate +
+        ',' + dataObj.weight + ',' + dataObj.height + ',' + dataObj.age + ',' + dataObj.ha + ',' + dataObj.wa + ',' + dataObj.wl + ',' + zscoreStatus.zscoreStatus + '\n';
+  return { data: dataObj, dataLine: dataLine, stakeDB: stakeDB, stakeName: stakeName, sortField: sortField, filter: 'listall' };
 }
 
 function addWomenToStack(input, stakeDB, sortField, filter, language) {
@@ -601,66 +598,18 @@ function addWomenToStack(input, stakeDB, sortField, filter, language) {
   // });
 }
 
-function numberEm(lists) {
-  var idCounter = 0;
-  var savedId = 0;
-  var screenCounter = 1;
-  lists.listIn.forEach(function(child, index) {
-    if (child.data.childId === savedId) {
-      lists.listIn[index].childIndexId = idCounter;
-      lists.listIn[index].screenIndex = ++screenCounter;
-    } else {
-      screenCounter = 1;
-      lists.listIn[index].childIndexId = ++idCounter;
-      lists.listIn[index].screenIndex = screenCounter;
-      savedId = child.data.childId;
-    }
-    lists.listIn[index].dataLine = lists.listIn[index].childIndexId + ',' + lists.listIn[index].stakeName + ',' + lists.listIn[index].screenIndex + ',' + lists.listIn[index].dataLine;
+function buildOutputData(listIn) {
+  let accumulate = '';
+  listIn.listIn.forEach(function (child) {
+    accumulate = accumulate.concat(child.dataLine);
   });
-  return lists;
+  return accumulate;
 }
 
-function sortEm(listIn) {
-  var missedList = [];
-  var atRiskList = [];
-  var possibleProb = [];
-  var normalList = [];
-  for (var i = listIn.length - 1; i >= 0; i--) {
-    if (listIn[i] === undefined) {
-      listIn.splice(i, 1);
-    } else if (listIn[i].missedScreen) {
-      if (listIn[i].dataLine.indexOf('duplicate') > -1) {
-        possibleProb.push(listIn[i]);
-      } else {
-        missedList.push(listIn[i]);
-      }
-      listIn.splice(i, 1);
-    } else if (listIn[i].atRisk) {
-      atRiskList.push(listIn[i]);
-      listIn.splice(i, 1);
-    } else if (listIn[i].normalZscore) {
-      normalList.push(listIn[i]);
-      listIn.splice(i, 1);
-    }
-  }
-  missedList.forEach(function(entry, index) {
-    if (entry.data[entry.sortField] === undefined) {
-      missedList[index].data[entry.sortField] = 'unknown';
-    }
-  });
-  atRiskList.forEach(function(entry, index) {
-    if (entry.data[entry.sortField] === undefined) {
-      atRiskList[index].data[entry.sortField] = 'unknown';
-    }
-  });
+function sortList(listIn) {
   listIn.forEach(function(entry, index) {
-    if (entry.data[entry.sortField] === undefined) {
-      listIn[index].data[entry.sortField] = 'unknown';
-    }
-  });
-  normalList.forEach(function(entry, index) {
-    if (entry.data[entry.sortField] === undefined) {
-      normalList[index].data[entry.sortField] = 'unknown';
+    if (entry.sortField === undefined) {
+      listIn[index].sortField = 'firstName';
     }
   });
   listIn.sort(function(x, y) {
@@ -675,156 +624,172 @@ function sortEm(listIn) {
     }
     return 0;
   });
-  missedList.sort(function(x, y) {
-    if (x.data[x.sortField].toUpperCase() < y.data[x.sortField].toUpperCase()) {
-      return -1;
-    }
-    if (x.data[x.sortField].toUpperCase() > y.data[x.sortField].toUpperCase()) {
-      return 1;
-    }
-    if (x.data[x.sortField].toUpperCase() === y.data[x.sortField].toUpperCase()) {
-      return 0;
-    }
-    return 0;
-  });
-  atRiskList.sort(function(x, y) {
-    if (x.data[x.sortField].toUpperCase() < y.data[x.sortField].toUpperCase()) {
-      return -1;
-    }
-    if (x.data[x.sortField].toUpperCase() > y.data[x.sortField].toUpperCase()) {
-      return 1;
-    }
-    if (x.data[x.sortField].toUpperCase() === y.data[x.sortField].toUpperCase()) {
-      return 0;
-    }
-    return 0;
-  });
-  normalList.sort(function(x, y) {
-    if (x.data[x.sortField].toUpperCase() < y.data[x.sortField].toUpperCase()) {
-      return -1;
-    }
-    if (x.data[x.sortField].toUpperCase() > y.data[x.sortField].toUpperCase()) {
-      return 1;
-    }
-    if (x.data[x.sortField].toUpperCase() === y.data[x.sortField].toUpperCase()) {
-      return 0;
-    }
-    return 0;
-  });
-  normalList.sort(firstNameSort);
-  missedList.sort(firstNameSort);
-  atRiskList.sort(firstNameSort);
-  possibleProb.sort(firstNameSort);
-  return { listIn: listIn, missedList: missedList, riskList: atRiskList, possibleProblems: possibleProb, normalList: normalList};
+
+  return { listIn: listIn };
 }
 
-function firstNameSort(x, y) {
-  if (x.data.firstName.toUpperCase() < y.data.firstName.toUpperCase()) {
-    return -1;
+async function saveStake(stakeInfo) {
+  try {
+    let childData;
+    const screeningData = await getChildAndData(stakeInfo);
+    if (stakeInfo.csvType === 'sup') {
+      childData = buildOutputData(splitSups(sortList(listAllChildren(screeningData, stakeInfo.csvType))));
+    } else {
+      childData = buildOutputData(sortList(listAllChildren(screeningData, stakeInfo.csvType)));
+    }
+    return appendStake(stakeInfo.fileToSave, childData);
+  } catch(err) {
+    // console.log(`redo somehow${ stakeInfo.stakeName } err.message`);
+    return (stakeInfo);
   }
-  if (x.data.firstName.toUpperCase() > y.data.firstName.toUpperCase()) {
-    return 1;
-  }
-  if (x.data.firstName.toUpperCase() === y.data.firstName.toUpperCase()) {
-    return 0;
-  }
-  return 0;
 }
 
-function dbListToFile(parmObj) {
-  return getDBListFromFile(parmObj).map(function(db) {
-    var newObj = parmObj;
-    newObj.stakeDB = db.db;
-    newObj.stakename = db.name;
-    return getChildAndData(newObj);
-  }, { concurrency: 2 });
-}
-
-function oneStake(parmObj) {
-  var stakeList = [];
-  var newObj = parmObj;
-  newObj.stakeDB = parmObj.stakeDB;
-  newObj.stakename = 'Current';
-  stakeList.push(newObj);
-  return Promise.map(stakeList, function(stuff) {
-    return Promise.resolve(getChildAndData(stuff));
-  }, { concurrency: 2 });
+async function saveWomenInfo(stakeInfo, type) {
+  const screeningData = await getWomen(stakeInfo);
+  const childData = buildOutputData(sortList(listWomen(screeningData)));
+  return appendStake(stakeInfo.fileToSave, childData);
 }
 
 function oneStakeWomen(parmObj) {
-  var stakeList = [];
-  var newObj = parmObj;
-  newObj.stakeDB = parmObj.stakeDB;
+  var newObj = Object.assign({}, parmObj);
+  // newObj.stakeDB = parmObj.stakeDB;
   newObj.stakename = 'Current';
-  newObj.filter = parmObj.filter;
-  stakeList.push(newObj);
-  return Promise.map(stakeList, function(stuff) {
-    return Promise.resolve(getWomen(stuff));
-  }, { concurrency: 2 });
+  newObj.csvType = 'womenInfo';
+  return saveWomenInfo(newObj);
 }
 
-exports.createCSVFromDB = function (req, res) {
+function parseJwt (token) {
+  return jwt_decode(token);
+}
+
+exports.compactDB = function (req, res) {
+  var stakeDb = require('nano')('https://' + process.env.SYNC_ENTITY + '@' + process.env.COUCH_URL + '/' + req.params.stakeDB);
+
+  stakeDb.compact(req.params.stakeDB, (err, body) => {
+    if (err) {
+      return res.status(400).send({
+        message: err.message
+      });
+    }
+    return res.status(200).send({
+      message: `${ req.params.stakeDB } compacted`
+    });
+  })
+};
+
+exports.createCSVFromDB = async function (req, res) {
   function reportCSVComplete(input) {
     let fileToRead = input;
-    return res.status(200).send({
-      message: req.params.stakeDB + '.csv'
-    });
-  }
-  function reportAggregateComplete(input) {
     return res.status(200).send({
       message: input
     });
   }
+
+  function reportAggregateComplete(input, retryCount) {
+    const toRetry = input.filter((retVal) => {
+      if (typeof retVal !== 'string') {
+        return (retVal);
+      }
+    });
+    if (toRetry.length === 0) {
+      return res.status(200).send({
+        message: input[0]
+      });
+    }
+    console.log(`stakes to retry = ${ toRetry.length }`);
+    if (retryCount < 1) {
+      return res.status(408).send({
+        message: `failed after ${ retryCount } retries`
+      })
+    }
+    const stakeRetryList = [];
+    toRetry.forEach((stakeToRetry) => {
+      stakeRetryList.push(saveStake(stakeToRetry));
+    });
+    try {
+      Promise.map(stakeRetryList, (stakeToSave) => {
+        return (stakeToSave);
+      }, {concurrancy: 1})
+        .then((results) => {
+          setTimeout(reportAggregateComplete, 10000, results, retryCount - 1);
+        }).catch((error) => {
+        console.log(error.message);
+        return res.status(400).send({
+          message: errorHandler.getErrorMessage(error)
+        });
+      });
+    } catch (err) {
+      console.log(err);
+    }
+
+  }
+
+  const tokenInfo = parseJwt(req.headers.authorization);
+  console.log('inside createCSVfrom DB');
   moment.locale(req.params.language);
-  var parmObj = { stakeDB: req.params.stakeDB, filter: req.params.filter, sortField: req.params.sortField, language: req.params.language };
-  if (~parmObj.filter.indexOf('zscore')) {
-    oneStake(parmObj)
-      .then(listAllChildren).all()
-      .then(sortEm)
-      .then(collectAll)
-      .then(writeTheFile)
-      .then(reportCSVComplete).catch(function (err) {
-        return res.status(400).send({
-          message: err.message,
-          name: err.name,
-          stack: err.stack
-        });
-      });
-  } else if (~parmObj.filter.indexOf('preg') || ~parmObj.filter.indexOf('nurs')) {
+  var parmObj = {
+    stakeDB: req.params.stakeDB,
+    scopeType: req.params.scopeType,
+    cCode: req.params.cCode,
+    sortField: req.params.sortField,
+    language: req.params.language,
+    csvType: req.params.csvType,
+    fileToSave: `${ req.params.stakeDB }_${tokenInfo.iat}_dbDump.csv`,
+  };
+  if (parmObj.csvType === 'women') {
+    const headerLine = input.language === 'en' ? 'id,firstName,lastName,idGroup,phone,address,city,ward,lds,screenDate,other date\n' :
+      'carné de identidad,nombre de pila,apellido,grupo de identificación,teléfono,dirección,ciudad,sala,miembro lds,fecha de la pantalla, otra fecha\n';
+    await writeHeader(parmObj.fileToSave, headerLine);
     oneStakeWomen(parmObj)
-      .then(listWomen)
-      .then(sortEm)
-      .then(collectAll)
-      .then(writeTheFile)
-      .then(reportCSVComplete).catch(function (err) {
-        return res.status(400).send({
-          message: err.message,
-          name: err.name,
-          stack: err.stack
-        });
+      .then(reportCSVComplete).catch(function (error) {
+      return res.status(400).send({
+        message: errorHandler.getErrorMessage(error)
       });
+    });
   } else {
-    dbListToFile(parmObj)
-      .then(listAllChildren)
-      .then(sortEm)
-      .then(numberEm)
-      .then(collectAll)
-      .then(writeBigFile)
-      .then(reportAggregateComplete).catch(function (err) {
-        return res.status(400).send({
-          message: err.message,
-          name: err.name,
-          stack: err.stack
-        });
+    parmObj.fileToSave = `sup_list${ req.params.stakeDB }_${tokenInfo.iat}_dbDump.csv`;
+    let headerLine = parmObj.language === 'en' ? '1,2,3,4,5,6,Sup,age,Prior Sup,firstName,lastName,ward,mother,\n' : '1,2,3,4,5,6,Sup,anos,Anterior Sup,nombre de pila,apellido,sala,madre,\n';
+    if (parmObj.csvType !== 'sup') {
+      parmObj.fileToSave = `${ tokenInfo.iat }_${ req.params.cCode }_${ req.params.csvType }_dbDump.csv`;
+      headerLine = 'child Index,stake db name,screen Count,id,gender,firstName,lastName,birthdate,idGroup,mother,father,phone,address,city,ward,lds,screenId,screenDate,weight,height,age,ha,wa,wh,status\n';
+    }
+    await writeHeader(parmObj.fileToSave, headerLine);
+    getDBListFromFile(parmObj).map((stakeToSave) => {
+      return stakeToSave;
+    }, {concurrancy: 1})
+      .then((results) => {
+        reportAggregateComplete(results, retryLimit)
+      }).catch((error) => {
+      console.log(error.message);
+      return res.status(400).send({
+        message: errorHandler.getErrorMessage(error)
       });
+    });
+
+    getDBListFromFile(parmObj).map((stakeToSave) => {
+      function meterTheFlow() {
+        return stakeToSave;
+      }
+      setTimeout(meterTheFlow, 500, stakeToSave);
+    })
+      .then((results) => {
+        reportAggregateComplete(results, retryLimit)
+      }).catch((error) => {
+      console.log(error.message);
+      return res.status(400).send({
+        message: errorHandler.getErrorMessage(error)
+      });
+    });
   }
 };
 
 exports.getSyncURL = function(req, res) {
+  console.log('inside getSyncURL');
   return res.json({ entity: process.env.SYNC_ENTITY, url: process.env.COUCH_URL });
 };
 
 exports.getCountryList = function(req, res) {
+  console.log('inside getCountryLIst');
   request.get('https://' + process.env.COUCH_URL +
       '/country_list/liahona_kids_countries_stakes', function (error, response, body) {
     if (!error && response.statusCode === 200) {
@@ -833,7 +798,7 @@ exports.getCountryList = function(req, res) {
       try {
         jsonObj = JSON.parse(response.body);
         res.json(jsonObj);
-      } catch (err) {
+      } catch (error) {
         console.log('JSON.parse error');
         reasons.error = 'JSON.parse error';
         reasons.reason = '?';
@@ -848,7 +813,6 @@ exports.getCountryList = function(req, res) {
     }
   });
 };
-
 
 function parseCsv(input, cb) {
   fs.rename(input, input + '.csv', function(err) {
@@ -892,83 +856,49 @@ function gradeZScores(screenObj) {
   return (screenObj);
 }
 
-function saveScreening(dataBase, childInfo, screeningInfo) {
-  return new Promise(function(resolve, reject) {
-    var statusInfo = calculateStatus(screeningInfo);
-    var stakeDb = require('nano')('https://' + process.env.SYNC_ENTITY + '@' + process.env.COUCH_URL + '/' + dataBase);
-    // screeningInfo._id = 'scr_' + childInfo.firstName.replace(' ','_') + '_' + dataBase + '_' + moment();
-    screeningInfo._id = 'scr_' + '_' + dataBase + '_' + uuid();
-    screeningInfo.owner = childInfo._id;
-    stakeDb.insert(screeningInfo, function (err, scrResponse) {
-      if (err) {
-        console.log(err.message);
-        errorStack.push(screeningInfo.owner);
-        errorStack.push(err.message);
-        resolve(err.message);
-//            reject(err);
-      } else {
-        childInfo.lastScreening = scrResponse.id;
-//        childInfo._rev = childInfo._rev;
-        childInfo.zscoreStatus = statusInfo.zscoreStatus;
-        childInfo.statusColor = statusColor(statusInfo.zscoreStatus);
-        resolve(updateChildObject(dataBase, childInfo));
-      }
-    });
+function buildScreens(dataBase, childId, screenList) {
+  const docEntrys = [];
+  screenList.map((screening) => {
+    const scrObj = screening.screen;
+    if (!scrObj._id) { // if we have the id, use it
+      scrObj._id = 'scr_' + '_' + dataBase + '_' + uuid();
+      scrObj.owner = childId;
+    }
+    docEntrys.push(scrObj);
   });
+  return docEntrys;
 }
 
-function updateChildObject(dataBase, childInfo) {
-  return new Promise(function (resolve, reject) {
-    var stakeDb = require('nano')('https://' + process.env.SYNC_ENTITY + '@' + process.env.COUCH_URL + '/' + dataBase);
-    stakeDb.insert(childInfo, function (err, childResponse) {
-      if (err) {
-        console.log(err.message);
-        errorStack.push('updating ' + childInfo.firstName + ' ' + childInfo.lastName);
-        errorStack.push(err.message);
-        resolve(err.message);
-//      reject(err);
-      } else {
-        if (childResponse.ok) {
-          resolve('update complete');
-        } else {
-          console.log(err.message);
-          errorStack.push(childInfo.firstName + ' ' + childInfo.lastName);
-          errorStack.push(err.message);
-          resolve(err.message);
-        }
-      }
-    });
+function buildChildAndScreens(dataBase, screenList) {
+  const docEntry = [];
+  const childInfo = screenList[0].child;
+  screenList.sort(function (x, y) {
+    if (x.surveyDate > y.surveyDate) {
+      return -1;
+    }
+    if (x.surveyDate < y.surveyDate) {
+      return 1;
+    }
+    if (x.surveyDate === y.surveyDate) {
+      return 0;
+    }
+    return 0;
   });
-}
-
-function saveTheObjects(dataBase, childInfo, screeningInfo) {
-  return new Promise(function (resolve, reject) {
-    var stakeDb = require('nano')('https://' + process.env.SYNC_ENTITY + '@' + process.env.COUCH_URL + '/' + dataBase);
- //   childInfo._id = 'chld_' + childInfo.firstName.replace(' ','_') + '_' + dataBase + '_' + moment ();
+  childInfo.zscoreStatus = calculateStatus(screenList[0].screen).zscoreStatus;
+  if (!childInfo.oldId) {
     childInfo._id = 'chld_' + dataBase + '_' + uuid();
-    stakeDb.insert(childInfo, function (err, childResponse) {
-      if (err) {
-        console.log(err.message);
-        errorStack.push(childInfo.firstName + ' ' + childInfo.lastName);
-        errorStack.push(err.message);
-        resolve(err.message);
-//      reject(err);
-      } else {
-        if (childResponse.ok) {
-          var childObj = {};
-          childObj = childInfo;
-          childObj._rev = childResponse.rev;
-         // existingChildren.push (childObj);
-          resolve(isScreeningDuplicate(dataBase, childObj, screeningInfo));
-        } else {
-          console.log(err.message);
-          errorStack.push(childInfo.firstName + ' ' + childInfo.lastName);
-          errorStack.push(err.message);
-          resolve(err.message);
-        }
-      }
-    });
-  });
+  } else {
+    childInfo._id = childInfo.oldId;
+  }
+
+  const screens = buildScreens(dataBase, childInfo._id, screenList);
+
+  childInfo.lastScreening = screens[0]._id;
+  // childInfo.zscoreStatus = calculateStatus(screens[0]).zscoreStatus;
+  childInfo.statusColor = statusColor(childInfo.zscoreStatus);
+  docEntry.push(childInfo);
+
+  return [...docEntry, ...screens];
 }
 
 function calculateStatus(screeningObj) {
@@ -980,13 +910,13 @@ function calculateStatus(screeningObj) {
   } else if ((screeningObj.zScore.ha < -2 || screeningObj.zScore.wa < -2) && screeningObj.monthAge > 36 && screeningObj.monthAge < 60) {
     zscoreStatus = 'Micro nutrients required';
   } else if (screeningObj.zScore.ha < -1 ||
-      screeningObj.zScore.wa < -1 ||
-      screeningObj.zScore.wl < -1) {
+    screeningObj.zScore.wa < -1 ||
+    screeningObj.zScore.wl < -1) {
     zscoreStatus = 'At Risk: Come to next screening';
   } else {
     zscoreStatus = 'Normal';
   }
-  return ({ screeningObj: screeningObj, zscoreStatus: zscoreStatus });
+  return ({screeningObj: screeningObj, zscoreStatus: zscoreStatus});
 }
 
 function statusColor(status) {
@@ -1001,171 +931,159 @@ function statusColor(status) {
   }
 }
 
-function childInDatabase(dataBase, childInfo, screeningInfo) {
-  return new Promise(function (resolve, reject) {
-    var stakeDb = require('nano')('https://' + process.env.SYNC_ENTITY + '@' + process.env.COUCH_URL + '/' + dataBase);
-    stakeDb.view('name_search', 'find_by_name', { key: [childInfo.firstName, childInfo.lastName], include_docs: true }, function(error, response) {
-      if (!error) {
-        if (response.rows.length === 0) {
-          resolve(saveTheObjects(dataBase, childInfo, screeningInfo));
-        } else {
-          childInfo = response.rows[0].doc;
-          resolve(isScreeningDuplicate(dataBase, childInfo, screeningInfo));
-        }
-      } else {
-        var msg = '';
-        var myError = new Error({ name: '', errors: [], message: '' });
-        myError.name = 'database error';
-        if (error) {
-          myError.message = error;
-          myError.name = 'database error';
-          reject(myError);
-        } else {
-          var reasons = JSON.parse(response.body);
-          myError.message = msg;
-          reject(myError);
-        }
-      }
-    });
-  });
-}
+async function buildScreenList(dataBase, input) {
+  var i = 0;
+  var k = 0;
+  var columnData = input.data;
+  var colIndexes = Object.keys(columnData[0]);
+  var firstNameIndex = 0;
+  var lastNameIndex = 0;
+  var birthDateIndex = 0;
+  var motherIndex = 0;
+  var fatherIndex = 0;
+  var addressIndex = 0;
+  var idGroupIndex = 0;
+  var cityIndex = 0;
+  var wardIndex = 0;
+  var phoneIndex = 0;
+  var monthAgeIndex = 0;
+  var genderIndex = 0;
+  var weightIndex = 0;
+  var heightIndex = 0;
+  var haIndex = 0;
+  var waIndex = 0;
+  var whIndex = 0;
+  var ldsIndex = 0;
+  var surveyDateIndex = 0;
+  var statusIndex = 0;
+  var idIndex = 0;
+  var scrIdIndex = 0;
 
-function isScreeningDuplicate(dataBase, childInfo, screeningInfo) {
-  return new Promise(function (resolve, reject) {
-    var stakeDb = require('nano')('https://' + process.env.SYNC_ENTITY + '@' + process.env.COUCH_URL + '/' + dataBase);
-    stakeDb.view('screen_search', 'find_by_owner', { key: [childInfo._id, screeningInfo.surveyDate], include_docs: true }, function(error, response) {
-      if (!error) {
-        if (response.rows.length === 0) {
-          resolve(saveScreening(dataBase, childInfo, screeningInfo));
-        } else {
-          childInfo = response.rows[0].doc;
-          resolve('duplicate screening, not added');
-        }
-      } else {
-        var msg = '';
-        var myError = new Error({ name: '', errors: [], message: '' });
-        myError.name = 'database error';
-        if (error) {
-          myError.message = error;
-          myError.name = 'database error';
-          reject(myError);
-        } else {
-          var reasons = JSON.parse(response.body);
-          myError.message = msg;
-          reject(myError);
-        }
-      }
-    });
-  });
-}
+  for (i = 1; i < columnData[0].length; i++) {
+    if (~columnData[0][i].toLowerCase().indexOf('firstname')) {
+      firstNameIndex = i;
+    } else if (columnData[0][i].toLowerCase() === 'id') {
+      idIndex = i;
+    } else if (columnData[0][i].toLowerCase() === 'scrid') {
+      scrIdIndex = i;
+    } else if (~columnData[0][i].toLowerCase().indexOf('lastname')) {
+      lastNameIndex = i;
+    } else if (~columnData[0][i].toLowerCase().indexOf('mother')) {
+      motherIndex = i;
+    } else if (~columnData[0][i].toLowerCase().indexOf('father')) {
+      fatherIndex = i;
+    } else if (~columnData[0][i].toLowerCase().indexOf('birthdate')) {
+      birthDateIndex = i;
+    } else if (~columnData[0][i].toLowerCase().indexOf('address')) {
+      addressIndex = i;
+    } else if (~columnData[0][i].toLowerCase().indexOf('city')) {
+      cityIndex = i;
+    } else if (~columnData[0][i].toLowerCase().indexOf('ward')) {
+      wardIndex = i;
+    } else if (~columnData[0][i].toLowerCase().indexOf('phone')) {
+      phoneIndex = i;
+    } else if (~columnData[0][i].toLowerCase().indexOf('age')) {
+      monthAgeIndex = i;
+    } else if (~columnData[0][i].toLowerCase().indexOf('gender')) {
+      genderIndex = i;
+    } else if (~columnData[0][i].toLowerCase().indexOf('weight')) {
+      weightIndex = i;
+    } else if (~columnData[0][i].toLowerCase().indexOf('height')) {
+      heightIndex = i;
+    } else if (~columnData[0][i].toLowerCase().indexOf('ha')) {
+      haIndex = i;
+    } else if (~columnData[0][i].toLowerCase().indexOf('wa')) {
+      waIndex = i;
+    } else if (~columnData[0][i].toLowerCase().indexOf('wh')) {
+      whIndex = i;
+    } else if (~columnData[0][i].toLowerCase().indexOf('lds')) {
+      ldsIndex = i;
+    } else if (~columnData[0][i].toLowerCase().indexOf('screendate')) {
+      surveyDateIndex = i;
+    } else if (~columnData[0][i].toLowerCase().indexOf('idgroup')) {
+      idGroupIndex = i;
+    } else if (~columnData[0][i].toLowerCase().indexOf('status')) {
+      statusIndex = i;
+    } else {
+      console.log(columnData[0][i]);
+    }
+  }
 
-function buildObject(dataBase, input) {
-  return new Promise(function(resolve, reject) {
-    var i = 0;
-    var k = 0;
-    var columnData = input.data;
-    var colIndexes = Object.keys(columnData[0]);
-    var firstNameIndex = 0;
-    var lastNameIndex = 0;
-    var birthDateIndex = 0;
-    var motherIndex = 0;
-    var fatherIndex = 0;
-    var addressIndex = 0;
-    var idGroupIndex = 0;
-    var cityIndex = 0;
-    var wardIndex = 0;
-    var phoneIndex = 0;
-    var monthAgeIndex = 0;
-    var genderIndex = 0;
-    var weightIndex = 0;
-    var heightIndex = 0;
-    var haIndex = 0;
-    var waIndex = 0;
-    var whIndex = 0;
-    var ldsIndex = 0;
-    var surveyDateIndex = 0;
-    var statusIndex = 0;
-
-    for (i = 1; i < columnData[0].length; i++) {
-      if (~columnData[0][i].toLowerCase().indexOf('firstname')) {
-        firstNameIndex = i;
-      } else if (~columnData[0][i].toLowerCase().indexOf('lastname')) {
-        lastNameIndex = i;
-      } else if (~columnData[0][i].toLowerCase().indexOf('mother')) {
-        motherIndex = i;
-      } else if (~columnData[0][i].toLowerCase().indexOf('father')) {
-        fatherIndex = i;
-      } else if (~columnData[0][i].toLowerCase().indexOf('birthdate')) {
-        birthDateIndex = i;
-      } else if (~columnData[0][i].toLowerCase().indexOf('address')) {
-        addressIndex = i;
-      } else if (~columnData[0][i].toLowerCase().indexOf('city')) {
-        cityIndex = i;
-      } else if (~columnData[0][i].toLowerCase().indexOf('ward')) {
-        wardIndex = i;
-      } else if (~columnData[0][i].toLowerCase().indexOf('phone')) {
-        phoneIndex = i;
-      } else if (~columnData[0][i].toLowerCase().indexOf('age')) {
-        monthAgeIndex = i;
-      } else if (~columnData[0][i].toLowerCase().indexOf('gender')) {
-        genderIndex = i;
-      } else if (~columnData[0][i].toLowerCase().indexOf('weight')) {
-        weightIndex = i;
-      } else if (~columnData[0][i].toLowerCase().indexOf('height')) {
-        heightIndex = i;
-      } else if (~columnData[0][i].toLowerCase().indexOf('ha')) {
-        haIndex = i;
-      } else if (~columnData[0][i].toLowerCase().indexOf('wa')) {
-        waIndex = i;
-      } else if (~columnData[0][i].toLowerCase().indexOf('wh')) {
-        whIndex = i;
-      } else if (~columnData[0][i].toLowerCase().indexOf('lds')) {
-        ldsIndex = i;
-      } else if (~columnData[0][i].toLowerCase().indexOf('screendate')) {
-        surveyDateIndex = i;
-      } else if (~columnData[0][i].toLowerCase().indexOf('idgroup')) {
-        idGroupIndex = i;
-      } else if (~columnData[0][i].toLowerCase().indexOf('status')) {
-        statusIndex = i;
-      } else {
-        console.log(columnData[0][i]);
-      }
+  var dataBaseObj = [];
+  var j;
+  for (j = 1; j < columnData.length - 1; j++) {
+    var childObj = {};
+    var screenObj = {zScore: {ha: '', haStatus: '', wa: '', waStatus: '', wl: '', wlStatus: ''}};
+    childObj.birthDate = columnData[j][birthDateIndex];
+    childObj.firstName = columnData[j][firstNameIndex];
+    childObj.lastName = columnData[j][lastNameIndex];
+    childObj.mother = motherIndex !== 0 ? columnData[j][motherIndex] : undefined;
+    childObj.father = fatherIndex !== 0 ? columnData[j][fatherIndex] : undefined;
+    childObj.address = addressIndex !== 0 ? columnData[j][addressIndex] : undefined;
+    childObj.city = cityIndex !== 0 ? columnData[j][cityIndex] : undefined;
+    childObj.ward = wardIndex !== 0 ? columnData[j][wardIndex] : undefined;
+    childObj.phone = phoneIndex !== 0 ? columnData[j][phoneIndex] : undefined;
+    childObj.monthAge = columnData[j][monthAgeIndex];
+    childObj.gender = columnData[j][genderIndex];
+    childObj.lds = columnData[j][ldsIndex];
+    childObj.idGroup = columnData[j][idGroupIndex];
+    if (idIndex !==0) {
+      childObj._id = columnData[j][idIndex];
     }
 
-    var dataBaseObj = [];
-    var j;
-    for (j = 1; j < columnData.length - 1; j++) {
-      var childObj = {};
-      var screenObj = { zScore: { ha:'', haStatus:'', wa:'', waStatus:'', wl:'', wlStatus:'' } };
-      childObj.birthDate = columnData[j][birthDateIndex];
-      childObj.firstName = columnData[j][firstNameIndex];
-      childObj.lastName = columnData[j][lastNameIndex];
-      childObj.mother = motherIndex !== 0 ? columnData[j][motherIndex] : undefined;
-      childObj.father = fatherIndex !== 0 ? columnData[j][fatherIndex] : undefined;
-      childObj.address = addressIndex !== 0 ? columnData[j][addressIndex] : undefined;
-      childObj.city = cityIndex !== 0 ? columnData[j][cityIndex] : undefined;
-      childObj.ward = wardIndex !== 0 ? columnData[j][wardIndex] : undefined;
-      childObj.phone = phoneIndex !== 0 ? columnData[j][phoneIndex] : undefined;
-      childObj.monthAge = columnData[j][monthAgeIndex];
-      childObj.gender = columnData[j][genderIndex];
-      childObj.lds = columnData[j][ldsIndex];
-      childObj.idGroup = columnData[j][idGroupIndex];
-
-      screenObj.surveyDate = columnData[j][surveyDateIndex];
-      screenObj.monthAge = columnData[j][monthAgeIndex];
-      screenObj.gender = columnData[j][genderIndex];
-      screenObj.weight = columnData[j][weightIndex];
-      screenObj.height = columnData[j][heightIndex];
-      screenObj.zScore.ha = columnData[j][haIndex];
-      screenObj.zScore.wa = columnData[j][waIndex];
-      screenObj.zScore.wl = columnData[j][whIndex];
-      dataBaseObj.push(childInDatabase(dataBase, childObj, gradeZScores(screenObj)));
+    screenObj.surveyDate = columnData[j][surveyDateIndex];
+    screenObj.monthAge = columnData[j][monthAgeIndex];
+    screenObj.gender = columnData[j][genderIndex];
+    screenObj.weight = columnData[j][weightIndex];
+    screenObj.height = columnData[j][heightIndex];
+    screenObj.zScore.ha = columnData[j][haIndex];
+    screenObj.zScore.wa = columnData[j][waIndex];
+    screenObj.zScore.wl = columnData[j][whIndex];
+    screenObj.owner = columnData[j][idIndex];
+    if (scrIdIndex !== 0) {
+      screenObj._id = columnData[j][scrIdIndex];
     }
-    resolve(dataBaseObj).each();
+    screenObj = gradeZScores(screenObj);
+
+    dataBaseObj.push({db: dataBase, child: childObj, screen: screenObj});
+  }
+
+  const uniqueChildEntries = _.uniqWith(dataBaseObj, (arrVal, otherVal) => {
+    return arrVal.child._id === otherVal.child._id;
   });
+
+  const childAndScreens = [];
+  _.forEach(uniqueChildEntries, (uniqueChild, uniqueIndex) => {
+    childAndScreens[uniqueIndex] = [];
+    _.forEach(dataBaseObj, (child) => {
+      if (child.child._id === uniqueChild.child._id) {
+        childAndScreens[uniqueIndex].push(child);
+      }
+    })
+  });
+
+  let updatedDocs = [];
+  childAndScreens.map((childInfo) => {
+    const dbInfo = buildChildAndScreens(dataBase, childInfo);
+    updatedDocs = [...updatedDocs, ...dbInfo];
+  });
+
+  return updatedDocs;
 }
 
-exports.uploadCsv = function (req, res) {
+async function bulkUpload(dataBase, docs) {
+  return new Promise((resolve, reject) => {
+    var stakeDb = require('nano')('https://' + process.env.SYNC_ENTITY + '@' + process.env.COUCH_URL + '/' + dataBase);
+    return stakeDb.bulk({docs: docs}, (err, body) => {
+      if (!err) {
+        return resolve(body);
+      }
+      reject(err);
+    });
+  })
+}
+
+exports.uploadCsv = async function (req, res) {
   function returnOk() {
     if (errorStack.length > 0) {
       return (res.status(400).send({ message: errorStack.join() }));
@@ -1174,27 +1092,28 @@ exports.uploadCsv = function (req, res) {
   }
 
   var upload = csvloader(config.uploads.csvUpload).single('newUploadCsv');
-  var csvUploadFileFilter = require(path.resolve('./config/lib/csvloader.js')).csvUploadFileFilter;
-
   // Filtering to upload only images
-  upload.fileFilter = csvUploadFileFilter;
+  upload.fileFilter = require(path.resolve('./config/lib/csvloader.js')).csvUploadFileFilter;
 
   upload(req, res, function (uploadError) {
     if (uploadError) {
       return res.status(400).send({
-        message: 'Error occurred while uploading csv file'
+        message: errorHandler.getErrorMessage(uploadError)
       });
     } else {
       // parse csv
-      parseCsv(res.req.file.path, function (parsedData) {
-        buildObject(req.params.stakeDB, parsedData)
-          .all().then(returnOk).catch(function (err) {
-            return res.status(400).send({
-              message: err.message,
-              name: err.name,
-              stack: err.stack
-            });
+      parseCsv(res.req.file.path, async (parsedData) => {
+
+        try {
+          const bulkData = await buildScreenList(req.params.stakeDB, parsedData);
+          await bulkUpload(req.params.stakeDB, bulkData);
+          returnOk();
+        } catch (error) {
+          console.log(error);
+          return res.status(400).send({
+            message: errorHandler.getErrorMessage(error),
           });
+        }
       });
     }
   });
@@ -1213,13 +1132,12 @@ exports.listDbs = function(req, res) {
       try {
         jsonObj = JSON.parse(body);
         res.json(jsonObj);
-      } catch (err) {
+      } catch (error) {
         console.log('error in JSON.parse listDbs');
         return res.status(400).send({
           message: errorHandler.getErrorMessage(error)
         });
       }
-
     } else {
       return res.status(400).send({
         message: errorHandler.getErrorMessage(error)
@@ -1231,19 +1149,45 @@ exports.listDbs = function(req, res) {
 function getDBListFromFile(parmsIn) {
   return new Promise(function(resolve, reject) {
     request.get('https://' + process.env.COUCH_URL +
-      '/country_list/liahona_kids_countries_stakes', function (error, response, body) {
+      '/country_list/liahona_kids_countries_stakes', function (error, response) {
       if (!error && response.statusCode === 200) {
         var jsonObj;
-        var stakeList = [];
+        let stakes = [];
+        let stakeList = [];
+        let countryList = [];
+
         try {
           jsonObj = JSON.parse(response.body);
-          jsonObj.countries.forEach(function(country) {
-            country.stakes.forEach(function(stake) {
-              if (!stake.stakeDB.startsWith('test') && (parmsIn.filter.toUpperCase().indexOf(country.code) > -1 || parmsIn.filter.indexOf('listall') > -1)) {
-                stakeList.push({ name: stake.stakeName, db: stake.stakeDB });
-              }
+          countryList = jsonObj.countries;
+          if (parmsIn.scopeType === 'stake') {
+            let parmObj = Object.assign({}, parmsIn);
+            // parmObj.stakeDB = stake.stakeDB;
+            // parmObj.stakeName = stake.stakeName;
+            stakeList.push(saveStake(parmObj));
+            // resolve(stakeList);
+          } else if (parmsIn.scopeType === 'country') {
+            let country = countryList.filter((country) => {
+              return country.code === parmsIn.cCode;
             });
-          });
+            country[0].stakes.forEach((stake) => {
+              let parmObj = Object.assign({}, parmsIn);
+              parmObj.stakeDB = stake.stakeDB;
+              parmObj.stakeName = stake.stakeName;
+              stakeList.push(saveStake(parmObj));
+            })
+          } else if (parmsIn.scopeType === 'countries') {
+            countryList.forEach((country) => {
+              country.stakes.forEach(function (stake) {
+                if (!stake.stakeDB.startsWith('test')) {
+                  let parmObj = Object.assign({}, parmsIn);
+                  parmObj.stakeDB = stake.stakeDB;
+                  parmObj.stakeName = stake.stakeName;
+                  stakeList.push(saveStake(parmObj));
+                }
+              });
+            });
+          }
+
           resolve(stakeList);
         } catch (err) {
           console.log('JSON.parse error');
@@ -1251,25 +1195,6 @@ function getDBListFromFile(parmsIn) {
         }
       } else {
         reject(error.message);
-      }
-    });
-  });
-}
-
-function getDBList() {
-  return new Promise(function(resolve, reject) {
-    request.get('https://' + process.env.SYNC_ENTITY + '@' + process.env.COUCH_URL +
-      '/_all_dbs', function (error, response, body) {
-      if (!error && response.statusCode === 200) {
-        var jsonObj;
-        try {
-          jsonObj = JSON.parse(body);
-        } catch (e) {
-          reject('Error in JSON.parse getDBList');
-        }
-        resolve(jsonObj);
-      } else {
-        reject(errorHandler.getErrorMessage(error));
       }
     });
   });

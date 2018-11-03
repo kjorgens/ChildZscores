@@ -57,10 +57,10 @@ module.exports = {
       'modules/*/client/**/*.js'
     ],
     img: [
-      'modules/**/*/img/**/*.jpg',
-      'modules/**/*/img/**/*.png',
-      'modules/**/*/img/**/*.gif',
-      'modules/**/*/img/**/*.svg'
+      'public/img/**/*.jpg',
+      'public/img/**/*.png',
+      'public/img/**/*.gif',
+      'public/img/**/*.svg'
     ],
     views: ['modules/*/client/views/**/*.html'],
     templates: ['build/templates.js']
