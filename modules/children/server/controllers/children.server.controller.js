@@ -353,8 +353,12 @@ function newDBRequest(stake, stakeName, parmObj, view) {
             reject(e);
             // resolve({ stake: stake, stakeName: stakeName, parms: newObj, data: [], view: view });
           }
-        } else if (response.statusCode === 500) {
-          console.log(`${ response.statusCode } returned from couch access ${ stake }`);
+        } else {
+          try {
+            console.log(`${ response.statusCode } returned from couch access ${ stake }`);
+          } catch(err) {
+            console.log(err);
+          }
           // resolve({ stake: stake, stakeName: stakeName, parms: newObj, data: {}, view: view });
           reject(new Error(`${ response.statusCode } returned from couch access ${ stake }`));
         }
@@ -516,6 +520,14 @@ function addLineToStack(childCount, screenCount, ownerInfo, screenInfo, sortFiel
   if (typeof ownerInfo.phone === 'string' && ownerInfo.phone.indexOf(',') > -1) {
     ownerInfo.phone = ownerInfo.phone.replace(/,/g, ' ');
   }
+  if (!ownerInfo.firstName) {
+    console.log('firstName invalid');
+    ownerInfo.firstname = 'unknown';
+  }
+  if (!ownerInfo.lastName) {
+    console.log('lastName invalid');
+    ownerInfo.lastName = 'unknown';
+  }
   var dataObj = {
     childId: ownerInfo._id,
     gender: screenInfo.gender[0].toUpperCase() + screenInfo.gender.substr(1),
@@ -612,18 +624,27 @@ function sortList(listIn) {
       listIn[index].sortField = 'firstName';
     }
   });
-  listIn.sort(function(x, y) {
-    if (x.data[x.sortField].toUpperCase() < y.data[x.sortField].toUpperCase()) {
-      return -1;
-    }
-    if (x.data[x.sortField].toUpperCase() > y.data[x.sortField].toUpperCase()) {
-      return 1;
-    }
-    if (x.data[x.sortField].toUpperCase() === y.data[x.sortField].toUpperCase()) {
+  try {
+    listIn.sort(function (x, y) {
+      try {
+        if (x.data[x.sortField].toUpperCase() < y.data[x.sortField].toUpperCase()) {
+          return -1;
+        }
+      } catch(err){
+        console.log(err);
+      }
+      if (x.data[x.sortField].toUpperCase() > y.data[x.sortField].toUpperCase()) {
+        return 1;
+      }
+      if (x.data[x.sortField].toUpperCase() === y.data[x.sortField].toUpperCase()) {
+        return 0;
+      }
       return 0;
-    }
-    return 0;
-  });
+    });
+  }
+  catch(err) {
+    console.log(err);
+  }
 
   return { listIn: listIn };
 }
@@ -711,7 +732,7 @@ exports.createCSVFromDB = async function (req, res) {
         return (stakeToSave);
       }, {concurrancy: 1})
         .then((results) => {
-          setTimeout(reportAggregateComplete, 10000, results, retryCount - 1);
+          setTimeout(reportAggregateComplete, 20000, results, retryCount - 1);
         }).catch((error) => {
         console.log(error.message);
         return res.status(400).send({
@@ -757,21 +778,6 @@ exports.createCSVFromDB = async function (req, res) {
     getDBListFromFile(parmObj).map((stakeToSave) => {
       return stakeToSave;
     }, {concurrancy: 1})
-      .then((results) => {
-        reportAggregateComplete(results, retryLimit)
-      }).catch((error) => {
-      console.log(error.message);
-      return res.status(400).send({
-        message: errorHandler.getErrorMessage(error)
-      });
-    });
-
-    getDBListFromFile(parmObj).map((stakeToSave) => {
-      function meterTheFlow() {
-        return stakeToSave;
-      }
-      setTimeout(meterTheFlow, 500, stakeToSave);
-    })
       .then((results) => {
         reportAggregateComplete(results, retryLimit)
       }).catch((error) => {
@@ -1194,7 +1200,7 @@ function getDBListFromFile(parmsIn) {
           reject('JSON.parse error');
         }
       } else {
-        reject(error.message);
+        reject();
       }
     });
   });
