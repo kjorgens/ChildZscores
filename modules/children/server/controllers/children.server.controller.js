@@ -104,7 +104,6 @@ var removeFilterList = [
 
 function validateView(type, stakeDB, view) {
   return new Promise(function(resolve, reject) {
-    console.log('inside validateView');
     var stakeDb = require('nano')('https://' + process.env.SYNC_ENTITY + '@' + process.env.COUCH_URL + '/' + stakeDB);
     var viewObject;
     if (~type.indexOf('view')) {
@@ -168,7 +167,6 @@ function removeView(type, stakeDB, view) {
 
 exports.checkUpdateViews = function (req, res) {
   var toCheck = [];
-  console.log('inside checkUpdateViews');
   viewList.forEach(function (view) {
     toCheck.push(validateView('view', req.params.stakeDB, view));
   });
