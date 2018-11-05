@@ -376,10 +376,15 @@ function getWomen(parmObj) {
   return Promise.join(newDBRequest(stake, parmObj.stakename, newObj, 'pregnant_women'), newDBRequest(stake, parmObj.stakename, newObj, 'nursing_mothers'));
 }
 
-async function getChildAndData(parmObj) {
-  var newObj = Object.assign({},parmObj);
-  var stake = parmObj.stakeDB;
-  return Promise.join(newDBRequest(stake, parmObj.stakename, newObj, 'children_list'), newDBRequest(stake, parmObj.stakename, newObj, 'scr_list'));
+async function getChildAndData(parmObj, multiplier) {
+  return new Promise((resolve) => {
+    function accessDB(parmObj) {
+      var newObj = Object.assign({},parmObj);
+      var stake = parmObj.stakeDB;
+      return resolve(Promise.join(newDBRequest(stake, parmObj.stakename, newObj, 'children_list'), newDBRequest(stake, parmObj.stakename, newObj, 'scr_list')));
+    }
+    return setTimeout(accessDB, 1000*multiplier, parmObj);
+  });
 }
 
 async function writeHeader(fileToWrite, headerLine) {
@@ -649,10 +654,10 @@ function sortList(listIn) {
   return { listIn: listIn };
 }
 
-async function saveStake(stakeInfo) {
+async function saveStake(stakeInfo, timeOutMultiplier) {
   try {
     let childData;
-    const screeningData = await getChildAndData(stakeInfo);
+    const screeningData = await getChildAndData(stakeInfo, timeOutMultiplier);
     if (stakeInfo.csvType === 'sup') {
       childData = buildOutputData(splitSups(sortList(listAllChildren(screeningData, stakeInfo.csvType))));
     } else {
@@ -660,7 +665,6 @@ async function saveStake(stakeInfo) {
     }
     return appendStake(stakeInfo.fileToSave, childData);
   } catch(err) {
-    // console.log(`redo somehow${ stakeInfo.stakeName } err.message`);
     return (stakeInfo);
   }
 }
@@ -725,7 +729,7 @@ exports.createCSVFromDB = async function (req, res) {
     }
     const stakeRetryList = [];
     toRetry.forEach((stakeToRetry) => {
-      stakeRetryList.push(saveStake(stakeToRetry));
+      stakeRetryList.push(saveStake(stakeToRetry, 0));
     });
     try {
       Promise.map(stakeRetryList, (stakeToSave) => {
@@ -768,11 +772,14 @@ exports.createCSVFromDB = async function (req, res) {
       });
     });
   } else {
-    parmObj.fileToSave = `sup_list${ req.params.stakeDB }_${tokenInfo.iat}_dbDump.csv`;
+    parmObj.fileToSave = `sup_list_${ req.params.stakeDB }_${tokenInfo.iat}_dbDump.csv`;
     let headerLine = parmObj.language === 'en' ? '1,2,3,4,5,6,Sup,age,Prior Sup,firstName,lastName,ward,mother,\n' : '1,2,3,4,5,6,Sup,anos,Anterior Sup,nombre de pila,apellido,sala,madre,\n';
     if (parmObj.csvType !== 'sup') {
       parmObj.fileToSave = `${ tokenInfo.iat }_${ req.params.cCode }_${ req.params.csvType }_dbDump.csv`;
       headerLine = 'child Index,stake db name,screen Count,id,gender,firstName,lastName,birthdate,idGroup,mother,father,phone,address,city,ward,lds,screenId,screenDate,weight,height,age,ha,wa,wh,status\n';
+    }
+    if (parmObj.scopeType === 'countries') {
+      parmObj.fileToSave = `${ tokenInfo.iat }_all_data_${ req.params.csvType }_dbDump.csv`;
     }
     await writeHeader(parmObj.fileToSave, headerLine);
     getDBListFromFile(parmObj).map((stakeToSave) => {
@@ -1169,26 +1176,26 @@ function getDBListFromFile(parmsIn) {
             let parmObj = Object.assign({}, parmsIn);
             // parmObj.stakeDB = stake.stakeDB;
             // parmObj.stakeName = stake.stakeName;
-            stakeList.push(saveStake(parmObj));
+            stakeList.push(saveStake(parmObj, 0));
             // resolve(stakeList);
           } else if (parmsIn.scopeType === 'country') {
             let country = countryList.filter((country) => {
               return country.code === parmsIn.cCode;
             });
-            country[0].stakes.forEach((stake) => {
+            country[0].stakes.forEach((stake, index) => {
               let parmObj = Object.assign({}, parmsIn);
               parmObj.stakeDB = stake.stakeDB;
               parmObj.stakeName = stake.stakeName;
-              stakeList.push(saveStake(parmObj));
+              stakeList.push(saveStake(parmObj, index));
             })
           } else if (parmsIn.scopeType === 'countries') {
             countryList.forEach((country) => {
-              country.stakes.forEach(function (stake) {
+              country.stakes.forEach((stake, index) => {
                 if (!stake.stakeDB.startsWith('test')) {
                   let parmObj = Object.assign({}, parmsIn);
                   parmObj.stakeDB = stake.stakeDB;
                   parmObj.stakeName = stake.stakeName;
-                  stakeList.push(saveStake(parmObj));
+                  stakeList.push(saveStake(parmObj, index));
                 }
               });
             });
