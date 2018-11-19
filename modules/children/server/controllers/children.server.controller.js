@@ -1479,6 +1479,7 @@ function getDBListFromFile(parmsIn) {
                   let parmObj = Object.assign({}, parmsIn);
                   parmObj.stakeDB = stake.stakeDB;
                   parmObj.stakeName = stake.stakeName;
+                  parmObj.cCode = country.code;
                   stakeList.push(parmObj.updateProcess(parmObj, index));
                 }
               });
