@@ -41,6 +41,9 @@ exports.invokeRolesPolicies = function () {
     }, {
       resources: '/report/:stakeDB/:cCode/:scopeType/:sortField/:language/:csvType',
       permissions: ['*']
+    }, {
+      resources: '/update/:stakeDB/:cCode/:scopeType/:function',
+      permissions: ['get']
     }]
   }, {
     roles: ['user'],
@@ -63,7 +66,7 @@ exports.invokeRolesPolicies = function () {
       resources: '/stakes',
       permissions: ['get']
     }, {
-      resources: '/countries',
+      resources: '/countries/:networkFirst',
       permissions: ['get']
     }]
   }, {
@@ -75,7 +78,7 @@ exports.invokeRolesPolicies = function () {
       resources: '/stakes',
       permissions: ['get']
     }, {
-      resources: '/countries',
+      resources: '/countries/:networkFirst',
       permissions: ['get']
     }, {
       resources: '/:childId',

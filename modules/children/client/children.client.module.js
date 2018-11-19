@@ -13,6 +13,7 @@
   app.registerModule('children.modalService', ['ui.bootstrap']);
   app.registerModule('children.pouchService', ['pouchdb']);
   app.registerModule('children.zscoreService', []);
+  app.registerModule('children.obesityService', []);
   app.registerModule('children.graphService', []);
   app.registerModule('children.filterListService', []);
   app.registerModule('children.spinner', ['angularSpinner']);

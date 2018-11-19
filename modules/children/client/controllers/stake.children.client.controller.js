@@ -2,14 +2,14 @@
   'use strict';
 
   angular
-      .module('children')
-      .controller('ChildrenStakeController', ChildrenStakeController);
+    .module('children')
+    .controller('ChildrenStakeController', ChildrenStakeController);
 
   ChildrenStakeController.$inject = ['$rootScope', '$state', '$translate', 'FilterService', 'usSpinnerService',
-    'countryData', 'ChildrenStakes', '$stateParams'];
+    'countryData', '$stateParams'];
 
   function ChildrenStakeController($rootScope, $state, $translate, FilterService, usSpinnerService,
-    countryData, ChildrenStakes, $stateParams) {
+    countryData, $stateParams) {
     var vm = this;
     vm.selectedCountry = countryData;
     sessionStorage.setItem('selectedCountry', vm.selectedCountry.name);
@@ -42,6 +42,10 @@
       }
     };
 
+    vm.countryList = function() {
+      $state.go('children.countries', { networkFirst: 'true' });
+    };
+
     vm.stopSpin = function() {
       if (vm.spinneractive) {
         usSpinnerService.stop('spinner-sync');
@@ -72,6 +76,7 @@
       sessionStorage.setItem('selectedCountry', vm.selectedCountry.name);
       localStorage.setItem('selectedCountry', vm.selectedCountry.name);
       localStorage.setItem('selectecCountryCode', vm.selectedCountry.code);
+      sessionStorage.setItem('selectecCountryCode', vm.selectedCountry.code);
       sessionStorage.getItem('selectedCountryImage', vm.selectedCountry.image);
       localStorage.setItem('selectedCountryImage', vm.selectedCountry.image);
     }

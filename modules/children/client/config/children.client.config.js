@@ -6,9 +6,9 @@
     .module('children')
     .run(dataConfig);
 
-  dataConfig.$inject = ['$rootScope', 'PouchService', 'ChildrenStakes'];
+  dataConfig.$inject = ['$rootScope'];
 
-  function dataConfig($rootScope, PouchService, ChildrenStakes) {
+  function dataConfig($rootScope) {
     // Add the children dropdown item
     // $rootScope.selectedStake = 'temporary';
     // PouchService.createDatabase('temporary');

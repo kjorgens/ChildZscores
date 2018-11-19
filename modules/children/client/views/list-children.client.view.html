@@ -79,19 +79,25 @@
         <a ng-repeat="child in vm.childList" ui-sref="children.view({childId: child._id})" >
             <div class="list-group-item list-group-item-action" ng-if="child.display === true" ng-class="child.backGroundColor">
             <small class="list-group-item-text">
-                <h3><span ng-bind="child.firstName"></span>
-                    <span ng-bind="child.lastName"></span></h3>
-                <h4 ng-if="child.statusColor">
-                    {{child.monthAge<60 ? ('ZSCORE_STATUS' | translate) : ('CHILD_GRADUATED' | translate)}}:
-                    <span ng-class="child.statusColor" ng-if="child.zscoreStatus === 'Acute: supplements required' && child.monthAge<48">
-                          {{'ACUTE_ZSCORE' | translate}} </span>
-                    <span ng-class="child.statusColor" ng-if="child.zscoreStatus === 'Micro nutrients required' && child.monthAge<48">
-                          {{'MICRO_NUTRITION_ZSCORE' | translate}} </span>
-                    <span ng-class="child.statusColor" ng-if="child.zscoreStatus === 'At Risk: Come to next screening' && child.monthAge<48">
-                          {{'AT_RISK_ZSCORE' | translate}} </span>
-                    <span ng-class="child.statusColor" ng-if="child.zscoreStatus === 'Normal' && child.monthAge<48">
-                          {{'NORMAL_ZSCORE' | translate}} </span>
-                </h4>
+                <h3>
+                    <span ng-bind="child.firstName"></span>
+                    <span ng-bind="child.lastName"></span>
+                </h3>
+                <!--<h4 ng-if="child.statusColor">-->
+                    <!--{{child.monthAge<60 ? 'Current Supplements' : ('CHILD_GRADUATED' | translate)}}:-->
+                  <!--&lt;!&ndash;<span ng-bind="child.supInfo"></span>&ndash;&gt;-->
+                    <!--&lt;!&ndash;<span ng-class="child.statusColor" ng-if="child.zscoreStatus === 'Acute: supplements required' && child.monthAge<48">&ndash;&gt;-->
+                          <!--&lt;!&ndash;{{'ACUTE_ZSCORE' | translate}} </span>&ndash;&gt;-->
+                    <!--&lt;!&ndash;<span ng-class="child.statusColor" ng-if="child.zscoreStatus === 'Micro nutrients required' && child.monthAge<48">&ndash;&gt;-->
+                          <!--&lt;!&ndash;{{'MICRO_NUTRITION_ZSCORE' | translate}} </span>&ndash;&gt;-->
+                    <!--&lt;!&ndash;<span ng-class="child.statusColor" ng-if="child.zscoreStatus === 'At Risk: Come to next screening' && child.monthAge<48">&ndash;&gt;-->
+                          <!--&lt;!&ndash;{{'AT_RISK_ZSCORE' | translate}} </span>&ndash;&gt;-->
+                    <!--&lt;!&ndash;<span ng-class="child.statusColor" ng-if="child.zscoreStatus === 'Normal' && child.monthAge<48">&ndash;&gt;-->
+                          <!--&lt;!&ndash;{{'NORMAL_ZSCORE' | translate}} </span>&ndash;&gt;-->
+                <!--</h4>-->
+              <!--<h4>Current Supplement</h4>-->
+              <h2><span ng-if="child.supType !== 'none'" ng-bind="child.supType"></span></h2>
+              <h2><span ng-if="child.obese" ng-bind="vm.obeseMsg"></span></h2>
                  {{child.gender === 'Boy' ? ('TXT_MALE' | translate) : ('TXT_FEMALE' | translate)}}, {{'BORN' | translate}}
                 <span ng-bind="child.birthDate | date:'mediumDate'"></span>
             </small>

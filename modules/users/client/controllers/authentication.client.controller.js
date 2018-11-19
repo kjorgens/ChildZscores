@@ -32,10 +32,7 @@
     }
 
     function populateLocalDB() {
-      ChildrenStakes.get(function (retVal) {
-        PouchService.createCountryDatabase();
-        PouchService.putStakesLocal(retVal, returnFromPut, handleError);
-      });
+      PouchService.getCountriesList(true);
     }
 
     function signup(isValid) {

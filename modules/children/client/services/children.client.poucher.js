@@ -6,9 +6,9 @@
     .module('children.pouchService')
     .factory('PouchService', PouchService);
 
-  PouchService.$inject = ['$q', 'pouchDB', 'moment'];
+  PouchService.$inject = ['$q', 'pouchDB', 'moment', 'ChildrenStakes'];
 
-  function PouchService($q, pouchDB, moment) {
+  function PouchService($q, pouchDB, moment, ChildrenStakes) {
     var factory = {};
     var database;
     var countryDataBase;
@@ -42,10 +42,10 @@
               callback(response);
             }).catch(function (error) {
             // Do something with the error
-            errCallback(error);
-          }).finally(function () {
+              errCallback(error);
+            }).finally(function () {
             // Do something when everything is done
-          });
+            });
         })
         .catch(function (error) {
           newObj._id = 'liahona_kids_countries_stakes';
@@ -64,19 +64,6 @@
             });
         });
     };
-    // factory.putStakesLocal = async function (countryObj, callback) {
-    //   var newObj = {};
-    //   try {
-    //     const countryInfo = await countryDataBase.get('liahona_kids_countries_stakes');
-    //     newObj._id = countryInfo._id;
-    //     newObj._rev = countryInfo._rev;
-    //     newObj.countries = countryObj.countries;
-    //     const putResults = await countryDataBase.put(newObj);
-    //     callback({ countriesID: putResults.id, countries: newObj.countries });
-    //   } catch(err) {
-    //     console.log(err.message);
-    //   }
-    // };
 
     factory.createCountryDatabase = function () {
       countryDataBase = pouchDB('country_list');
@@ -88,26 +75,24 @@
       database.name = '';
     };
 
-    factory.ddocFilter = function() {
-      return $q(function(resolve, reject) {
+    factory.ddocFilter = function () {
+      return $q(function (resolve, reject) {
         database.get('_design/filter_ddocs')
           .then(function (response) {
             resolve('filter found');
-          }).catch(function(err) {
-            database.put(
-              {
-                _id: '_design/filter_ddocs',
-                filters:
-                {
-                  'ddocs': 'function(doc, req) {if(doc._id[0] != \'_\') {return true} else {return false}  }'
-                }
-              }).then(function(response) {
-                console.log('filter created');
-                resolve('filter created');
-              }).catch(function(err) {
-                console.log(err.message);
-                reject(err.message);
-              });
+          }).catch(function (err) {
+            database.put({
+              _id: '_design/filter_ddocs',
+              filters: {
+                'ddocs': 'function(doc, req) {if(doc._id[0] != \'_\') {return true} else {return false}  }'
+              }
+            }).then(function (response) {
+              console.log('filter created');
+              resolve('filter created');
+            }).catch(function (err) {
+              console.log(err.message);
+              reject(err.message);
+            });
           });
       });
     };
@@ -120,33 +105,64 @@
       return ($q.all(indexFunctions));
     };
 
-    // async function stakesLocal(countryObj, callback) {
-    //   var newObj = {};
-    //   try {
-    //     const countryInfo = await countryDataBase.get('liahona_kids_countries_stakes');
-    //     newObj._id = countryInfo._id;
-    //     newObj._rev = countryInfo._rev;
-    //     newObj.countries = countryObj.countries;
-    //     const putResults = await countryDataBase.put(newObj);
-    //     callback({ countriesID: putResults.id, countries: newObj.countries });
-    //   } catch(err) {
-    //     console.log(err.message);
-    //   }
-    // }
+    factory.getCountriesList = function (networkFirst) {
+      return new Promise(function(resolve, reject) {
+        if (navigator.onLine) {
+          if (networkFirst) {
+            countryDataBase = pouchDB('country_list');
+            countryDataBase.info()
+              .then((info) => {
+                if (info.doc_count === 0 || networkFirst) {
+                  ChildrenStakes.getStakes()
+                    .then(function(countries) {
+                      var docToSave = {
+                        _id: 'liahona_kids_countries_stakes',
+                        countries: countries
+                      };
+                      countryDataBase.get('liahona_kids_countries_stakes')
+                        .then((doc) => {
+                          if (info.doc_count !== 0) {
+                            docToSave._rev = doc._rev;
+                          }
+                          countryDataBase.put(docToSave).then(function (results) {
+                            resolve(countries);
+                          }).catch(function (err) {
+                            console.log(err);
+                          });
+                        }).catch((err) => {
+                          console.log(err);
+                          if (err.status === 404) {
+                            countryDataBase.put(docToSave).then(function (results) {
+                              resolve(countries);
+                            }).catch(function (err) {
+                              console.log(err);
+                            });
+                          }
+                        });
+                    });
+                }
+              });
+          } else {
+            resolve(getCountriesLocalDB());
+          }
+        }
+      });
+    };
 
-
-    factory.getCountriesLocal = function (callback, errCallback) {
+    function getCountriesLocalDB () {
       if (countryDataBase === undefined) {
         countryDataBase = pouchDB('country_list');
       }
-      countryDataBase.get('liahona_kids_countries_stakes')
-      .then(function (response) {
-        callback(response);
-      })
-      .catch(function(error) {
-        errCallback(error);
-      });
-    };
+      return countryDataBase.get('liahona_kids_countries_stakes')
+        .then(function (response) {
+          return response.countries;
+        })
+        .catch(function(error) {
+          throw error;
+        });
+    }
+
+    factory.getCountriesLocal = getCountriesLocalDB;
 
     factory.getCountryData = function (countryName) {
       if (countryDataBase === undefined) {
@@ -169,39 +185,37 @@
         countryDataBase = pouchDB('country_list');
       }
       countryDataBase.get('liahona_kids_countries_stakes')
-          .then(function (response) {
-            response.countries.forEach(function(country) {
-              if (country.name.indexOf(countryName) > -1) {
-                country.stakes.forEach(function(stake) {
-                  if (stake.stakeName.indexOf(stakeName) > -1) {
-                    if (stake.wards !== undefined) {
-                      callback(stake.wards);
-                    } else {
-                      callback(null);
-                    }
+        .then(function (response) {
+          response.countries.forEach(function (country) {
+            if (country.name.indexOf(countryName) > -1) {
+              country.stakes.forEach(function (stake) {
+                if (stake.stakeName.indexOf(stakeName) > -1) {
+                  if (stake.wards !== undefined) {
+                    callback(stake.wards);
                   } else {
                     callback(null);
                   }
-                });
-              } else {
-                callback(null);
-              }
-            });
-          })
-          .catch(function(error) {
-            // Do something with the error
-            errCallback(error);
+                } else {
+                  callback(null);
+                }
+              });
+            } else {
+              callback(null);
+            }
           });
+        })
+        .catch(function (error) {
+          // Do something with the error
+          errCallback(error);
+        });
     };
 
     factory.createIndex = function (indexName, callback, errCallback) {
-      return database.createIndex(
-          { index:
-          {
-            fields: [indexName]
-          }
-          }
-      );
+      return database.createIndex({
+        index: {
+          fields: [indexName]
+        }
+      });
     };
 
     factory.queryByWardPromise = function (wardId) {
@@ -219,13 +233,11 @@
         },
         // sort: ['firstName']
       };
-      return database.find(findObj)
-          .then(function(response) {
-            callback(response);
-          })
-          .catch(function(error) {
-            errorCallBack(error);
-          });
+      return database.find(findObj).then(function(response) {
+        callback(response);
+      }).catch(function(error) {
+        errorCallBack(error);
+      });
     };
 
     factory.findAndFilterChildren = function() {
@@ -238,8 +250,12 @@
 
     factory.findChildren = function () {
       var params = {
-        selector: { lastScreening: { $gt: null } }
-        };
+        selector: {
+          lastScreening: {
+            $gt: null
+          }
+        }
+      };
       return database.find(params);
     };
 
@@ -259,16 +275,21 @@
 
     factory.queryChildren = function (callback, callbackError) {
       return database.find({
-        selector: { firstName: { $gt: null } },
-        // sort: ['firstName']
-      })
-      .then(function (response) {
-            // Do something with the response
+        selector: { firstName: { $gt: null } }
+      }).then(function (response) {
         callback(response);
-      })
-      .catch(function (error) {
-            // Do something with the error
+      }).catch(function (error) {
         callbackError(error);
+      });
+    };
+
+    factory.getScreens = function (childId) {
+      return database.find({
+        selector: {
+          owner: { $eq: childId },
+          surveyDate: { $gt: null }
+        },
+        sort: [{ surveyDate: 'desc' }]
       });
     };
 
@@ -279,58 +300,50 @@
           surveyDate: { $gt: null }
         },
         sort: [{ surveyDate: 'desc' }]
-      })
-      .then(function (response) {
-            // Do something with the response
+      }).then(function (response) {
         callback(response);
-      })
-      .catch(function (error) {
-          // Do something with the error
+      }).catch(function (error) {
         callbackError(error);
       });
     };
 
     factory.getAll = function (callback, errCallback) {
       database.allDocs({ include_docs: true, attachments: true })
-          .then(function (response) {
-            callback(response.rows);
-          })
-          .catch(function (error) {
-            errCallback(error);
-          })
-          .finally(function () {
-            // Do something when everything is done
-          });
+        .then(function (response) {
+          callback(response.rows);
+        }).catch(function (error) {
+          errCallback(error);
+        }).finally(function () {
+          // Do something when everything is done
+        });
     };
 
     factory.remove = function (doc, callBack, errorCallback) {
-      database.remove(doc)
-          .then(function (response) {
-            // Do something with the response
-            callBack(response);
-          })
-          .catch(function (error) {
-            // Do something with the error
-            errorCallback(error);
-          })
-          .finally(function () {
-            // Do something when everything is done
-          });
+      database.remove(doc).then(function (response) {
+        callBack(response);
+      }).catch(function (error) {
+        errorCallback(error);
+      }).finally(function () {
+        // Do something when everything is done
+      });
     };
 
     factory.get = function (doc, callBack, errCallback) {
-      database.get(doc.childId)
-          .then(function (response) {
-            // Do something with the response
-            callBack(response);
-          })
-          .catch(function (error) {
-            // Do something with the error
-            errCallback(error);
-          })
-          .finally(function () {
-            // Do something when everything is done
-          });
+      database.get(doc.childId).then(function (response) {
+        callBack(response);
+      }).catch(function (error) {
+        errCallback(error);
+      }).finally(function () {
+          // Do something when everything is done
+      });
+    };
+
+    factory.getChildById = function (id) {
+      return database.get(id).then(function (retVal) {
+        return retVal;
+      }).catch(function (err) {
+        console.log(err);
+      });
     };
 
     factory.getOneChild = function (doc) {
@@ -342,37 +355,26 @@
     };
 
     factory.query = function (qFunction, callback, errorCallback) {
-      database.query(qFunction)
-          .then(function (response) {
-            // Do something with the response
-            callback(response.doc);
-          })
-          .catch(function (error) {
-            // Do something with the error
-            errorCallback(error);
-          })
-          .finally(function () {
-            // Do something when everything is done
-          });
+      database.query(qFunction).then(function (response) {
+        callback(response.doc);
+      }).catch(function (error) {
+         errorCallback(error);
+      }).finally(function () {
+          // Do something when everything is done
+      });
     };
 
     factory.insertSurvey = function (childInfo, callback, errorCallback) {
-      database.put(childInfo)
-          .then(function (response) {
-            // Do something with the response
-            callback(response);
-          })
-          .catch(function (error) {
-            // Do something with the error
-            errorCallback(error);
-          })
-          .finally(function () {
+      database.put(childInfo).then(function (response) {
+         callback(response);
+       }).catch(function (error) {
+         errorCallback(error);
+       }).finally(function () {
             // Do something when everything is done
-          });
+       });
     };
 
     function calculateStatus(screeningObj) {
-      // return new Promise(function(resolve, reject) {
       var zscoreStatus = '';
       if (screeningObj.zScore.wl < -3) {
           zscoreStatus = 'Acute: sam supplements required';
@@ -390,7 +392,6 @@
           zscoreStatus = 'Normal';
         }
       return ({ screeningObj: screeningObj, zscoreStatus: zscoreStatus });
-      // });
     }
 
     function statusColor(status) {
@@ -486,9 +487,6 @@
         childInfo._id = childInfo._id + currentDbName + '_' + moment.now();
       }
 
-      // if (childInfo._rev) {
-      //   childInfo._rev = childInfo._rev;
-      // }
       database.put(childInfo)
           .then(function (response) {
             // Do something with the response
@@ -588,12 +586,6 @@
         // Do something when everything is done
       });
     };
-
-    // factory.compactDB = function(stakeDB) {
-    //   database.compact((error) => {
-    //     console.log(error)
-    //   });
-    // };
 
     factory.replicate = function (upStreamDb, callback, errorCallback, whenDone) {
       database.replicate.to(upStreamDb)

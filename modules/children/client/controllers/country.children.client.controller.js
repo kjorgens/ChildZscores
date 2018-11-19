@@ -2,45 +2,49 @@
   'use strict';
 
   angular
-      .module('children')
-      .controller('ChildrenCountryController', ChildrenCountryController);
+    .module('children')
+    .controller('ChildrenCountryController', ChildrenCountryController);
 
-  ChildrenCountryController.$inject = ['$rootScope', '$translate', 'usSpinnerService', 'ChildrenStakes', 'PouchService'];
+  ChildrenCountryController.$inject = ['$state', '$rootScope', '$translate', 'usSpinnerService', 'countryResolve'];
 
-  function ChildrenCountryController($rootScope, $translate, usSpinnerService, ChildrenStakes, PouchService) {
+  function ChildrenCountryController($state, $rootScope, $translate, usSpinnerService, countryResolve) {
     var vm = this;
-
-    vm.featurePromptCount = parseInt(localStorage.getItem('featurePromptCount')) || 0;
-    if(vm.featurePromptCount < 3){
-      localStorage.setItem('featurePromptCount',vm.featurePromptCount+1);
+    vm.liahonaStakes = countryResolve;
+    vm.featurePromptCount = parseInt(localStorage.getItem('featurePromptCount'), 10) || 0;
+    if (vm.featurePromptCount < 3) {
+      localStorage.setItem('featurePromptCount', vm.featurePromptCount + 1);
     } else {
-      localStorage.setItem('featurePromptCount',"5");
+      localStorage.setItem('featurePromptCount', '5');
     }
 
-    vm.refreshCountryList = refreshCountryList;
+    // vm.refreshCountryList = refreshCountryList;
     vm.onLine = navigator.onLine;
     $translate.use($rootScope.SelectedLanguage);
+    //
+    // function storeDbList(input) {
+    //   vm.liahonaStakes = input.countries;
+    //   vm.stopSpin();
+    // }
 
-    function storeDbList(input) {
-      vm.liahonaStakes = input.countries;
-      vm.stopSpin();
-    }
+    // function returnFromPut(input) {
+    //   // vm.liahonaStakes = input.countries;
+    //   vm.stopSpin();
+    // }
 
-    function returnFromPut(input) {
-      // vm.liahonaStakes = input.countries;
-      vm.stopSpin();
-    }
+    // function handleSaveLocalError(input) {
+    //   vm.stopSpin();
+    //   console.log("error creating country db local");
+    // }
+    //
+    // function handleError(input) {
+    //   console.log(input + " attempt to retrieve info remote");
+    //   // getStakesDB();
+    //   vm.stopSpin();
+    // }
+    vm.countryMenu = function() {
+      $state.go('children.countries', { networkFirst: 'true' });
+    };
 
-    function handleSaveLocalError(input) {
-      vm.stopSpin();
-      console.log("error creating country db local");
-    }
-
-    function handleError(input) {
-      console.log(input + " attempt to retrieve info remote");
-      getStakesDB();
-      vm.stopSpin();
-    }
     vm.startSpin = function() {
       if (!vm.spinneractive) {
         usSpinnerService.spin('spinner-sync');
@@ -61,23 +65,22 @@
     $rootScope.$on('us-spinner:stop', function(event, key) {
       vm.spinneractive = false;
     });
-    function refreshCountryList() {
-      vm.startSpin();
-      getStakesDB();
-    }
+    // function refreshCountryList() {
+    //   vm.startSpin();
+    //   getStakesDB();
+    // }
 
-    function getStakesDB() {
-      if (navigator.onLine) {
-        ChildrenStakes.get(function(retVal) {
-          vm.liahonaStakes = retVal;
-          PouchService.createCountryDatabase();
-          PouchService.putStakesLocal(retVal, returnFromPut, handleSaveLocalError);
-        });
-      } else {
-        PouchService.getCountriesLocal(storeDbList, handleError);
-      }
-    }
-    getStakesDB();
+    // function getStakesDB() {
+    //   if (navigator.onLine) {
+    //     ChildrenStakes.get(function(retVal) {
+    //       vm.liahonaStakes = retVal;
+    //       PouchService.createCountryDatabase();
+    //       PouchService.putStakesLocal(retVal, returnFromPut, handleSaveLocalError);
+    //     });
+    //   } else {
+    //     PouchService.getCountriesLocal(storeDbList, handleError);
+    //   }
+    // }
+    // getStakesDB();
   }
 }());
-

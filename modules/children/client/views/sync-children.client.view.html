@@ -49,38 +49,38 @@
             <i class="glyphicon glyphicon-share"></i>
             </h3>
         </a>
-        <a ng-click="vm.createReport('country', vm.countryCode, vm.sortSelect, 'all')">
+        <a ng-click="vm.createReport('country', vm.countryCode, vm.sortSelect, 'all', 'admin')">
           <h3><span> Aggregate csv files for {{vm.selectedCountry}}</span>
             <i class="glyphicon glyphicon-share"></i>
           </h3>
         </a>
-        <a ng-click="vm.createReport('stake', vm.countryCode, vm.sortSelect, 'all')">
+        <a ng-click="vm.createReport('stake', vm.countryCode, vm.sortSelect, 'all', 'admin')">
           <h3><span> Create csv file for {{vm.selectedStake}} </span>
             <i class="glyphicon glyphicon-share"></i>
           </h3>
         </a>
-      <a ng-click="vm.createReport('countries', vm.countryCode, vm.sortSelect, 'sup')">
+      <a ng-click="vm.createReport('countries', vm.countryCode, vm.sortSelect, 'sup', 'admin')">
         <h3><span> Aggregate supplement report all countries </span>
           <i class="glyphicon glyphicon-share"></i>
         </h3>
       </a>
-      <a ng-click="vm.createReport('country', vm.countryCode, vm.sortSelect, 'sup')">
+      <a ng-click="vm.createReport('country', vm.countryCode, vm.sortSelect, 'sup', 'admin')">
         <h3><span> Aggregate supplement report for {{vm.selectedCountry}}</span>
           <i class="glyphicon glyphicon-share"></i>
         </h3>
       </a>
-      <a ng-click="vm.createReport('stake', vm.countryCode, vm.sortSelect, 'sup')">
+      <a ng-click="vm.createReport('stake', vm.countryCode, vm.sortSelect, 'sup', 'admin')">
         <h3><span> Supplement report for {{vm.selectedStake}} </span>
           <i class="glyphicon glyphicon-share"></i>
         </h3>
       </a>
-        <a ng-click="vm.updateViews(vm.selectedStake)">
+        <a ng-click="vm.updateViews(vm.selectedStakeDB)">
           <h3><span> Update Views {{vm.selectedStake}} </span>
             <i class="glyphicon glyphicon-share"></i>
           </h3>
         </a>
-        <a ng-click="vm.compactDB(vm.selectedStake)">
-          <h3><span> Compact {{vm.selectedStake}} </span>
+        <a ng-click="vm.updateStakeChildStatus(vm.stakeDB, vm.selectedCountryCode, 'stake', 'updateStatus' )">
+          <h3><span> Update Zscore Status {{vm.selectedStake}} </span>
             <i class="glyphicon glyphicon-share"></i>
           </h3>
         </a>

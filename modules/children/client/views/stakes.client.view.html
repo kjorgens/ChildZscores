@@ -1,7 +1,7 @@
 <section>
     <div class="page-header" style="margin-top: 8em">
-        <h3>
-            <img ng-src={{vm.selectedCountry.image}}>
+        <h3 class="input" ui-sref="Home">
+            <img class="button" ng-src={{vm.selectedCountry.image}} ng-click="vm.countryList()">
             <span ng-bind="vm.selectedCountry.name"></span>
         </h3>
     </div>

@@ -2,8 +2,8 @@
   'use strict';
 
   angular
-      .module('children')
-      .controller('ChildrenModalController', ChildrenModalController);
+    .module('children')
+    .controller('ChildrenModalController', ChildrenModalController);
 
   ChildrenModalController.$inject = ['$uibModalInstance'];
 
@@ -19,4 +19,3 @@
     };
   }
 }());
-

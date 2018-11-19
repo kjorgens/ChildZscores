@@ -36,6 +36,7 @@
     vm.cancelUpload = cancelUpload;
     vm.updateViews = updateViews;
     vm.compactDB = compactDB;
+    vm.updateStakeChildStatus = updateStakeChildStatus;
 
     // Create file uploader instance
     vm.uploader = new FileUploader({
@@ -107,13 +108,13 @@
     }
 
     vm.uploader.onCompleteItem = function(fileItem, response, status, headers) {
-      if(status !== 200){
+      if (status !== 200) {
         console.log(status + ' ' + response);
         vm.reportError('Error uploading to database', response, true);
       } else {
         console.log(response);
       }
- //     console.info('onComplete', fileItem, response, status, headers);
+      // console.info('onComplete', fileItem, response, status, headers);
       vm.onComplete = true;
       cancelUpload();
       vm.stopSpin();
@@ -155,7 +156,6 @@
     vm.createReport = createReport;
     vm.syncUpstream = syncUpstream;
     vm.online = $rootScope.appOnline;
-//    vm.find();
 
     vm.deleteLocalDB = function(dbName) {
       PouchService.destroyDatabase(dbName);
@@ -246,12 +246,25 @@
       // console.log(input);
     }
 
+    function updateComplete() {
+      vm.stopSpin();
+      syncUpstream();
+    }
+
     function genReport(input) {
-      // ChildrenReport.get(input, returnReport, getCsvError);
-      // return $resource('api/children/report/:stakeDB/:cCode/:scopeType/:sortField/:language/:csvType');
-      return $http.get(
-        'api/children/report/' + input.stakeDB + '/' + input.cCode + '/' + input.scopeType + '/' + input.sortField + '/' + input.language + '/' + input.csvType)
+      let url = 'api/children/report/' + input.stakeDB + '/' + input.cCode + '/' + input.scopeType + '/' + input.sortField + '/' + input.language + '/' + input.csvType;
+      if (input.stakeName) {
+        url = `${ url }?stake=${ encodeURIComponent(vm.selectedStake) }`;
+      }
+
+      return $http.get(url)
         .then(returnReport, getCsvError);
+    }
+
+    function updateStakeChildStatus(stakeDB, cCode, scopeType, func) {
+      vm.startSpin();
+      return $http.get('api/children/update/' + stakeDB + '/' + cCode + '/' + scopeType + '/' + func)
+        .then(updateComplete);
     }
 
     function getCsvError(error) {
@@ -262,7 +275,7 @@
 //      vm.reportError('Download csv error', error.data.error.message, error.data.error.name.indexOf('Empty database') < 0);
     }
 
-    function createReport(scope, scopeID, sortField, csvType) {
+    function createReport(scope, scopeID, sortField, csvType, stakeName) {
       vm.startSpin();
       if (scope === undefined) {
         scope = 'stake';
@@ -270,9 +283,16 @@
       if (sortField === undefined) {
         sortField = 'firstName';
       }
-      var reportParams = { csvType: csvType, stakeDB: vm.stakeDB, scopeType: scope, cCode: vm.selectedCountryCode, sortField: sortField, language: $rootScope.SelectedLanguage };
- //     ChildrenViews.get(sortParam, genReport(sortParam), getCsvError);
- //      ChildrenViews.updateViews(vm.stakeDB).then(genReport(sortParam), getCsvError);
+      var reportParams = {
+        csvType: csvType,
+        stakeDB: vm.stakeDB,
+        scopeType: scope,
+        cCode: vm.selectedCountryCode,
+        sortField: sortField,
+        language: $rootScope.SelectedLanguage,
+        stakeName: stakeName
+      };
+
       return genReport(reportParams, getCsvError);
     }
 
@@ -286,12 +306,12 @@
 
     function viewUpdateComplete() {
       console.log('couch view update complete');
-        // Clear messages
-        vm.success = vm.error = null;
-        vm.onComplete = null;
-        // Start upload
-        vm.uploader.uploadAll();
-     }
+      // Clear messages
+      vm.success = vm.error = null;
+      vm.onComplete = null;
+      // Start upload
+      vm.uploader.uploadAll();
+    }
 
     function viewUpdateError(err) {
       vm.stopSpin();
@@ -312,4 +332,3 @@
 //    createReport();
   }
 }());
-

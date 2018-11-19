@@ -14,11 +14,140 @@ var path = require('path'),
   config = require(path.resolve('./config/config')),
   Promise = require('bluebird'),
   _ = require('lodash'),
+  nano = require('nano'),
   errorHandler = require(path.resolve('./modules/core/server/controllers/errors.server.controller'));
 
 var retryLimit = 5;
 
 var errorStack = [];
+
+var obesityGirls = [
+  15.5,
+  17.0,
+  18.4,
+  19.0,
+  19.4,
+  19.6,
+  19.6,
+  19.6,
+  19.6,
+  19.4,
+  19.3,
+  19.1,
+  19.0,
+  18.8,
+  18.7,
+  18.6,
+  18.4,
+  18.3,
+  18.2,
+  18.1,
+  18.1,
+  18.0,
+  17.9,
+  17.9,
+  17.8,
+  18.1,
+  18.1,
+  18.0,
+  18.0,
+  18.0,
+  17.9,
+  17.9,
+  17.9,
+  17.9,
+  17.9,
+  17.8,
+  17.8,
+  17.8,
+  17.8,
+  17.8,
+  17.8,
+  17.8,
+  17.8,
+  17.8,
+  17.8,
+  17.8,
+  17.8,
+  17.9,
+  17.9,
+  17.9,
+  17.9,
+  17.9,
+  17.9,
+  17.9,
+  18.0,
+  18.0,
+  18.0,
+  18.0,
+  18.0,
+  18.1,
+  18.1
+];
+
+var obesityBoys = [
+  15.8,
+  17.3,
+  18.8,
+  19.4,
+  19.7,
+  19.8,
+  19.9,
+  19.9,
+  19.8,
+  19.7,
+  19.5,
+  19.4,
+  19.2,
+  19.1,
+  18.9,
+  18.8,
+  18.7,
+  18.6,
+  18.5,
+  18.4,
+  18.3,
+  18.2,
+  18.1,
+  18.0,
+  18.0,
+  18.3,
+  18.2,
+  18.2,
+  18.1,
+  18.1,
+  18.0,
+  18.0,
+  18.0,
+  17.9,
+  17.9,
+  17.9,
+  17.8,
+  17.8,
+  17.8,
+  17.7,
+  17.7,
+  17.7,
+  17.7,
+  17.7,
+  17.7,
+  17.6,
+  17.6,
+  17.6,
+  17.6,
+  17.6,
+  17.6,
+  17.6,
+  17.6,
+  17.6,
+  17.6,
+  17.6,
+  17.6,
+  17.6,
+  17.6,
+  17.7,
+  17.7
+];
 
 var filterList = [
   {
@@ -26,7 +155,7 @@ var filterList = [
     'filters': {
       'ddocs': 'function(doc, req) {if(doc._id[0] != \'_\') {return true} else {return false}  }'
     }
-  },
+  }
 ];
 
 var viewList = [
@@ -93,18 +222,24 @@ var viewList = [
         'map': 'function(doc){emit(doc.owner, doc)}'
       }
     }
-  },
+  }
 ];
 
 var removeFilterList = [
   {
-    '_id': '_design/screenings_search',
-  },
+    '_id': '_design/screenings_search'
+  }
 ];
+
+function calcObesity(child, latestScreen) {
+  var bmi = latestScreen.weight / (Math.pow(latestScreen.height / 100, 2));
+  var tableBMI = latestScreen.gender === 'Girl' ? obesityGirls[Math.round(latestScreen.monthAge)] : obesityBoys[Math.round(latestScreen.monthAge)];
+  return ({ obese: bmi > tableBMI, currentBMI: bmi });
+}
 
 function validateView(type, stakeDB, view) {
   return new Promise(function(resolve, reject) {
-    var stakeDb = require('nano')('https://' + process.env.SYNC_ENTITY + '@' + process.env.COUCH_URL + '/' + stakeDB);
+    var stakeDb = nano('https://' + process.env.SYNC_ENTITY + '@' + process.env.COUCH_URL + '/' + stakeDB);
     var viewObject;
     if (~type.indexOf('view')) {
       viewObject = { _id: view._id, views: view.views };
@@ -145,7 +280,7 @@ function validateView(type, stakeDB, view) {
 
 function removeView(type, stakeDB, view) {
   return new Promise(function (resolve, reject) {
-    var stakeDb = require('nano')('https://' + process.env.SYNC_ENTITY + '@' + process.env.COUCH_URL + '/' + stakeDB);
+    var stakeDb = nano('https://' + process.env.SYNC_ENTITY + '@' + process.env.COUCH_URL + '/' + stakeDB);
 
     stakeDb.get(view._id, function (err, body) {
       if (!err) {
@@ -182,9 +317,8 @@ exports.checkUpdateViews = function (req, res) {
     return (res.status(200).send({ message: input }));
   }).catch(function (error) {
     return res.status(400).send({
-        message: errorHandler.getErrorMessage(error)
-      }
-    );
+      message: errorHandler.getErrorMessage(error)
+    });
   });
 };
 
@@ -221,6 +355,82 @@ function splitSups(childScreenList) {
   return { listIn: [...supList, ...others] };
 }
 
+function updateChildStatus(child, stakeDB) {
+  return new Promise(() => {
+    var stakeDb = nano('https://' + process.env.SYNC_ENTITY + '@' + process.env.COUCH_URL + '/' + stakeDB);
+    child.key.supType = child.supType;
+    child.key.zscoreStatus = child.zscoreStatus;
+    child.key.statusColor = child.statusColor;
+    child.key.bmi = child.bmi;
+    child.key.obese = child.obese;
+    return stakeDb.insert(child.key, child.key._id).then((result) => {
+      console.log(result);
+    }).catch((err) => {
+      console.log(err);
+    });
+  });
+}
+
+function updateSupplementStatus(childList, stakeDB) {
+  var noScreenings = 0;
+  var sortedScreenList = [];
+  var updateList = [];
+  if (childList[0].data.total_rows > 0) {
+    childList[0].data.rows.forEach(function (childEntry) {
+      var currentAge = moment().diff(moment(new Date(childEntry.key.birthDate)), 'months');
+      if (!~childEntry.id.indexOf('mthr')) {
+        if (currentAge < 60 && ~childEntry.id.indexOf('chld')) {
+          sortedScreenList = getScreeningsList(childEntry.id, childList[1].data.rows);
+          if (sortedScreenList.length === 0) {
+            noScreenings += 1;
+            childEntry.noScreenings = true;
+          } else {
+            var supType = 'none';
+            var currentSupType = 'none';
+            var priorMalnurished = 'no';
+            sortedScreenList.forEach(function (screening, index) {
+              if ((screening.zScore.ha < -2 || screening.zScore.wa < -2)) {
+                priorMalnurished = 'yes';
+                supType = 'sup';
+                if (currentAge > 36 && currentAge <= 60) {
+                  supType = 'mic';
+                }
+              }
+              if (screening.zScore.wl < -2) {
+                priorMalnurished = 'yes';
+                supType = 'MAM';
+                if (screening.zScore.wl < -3) {
+                  supType = 'SAM';
+                }
+              }
+              if (index === 0) {
+                currentSupType = supType;
+              }
+            });
+            let timeSinceLastScreen = moment().diff(moment(new Date(sortedScreenList[0].surveyDate)), 'months');
+            if (timeSinceLastScreen > 6) {
+              currentSupType = 'none';
+            }
+            childEntry.supType = currentSupType;
+            // if (childEntry.key.firstName === 'Abegail') {
+            //   childEntry.zscoreStatus = calculateStatus(sortedScreenList[0]).zscoreStatus;
+            //   console.log('stop');
+            // }
+            const bmiInfo = calcObesity(childEntry, sortedScreenList[0]);
+            childEntry.bmi = bmiInfo.bmi;
+            childEntry.obese = bmiInfo.obese;
+            childEntry.zscoreStatus = calculateStatus(sortedScreenList[0]).zscoreStatus;
+            childEntry.statusColor = statusColor(childEntry.zscoreStatus);
+            updateList.push(updateChildStatus(childEntry, stakeDB));
+          }
+        }
+      }
+    });
+  }
+
+  return updateList;
+}
+
 function listAllChildren(childScreenList, screenType) {
   var childCount = 0;
   var sortedScreenList = [];
@@ -234,75 +444,81 @@ function listAllChildren(childScreenList, screenType) {
   if (childScreenList[0].data.total_rows > 0) {
     childScreenList[0].data.rows.forEach(function (childEntry) {
       var currentAge = moment().diff(moment(new Date(childEntry.key.birthDate)), 'months');
-        if (!~childEntry.id.indexOf('mthr')) {
-          if (screenType === 'sup') {
-            if (currentAge < 60 && ~childEntry.id.indexOf('chld')) {
-              sortedScreenList = getScreeningsList(childEntry.id, childScreenList[1].data.rows);
-              if (sortedScreenList.length === 0) {
-                noScreenings++;
-                lineAccumulator.push(addChildToLine(childEntry.key, sortedScreenList[0], childScreenList[0].parms.sortField, childScreenList[0].parms.stakeDB, childScreenList[0].parms.filter, ' ', 100, 'no', childScreenList[0].language));
-              } else {
-                supType = 'none';
-                priorMalnurished = 'no';
-                currentSupType = 'none';
-                sortedScreenList.forEach(function (screening, index) {
-                  // if ((screening.zScore.ha > -2 && screening.zScore.ha < -1) || (screening.zScore.wa > -2 && screening.zScore.wa < -1)) {
-                  //   supType = 'risk';
-                  // }
-                  if ((screening.zScore.ha < -2 || screening.zScore.wa < -2)) {
-                    priorMalnurished = 'yes';
-                    supType = 'sup';
-                    if (currentAge > 36 && currentAge <= 60) {
-                      supType = 'mic';
-                    }
+      if (!~childEntry.id.indexOf('mthr')) {
+        if (screenType === 'sup') {
+          if (currentAge < 60 && ~childEntry.id.indexOf('chld')) {
+            sortedScreenList = getScreeningsList(childEntry.id, childScreenList[1].data.rows);
+            if (sortedScreenList.length === 0) {
+              noScreenings++;
+              lineAccumulator.push(addChildToLine(childEntry.key, sortedScreenList[0], childScreenList[0].parms.sortField, childScreenList[0].parms.stakeDB, childScreenList[0].parms.filter, ' ', 100, 'no', childScreenList[0].language));
+            } else {
+              supType = 'none';
+              priorMalnurished = 'no';
+              currentSupType = 'none';
+              sortedScreenList.forEach(function (screening, index) {
+                if ((screening.zScore.ha < -2 || screening.zScore.wa < -2)) {
+                  priorMalnurished = 'yes';
+                  supType = 'sup';
+                  if (currentAge > 36 && currentAge <= 60) {
+                    supType = 'mic';
                   }
-                  if (screening.zScore.wl < -2) {
-                    priorMalnurished = 'yes';
-                    supType = 'MAM';
-                    if (screening.zScore.wl < -3) {
-                      supType = 'SAM';
-                    }
+                }
+                if (screening.zScore.wl < -2) {
+                  priorMalnurished = 'yes';
+                  supType = 'MAM';
+                  if (screening.zScore.wl < -3) {
+                    supType = 'SAM';
                   }
-                  if (index === 0) {
-                    currentSupType = supType;
-                  }
-                });
-                timeSinceLastScreen = moment().diff(moment(new Date(sortedScreenList[0].surveyDate)), 'months');
+                }
+                if (index === 0) {
+                  currentSupType = supType;
+                }
+              });
+              timeSinceLastScreen = moment().diff(moment(new Date(sortedScreenList[0].surveyDate)), 'months');
 
-                lineAccumulator.push(addChildToLine(childEntry.key, sortedScreenList[0], childScreenList[0].parms.sortField, childScreenList[0].parms.stakeDB,
-                  childScreenList[0].parms.filter, currentSupType, timeSinceLastScreen, priorMalnurished, childScreenList[0].parms.language));
-              }
-            }
-          } else if (screenType === 'all') {
-            try {
-              if (childScreenList[1].data.total_rows > 0) {
-                sortedScreenList = getScreeningsList(childEntry.id, childScreenList[1].data.rows);
-                let screenCount = 1;
-                sortedScreenList.forEach(function (entry) {
-                  lineAccumulator.push(addLineToStack(childCount, screenCount, childEntry.key, entry, childScreenList[0].parms.sortField, childScreenList[0].stake, childScreenList[0].stakeName, childScreenList[0].parms.language));
-                  childCount++;
-                  screenCount++;
-                });
-              }
-            } catch (err) {
-              console.log(err.message);
+              lineAccumulator.push(addChildToLine(
+                childEntry.key, sortedScreenList[0],
+                childScreenList[0].parms.sortField,
+                childScreenList[0].parms.stakeDB,
+                childScreenList[0].parms.filter,
+                currentSupType, timeSinceLastScreen,
+                priorMalnurished,
+                childScreenList[0].parms.language,
+                childScreenList[0].parms.cCode,
+                childScreenList[0].parms.stakeName
+              ));
             }
           }
-        } else {
+        } else if (screenType === 'all') {
           try {
             if (childScreenList[1].data.total_rows > 0) {
               sortedScreenList = getScreeningsList(childEntry.id, childScreenList[1].data.rows);
               let screenCount = 1;
               sortedScreenList.forEach(function (entry) {
                 lineAccumulator.push(addLineToStack(childCount, screenCount, childEntry.key, entry, childScreenList[0].parms.sortField, childScreenList[0].stake, childScreenList[0].stakeName, childScreenList[0].parms.language));
-                childCount++;
-                screenCount++;
+                childCount += 1;
+                screenCount += 1;
               });
             }
           } catch (err) {
             console.log(err.message);
           }
         }
+      } else {
+        try {
+          if (childScreenList[1].data.total_rows > 0) {
+            sortedScreenList = getScreeningsList(childEntry.id, childScreenList[1].data.rows);
+            let screenCount = 1;
+            sortedScreenList.forEach(function (entry) {
+              lineAccumulator.push(addLineToStack(childCount, screenCount, childEntry.key, entry, childScreenList[0].parms.sortField, childScreenList[0].stake, childScreenList[0].stakeName, childScreenList[0].parms.language));
+              childCount += 1;
+              screenCount += 1;
+            });
+          }
+        } catch (err) {
+          console.log(err.message);
+        }
+      }
     });
   }
 
@@ -317,13 +533,13 @@ function listWomen(womanScreenList) {
     if (dataSet[0].data.total_rows > 0) {
       dataSet[0].data.rows.forEach(function (childEntry) {
         linesToAdd.push(addWomenToStack(childEntry.key, dataSet[0].stake, dataSet[0].parms.sortField, dataSet[0].parms.filter, dataSet[0].parms.language));
-        count++;
+        count += 1;
       });
     }
     if (dataSet[1].data.total_rows > 0) {
       dataSet[1].data.rows.forEach(function (childEntry) {
         linesToAdd.push(addWomenToStack(childEntry.key, dataSet[1].stake, dataSet[1].parms.sortField, dataSet[1].parms.filter, dataSet[1].parms.language));
-        count++;
+        count += 1;
       });
     }
   });
@@ -345,23 +561,29 @@ function newDBRequest(stake, stakeName, parmObj, view) {
           var jsonObj;
           try {
             jsonObj = JSON.parse(response.body);
-            resolve({ stake: stake, stakeName: stakeName, parms: newObj, data: jsonObj, view: view });
+            resolve({
+              stake: stake,
+              stakeName: stakeName,
+              parms: newObj,
+              data: jsonObj,
+              view: view
+            });
           } catch (e) {
-             console.log('Error JSON.Parse dbRequest');
+            console.log('Error JSON.Parse dbRequest');
             reject(e);
             // resolve({ stake: stake, stakeName: stakeName, parms: newObj, data: [], view: view });
           }
         } else {
           try {
             console.log(`${ response.statusCode } returned from couch access ${ stake }`);
-          } catch(err) {
+          } catch (err) {
             console.log(err);
           }
           // resolve({ stake: stake, stakeName: stakeName, parms: newObj, data: {}, view: view });
           reject(new Error(`${ response.statusCode } returned from couch access ${ stake }`));
         }
       });
-    } catch(err) {
+    } catch (err) {
       console.log(err.message);
       reject(err);
     }
@@ -369,7 +591,7 @@ function newDBRequest(stake, stakeName, parmObj, view) {
 }
 
 function getWomen(parmObj) {
-  var newObj = Object.assign({},parmObj);
+  var newObj = Object.assign({}, parmObj);
   var stake = parmObj.stakeDB;
   return Promise.join(newDBRequest(stake, parmObj.stakename, newObj, 'pregnant_women'), newDBRequest(stake, parmObj.stakename, newObj, 'nursing_mothers'));
 }
@@ -377,11 +599,11 @@ function getWomen(parmObj) {
 async function getChildAndData(parmObj, multiplier) {
   return new Promise((resolve) => {
     function accessDB(parmObj) {
-      var newObj = Object.assign({},parmObj);
+      var newObj = Object.assign({}, parmObj);
       var stake = parmObj.stakeDB;
       return resolve(Promise.join(newDBRequest(stake, parmObj.stakename, newObj, 'children_list'), newDBRequest(stake, parmObj.stakename, newObj, 'scr_list')));
     }
-    return setTimeout(accessDB, 1000*multiplier, parmObj);
+    return setTimeout(accessDB, 1000 * multiplier, parmObj);
   });
 }
 
@@ -396,7 +618,7 @@ async function writeHeader(fileToWrite, headerLine) {
         resolve(fileToWrite);
       }
     });
-  })
+  });
 }
 
 async function appendStake(fileToWrite, data) {
@@ -411,7 +633,7 @@ async function appendStake(fileToWrite, data) {
   });
 }
 
-function addChildToLine(existingOwnerInfo, screenInfo, sortField, stakeDB, filter, supType, timeSinceLastScreen, priorMalNurish, language) {
+function addChildToLine(existingOwnerInfo, screenInfo, sortField, stakeDB, filter, supType, timeSinceLastScreen, priorMalNurish, language, ccode, stakeName) {
   const ownerInfo = existingOwnerInfo;
   ownerInfo.sup = supType;
   ownerInfo.sinceLastScreen = timeSinceLastScreen;
@@ -431,13 +653,14 @@ function addChildToLine(existingOwnerInfo, screenInfo, sortField, stakeDB, filte
     ownerInfo.ward = ownerInfo.ward.replace(/,/g, ' ');
   }
   var dataLine;
+  var message;
   var currentAge = moment().diff(moment(new Date(ownerInfo.birthDate)), 'months');
   var priorMessage = language === 'en' ? `${ priorMalNurish }` : `${ priorMalNurish === 'yes' ? 'si' : 'no' }`;
   if (supType.indexOf('risk') > -1) {
-    var message = language === 'en' ? ` months since last screening\n` :
-      ` meses desde la última evaluación\n`;
-    dataLine = '' + ',' + ',' + ',' + ',' + ',' + ',' + ',' + currentAge + ',' + priorMessage + ',' + ownerInfo.firstName + ',' + ownerInfo.lastName + ',' + ownerInfo.ward +
-      ',' + ownerInfo.mother + ',' + timeSinceLastScreen + message;
+    message = language === 'en' ? ' months since last screening\n'
+      : ' meses desde la última evaluación\n';
+    dataLine = '' + ',' + ',' + ',' + ',' + ',' + ',' + ',' + currentAge + ',' + priorMessage + ',' + ownerInfo.firstName + ',' + ownerInfo.lastName + ',' + ownerInfo.ward
+      + ',' + ownerInfo.mother + ',' + timeSinceLastScreen + message;
     return ({
       data: ownerInfo,
       dataLine: dataLine,
@@ -448,10 +671,14 @@ function addChildToLine(existingOwnerInfo, screenInfo, sortField, stakeDB, filte
       language: language
     });
   } else if (supType.indexOf('none') > -1) {
-    var message = language === 'en' ? ` months since last screening\n` :
-      ` meses desde la última evaluación\n`;
-    dataLine = '' + ',' + ',' + ',' + ',' + ',' + ',' + ',' + currentAge + ',' + priorMessage + ',' + ownerInfo.firstName + ',' + ownerInfo.lastName + ',' + ownerInfo.ward +
-      ',' + ownerInfo.mother + ',' + timeSinceLastScreen + message;
+    message = language === 'en' ? ' months since last screening\n'
+      : ' meses desde la última evaluación\n';
+    dataLine = '' + ',' + ',' + ',' + ',' + ',' + ',' + ',' + currentAge + ',' + priorMessage + ',' + ownerInfo.firstName + ',' + ownerInfo.lastName + ',' + ownerInfo.ward
+      + ',' + ownerInfo.mother;
+    if (stakeName) {
+      dataLine += ',' + ccode + ',' + stakeName;
+    }
+    dataLine += ',' + timeSinceLastScreen + message;
     return ({
       data: ownerInfo,
       dataLine: dataLine,
@@ -464,13 +691,21 @@ function addChildToLine(existingOwnerInfo, screenInfo, sortField, stakeDB, filte
   } else if (screenInfo === undefined || timeSinceLastScreen > 6) {
     if (timeSinceLastScreen === undefined || timeSinceLastScreen === 100) {
       var messageProb = language === 'en' ? ' no screenings: possible duplicate?\n' : ' sin proyecciones: posible duplicado?\n';
-      dataLine = '' + ',' + ',' + ',' + ',' + ',' + ',' + ',' + currentAge + ',' + priorMessage + ',' + ownerInfo.firstName + ',' + ownerInfo.lastName + ',' + ownerInfo.ward +
-        ',' + ownerInfo.mother + ',' + messageProb;
+      dataLine = '' + ',' + ',' + ',' + ',' + ',' + ',' + ',' + currentAge + ',' + priorMessage + ',' + ownerInfo.firstName + ',' + ownerInfo.lastName + ',' + ownerInfo.ward
+        + ',' + ownerInfo.mother;
+      if (stakeName) {
+        dataLine += ',' + ccode + ',' + stakeName;
+      }
+      dataLine += ',' + ',' + messageProb;
     } else {
-      var messageRisk = language === 'en' ? `  months since last screening\n` :
-        ` meses desde la última evaluación , Niño en riesgo: debería pasar a la siguiente evaluación\n`;
-      dataLine = '' + ',' + ',' + ',' + ',' + ',' + ',' + ',' + currentAge + ',' + priorMessage + ',' + ownerInfo.firstName + ',' + ownerInfo.lastName + ',' + ownerInfo.ward +
-        ',' + ownerInfo.mother + ',' + timeSinceLastScreen + messageRisk;
+      var messageRisk = language === 'en' ? '  months since last screening\n'
+        : ' meses desde la última evaluación , Niño en riesgo: debería pasar a la siguiente evaluación\n';
+      dataLine = '' + ',' + ',' + ',' + ',' + ',' + ',' + ',' + currentAge + ',' + priorMessage + ',' + ownerInfo.firstName + ',' + ownerInfo.lastName + ',' + ownerInfo.ward
+        + ',' + ownerInfo.mother;
+      if (stakeName) {
+        dataLine += ',' + ccode + ',' + stakeName;
+      }
+      dataLine += ',' + timeSinceLastScreen + messageRisk;
     }
     return ({
       data: ownerInfo,
@@ -482,8 +717,12 @@ function addChildToLine(existingOwnerInfo, screenInfo, sortField, stakeDB, filte
       language: language
     });
   } else {
-    dataLine = '' + ',' + ',' + ',' + ',' + ',,' + supType + ',' + currentAge + ',' + priorMessage + ',' + ownerInfo.firstName + ',' + ownerInfo.lastName +
-      ',' + ownerInfo.ward + ',' + ownerInfo.mother + '\n';
+    dataLine = '' + ',' + ',' + ',' + ',' + ',,' + supType + ',' + currentAge + ',' + priorMessage + ',' + ownerInfo.firstName + ',' + ownerInfo.lastName
+      + ',' + ownerInfo.ward + ',' + ownerInfo.mother;
+    if (stakeName) {
+      dataLine += ',' + ccode + ',' + stakeName;
+    }
+    dataLine += '\n';
     return ({
       data: ownerInfo,
       dataLine: dataLine,
@@ -546,6 +785,7 @@ function addLineToStack(childCount, screenCount, ownerInfo, screenInfo, sortFiel
     ward: ownerInfo.ward || '',
     memberStatus: ownerInfo.memberStatus || '',
     lastScreening: ownerInfo.lastScreening,
+    obese: ownerInfo.obese,
     screeningID: screenInfo.id,
     weight: screenInfo.weight,
     height: screenInfo.height,
@@ -558,59 +798,71 @@ function addLineToStack(childCount, screenCount, ownerInfo, screenInfo, sortFiel
   };
 
   const zscoreStatus = calculateStatus(screenInfo);
-   var dataLine = childCount + ',' + stakeDB + ',' + screenCount + ',' + dataObj.childId + ',' + dataObj.gender + ',' + dataObj.firstName + ',' + dataObj.lastName + ',' + dataObj.birthDate +
-        ',' + dataObj.idGroup + ',' + dataObj.mother + ',' + dataObj.father + ',' + dataObj.phone + ',' + dataObj.address +
-        ',' + dataObj.city + ',' + dataObj.ward + ',' + dataObj.memberStatus + ',' + dataObj.screenId + ',' + dataObj.surveyDate +
-        ',' + dataObj.weight + ',' + dataObj.height + ',' + dataObj.age + ',' + dataObj.ha + ',' + dataObj.wa + ',' + dataObj.wl + ',' + zscoreStatus.zscoreStatus + '\n';
-  return { data: dataObj, dataLine: dataLine, stakeDB: stakeDB, stakeName: stakeName, sortField: sortField, filter: 'listall' };
+  var dataLine = childCount + ',' + stakeDB + ',' + screenCount + ',' + dataObj.childId + ',' + dataObj.gender + ',' + dataObj.firstName + ',' + dataObj.lastName + ',' + dataObj.birthDate
+    + ',' + dataObj.idGroup + ',' + dataObj.mother + ',' + dataObj.father + ',' + dataObj.phone + ',' + dataObj.address
+    + ',' + dataObj.city + ',' + dataObj.ward + ',' + dataObj.memberStatus + ',' + dataObj.screenId + ',' + dataObj.surveyDate
+    + ',' + dataObj.weight + ',' + dataObj.height + ',' + dataObj.age + ',' + dataObj.obese + ',' + dataObj.ha + ',' + dataObj.wa + ',' + dataObj.wl + ',' + zscoreStatus.zscoreStatus + '\n';
+  return {
+    data: dataObj,
+    dataLine: dataLine,
+    stakeDB: stakeDB,
+    stakeName: stakeName,
+    sortField: sortField,
+    filter: 'listall'
+  };
 }
 
 function addWomenToStack(input, stakeDB, sortField, filter, language) {
   var parmObj = input;
-  // return new Promise(function (resolve, reject) {
-    if (parmObj.address !== undefined && parmObj.address.indexOf(',') > -1) {
-      parmObj.address = parmObj.address.replace(/,/g, ' ');
-    }
-    if (parmObj.city !== undefined && parmObj.city.indexOf(',') > -1) {
-      parmObj.city = parmObj.city.replace(/,/g, ' ');
-    }
-    if (parmObj.ward !== undefined && parmObj.ward.indexOf(',') > -1) {
-      parmObj.ward = parmObj.ward.replace(/,/g, ' ');
-    }
-    if (parmObj.firstName !== undefined && parmObj.firstName.indexOf(',') > -1) {
-      parmObj.firstName = parmObj.firstName.replace(/,/g, ' ');
-    }
-    if (parmObj.lastName !== undefined && parmObj.lastName.indexOf(',') > -1) {
-      parmObj.lastName = parmObj.lastName.replace(/,/g, ' ');
-    }
-    var dataObj = {
-      childId: parmObj._id,
-      firstName: parmObj.firstName,
-      lastName: parmObj.lastName,
-      city: parmObj.city || '',
-      phone: parmObj.phone || '',
-      address: parmObj.address || '',
-      ward: parmObj.ward || '',
-      memberStatus: parmObj.memberStatus || '',
-      surveyDate: parmObj.created,
-      screenId: parmObj._id
-    };
-    if (parmObj.childsBirthDate) {
-      dataObj.childsBirthDate = parmObj.childsBirthDate;
-    } else {
-      dataObj.deliveryDate = parmObj.deliveryDate;
-    }
+  if (parmObj.address !== undefined && parmObj.address.indexOf(',') > -1) {
+    parmObj.address = parmObj.address.replace(/,/g, ' ');
+  }
+  if (parmObj.city !== undefined && parmObj.city.indexOf(',') > -1) {
+    parmObj.city = parmObj.city.replace(/,/g, ' ');
+  }
+  if (parmObj.ward !== undefined && parmObj.ward.indexOf(',') > -1) {
+    parmObj.ward = parmObj.ward.replace(/,/g, ' ');
+  }
+  if (parmObj.firstName !== undefined && parmObj.firstName.indexOf(',') > -1) {
+    parmObj.firstName = parmObj.firstName.replace(/,/g, ' ');
+  }
+  if (parmObj.lastName !== undefined && parmObj.lastName.indexOf(',') > -1) {
+    parmObj.lastName = parmObj.lastName.replace(/,/g, ' ');
+  }
+  var dataObj = {
+    childId: parmObj._id,
+    firstName: parmObj.firstName,
+    lastName: parmObj.lastName,
+    city: parmObj.city || '',
+    phone: parmObj.phone || '',
+    address: parmObj.address || '',
+    ward: parmObj.ward || '',
+    memberStatus: parmObj.memberStatus || '',
+    surveyDate: parmObj.created,
+    screenId: parmObj._id
+  };
+  if (parmObj.childsBirthDate) {
+    dataObj.childsBirthDate = parmObj.childsBirthDate;
+  } else {
+    dataObj.deliveryDate = parmObj.deliveryDate;
+  }
 
-    var dataLine = dataObj.childId + ',' + dataObj.firstName + ',' + dataObj.lastName + ',' +
-        ',' + dataObj.phone + ',' + dataObj.address +
-        ',' + dataObj.city + ',' + dataObj.ward + ',' + dataObj.memberStatus + ',' + dataObj.surveyDate;
-    if (parmObj.childsBirthDate) {
-      dataLine = dataLine + ',' + dataObj.childsBirthDate + '\n';
-    } else {
-      dataLine = dataLine + ',' + dataObj.deliveryDate + '\n';
-    }
-    return { data: dataObj, dataLine: dataLine, stakeDB: stakeDB, sortField: sortField, filter: filter, language: language };
-  // });
+  var dataLine = dataObj.childId + ',' + dataObj.firstName + ',' + dataObj.lastName + ','
+    + ',' + dataObj.phone + ',' + dataObj.address
+    + ',' + dataObj.city + ',' + dataObj.ward + ',' + dataObj.memberStatus + ',' + dataObj.surveyDate;
+  if (parmObj.childsBirthDate) {
+    dataLine = dataLine + ',' + dataObj.childsBirthDate + '\n';
+  } else {
+    dataLine = dataLine + ',' + dataObj.deliveryDate + '\n';
+  }
+  return {
+    data: dataObj,
+    dataLine: dataLine,
+    stakeDB: stakeDB,
+    sortField: sortField,
+    filter: filter,
+    language: language
+  };
 }
 
 function buildOutputData(listIn) {
@@ -633,7 +885,7 @@ function sortList(listIn) {
         if (x.data[x.sortField].toUpperCase() < y.data[x.sortField].toUpperCase()) {
           return -1;
         }
-      } catch(err){
+      } catch (err) {
         console.log(err);
       }
       if (x.data[x.sortField].toUpperCase() > y.data[x.sortField].toUpperCase()) {
@@ -644,12 +896,21 @@ function sortList(listIn) {
       }
       return 0;
     });
-  }
-  catch(err) {
+  } catch (err) {
     console.log(err);
   }
 
   return { listIn: listIn };
+}
+
+async function updateStatusStake(stakeInfo, timeOutMultiplier) {
+  try {
+    const screeningData = await getChildAndData(stakeInfo, timeOutMultiplier);
+
+    return updateSupplementStatus(screeningData, stakeInfo.stakeDB);
+  } catch (err) {
+    return (stakeInfo);
+  }
 }
 
 async function saveStake(stakeInfo, timeOutMultiplier) {
@@ -662,7 +923,7 @@ async function saveStake(stakeInfo, timeOutMultiplier) {
       childData = buildOutputData(sortList(listAllChildren(screeningData, stakeInfo.csvType)));
     }
     return appendStake(stakeInfo.fileToSave, childData);
-  } catch(err) {
+  } catch (err) {
     return (stakeInfo);
   }
 }
@@ -686,7 +947,7 @@ function parseJwt (token) {
 }
 
 exports.compactDB = function (req, res) {
-  var stakeDb = require('nano')('https://' + process.env.SYNC_ENTITY + '@' + process.env.COUCH_URL + '/' + req.params.stakeDB);
+  var stakeDb = nano('https://' + process.env.SYNC_ENTITY + '@' + process.env.COUCH_URL + '/' + req.params.stakeDB);
 
   stakeDb.compact(req.params.stakeDB, (err, body) => {
     if (err) {
@@ -697,18 +958,44 @@ exports.compactDB = function (req, res) {
     return res.status(200).send({
       message: `${ req.params.stakeDB } compacted`
     });
-  })
+  });
 };
 
-exports.createCSVFromDB = async function (req, res) {
-  function reportCSVComplete(input) {
-    let fileToRead = input;
+exports.updateZscoreStatus = async function (req, res) {
+  function reportUpdateComplete(input) {
     return res.status(200).send({
       message: input
     });
   }
 
-  function reportAggregateComplete(input, retryCount) {
+  var parmObj = {
+    stakeDB: req.params.stakeDB,
+    scopeType: req.params.scopeType,
+    cCode: req.params.cCode,
+    updateProcess: updateStatusStake
+  };
+
+  getDBListFromFile(parmObj).map((stakeToSave) => {
+    return stakeToSave;
+  }, { concurrancy: 1 })
+    .then((results) => {
+      reportUpdateComplete(results, retryLimit);
+    }).catch((error) => {
+      console.log(error.message);
+      return res.status(400).send({
+        message: errorHandler.getErrorMessage(error)
+      });
+    });
+};
+
+exports.createCSVFromDB = async function (req, res) {
+  function reportCSVComplete(input) {
+    return res.status(200).send({
+      message: input
+    });
+  }
+
+  function reportAggregateComplete(input, retryCount, processToExec) {
     const toRetry = input.filter((retVal) => {
       if (typeof retVal !== 'string') {
         return (retVal);
@@ -723,34 +1010,34 @@ exports.createCSVFromDB = async function (req, res) {
     if (retryCount < 1) {
       return res.status(408).send({
         message: `failed after ${ retryCount } retries`
-      })
+      });
     }
     const stakeRetryList = [];
     toRetry.forEach((stakeToRetry) => {
-      stakeRetryList.push(saveStake(stakeToRetry, 0));
+      stakeRetryList.push(processToExec(stakeToRetry, 2));
     });
     try {
       Promise.map(stakeRetryList, (stakeToSave) => {
         return (stakeToSave);
-      }, {concurrancy: 1})
+      }, { concurrancy: 1 })
         .then((results) => {
-          setTimeout(reportAggregateComplete, 20000, results, retryCount - 1);
+          setTimeout(reportAggregateComplete, 30000, results, retryCount - 1, processToExec);
         }).catch((error) => {
-        console.log(error.message);
-        return res.status(400).send({
-          message: errorHandler.getErrorMessage(error)
+          console.log(error.message);
+          return res.status(400).send({
+            message: errorHandler.getErrorMessage(error)
+          });
         });
-      });
     } catch (err) {
       console.log(err);
     }
-
   }
 
   const tokenInfo = parseJwt(req.headers.authorization);
   console.log('inside createCSVfrom DB');
   moment.locale(req.params.language);
   var parmObj = {
+    stakeName: req.query.stake,
     stakeDB: req.params.stakeDB,
     scopeType: req.params.scopeType,
     cCode: req.params.cCode,
@@ -758,23 +1045,27 @@ exports.createCSVFromDB = async function (req, res) {
     language: req.params.language,
     csvType: req.params.csvType,
     fileToSave: `${ req.params.stakeDB }_${tokenInfo.iat}_dbDump.csv`,
+    updateProcess: saveStake
   };
   if (parmObj.csvType === 'women') {
-    const headerLine = input.language === 'en' ? 'id,firstName,lastName,idGroup,phone,address,city,ward,lds,screenDate,other date\n' :
-      'carné de identidad,nombre de pila,apellido,grupo de identificación,teléfono,dirección,ciudad,sala,miembro lds,fecha de la pantalla, otra fecha\n';
+    const headerLine = parmObj.language === 'en' ? 'id,firstName,lastName,idGroup,phone,address,city,ward,lds,screenDate,other date\n'
+      : 'carné de identidad,nombre de pila,apellido,grupo de identificación,teléfono,dirección,ciudad,sala,miembro lds,fecha de la pantalla, otra fecha\n';
     await writeHeader(parmObj.fileToSave, headerLine);
     oneStakeWomen(parmObj)
       .then(reportCSVComplete).catch(function (error) {
-      return res.status(400).send({
-        message: errorHandler.getErrorMessage(error)
+        return res.status(400).send({
+          message: errorHandler.getErrorMessage(error)
+        });
       });
-    });
   } else {
     parmObj.fileToSave = `sup_list_${ req.params.stakeDB }_${tokenInfo.iat}_dbDump.csv`;
     let headerLine = parmObj.language === 'en' ? '1,2,3,4,5,6,Sup,age,Prior Sup,firstName,lastName,ward,mother,\n' : '1,2,3,4,5,6,Sup,anos,Anterior Sup,nombre de pila,apellido,sala,madre,\n';
+    if (parmObj.stakeName) {
+      headerLine = '1,2,3,4,5,6,Sup,age,Prior Sup,firstName,lastName,ward,mother,country,stake\n';
+    }
     if (parmObj.csvType !== 'sup') {
       parmObj.fileToSave = `${ tokenInfo.iat }_${ req.params.cCode }_${ req.params.csvType }_dbDump.csv`;
-      headerLine = 'child Index,stake db name,screen Count,id,gender,firstName,lastName,birthdate,idGroup,mother,father,phone,address,city,ward,lds,screenId,screenDate,weight,height,age,ha,wa,wh,status\n';
+      headerLine = 'child Index,stake db name,screen Count,id,gender,firstName,lastName,birthdate,idGroup,mother,father,phone,address,city,ward,lds,screenId,screenDate,weight,height,age,obese,ha,wa,wh,status\n';
     }
     if (parmObj.scopeType === 'countries') {
       parmObj.fileToSave = `${ tokenInfo.iat }_all_data_${ req.params.csvType }_dbDump.csv`;
@@ -782,15 +1073,14 @@ exports.createCSVFromDB = async function (req, res) {
     await writeHeader(parmObj.fileToSave, headerLine);
     getDBListFromFile(parmObj).map((stakeToSave) => {
       return stakeToSave;
-    }, {concurrancy: 1})
+    }, { concurrancy: 1 })
       .then((results) => {
-        reportAggregateComplete(results, retryLimit)
+        reportAggregateComplete(results, retryLimit, parmObj.updateProcess);
       }).catch((error) => {
-      console.log(error.message);
-      return res.status(400).send({
-        message: errorHandler.getErrorMessage(error)
+        return res.status(400).send({
+          message: errorHandler.getErrorMessage(error)
+        });
       });
-    });
   }
 };
 
@@ -801,8 +1091,8 @@ exports.getSyncURL = function(req, res) {
 
 exports.getCountryList = function(req, res) {
   console.log('inside getCountryLIst');
-  request.get('https://' + process.env.COUCH_URL +
-      '/country_list/liahona_kids_countries_stakes', function (error, response, body) {
+  request.get('https://' + process.env.COUCH_URL
+      + '/country_list/liahona_kids_countries_stakes', function (error, response, body) {
     if (!error && response.statusCode === 200) {
       var jsonObj;
       var reasons;
@@ -841,43 +1131,36 @@ function gradeZScores(screenObj) {
   screenObj.zScore.wlStatus = 'normalZscore';
   if (screenObj.zScore.ha < -2) {
     screenObj.zScore.haStatus = 'redZoneZscore';
-  } else {
-    if (screenObj.zScore.ha < -1 && screenObj.zScore.ha > -2) {
-      screenObj.zScore.haStatus = 'marginalZscore';
-    }
+  } else if (screenObj.zScore.ha < -1 && screenObj.zScore.ha > -2) {
+    screenObj.zScore.haStatus = 'marginalZscore';
   }
   if (screenObj.zScore.wa < -2) {
     screenObj.zScore.waStatus = 'redZoneZscore';
-  } else {
-    if (screenObj.zScore.wa < -1 && screenObj.zScore.wa > -2) {
-      screenObj.zScore.waStatus = 'marginalZscore';
-    }
+  } else if (screenObj.zScore.wa < -1 && screenObj.zScore.wa > -2) {
+    screenObj.zScore.waStatus = 'marginalZscore';
   }
   if (screenObj.zScore.wl < -3) {
     screenObj.zScore.wlStatus = 'dangerZscore';
-  } else {
-    if (screenObj.zScore.wl < -2 && screenObj.zScore.wl > -3) {
-      screenObj.zScore.wlStatus = 'redZoneZscore';
-    } else {
-      if (screenObj.zScore.wl < -1 && screenObj.zScore.wl > -2) {
-        screenObj.zScore.wlStatus = 'marginalZscore';
-      }
-    }
+  } else if (screenObj.zScore.wl < -2 && screenObj.zScore.wl > -3) {
+    screenObj.zScore.wlStatus = 'redZoneZscore';
+  } else if (screenObj.zScore.wl < -1 && screenObj.zScore.wl > -2) {
+    screenObj.zScore.wlStatus = 'marginalZscore';
   }
   return (screenObj);
 }
 
 function buildScreens(dataBase, childId, screenList) {
-  const docEntrys = [];
-  screenList.map((screening) => {
+  // const docEntrys = [];
+  return screenList.map((screening) => {
     const scrObj = screening.screen;
     if (!scrObj._id) { // if we have the id, use it
-      scrObj._id = 'scr_' + '_' + dataBase + '_' + uuid();
+      scrObj._id = 'scr__' + dataBase + '_' + uuid();
       scrObj.owner = childId;
     }
-    docEntrys.push(scrObj);
+    return scrObj;
+    // docEntrys.push(scrObj);
   });
-  return docEntrys;
+  // return docEntrys;
 }
 
 function buildChildAndScreens(dataBase, screenList) {
@@ -920,14 +1203,14 @@ function calculateStatus(screeningObj) {
     zscoreStatus = 'Acute: supplements required';
   } else if ((screeningObj.zScore.ha < -2 || screeningObj.zScore.wa < -2) && screeningObj.monthAge > 36 && screeningObj.monthAge < 60) {
     zscoreStatus = 'Micro nutrients required';
-  } else if (screeningObj.zScore.ha < -1 ||
-    screeningObj.zScore.wa < -1 ||
-    screeningObj.zScore.wl < -1) {
+  } else if (screeningObj.zScore.ha < -1
+    || screeningObj.zScore.wa < -1
+    || screeningObj.zScore.wl < -1) {
     zscoreStatus = 'At Risk: Come to next screening';
   } else {
     zscoreStatus = 'Normal';
   }
-  return ({screeningObj: screeningObj, zscoreStatus: zscoreStatus});
+  return ({ screeningObj: screeningObj, zscoreStatus: zscoreStatus });
 }
 
 function statusColor(status) {
@@ -943,8 +1226,7 @@ function statusColor(status) {
 }
 
 async function buildScreenList(dataBase, input) {
-  var i = 0;
-  var k = 0;
+  var i;
   var columnData = input.data;
   var colIndexes = Object.keys(columnData[0]);
   var firstNameIndex = 0;
@@ -1024,7 +1306,11 @@ async function buildScreenList(dataBase, input) {
   var j;
   for (j = 1; j < columnData.length - 1; j++) {
     var childObj = {};
-    var screenObj = {zScore: {ha: '', haStatus: '', wa: '', waStatus: '', wl: '', wlStatus: ''}};
+    var screenObj = {
+      zScore: {
+        ha: '', haStatus: '', wa: '', waStatus: '', wl: '', wlStatus: ''
+      }
+    };
     childObj.birthDate = columnData[j][birthDateIndex];
     childObj.firstName = columnData[j][firstNameIndex];
     childObj.lastName = columnData[j][lastNameIndex];
@@ -1038,7 +1324,7 @@ async function buildScreenList(dataBase, input) {
     childObj.gender = columnData[j][genderIndex];
     childObj.lds = columnData[j][ldsIndex];
     childObj.idGroup = columnData[j][idGroupIndex];
-    if (idIndex !==0) {
+    if (idIndex !== 0) {
       childObj._id = columnData[j][idIndex];
     }
 
@@ -1056,7 +1342,7 @@ async function buildScreenList(dataBase, input) {
     }
     screenObj = gradeZScores(screenObj);
 
-    dataBaseObj.push({db: dataBase, child: childObj, screen: screenObj});
+    dataBaseObj.push({ db: dataBase, child: childObj, screen: screenObj });
   }
 
   const uniqueChildEntries = _.uniqWith(dataBaseObj, (arrVal, otherVal) => {
@@ -1070,7 +1356,7 @@ async function buildScreenList(dataBase, input) {
       if (child.child._id === uniqueChild.child._id) {
         childAndScreens[uniqueIndex].push(child);
       }
-    })
+    });
   });
 
   let updatedDocs = [];
@@ -1084,14 +1370,14 @@ async function buildScreenList(dataBase, input) {
 
 async function bulkUpload(dataBase, docs) {
   return new Promise((resolve, reject) => {
-    var stakeDb = require('nano')('https://' + process.env.SYNC_ENTITY + '@' + process.env.COUCH_URL + '/' + dataBase);
-    return stakeDb.bulk({docs: docs}, (err, body) => {
+    var stakeDb = nano('https://' + process.env.SYNC_ENTITY + '@' + process.env.COUCH_URL + '/' + dataBase);
+    return stakeDb.bulk({ docs: docs }, (err, body) => {
       if (!err) {
         return resolve(body);
       }
       reject(err);
     });
-  })
+  });
 }
 
 exports.uploadCsv = async function (req, res) {
@@ -1122,7 +1408,7 @@ exports.uploadCsv = async function (req, res) {
         } catch (error) {
           console.log(error);
           return res.status(400).send({
-            message: errorHandler.getErrorMessage(error),
+            message: errorHandler.getErrorMessage(error)
           });
         }
       });
@@ -1136,8 +1422,8 @@ exports.jiraWebhook = function(req, res) {
 };
 
 exports.listDbs = function(req, res) {
-  request.get('https://' + process.env.SYNC_ENTITY + '@' + process.env.COUCH_URL +
-      '/_all_dbs', function (error, response, body) {
+  request.get('https://' + process.env.SYNC_ENTITY + '@' + process.env.COUCH_URL
+      + '/_all_dbs', function (error, response, body) {
     if (!error && response.statusCode === 200) {
       var jsonObj;
       try {
@@ -1159,8 +1445,8 @@ exports.listDbs = function(req, res) {
 
 function getDBListFromFile(parmsIn) {
   return new Promise(function(resolve, reject) {
-    request.get('https://' + process.env.COUCH_URL +
-      '/country_list/liahona_kids_countries_stakes', function (error, response) {
+    request.get('https://' + process.env.COUCH_URL
+      + '/country_list/liahona_kids_countries_stakes', function (error, response) {
       if (!error && response.statusCode === 200) {
         var jsonObj;
         let stakes = [];
@@ -1174,7 +1460,7 @@ function getDBListFromFile(parmsIn) {
             let parmObj = Object.assign({}, parmsIn);
             // parmObj.stakeDB = stake.stakeDB;
             // parmObj.stakeName = stake.stakeName;
-            stakeList.push(saveStake(parmObj, 0));
+            stakeList.push(parmObj.updateProcess(parmObj, 0));
             // resolve(stakeList);
           } else if (parmsIn.scopeType === 'country') {
             let country = countryList.filter((country) => {
@@ -1184,8 +1470,8 @@ function getDBListFromFile(parmsIn) {
               let parmObj = Object.assign({}, parmsIn);
               parmObj.stakeDB = stake.stakeDB;
               parmObj.stakeName = stake.stakeName;
-              stakeList.push(saveStake(parmObj, index));
-            })
+              stakeList.push(parmObj.updateProcess(parmObj, index));
+            });
           } else if (parmsIn.scopeType === 'countries') {
             countryList.forEach((country) => {
               country.stakes.forEach((stake, index) => {
@@ -1193,7 +1479,7 @@ function getDBListFromFile(parmsIn) {
                   let parmObj = Object.assign({}, parmsIn);
                   parmObj.stakeDB = stake.stakeDB;
                   parmObj.stakeName = stake.stakeName;
-                  stakeList.push(saveStake(parmObj, index));
+                  stakeList.push(parmObj.updateProcess(parmObj, index));
                 }
               });
             });
@@ -1202,7 +1488,7 @@ function getDBListFromFile(parmsIn) {
           resolve(stakeList);
         } catch (err) {
           console.log('JSON.parse error');
-          reject('JSON.parse error');
+          reject(err);
         }
       } else {
         reject();

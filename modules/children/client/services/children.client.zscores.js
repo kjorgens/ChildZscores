@@ -751,10 +751,44 @@
     .module('children.zscoreService')
     .factory('ZScores', ZScores);
 
-  ZScores.$inject = [];
+  ZScores.$inject = ['moment'];
 
-  function ZScores() {
+  function ZScores(moment) {
     var tableByAge;
+    var getStatus = function (child, screenList) {
+      var sortedScreenList = [];
+      var supType = 'none';
+      var currentSupType = 'none';
+      var priorMalnurished = 'no';
+      var currentAge = moment().diff(moment(new Date(child.birthDate)), 'months');
+      if (currentAge < 60) {
+        sortedScreenList = screenList;
+        supType = 'none';
+        priorMalnurished = 'no';
+        currentSupType = 'none';
+        sortedScreenList.forEach(function (screening, index) {
+          if ((screening.zScore.ha < -2 || screening.zScore.wa < -2)) {
+            priorMalnurished = 'yes';
+            supType = 'sup';
+            if (currentAge > 36 && currentAge <= 60) {
+              supType = 'mic';
+            }
+          }
+          if (screening.zScore.wl < -2) {
+            priorMalnurished = 'yes';
+            supType = 'MAM';
+            if (screening.zScore.wl < -3) {
+              supType = 'SAM';
+            }
+          }
+          if (index === 0) {
+            currentSupType = supType;
+          }
+        });
+      }
+      return ({ child: child, screens: screenList, sup: supType });
+    };
+
     var getMethod = function (sex, age, height, weight, firstScreening, callback) {
       var ha,
         wa,
@@ -818,9 +852,9 @@
       if (weightForLength < -3) {
         wlStatus = 'dangerZscore';
       } else if (weightForLength < -2 && weightForLength > -3) {
-          wlStatus = 'moderateRedZoneZscore';
+        wlStatus = 'moderateRedZoneZscore';
       } else if (weightForLength < -1 && weightForLength > -2) {
-          wlStatus = 'marginalZscore';
+        wlStatus = 'marginalZscore';
       }
 
 
@@ -900,7 +934,6 @@
         wl: weightForLength, wlStatus: wlStatus,
         zscoreString: zscoreString, status: status, actions: sugAction });
     };
-    return { getMethod: getMethod };
+    return { getMethod: getMethod, getStatus: getStatus };
   }
 }());
-

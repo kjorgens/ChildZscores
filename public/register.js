@@ -4,7 +4,7 @@ var swRegistration;
 
 // register service worker
 if ('serviceWorker' in navigator) {
-  console.log('CLIENT: service worker registration in progress');
+  console.log('CLIENT: service worker registration using sw.js in progress');
   navigator.serviceWorker.register('sw.js', {
     scope: './'
   }).then(function (registration) {

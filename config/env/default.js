@@ -45,11 +45,11 @@ module.exports = {
     },
     xssProtection: true
   },
-  logo: 'public/img/brand/logo_small.png',
-  favicon: 'public/img/brand/favicon.ico',
+  logo: 'modules/core/client/img/brand/logo_small.png',
+  favicon: 'modules/core/client/img/brand/favicon.ico',
   uploads: {
     profileUpload: {
-      dest: './public/img/profile/uploads/', // Profile upload destination path
+      dest: './modules/users/client/img/profile/uploads/', // Profile upload destination path
       limits: {
         fileSize: 1 * 1024 * 1024 // Max file size in bytes (1 MB)
       }

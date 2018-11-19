@@ -5,14 +5,14 @@
   'use strict';
 
   angular
-      .module('children')
-      .controller('ChildrenListController', ChildrenListController);
+    .module('children')
+    .controller('ChildrenListController', ChildrenListController);
 
   ChildrenListController.$inject = ['$rootScope', '$scope', '$state', '$stateParams', '$window', '$translate',
     'FilterService', 'childResolve', 'usSpinnerService', 'PouchService'];
 
   function ChildrenListController($rootScope, $scope, $state, $stateParams, $window, $translate,
-     FilterService, childResolve, usSpinnerService, PouchService) {
+    FilterService, childResolve, usSpinnerService, PouchService) {
     var vm = this;
     vm.countryCode = $stateParams.countryCode;
     vm.countryName = $stateParams.countryName;
@@ -28,6 +28,7 @@
 
     sessionStorage.setItem('selectedStake', $stateParams.stakeName);
     sessionStorage.setItem('selectedDBName', $stateParams.stakeDB);
+    sessionStorage.setItem('selectedCountryCode', $stateParams.countryCode);
     localStorage.setItem('selectedCountryCode', $stateParams.countryCode);
     localStorage.setItem('selectedStake', $stateParams.stakeName);
     localStorage.setItem('selectedDBName', $stateParams.stakeDB);
@@ -53,6 +54,8 @@
     vm.onLine = navigator.onLine;
 
     vm.selectWard = selectWard;
+
+    vm.obeseMsg = "Child is obese";
 
     $rootScope.$on('$translateChangeSuccess', function () {
       performTranslation();

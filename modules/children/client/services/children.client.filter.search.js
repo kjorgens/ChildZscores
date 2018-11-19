@@ -119,7 +119,8 @@
         child.monthAge = currentAge;
         if ((currentSearch === '' || child.firstName.toUpperCase().startsWith(currentSearch.toUpperCase())) &&
           (currentColorFilter === '' || ~child.statusColor.indexOf(currentColorFilter)) &&
-          (currentAge < 72 || currentAge > 180)) {
+          // (currentAge < 72 || currentAge > 180)) {
+          (currentAge < 60)) {
           child.display = true;
           child.backGroundColor = child.statusColor + 'Background';
           displayCount++;
