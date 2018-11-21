@@ -9,7 +9,7 @@
     'surveyResolve', 'Authentication', 'ZScores', 'PouchService', 'ModalService'];
 
   function SurveyController($rootScope, $scope, $state, $translate, $window, moment,
-     survey, Authentication, ZScores, PouchService, ModalService) {
+    survey, Authentication, ZScores, PouchService, ModalService) {
     var vm = this;
     $translate.use($rootScope.SelectedLanguage);
     vm.initialSurvey = false;
@@ -361,4 +361,3 @@
     };
   }
 }());
-

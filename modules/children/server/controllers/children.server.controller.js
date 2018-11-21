@@ -442,7 +442,7 @@ function listAllChildren(childScreenList, screenType) {
   var lineAccumulator = [];
 
   if (childScreenList[0].data.total_rows > 0) {
-    childScreenList[0].data.rows.forEach(function (childEntry) {
+    childScreenList[0].data.rows.forEach(function (childEntry, childIndex) {
       var currentAge = moment().diff(moment(new Date(childEntry.key.birthDate)), 'months');
       if (!~childEntry.id.indexOf('mthr')) {
         if (screenType === 'sup') {
@@ -450,12 +450,23 @@ function listAllChildren(childScreenList, screenType) {
             sortedScreenList = getScreeningsList(childEntry.id, childScreenList[1].data.rows);
             if (sortedScreenList.length === 0) {
               noScreenings++;
-              lineAccumulator.push(addChildToLine(childEntry.key, sortedScreenList[0], childScreenList[0].parms.sortField, childScreenList[0].parms.stakeDB, childScreenList[0].parms.filter, ' ', 100, 'no', childScreenList[0].language));
+              lineAccumulator.push(addChildToLine(
+                childEntry.key, sortedScreenList[0],
+                childScreenList[0].parms.sortField,
+                childScreenList[0].parms.stakeDB,
+                childScreenList[0].parms.filter,
+                ' ',
+                100,
+                'no',
+                childScreenList[0].language,
+                childScreenList[0].parms.stakeName,
+                childScreenList[0].parms.cCode
+              ));
             } else {
               supType = 'none';
               priorMalnurished = 'no';
               currentSupType = 'none';
-              sortedScreenList.forEach(function (screening, index) {
+              sortedScreenList.forEach(function (screening, screenIndex) {
                 if ((screening.zScore.ha < -2 || screening.zScore.wa < -2)) {
                   priorMalnurished = 'yes';
                   supType = 'sup';
@@ -470,7 +481,7 @@ function listAllChildren(childScreenList, screenType) {
                     supType = 'SAM';
                   }
                 }
-                if (index === 0) {
+                if (screenIndex === 0) {
                   currentSupType = supType;
                 }
               });
@@ -493,11 +504,8 @@ function listAllChildren(childScreenList, screenType) {
           try {
             if (childScreenList[1].data.total_rows > 0) {
               sortedScreenList = getScreeningsList(childEntry.id, childScreenList[1].data.rows);
-              let screenCount = 1;
-              sortedScreenList.forEach(function (entry) {
-                lineAccumulator.push(addLineToStack(childCount, screenCount, childEntry.key, entry, childScreenList[0].parms.sortField, childScreenList[0].stake, childScreenList[0].stakeName, childScreenList[0].parms.language));
-                childCount += 1;
-                screenCount += 1;
+              sortedScreenList.forEach(function (entry, screenIndex) {
+                lineAccumulator.push(addLineToStack(childIndex + 1, screenIndex + 1, childEntry.key, entry, childScreenList[0].parms.sortField, childScreenList[0].stake, childScreenList[0].parms.stakeName, childScreenList[0].parms.language, childScreenList[0].parms.cCode));
               });
             }
           } catch (err) {
@@ -508,11 +516,8 @@ function listAllChildren(childScreenList, screenType) {
         try {
           if (childScreenList[1].data.total_rows > 0) {
             sortedScreenList = getScreeningsList(childEntry.id, childScreenList[1].data.rows);
-            let screenCount = 1;
-            sortedScreenList.forEach(function (entry) {
-              lineAccumulator.push(addLineToStack(childCount, screenCount, childEntry.key, entry, childScreenList[0].parms.sortField, childScreenList[0].stake, childScreenList[0].stakeName, childScreenList[0].parms.language));
-              childCount += 1;
-              screenCount += 1;
+            sortedScreenList.forEach(function (entry, screenIndex) {
+              lineAccumulator.push(addLineToStack(childIndex + 1, screenIndex + 1, childEntry.key, entry, childScreenList[0].parms.sortField, childScreenList[0].stake, childScreenList[0].parms.stakeName, childScreenList[0].parms.language, childScreenList[0].parms.cCode));
             });
           }
         } catch (err) {
@@ -657,10 +662,10 @@ function addChildToLine(existingOwnerInfo, screenInfo, sortField, stakeDB, filte
   var currentAge = moment().diff(moment(new Date(ownerInfo.birthDate)), 'months');
   var priorMessage = language === 'en' ? `${ priorMalNurish }` : `${ priorMalNurish === 'yes' ? 'si' : 'no' }`;
   if (supType.indexOf('risk') > -1) {
-    message = language === 'en' ? ' months since last screening\n'
-      : ' meses desde la última evaluación\n';
+    // message = language === 'en' ? ' months since last screening\n'
+    //   : ' meses desde la última evaluación\n';
     dataLine = '' + ',' + ',' + ',' + ',' + ',' + ',' + ',' + currentAge + ',' + priorMessage + ',' + ownerInfo.firstName + ',' + ownerInfo.lastName + ',' + ownerInfo.ward
-      + ',' + ownerInfo.mother + ',' + timeSinceLastScreen + message;
+      + ',' + ownerInfo.mother + ',' + timeSinceLastScreen + '\n';
     return ({
       data: ownerInfo,
       dataLine: dataLine,
@@ -671,14 +676,14 @@ function addChildToLine(existingOwnerInfo, screenInfo, sortField, stakeDB, filte
       language: language
     });
   } else if (supType.indexOf('none') > -1) {
-    message = language === 'en' ? ' months since last screening\n'
-      : ' meses desde la última evaluación\n';
+    // message = language === 'en' ? ' months since last screening\n'
+    //   : ' meses desde la última evaluación\n';
     dataLine = '' + ',' + ',' + ',' + ',' + ',' + ',' + ',' + currentAge + ',' + priorMessage + ',' + ownerInfo.firstName + ',' + ownerInfo.lastName + ',' + ownerInfo.ward
-      + ',' + ownerInfo.mother;
+      + ',' + ownerInfo.mother + ',' + timeSinceLastScreen;
     if (stakeName) {
       dataLine += ',' + ccode + ',' + stakeName;
     }
-    dataLine += ',' + timeSinceLastScreen + message;
+    dataLine += '\n';
     return ({
       data: ownerInfo,
       dataLine: dataLine,
@@ -696,16 +701,16 @@ function addChildToLine(existingOwnerInfo, screenInfo, sortField, stakeDB, filte
       if (stakeName) {
         dataLine += ',' + ccode + ',' + stakeName;
       }
-      dataLine += ',' + ',' + messageProb;
+      dataLine += ',' + ',' + messageProb + '\n';
     } else {
-      var messageRisk = language === 'en' ? '  months since last screening\n'
-        : ' meses desde la última evaluación , Niño en riesgo: debería pasar a la siguiente evaluación\n';
+      // var messageRisk = language === 'en' ? '  months since last screening\n'
+      //   : ' meses desde la última evaluación , Niño en riesgo: debería pasar a la siguiente evaluación\n';
       dataLine = '' + ',' + ',' + ',' + ',' + ',' + ',' + ',' + currentAge + ',' + priorMessage + ',' + ownerInfo.firstName + ',' + ownerInfo.lastName + ',' + ownerInfo.ward
-        + ',' + ownerInfo.mother;
+        + ',' + ownerInfo.mother + ',' + timeSinceLastScreen;
       if (stakeName) {
         dataLine += ',' + ccode + ',' + stakeName;
       }
-      dataLine += ',' + timeSinceLastScreen + messageRisk;
+      dataLine += '\n';
     }
     return ({
       data: ownerInfo,
@@ -718,7 +723,7 @@ function addChildToLine(existingOwnerInfo, screenInfo, sortField, stakeDB, filte
     });
   } else {
     dataLine = '' + ',' + ',' + ',' + ',' + ',,' + supType + ',' + currentAge + ',' + priorMessage + ',' + ownerInfo.firstName + ',' + ownerInfo.lastName
-      + ',' + ownerInfo.ward + ',' + ownerInfo.mother;
+      + ',' + ownerInfo.ward + ',' + ownerInfo.mother + ',' + timeSinceLastScreen;
     if (stakeName) {
       dataLine += ',' + ccode + ',' + stakeName;
     }
@@ -734,7 +739,7 @@ function addChildToLine(existingOwnerInfo, screenInfo, sortField, stakeDB, filte
   }
 }
 
-function addLineToStack(childCount, screenCount, ownerInfo, screenInfo, sortField, stakeDB, stakeName, language) {
+function addLineToStack(childCount, screenCount, ownerInfo, screenInfo, sortField, stakeDB, stakeName, language, cCode) {
   if (typeof ownerInfo.address === 'string' && ownerInfo.address.indexOf(',') > -1) {
     ownerInfo.address = ownerInfo.address.replace(/,/g, ' ');
   }
@@ -798,7 +803,7 @@ function addLineToStack(childCount, screenCount, ownerInfo, screenInfo, sortFiel
   };
 
   const zscoreStatus = calculateStatus(screenInfo);
-  var dataLine = childCount + ',' + stakeDB + ',' + screenCount + ',' + dataObj.childId + ',' + dataObj.gender + ',' + dataObj.firstName + ',' + dataObj.lastName + ',' + dataObj.birthDate
+  var dataLine = cCode + ',' + stakeName + ',' + childCount + ',' + stakeDB + ',' + screenCount + ',' + dataObj.childId + ',' + dataObj.gender + ',' + dataObj.firstName + ',' + dataObj.lastName + ',' + dataObj.birthDate
     + ',' + dataObj.idGroup + ',' + dataObj.mother + ',' + dataObj.father + ',' + dataObj.phone + ',' + dataObj.address
     + ',' + dataObj.city + ',' + dataObj.ward + ',' + dataObj.memberStatus + ',' + dataObj.screenId + ',' + dataObj.surveyDate
     + ',' + dataObj.weight + ',' + dataObj.height + ',' + dataObj.age + ',' + dataObj.obese + ',' + dataObj.ha + ',' + dataObj.wa + ',' + dataObj.wl + ',' + zscoreStatus.zscoreStatus + '\n';
@@ -1048,8 +1053,8 @@ exports.createCSVFromDB = async function (req, res) {
     updateProcess: saveStake
   };
   if (parmObj.csvType === 'women') {
-    const headerLine = parmObj.language === 'en' ? 'id,firstName,lastName,idGroup,phone,address,city,ward,lds,screenDate,other date\n'
-      : 'carné de identidad,nombre de pila,apellido,grupo de identificación,teléfono,dirección,ciudad,sala,miembro lds,fecha de la pantalla, otra fecha\n';
+    const headerLine = parmObj.language === 'en' ? 'country,stakeName,id,firstName,lastName,idGroup,phone,address,city,ward,lds,screenDate,other date\n'
+      : 'País,Estaca,carné de identidad,nombre de pila,apellido,grupo de identificación,teléfono,dirección,ciudad,sala,miembro lds,fecha de la pantalla, otra fecha\n';
     await writeHeader(parmObj.fileToSave, headerLine);
     oneStakeWomen(parmObj)
       .then(reportCSVComplete).catch(function (error) {
@@ -1059,13 +1064,13 @@ exports.createCSVFromDB = async function (req, res) {
       });
   } else {
     parmObj.fileToSave = `sup_list_${ req.params.stakeDB }_${tokenInfo.iat}_dbDump.csv`;
-    let headerLine = parmObj.language === 'en' ? '1,2,3,4,5,6,Sup,age,Prior Sup,firstName,lastName,ward,mother,\n' : '1,2,3,4,5,6,Sup,anos,Anterior Sup,nombre de pila,apellido,sala,madre,\n';
+    let headerLine = parmObj.language === 'en' ? '1,2,3,4,5,6,Sup,age,Prior Sup,firstName,lastName,ward,mother,months since last screening\n' : '1,2,3,4,5,6,Sup,anos,Anterior Sup,nombre de pila,apellido,sala,madre,meses desde la última evaluación\n';
     if (parmObj.stakeName) {
-      headerLine = '1,2,3,4,5,6,Sup,age,Prior Sup,firstName,lastName,ward,mother,country,stake\n';
+      headerLine = '1,2,3,4,5,6,Sup,age,Prior Sup,firstName,lastName,ward,mother,months since last screening,country,stake\n';
     }
     if (parmObj.csvType !== 'sup') {
       parmObj.fileToSave = `${ tokenInfo.iat }_${ req.params.cCode }_${ req.params.csvType }_dbDump.csv`;
-      headerLine = 'child Index,stake db name,screen Count,id,gender,firstName,lastName,birthdate,idGroup,mother,father,phone,address,city,ward,lds,screenId,screenDate,weight,height,age,obese,ha,wa,wh,status\n';
+      headerLine = 'Country,Stake,child Index,stake db name,screen Count,id,gender,firstName,lastName,birthdate,idGroup,mother,father,phone,address,city,ward,lds,screenId,screenDate,weight,height,age,obese,ha,wa,wh,status\n';
     }
     if (parmObj.scopeType === 'countries') {
       parmObj.fileToSave = `${ tokenInfo.iat }_all_data_${ req.params.csvType }_dbDump.csv`;
@@ -1467,10 +1472,12 @@ function getDBListFromFile(parmsIn) {
               return country.code === parmsIn.cCode;
             });
             country[0].stakes.forEach((stake, index) => {
-              let parmObj = Object.assign({}, parmsIn);
-              parmObj.stakeDB = stake.stakeDB;
-              parmObj.stakeName = stake.stakeName;
-              stakeList.push(parmObj.updateProcess(parmObj, index));
+              if (!stake.stakeDB.startsWith('test')) {
+                let parmObj = Object.assign({}, parmsIn);
+                parmObj.stakeDB = stake.stakeDB;
+                parmObj.stakeName = stake.stakeName;
+                stakeList.push(parmObj.updateProcess(parmObj, index));
+              }
             });
           } else if (parmsIn.scopeType === 'countries') {
             countryList.forEach((country) => {

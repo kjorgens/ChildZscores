@@ -108,13 +108,15 @@
         data: {}
       })
       .state('children.create', {
-        url: '/create',
+        url: '/create/:dbName',
         templateUrl: 'modules/children/client/views/form-child.client.view.html',
         controller: 'ChildrenController',
         controllerAs: 'vm',
         resolve: {
-          childResolve: newChild
+          childResolve: newChild,
+          screenResolve: newScreen
         },
+        params: { dbName: null },
         data: {}
       })
       .state('children.edit', {
@@ -188,8 +190,7 @@
           MotherResolve: newMother
         },
         data: {}
-      })
-    ;
+      });
   }
 
   listChildren.$inject = ['$stateParams', 'PouchService'];
@@ -295,15 +296,21 @@
     }
   }
 
-  newChild.$inject = ['PouchService'];
+  newChild.$inject = ['$stateParams', 'PouchService'];
 
-  function newChild(PouchService) {
-    return PouchService;
+  function newChild($stateParams, PouchService) {
+    return PouchService.getDB($stateParams.dbName);
+  }
+
+  newScreen.$inject = ['$stateParams', 'PouchService'];
+
+  function newScreen($stateParams, PouchService) {
+    return PouchService.getDB($stateParams.dbName);
   }
 
   listDataBases.$inject = ['PouchService'];
 
   function listDataBases(PouchService) {
-    return PouchService;
+    return PouchService.createDatabase();
   }
 }());

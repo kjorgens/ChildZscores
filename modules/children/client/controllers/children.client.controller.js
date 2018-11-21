@@ -20,14 +20,14 @@
     vm.callback = callback;
 
     vm.supInfo = screens.sup;
-    setSurveyList(screens.child, screens.screens);
+    // setSurveyList(screens.child, screens.screens);
 
     function callback(scope, element) {
       var api = scope.api;
       var chart = scope.chart;
       var svg = scope.svg;
     }
-    // var getMethod(firstScreening);
+
     var editChild = false;
     vm.checkAge = checkAge;
     vm.childTooOld = childTooOld;
@@ -106,6 +106,7 @@
 
     if ($state.params.childId) {
       editChild = true;
+      vm.surveys = screens.screens;
       vm.child = screens.child;
       let obeseInfo = Obesity.getObesity(vm.child, vm.surveys[0]);
       vm.obese = obeseInfo.obese;
@@ -122,8 +123,7 @@
       vm.wardIsValid = true;
 
       vm.child.birthDate = new Date(vm.child.birthDate);
-      // vm.startSpin();
-      // PouchService.getSurveys(vm.child._id, setSurveyList, surveyErrors);
+      setSurveyList(screens.child, screens.screens);
     } else {
       vm.child = {};
       // vm.child.gender = 'Boy';

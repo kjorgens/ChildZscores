@@ -1,7 +1,6 @@
 (function () {
   'use strict';
 
-/* jshint newcap: false*/
   angular
     .module('children.pouchService')
     .factory('PouchService', PouchService);
@@ -19,6 +18,11 @@
       'surveyDate', 'firstName', 'zscoreStatus', 'lastName', 'owner', 'ward',
       'deliveryDate', 'childsBirthDate', 'lastScreening'
     ];
+
+    factory.getDB = function (dbName) {
+      return pouchDB(dbName);
+    };
+
     factory.createDatabase = function (dbName, queryFunction, queryParams) {
       if (database && ~database.name.indexOf(dbName)) {
         return queryFunction(queryParams);
@@ -334,7 +338,7 @@
       }).catch(function (error) {
         errCallback(error);
       }).finally(function () {
-          // Do something when everything is done
+        // Do something when everything is done
       });
     };
 
@@ -358,39 +362,39 @@
       database.query(qFunction).then(function (response) {
         callback(response.doc);
       }).catch(function (error) {
-         errorCallback(error);
+        errorCallback(error);
       }).finally(function () {
-          // Do something when everything is done
+        // Do something when everything is done
       });
     };
 
     factory.insertSurvey = function (childInfo, callback, errorCallback) {
       database.put(childInfo).then(function (response) {
-         callback(response);
-       }).catch(function (error) {
-         errorCallback(error);
-       }).finally(function () {
-            // Do something when everything is done
-       });
+        callback(response);
+      }).catch(function (error) {
+        errorCallback(error);
+      }).finally(function () {
+        // Do something when everything is done
+      });
     };
 
     function calculateStatus(screeningObj) {
       var zscoreStatus = '';
       if (screeningObj.zScore.wl < -3) {
-          zscoreStatus = 'Acute: sam supplements required';
-        } else if (screeningObj.zScore.wl < -2 && screeningObj.zScore.wl > -3) {
-          zscoreStatus = 'Acute: mam supplements required';
-        } else if ((screeningObj.zScore.ha < -2 || screeningObj.zScore.wa < -2) && screeningObj.monthAge > 6 && screeningObj.monthAge < 36) {
-          zscoreStatus = 'Acute: supplements required';
-        } else if ((screeningObj.zScore.ha < -2 || screeningObj.zScore.wa < -2) && screeningObj.monthAge > 36 && screeningObj.monthAge < 48) {
-          zscoreStatus = 'Micro nutrients required';
-        } else if (screeningObj.zScore.ha < -1 ||
-            screeningObj.zScore.wa < -1 ||
-            screeningObj.zScore.wl < -1) {
-          zscoreStatus = 'At Risk: Come to next screening';
-        } else {
-          zscoreStatus = 'Normal';
-        }
+        zscoreStatus = 'Acute: sam supplements required';
+      } else if (screeningObj.zScore.wl < -2 && screeningObj.zScore.wl > -3) {
+        zscoreStatus = 'Acute: mam supplements required';
+      } else if ((screeningObj.zScore.ha < -2 || screeningObj.zScore.wa < -2) && screeningObj.monthAge > 6 && screeningObj.monthAge < 36) {
+        zscoreStatus = 'Acute: supplements required';
+      } else if ((screeningObj.zScore.ha < -2 || screeningObj.zScore.wa < -2) && screeningObj.monthAge > 36 && screeningObj.monthAge < 48) {
+        zscoreStatus = 'Micro nutrients required';
+      } else if (screeningObj.zScore.ha < -1 ||
+        screeningObj.zScore.wa < -1 ||
+        screeningObj.zScore.wl < -1) {
+        zscoreStatus = 'At Risk: Come to next screening';
+      } else {
+        zscoreStatus = 'Normal';
+      }
       return ({ screeningObj: screeningObj, zscoreStatus: zscoreStatus });
     }
 
@@ -407,27 +411,27 @@
     }
 
     function updateChildRecord(input) {
-      return new Promise(function(resolve, reject) {
+      return new Promise(function (resolve, reject) {
         database.get(input.screeningObj.owner)
-            .then(function (response) {
-              var childObj = response;
-              if (childObj.lastScreening !== input.screeningObj._id) {
-                childObj.zscoreStatus = input.zscoreStatus;
-                childObj.lastScreening = input.screeningObj._id;
-                childObj.statusColor = statusColor(input.zscoreStatus);
-              } else {
-                childObj.zscoreStatus = input.zscoreStatus;
-                childObj.statusColor = statusColor(input.zscoreStatus);
-              }
-              resolve(database.put(childObj));
-            })
-            .catch(function (error) {
-              // Do something with the error
-              reject(error);
-            })
-            .finally(function () {
-              // Do something when everything is done
-            });
+          .then(function (response) {
+            var childObj = response;
+            if (childObj.lastScreening !== input.screeningObj._id) {
+              childObj.zscoreStatus = input.zscoreStatus;
+              childObj.lastScreening = input.screeningObj._id;
+              childObj.statusColor = statusColor(input.zscoreStatus);
+            } else {
+              childObj.zscoreStatus = input.zscoreStatus;
+              childObj.statusColor = statusColor(input.zscoreStatus);
+            }
+            resolve(database.put(childObj));
+          })
+          .catch(function (error) {
+            // Do something with the error
+            reject(error);
+          })
+          .finally(function () {
+            // Do something when everything is done
+          });
       });
     }
 
@@ -488,47 +492,46 @@
       }
 
       database.put(childInfo)
-          .then(function (response) {
-            // Do something with the response
-
-            callback(response);
-          })
-          .catch(function (error) {
-            // Do something with the error
-            errorCallback(error);
-          })
-          .finally(function () {
-            // Do something when everything is done
-          });
+        .then(function (response) {
+          // Do something with the response
+          callback(response);
+        })
+        .catch(function (error) {
+          // Do something with the error
+          errorCallback(error);
+        })
+        .finally(function () {
+          // Do something when everything is done
+        });
     };
 
     factory.updateChild = function (childInfo) {
- //     childInfo._id = uuid4.generate ();
+      // childInfo._id = uuid4.generate ();
       database.put(childInfo)
-          .then(function (response) {
-            // Do something with the response
-            return response;
-          })
-          .catch(function (error) {
-            // Do something with the error
-          })
-          .finally(function () {
-            // Do something when everything is done
-          });
+        .then(function (response) {
+          // Do something with the response
+          return response;
+        })
+        .catch(function (error) {
+          // Do something with the error
+        })
+        .finally(function () {
+          // Do something when everything is done
+        });
     };
 
     factory.updateMother = function (motherInfo, callback, errorCallback) {
       //     childInfo._id = uuid4.generate ();
       database.put(motherInfo)
-          .then(function (response) {
-            callback(response);
-          })
-          .catch(function (error) {
-            errorCallback(error);
-          })
-          .finally(function () {
-            // Do something when everything is done
-          });
+        .then(function (response) {
+          callback(response);
+        })
+        .catch(function (error) {
+          errorCallback(error);
+        })
+        .finally(function () {
+          // Do something when everything is done
+        });
     };
 
     factory.newSyncTo = function(upStreamDb, callback, errorCallback) {
@@ -573,35 +576,34 @@
 
     factory.sync = function (upStreamDb, callback, errorCallback, nextState) {
       database.sync(upStreamDb).$promise
-      .then(function (response) {
-        // Do something with the response
-        callback(response);
-      })
-      .catch(function (error) {
-        // Do something with the error
-        errorCallback(error);
-      })
-      .finally(function () {
-        nextState();
-        // Do something when everything is done
-      });
+        .then(function (response) {
+          // Do something with the response
+          callback(response);
+        })
+        .catch(function (error) {
+          // Do something with the error
+          errorCallback(error);
+        })
+        .finally(function () {
+          nextState();
+          // Do something when everything is done
+        });
     };
 
     factory.replicate = function (upStreamDb, callback, errorCallback, whenDone) {
       database.replicate.to(upStreamDb)
-          .then(function (response) {
-            // Do something with the response
-            callback(response);
-          })
-          .catch(function (error) {
-            // Do something with the error
-            errorCallback(error);
-          })
-          .finally(function () {
-            whenDone();
-          });
+        .then(function (response) {
+          // Do something with the response
+          callback(response);
+        })
+        .catch(function (error) {
+          // Do something with the error
+          errorCallback(error);
+        })
+        .finally(function () {
+          whenDone();
+        });
     };
     return factory;
   }
 }());
-

@@ -36,6 +36,12 @@
 
     vm.selectedStake = $stateParams.stakeName;
     vm.selectedStakeDB = $stateParams.stakeDB;
+    vm.addChild = addNewChild;
+
+    function addNewChild(input) {
+      console.log('here we are' + input);
+
+    }
 
     function performTranslation() {
       $translate(['BOY', 'GIRL', 'ACUTE_ZSCORE', 'MICRO_NUTRITION_ZSCORE', 'AT_RISK_ZSCORE', 'NORMAL_ZSCORE', 'CHILD_GRADUATED'])

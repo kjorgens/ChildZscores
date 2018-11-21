@@ -39,7 +39,7 @@
                     </select>
                 </h4>
                 <h3 >
-                   <a id="addChild" ui-sref="children.create({ward:vm.selectedWard.wardName})">{{'ADD_NEW_CHILD' | translate}} <i class="glyphicon glyphicon-plus"></i></a>
+                   <a id="addChild" ui-sref="children.create({dbName: vm.selectedStakeDB})">{{'ADD_NEW_CHILD' | translate}} <i class="glyphicon glyphicon-plus"></i></a>
                 </h3>
             </div>
             <div ng-if="vm.childList.length > 0">
@@ -108,11 +108,11 @@
     <h4>
         <div ng-if="vm.onLine && !vm.childList.length" class="alert alert-warning text-center">
             {{'NO_CHILDREN_LISTED' | translate}} <a ui-sref="children.sync({stakeDB: vm.selectedStakeDB, stakeName:vm.selectedStake, screenType: vm.screenType})">{{'SYNC' | translate}}
-            <i class="glyphicon glyphicon-refresh"></i></a> or <a ui-sref="children.create({ward:'none'})">{{'ADD_NEW_CHILD' | translate}} <i
+            <i class="glyphicon glyphicon-refresh"></i></a> or <a ui-sref="children.create({dbName: vm.selectedStakeDB})">{{'ADD_NEW_CHILD' | translate}} <i
                 class="glyphicon glyphicon-plus"></i></a>
         </div>
         <div ng-if="!vm.onLine && !vm.childList.length" class="alert alert-warning text-center">
-           {{'NO_CHILDREN_LISTED' | translate}} <a ui-sref="children.create({ward:'none'})">{{'ADD_NEW_CHILD' | translate}} <i class="glyphicon glyphicon-plus"></i></a>
+           {{'NO_CHILDREN_LISTED' | translate}} <a ui-sref="children.create({dbName: vm.selectedStakeDB})">{{'ADD_NEW_CHILD' | translate}} <i class="glyphicon glyphicon-plus"></i></a>
         </div>
     </h4>
 </section>
