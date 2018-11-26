@@ -23,7 +23,7 @@
     vm.focusSearch = 1;
     vm.searchString = FilterService.currentListFilter();
     vm.noSelection = FilterService.getCurrentScreenType() === '';
-    vm.childList = FilterService.searchAndFilter(childResolve.docs, FilterService.currentListFilter(), FilterService.currentColorFilter(), 'firstName');
+    vm.childList = FilterService.searchAndFilterRegex(childResolve.docs, FilterService.currentListFilter(), FilterService.currentColorFilter(), 'firstName');
     $translate.use($rootScope.SelectedLanguage);
 
     sessionStorage.setItem('selectedStake', $stateParams.stakeName);
@@ -40,7 +40,6 @@
 
     function addNewChild(input) {
       console.log('here we are' + input);
-
     }
 
     function performTranslation() {
@@ -88,14 +87,14 @@
 
     vm.clearSearch = function(){
       vm.searchString = '';
-      FilterService.searchAndFilter(vm.childList, '', FilterService.currentColorFilter(), 'firstName');
+      FilterService.searchAndFilterRegex(vm.childList, '', FilterService.currentColorFilter(), 'firstName');
     };
 
     function searchStarted() {
-      vm.childList = FilterService.searchAndFilter(vm.childList, vm.searchString, FilterService.currentColorFilter(), 'firstName');
-      if ( FilterService.displayCount() === 1 ){
+      vm.childList = FilterService.searchAndFilterRegex(vm.childList, vm.searchString, FilterService.currentColorFilter(), 'firstName');
+      if (FilterService.displayCount() === 1) {
         FilterService.setSearchFilter(vm.searchString.slice(0, -1));
-        vm.focusSearch++;
+        vm.focusSearch +=1;
         $state.go('children.view', { childId: FilterService.getSingleChildId() });
       }
     }
@@ -134,34 +133,34 @@
 
     vm.filterDanger = function() {
       vm.startSpin();
-      vm.childList = FilterService.searchAndFilter(vm.childList, FilterService.currentListFilter(), 'redZoneZscore', 'firstName');
+      vm.childList = FilterService.searchAndFilterRegex(vm.childList, FilterService.currentListFilter(), 'redZoneZscore', 'firstName');
       vm.childFilter = 'r';
-      localStorage.setItem('childFilter','r');
+      localStorage.setItem('childFilter', 'r');
       vm.stopSpin();
-      vm.focusSearch++;
+      vm.focusSearch += 1;
     };
 
     vm.filterWarning = function() {
       vm.startSpin();
-      vm.childList = FilterService.searchAndFilter(vm.childList, FilterService.currentListFilter(), 'marginalZscore', 'firstName');
+      vm.childList = FilterService.searchAndFilterRegex(vm.childList, FilterService.currentListFilter(), 'marginalZscore', 'firstName');
       vm.childFilter = 'w';
       localStorage.setItem('childFilter','w');
       vm.stopSpin();
-      vm.focusSearch++;
+      vm.focusSearch += 1;
     };
 
     vm.filterSuccess = function() {
       vm.startSpin();
-      vm.childList = FilterService.searchAndFilter(vm.childList, FilterService.currentListFilter(), 'normalZscore', 'firstName');
+      vm.childList = FilterService.searchAndFilterRegex(vm.childList, FilterService.currentListFilter(), 'normalZscore', 'firstName');
       vm.childFilter = 'n';
       localStorage.setItem('childFilter','n');
       vm.stopSpin();
-      vm.focusSearch++;
+      vm.focusSearch += 1;
     };
 
     vm.filterNone = function() {
       vm.startSpin();
-      vm.childList = FilterService.searchAndFilter(vm.childList, FilterService.currentListFilter(), '', 'firstName');
+      vm.childList = FilterService.searchAndFilterRegex(vm.childList, FilterService.currentListFilter(), '', 'firstName');
       vm.childFilter = 'a';
       localStorage.setItem('childFilter','a');
       vm.stopSpin();

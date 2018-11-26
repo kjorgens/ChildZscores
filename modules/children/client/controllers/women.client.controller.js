@@ -2,14 +2,14 @@
   'use strict';
 
   angular
-      .module('children')
-      .controller('MotherController', MotherController);
+    .module('children')
+    .controller('MotherController', MotherController);
 
   MotherController.$inject = ['$rootScope', '$scope', '$state', '$stateParams', '$translate', '$location', 'FilterService',
     'MotherResolve', 'Authentication', 'PouchService', 'ModalService'];
 
   function MotherController($rootScope, $scope, $state, $stateParams, $translate, $location, FilterService,
-     mothers, Authentication, PouchService, ModalService) {
+    mothers, Authentication, PouchService, ModalService) {
 
     var vm = this;
 
@@ -188,7 +188,7 @@
 
     var setMothers = function (res) {
       vm.motherList = FilterService.searchAndFilter(res.docs, '', '', 'firstName');
- //     vm.motherList = res.docs;
+    //     vm.motherList = res.docs;
     };
 
     var listMotherErrors = function (error) {

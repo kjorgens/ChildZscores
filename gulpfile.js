@@ -10,12 +10,14 @@ var _ = require('lodash'),
   merge = require('merge-stream'),
   uglify = require('gulp-uglify-es').default,
   // uglify = require('gulp-uglify-es'),
+  terser = require('gulp-terser'),
   defaultAssets = require('./config/assets/default'),
   testAssets = require('./config/assets/test'),
   glob = require('glob'),
   gulp = require('gulp'),
   concat = require('gulp-concat'),
   zip = require('gulp-vinyl-zip').zip,
+  del = require('del'),
   packageJson = require('./package.json'),
   gulpLoadPlugins = require('gulp-load-plugins'),
   runSequence = require('run-sequence'),
@@ -116,26 +118,27 @@ gulp.task('zipit', function() {
     'files/**',
     'scripts/**'
   ], { base: "." })
-      .pipe(plugins.plumber())
-      .pipe(zip('liahonaKids.zip'))
-      .pipe(gulp.dest('./'));
+    .pipe(plugins.plumber())
+    .pipe(zip('liahonaKids.zip'))
+    .pipe(gulp.dest('./'));
 });
 
 gulp.task('zipitNew', function() {
   return gulp.src([
-    'package.json',
-    '.ebextensions/*',
-    'server.js',
-    'README.md',
-    '.npmrc',
-    'config/**',
-    'files/**',
-    'modules/**/*.{html,png,ico,gif,js,css}',
-    'scripts/**',
-    'public/dist/**',
-    'public/lib/**/*.min.js',
-    'public/*.js',
-  ], { base: '.' })
+    'dist/**/*'
+    // 'dist/package.json',
+    // 'dist/.ebextensions/*',
+    // 'dist/server.js',
+    // 'dist/README.md',
+    // 'dist/.npmrc',
+    // 'dist/config/**',
+    // 'dist/files/**',
+    // 'dist/modules/**/*',
+    // 'dist/scripts/**',
+    // 'dist/public/dist/**',
+    // 'dist/public/lib/**/*',
+    // 'dist/public/*.js'
+  ], { base: 'dist/', dot: true })
     .pipe(plugins.plumber())
     .pipe(zip('liahonaKids.zip'))
     .pipe(gulp.dest('./'));
@@ -244,21 +247,6 @@ gulp.task('eslint', function () {
 });
 
 // JS minifying task
-gulp.task('uglify', function () {
-  var assets = _.union(
-    defaultAssets.client.js,
-    defaultAssets.client.templates
-  );
-
-  return gulp.src(assets)
-    .pipe(plugins.ngAnnotate())
-    .pipe(uglify({
-      mangle: false
-    }))
-    .pipe(plugins.concat('application.min.js'))
-    .pipe(gulp.dest('public/dist'));
-});
-
 gulp.task('uglify-error-debugging', function (cb) {
   var assets = _.union(
     defaultAssets.client.js,
@@ -266,10 +254,38 @@ gulp.task('uglify-error-debugging', function (cb) {
   );
   pump([
     gulp.src(assets),
-    plugins.uglify(),
+    plugins.terser(),
     gulp.dest('dist/')
   ], cb);
 });
+
+// JS minifying task
+gulp.task('uglify', function(cb) {
+  const assets = _.union(
+    defaultAssets.client.js,
+    defaultAssets.client.templates
+  );
+
+  del(['public/dist/*']);
+
+  // pump([
+  //   gulp.src(assets),
+  //   plugins.ngAnnotatePatched(),
+  //   plugins.terser(),
+  //   plugins.concat('application.min.js'),
+  //   gulp.dest('public/dist')
+  // ], cb);
+  return gulp.src(assets)
+    .pipe(plugins.ngAnnotatePatched({
+      add: true
+    }))
+    .pipe(terser({
+      mangle: false
+    }))
+    .pipe(plugins.concat('application.min.js'))
+    .pipe(gulp.dest('public/dist'));
+});
+
 // CSS minifying task
 gulp.task('cssmin', function () {
   return gulp.src(defaultAssets.client.css)
@@ -524,7 +540,7 @@ gulp.task('lint', function (done) {
 
 // Lint project files and minify them into two production files.
 gulp.task('build', function (done) {
-  runSequence('env:dev', 'wiredep:prod', 'lint', ['uglify', 'cssmin'], 'service-worker', done);
+  runSequence('env:dev', 'wiredep:prod', 'lint', ['uglify', 'cssmin'], done);
 });
 
 // Run the project tests
@@ -575,7 +591,7 @@ gulp.task('prod', function (done) {
 
 // Run the project in production mode
 gulp.task('zip', function (done) {
-  runSequence('build', 'copy-bundle-stuff', 'zipit', done);
+  runSequence('build', 'build-new-sw', 'zipit', done);
 });
 
 function runExpress(port, rootDir) {
@@ -617,18 +633,18 @@ function writeServiceWorkerFile(rootDir, handleFetch, callback) {
     // local changes from being picked up during the development cycle.
     handleFetch: handleFetch,
     logger: plugins.util.log,
-    runtimeCaching: [{
-      // See https://github.com/GoogleChrome/sw-toolbox#methods
-      urlPattern: /runtime-caching/,
-      handler: 'cacheFirst',
-      // See https://github.com/GoogleChrome/sw-toolbox#options
-      options: {
-        cache: {
-          maxEntries: 1,
-          name: 'runtime-cache'
-        }
-      }
-    }],
+    // runtimeCaching: [{
+    //   // See https://github.com/GoogleChrome/sw-toolbox#methods
+    //   urlPattern: /runtime-caching/,
+    //   handler: 'cacheFirst',
+    //   // See https://github.com/GoogleChrome/sw-toolbox#options
+    //   options: {
+    //     cache: {
+    //       maxEntries: 1,
+    //       name: 'runtime-cache'
+    //     }
+    //   }
+    // }],
     staticFileGlobs: [
       'dist/public/**',
       'dist/modules/**/*.{html,ico,png,jpg,gif,css}'
@@ -645,6 +661,25 @@ gulp.task('default', ['serve-dist']);
 
 gulp.task('build-sw', function(callback) {
   runSequence('copy-bundle-stuff', 'generate-service-worker-dist', callback);
+});
+
+gulp.task('build-new-sw', (callback) => {
+  runSequence('copy-bundle-stuff', 'build-manifest', callback);
+});
+
+gulp.task('build-manifest', () => {
+  return workboxBuild.injectManifest({
+    swSrc: 'public/sw.js',
+    swDest: 'dist/public/sw.js',
+    globDirectory: 'dist',
+    globPatterns: [
+      'public/**/*.css',
+      'public/**/*.js',
+      'modules/**/*.{html,css,js,png,ico}'
+    ]
+  }).catch(err => {
+    console.log('Uh oh 😬', err);
+  });
 });
 
 gulp.task('clean', function() {
@@ -679,15 +714,21 @@ gulp.task('copy-dev-to-dist', function() {
 gulp.task('copy-bundle-stuff', function() {
   var dist = gulp.src('public/dist/**')
     .pipe(gulp.dest('dist/public/dist/'));
-  var html = gulp.src('modules/**/*.{html,ico,png,gif,css}')
+  var html = gulp.src('modules/**/*.{html,ico,js,png,gif,css}')
     .pipe(gulp.dest('dist/modules/'));
-  var lib = gulp.src(['public/lib/**/*.min.js',
-    'public/lib/angular-ui-router-uib-modal/angular-ui-router-uib-modal.js',
+  var libmin = gulp.src('public/lib/**/*.min.js')
+    .pipe(plugins.flatten())
+    .pipe(gulp.dest('dist/public/lib/'));
+  var lib = gulp.src(['public/lib/angular-ui-router-uib-modal/angular-ui-router-uib-modal.js',
     'public/lib/owasp-password-strength-test/owasp-password-strength-test.js'])
     .pipe(gulp.dest('dist/public/lib/'));
   var pub = gulp.src(['public/register.js', 'public/robots.txt', 'public/humans.txt'])
     .pipe(gulp.dest('dist/public/'));
-  return merge(dist, html, lib, pub);
+  var config = gulp.src(['config/**/*', '.ebextensions/**/*', 'files/**/*'], { base: '.' })
+    .pipe(gulp.dest('dist/'));
+  var rootStuff = gulp.src(['./package.json', './server.js', './.npmrc'])
+    .pipe(gulp.dest('dist/'));
+  return merge(dist, html, libmin, lib, pub, config, rootStuff);
 });
 
 gulp.task('service-worker', () => {
@@ -710,10 +751,9 @@ gulp.task('service-workerIm', () => {
     globPatterns: [
       '**\/*.{js,css,html,png,ico}',
     ]
-  }).then(({count, size, warnings}) => {
+  }).then(({ count, size, warnings }) => {
     // Optionally, log any warnings and details.
     warnings.forEach(console.warn);
-    console.log(`${count} files will be precached, totaling ${size} bytes.`);
+    console.log(`${ count } files will be precached, totaling ${size} bytes.`);
   });
 });
-
