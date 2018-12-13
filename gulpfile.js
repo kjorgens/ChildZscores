@@ -113,13 +113,12 @@ gulp.task('zipit', function() {
     'public/lib/bootstrap/dist/fonts/*',
     'public/lib/bootstrap/dist/css/bootstrap-theme.min.css',
     'public/lib/nvd3/build/nv.d3.min.css',
-    'public/register.js',
     'public/*.js',
     'files/**',
     'scripts/**'
   ], { base: "." })
     .pipe(plugins.plumber())
-    .pipe(zip('liahonaKids.zip'))
+    .pipe(zip('liahonaKidsOld.zip'))
     .pipe(gulp.dest('./'));
 });
 
@@ -591,76 +590,7 @@ gulp.task('prod', function (done) {
 
 // Run the project in production mode
 gulp.task('zip', function (done) {
-  runSequence('build', 'build-new-sw', 'zipit', done);
-});
-
-function runExpress(port, rootDir) {
-  var app = express();
-
-  app.use(express.static(rootDir));
-  app.set('views', path.join(rootDir, 'views'));
-  app.set('view engine', 'jade');
-
-  app.get('/dynamic/:page', function(req, res) {
-    res.render(req.params.page);
-  });
-
-  var server = app.listen(port, function() {
-    var host = server.address().address;
-    var port = server.address().port;
-    console.log('Server running at http://%s:%s', host, port);
-  });
-}
-
-function writeServiceWorkerFile(rootDir, handleFetch, callback) {
-  var config = {
-    cacheId: packageJson.name,
-    /*
-    dynamicUrlToDependencies: {
-      'dynamic/page1': [
-        path.join(rootDir, 'views', 'layout.jade'),
-        path.join(rootDir, 'views', 'page1.jade')
-      ],
-      'dynamic/page2': [
-        path.join(rootDir, 'views', 'layout.jade'),
-        path.join(rootDir, 'views', 'page2.jade')
-      ]
-    },
-    */
-    // If handleFetch is false (i.e. because this is called from generate-service-worker-dev), then
-    // the service worker will precache resources but won't actually serve them.
-    // This allows you to test precaching behavior without worry about the cache preventing your
-    // local changes from being picked up during the development cycle.
-    handleFetch: handleFetch,
-    logger: plugins.util.log,
-    // runtimeCaching: [{
-    //   // See https://github.com/GoogleChrome/sw-toolbox#methods
-    //   urlPattern: /runtime-caching/,
-    //   handler: 'cacheFirst',
-    //   // See https://github.com/GoogleChrome/sw-toolbox#options
-    //   options: {
-    //     cache: {
-    //       maxEntries: 1,
-    //       name: 'runtime-cache'
-    //     }
-    //   }
-    // }],
-    staticFileGlobs: [
-      'dist/public/**',
-      'dist/modules/**/*.{html,ico,png,jpg,gif,css}'
-    ],
-    stripPrefix: 'dist/',
-    // verbose defaults to false, but for the purposes of this demo, log more.
-    verbose: true
-  };
-
-  swPrecache.write(path.join(rootDir, 'public/service-worker.js'), config, callback);
-}
-
-gulp.task('default', ['serve-dist']);
-
-gulp.task('build-sw', function(callback) {
-  runSequence('copy-bundle-stuff', 'generate-service-worker-dist', callback);
+  runSequence('build', 'build-new-sw', 'zipitNew', done);
 });
 
 gulp.task('build-new-sw', (callback) => {
@@ -673,10 +603,20 @@ gulp.task('build-manifest', () => {
     swDest: 'dist/public/sw.js',
     globDirectory: 'dist',
     globPatterns: [
-      'public/**/*.css',
-      'public/**/*.js',
-      'modules/**/*.{html,css,js,png,ico}'
-    ]
+      'public/**/*.{css,js,eot,svg,ttf,woff,woff2}',
+      'modules/**/client/**/*.{html,css,png,ico,eot,svg,ttf,woff,woff}'
+    ],
+    modifyUrlPrefix: {
+      'public': ''
+    },
+    templatedUrls: {
+      '/index.html': [
+        'modules/core/server/views/layout.server.view.html'
+      ]
+    }
+  }).then(({ count, size, warnings }) => {
+    warnings.forEach(console.warn);
+    console.log(`${ count } files will be precached, totaling ${ size } bytes.`);
   }).catch(err => {
     console.log('Uh oh 😬', err);
   });
@@ -686,74 +626,56 @@ gulp.task('clean', function() {
   del.sync([DIST_DIR]);
 });
 
-gulp.task('serve-dev', ['generate-service-worker-dev'], function() {
-  runExpress(3001, DEV_DIR);
-});
-
-gulp.task('serve-dist', ['build'], function() {
-  runExpress(3000, DIST_DIR);
-});
-
-// gulp.task('gh-pages', ['build'], function(callback) {
-//   ghPages.publish(path.join(__dirname, DIST_DIR), callback);
-// });
-
-gulp.task('generate-service-worker-dev', function(callback) {
-  writeServiceWorkerFile(DEV_DIR, false, callback);
-});
-
-gulp.task('generate-service-worker-dist', function(callback) {
-  writeServiceWorkerFile('.', true, callback);
-});
-
-gulp.task('copy-dev-to-dist', function() {
-  return gulp.src(DEV_DIR + '/**')
-    .pipe(gulp.dest(DIST_DIR));
-});
-
 gulp.task('copy-bundle-stuff', function() {
-  var dist = gulp.src('public/dist/**')
+  var dist = gulp.src('public/dist/**/*')
     .pipe(gulp.dest('dist/public/dist/'));
-  var html = gulp.src('modules/**/*.{html,ico,js,png,gif,css}')
-    .pipe(gulp.dest('dist/modules/'));
-  var libmin = gulp.src('public/lib/**/*.min.js')
-    .pipe(plugins.flatten())
-    .pipe(gulp.dest('dist/public/lib/'));
-  var lib = gulp.src(['public/lib/angular-ui-router-uib-modal/angular-ui-router-uib-modal.js',
-    'public/lib/owasp-password-strength-test/owasp-password-strength-test.js'])
-    .pipe(gulp.dest('dist/public/lib/'));
-  var pub = gulp.src(['public/register.js', 'public/robots.txt', 'public/humans.txt'])
+  var html = gulp.src([
+    'modules/**',
+    '!modules/**/*.tests.js'
+    // '!modules/**/*/server/**'
+  ]).pipe(gulp.dest('dist/modules/'));
+  var libmin = gulp.src([
+    'public/lib/angular/angular.min.js',
+    'public/lib/angular-resource/angular-resource.min.js',
+    'public/lib/angular-animate/angular-animate.min.js',
+    'public/lib/angular-messages/angular-messages.min.js',
+    'public/lib/angular-ui-router/release/angular-ui-router.min.js',
+    'public/lib/spin.js/spin.min.js',
+    'public/lib/angular-spinner/dist/angular-spinner.min.js',
+    'public/lib/angular-ui-utils/ui-utils.min.js',
+    'public/lib/angular-bootstrap/ui-bootstrap.min.js',
+    'public/lib/angular-bootstrap/ui-bootstrap-tpls.min.js',
+    'public/lib/angular-file-upload/dist/angular-file-upload.min.js',
+    'public/lib/jquery/dist/jquery.min.js',
+    'public/lib/owasp-password-strength-test/owasp-password-strength-test.js',
+    'public/lib/pouchdb/dist/pouchdb.min.js',
+    'public/lib/pouchdb-all-dbs/dist/pouchdb.all-dbs.min.js',
+    'public/lib/pouchdb-find/dist/pouchdb.find.min.js',
+    'public/lib/angular-pouchdb/angular-pouchdb.min.js',
+    'public/lib/angular-ui-router-uib-modal/angular-ui-router-uib-modal.js',
+    'public/lib/moment/min/moment.min.js',
+    'public/lib/angular-moment/angular-moment.min.js',
+    'public/lib/angular-translate/angular-translate.min.js',
+    'public/lib/angular-sanitize/angular-sanitize.min.js',
+    'public/lib/angular-ui-validate/dist/validate.min.js',
+    'public/lib/angular-ui-event/dist/event.min.js',
+    'public/lib/angular-ui-inderminate/dist/inderminate.min.js',
+    'public/lib/angular-ui-mask/dist/mask.min.js',
+    'public/lib/angular-ui-scroll/dist/scroll.min.js',
+    'public/lib/angular-ui-scrollpoint/dist/scrollpoint.min.js',
+    'public/lib/d3/d3.min.js',
+    'public/lib/nvd3/build/nv.d3.min.js',
+    'public/lib/angular-nvd3/dist/angular-nvd3.min.js',
+    'public/lib/bootstrap/dist/css/bootstrap.min.css',
+    'public/lib/bootstrap/dist/fonts/*',
+    'public/lib/bootstrap/dist/css/bootstrap-theme.min.css',
+    'public/lib/nvd3/build/nv.d3.min.css'
+  ], { base: "." }).pipe(gulp.dest('dist/'));
+  var pub = gulp.src(['public/register.js', 'public/robots.txt', 'public/humans.txt', 'public/images/**/*', 'public/manifest.json'])
     .pipe(gulp.dest('dist/public/'));
   var config = gulp.src(['config/**/*', '.ebextensions/**/*', 'files/**/*'], { base: '.' })
     .pipe(gulp.dest('dist/'));
   var rootStuff = gulp.src(['./package.json', './server.js', './.npmrc'])
     .pipe(gulp.dest('dist/'));
-  return merge(dist, html, libmin, lib, pub, config, rootStuff);
-});
-
-gulp.task('service-worker', () => {
-  return workboxBuild.generateSW({
-    globDirectory: 'dist',
-    globPatterns: [
-      '**\/*.{html,json,js,css,png,ico}',
-    ],
-    cacheId: 'liahonaKids',
-    swDest: 'public/sw.js',
-    maximumFileSizeToCacheInBytes: 8 * 1024 * 1024
-  });
-});
-
-gulp.task('service-workerIm', () => {
-  return workboxBuild.injectManifest({
-    swSrc: 'dist/sw.js',
-    swDest: 'public/sw.js',
-    globDirectory: 'dist',
-    globPatterns: [
-      '**\/*.{js,css,html,png,ico}',
-    ]
-  }).then(({ count, size, warnings }) => {
-    // Optionally, log any warnings and details.
-    warnings.forEach(console.warn);
-    console.log(`${ count } files will be precached, totaling ${size} bytes.`);
-  });
+  return merge(dist, html, libmin, pub, config, rootStuff);
 });

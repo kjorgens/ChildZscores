@@ -11,46 +11,17 @@
  * See https://goo.gl/2aRDsh
  */
 
-importScripts("https://storage.googleapis.com/workbox-cdn/releases/3.6.3/workbox-sw.js");
+importScripts("https://storage.googleapis.com/workbox-cdn/releases/4.0.0-beta.0/workbox-sw.js");
+
+workbox.setConfig({
+  debug: true
+});
 
 if (workbox) {
   console.log(`Yay! Workbox is loaded 🎉`);
 
+
   workbox.precaching.precacheAndRoute([]);
-
-  const childrenHandler = workbox.strategies.cacheFirst({
-    cacheName: 'children-cache',
-    plugins: [
-      new workbox.expiration.Plugin({
-        maxEntries: 50,
-        maxAgeSeconds: 30 * 24 * 60 * 60 // 30 Days
-      })
-    ]
-  });
-
-  workbox.routing.registerRoute(/(.*)children(.*)\.html/, args => {
-    return childrenHandler.handle(args).then(response => {
-      if (!response) {
-        return caches.match('pages/offline.html');
-      } else if (response.status === 404) {
-        return caches.match('pages/404.html');
-      }
-      return response;
-    });
-  });
-
-  workbox.routing.registerRoute(
-    /(.*)children(.*)\.(?:png|gif|jpg|ico)/,
-    workbox.strategies.cacheFirst({
-      cacheName: 'images-cache',
-      plugins: [
-        new workbox.expiration.Plugin({
-          maxEntries: 50,
-          maxAgeSeconds: 30 * 24 * 60 * 60 // 30 Days
-        })
-      ]
-    })
-  );
 
 } else {
   console.log(`Boo! Workbox didn't load 😬`);

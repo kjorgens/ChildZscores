@@ -21,4 +21,3 @@ var ApplicationConfiguration = (function () {
     registerModule: registerModule
   };
 }());
-

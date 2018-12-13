@@ -30,6 +30,10 @@
   <!-- Fav Icon -->
   <link href="{{favicon}}" rel="shortcut icon" type="image/x-icon">
 
+  <!-- Manifest -->
+  <link rel="manifest" href="/manifest.json">
+
+
   <!-- Application CSS Files -->
   {% for cssFile in cssFiles %}<link rel="stylesheet" href="{{cssFile}}">{% endfor %}
 </head>
@@ -52,7 +56,7 @@
 
 
 <!--Load The Socket.io File-->
-<script type="application/javascript" src="/socket.io/socket.io.js"></script>
+<!--<script type="application/javascript" src="/socket.io/socket.io.js"></script>-->
 
 <!--Application JavaScript Files-->
 {% for jsFile in jsFiles %}<script type="application/javascript" src="{{jsFile}}"></script>{% endfor %}

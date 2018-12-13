@@ -149,6 +149,8 @@
           } else {
             resolve(getCountriesLocalDB());
           }
+        } else {
+          resolve(getCountriesLocalDB());
         }
       });
     };
