@@ -13,16 +13,15 @@
 
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/4.0.0-beta.0/workbox-sw.js");
 
-workbox.setConfig({
-  debug: true
-});
-
 if (workbox) {
-  console.log(`Yay! Workbox is loaded 🎉`);
 
+  workbox.setConfig({
+    debug: true
+  });
+  console.log(`Workbox is loaded 🎉`);
 
   workbox.precaching.precacheAndRoute([]);
 
 } else {
-  console.log(`Boo! Workbox didn't load 😬`);
+  console.log(`Workbox didn't load 😬`);
 }

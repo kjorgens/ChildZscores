@@ -661,7 +661,7 @@ gulp.task('copy-bundle-stuff', function() {
     'public/lib/angular-ui-event/dist/event.min.js',
     'public/lib/angular-ui-inderminate/dist/inderminate.min.js',
     'public/lib/angular-ui-mask/dist/mask.min.js',
-    'public/lib/angular-ui-scroll/dist/scroll.min.js',
+    'public/lib/angular-ui-scroll/dist/ui-scroll.min.js',
     'public/lib/angular-ui-scrollpoint/dist/scrollpoint.min.js',
     'public/lib/d3/d3.min.js',
     'public/lib/nvd3/build/nv.d3.min.js',
