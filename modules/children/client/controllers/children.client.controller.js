@@ -123,6 +123,7 @@
       vm.wardIsValid = true;
 
       vm.child.birthDate = new Date(vm.child.birthDate);
+      translationGraphs();
       setSurveyList(screens.child, screens.screens);
     } else {
       vm.child = {};
@@ -163,13 +164,35 @@
     vm.checkEnteredAgeIsValid = checkEnteredAgeIsValid;
     vm.checkAllFieldsValid = checkAllFieldsValid;
 
+    function translationGraphs() {
+      $translate([
+        'MIN_HEALTH_WEIGHT', 'CHILD_WEIGHT_GRAPH', 'MIN_HEALTH_WEIGHT_HEIGHT', 'WEIGHT_AGE_GRAPH',
+        'CHILD_WEIGHT_KEY', 'WEIGHT_HEIGHT_GRAPH', 'CHILD_AGE_GRAPH', 'CHILD_HEIGHT_KEY',
+        'MIN_HEALTH_HEIGHT', 'CHILD_HEIGHT_GRAPH', 'HEIGHT_AGE_CURVE']).then(function (translations) {
+        vm.minHealthW = translations.MIN_HEALTH_WEIGHT;
+        vm.childWeightW = translations.CHILD_WEIGHT_GRAPH;
+        vm.minHealthWH = translations.MIN_HEALTH_WEIGHT_HEIGHT;
+        vm.weightC = translations.WEIGHT_AGE_GRAPH;
+        vm.weightKey = translations.CHILD_WEIGHT_KEY;
+        vm.heightWeightC = translations.WEIGHT_HEIGHT_GRAPH;
+        vm.childAge = translations.CHILD_AGE_GRAPH;
+        vm.heightAgeH = translations.CHILD_HEIGHT_KEY;
+        vm.minHealthH = translations.MIN_HEALTH_HEIGHT;
+        vm.childHeightH = translations.CHILD_HEIGHT_GRAPH;
+        vm.heightAgeC = translations.HEIGHT_AGE_CURVE;
+        vm.optionsHeight = GraphService.setupHeightChart(vm.minHealthH, vm.childHeightH, vm.childAge);
+        vm.optionsWeight = GraphService.setupWeightChart(vm.minHealthW, vm.childWeightW, vm.childAge);
+        vm.optionsWeightPerHeight = GraphService.setupWeightPerHeightChart(vm.minHealthWH, vm.childWeightW, vm.childHeightH);
+        vm.dataHeight = GraphService.getChartDataHeight(vm.zscoreHa, vm.child.gender, vm.heightAgeC, vm.heightAgeH);
+        vm.dataWeight = GraphService.getChartDataWeight(vm.zscoreWa, vm.child.gender, vm.weightC, vm.weightKey);
+        vm.dataWeightPerHeight = GraphService.getChartDataWeightPerHeight(vm.zscoreWH, vm.child.gender, vm.heightWeightC);
+      });
+    }
+
     function performTranslation() {
       $translate(['BOY', 'GIRL', 'CHILD_RECORD', 'UPDATE', 'CREATE',
         'EDIT_EXISTING_CHILD', 'ADD_NEW_CHILD', 'CHILD_GT_5', 'CHILD_GRAD',
-        'INPUT_ERROR', 'INVALID_DATA', 'PLEASE_CORRECT', 'MIN_HEALTH_HEIGHT',
-        'CHILD_HEIGHT_GRAPH', 'CHILD_AGE_GRAPH', 'HEIGHT_AGE_CURVE', 'CHILD_HEIGHT_KEY',
-        'MIN_HEALTH_WEIGHT', 'CHILD_WEIGHT_GRAPH', 'MIN_HEALTH_WEIGHT_HEIGHT', 'WEIGHT_AGE_GRAPH',
-        'CHILD_WEIGHT_KEY', 'WEIGHT_HEIGHT_GRAPH']).then(function (translations) {
+        'INPUT_ERROR', 'INVALID_DATA', 'PLEASE_CORRECT']).then(function (translations) {
         vm.boy = translations.BOY;
         vm.girl = translations.GIRL;
         vm.childRec = translations.CHILD_RECORD;
@@ -182,23 +205,6 @@
         vm.inputError = translations.INPUT_ERROR;
         vm.invalidData = translations.INVALID_DATA;
         vm.pleaseCorrect = translations.PLEASE_CORRECT;
-        vm.minHealthH = translations.MIN_HEALTH_HEIGHT;
-        vm.childHeightH = translations.CHILD_HEIGHT_GRAPH;
-        vm.childAge = translations.CHILD_AGE_GRAPH;
-        vm.heightAgeC = translations.HEIGHT_AGE_CURVE;
-        vm.heightAgeH = translations.CHILD_HEIGHT_KEY;
-        vm.optionsHeight = GraphService.setupHeightChart(vm.minHealthH, vm.childHeightH, vm.childAge);
-        vm.minHealthW = translations.MIN_HEALTH_WEIGHT;
-        vm.childWeightW = translations.CHILD_WEIGHT_GRAPH;
-        vm.weightC = translations.WEIGHT_AGE_GRAPH;
-        vm.weightKey = translations.CHILD_WEIGHT_KEY;
-        vm.optionsWeight = GraphService.setupWeightChart(vm.minHealthW, vm.childWeightW, vm.childAge);
-        vm.minHealthWH = translations.MIN_HEALTH_WEIGHT_HEIGHT;
-        vm.heightWeightC = translations.WEIGHT_HEIGHT_GRAPH;
-        vm.optionsWeightPerHeight = GraphService.setupWeightPerHeightChart(vm.minHealthWH, vm.childWeightW, vm.childHeightH);
-        vm.dataHeight = GraphService.getChartDataHeight(vm.zscoreHa, vm.child.gender, vm.heightAgeC, vm.heightAgeH);
-        vm.dataWeight = GraphService.getChartDataWeight(vm.zscoreWa, vm.child.gender, vm.weightC, vm.weightKey);
-        vm.dataWeightPerHeight = GraphService.getChartDataWeightPerHeight(vm.zscoreWH, vm.child.gender, vm.heightWeightC);
       });
     }
 
@@ -262,22 +268,8 @@
           x: survey.height, y: survey.weight, size: 1, shape: 'diamond'
         });
       });
-
       // vm.screenStatus = ZScores.getStatus(vm.child, surveys);
       vm.surveys = surveys;
-      // $scope.$apply(function () {
-      //   vm.surveys = surveys.docs;
-      //   vm.zScoreGetter(vm.child.gender, vm.surveys[0].monthAge, vm.surveys[0].height, vm.surveys[0].weight, vm.surveys.length === 1, function (zscore) {
-      //     vm.zScore = zscore;
-      //     vm.actions = zscore.actions;
-      //   });
-      //   performTranslation();
-      //   //       vm.surveys.forEach(function(survey) {
-      //   //        if (vm.surveys.length > 0) {
-      //   //          gradeZScores(vm.surveys[0]);
-      //   //        }
-      //   //       });
-      // });
     }
 
     function surveyErrors(error) {
