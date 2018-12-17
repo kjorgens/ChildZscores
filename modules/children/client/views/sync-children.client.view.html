@@ -44,28 +44,28 @@
             <i class="glyphicon glyphicon-trash"></i>
             </h3>
         </a>
-        <a ng-click="vm.createReport('countries', vm.countryCode, vm.sortSelect, 'all')">
-            <h3><span> Aggregate csv all countries </span>
+        <a ng-click="vm.createReport('countries', vm.countryCode, vm.sortSelect, 'all', 'admin')">
+            <h3><span> CSV All countries</span>
             <i class="glyphicon glyphicon-share"></i>
             </h3>
         </a>
         <a ng-click="vm.createReport('country', vm.countryCode, vm.sortSelect, 'all', 'admin')">
-          <h3><span> Aggregate csv files for {{vm.selectedCountry}}</span>
+          <h3><span> CSV for {{vm.selectedCountry}}</span>
             <i class="glyphicon glyphicon-share"></i>
           </h3>
         </a>
         <a ng-click="vm.createReport('stake', vm.countryCode, vm.sortSelect, 'all', 'admin')">
-          <h3><span> Create csv file for {{vm.selectedStake}} </span>
+          <h3><span> CSV for {{vm.selectedStake}} </span>
             <i class="glyphicon glyphicon-share"></i>
           </h3>
         </a>
       <a ng-click="vm.createReport('countries', vm.countryCode, vm.sortSelect, 'sup', 'admin')">
-        <h3><span> Aggregate supplement report all countries </span>
+        <h3><span> Supplement reports all countries </span>
           <i class="glyphicon glyphicon-share"></i>
         </h3>
       </a>
       <a ng-click="vm.createReport('country', vm.countryCode, vm.sortSelect, 'sup', 'admin')">
-        <h3><span> Aggregate supplement report for {{vm.selectedCountry}}</span>
+        <h3><span> Supplement report for {{vm.selectedCountry}}</span>
           <i class="glyphicon glyphicon-share"></i>
         </h3>
       </a>

@@ -449,7 +449,7 @@ function listAllChildren(childScreenList, screenType) {
           if (currentAge < 60 && ~childEntry.id.indexOf('chld')) {
             sortedScreenList = getScreeningsList(childEntry.id, childScreenList[1].data.rows);
             if (sortedScreenList.length === 0) {
-              noScreenings++;
+              noScreenings + 1;
               lineAccumulator.push(addChildToLine(
                 childEntry.key, sortedScreenList[0],
                 childScreenList[0].parms.sortField,
@@ -1039,7 +1039,6 @@ exports.createCSVFromDB = async function (req, res) {
   }
 
   const tokenInfo = parseJwt(req.headers.authorization);
-  console.log('inside createCSVfrom DB');
   moment.locale(req.params.language);
   var parmObj = {
     stakeName: req.query.stake,
@@ -1090,12 +1089,10 @@ exports.createCSVFromDB = async function (req, res) {
 };
 
 exports.getSyncURL = function(req, res) {
-  console.log('inside getSyncURL');
   return res.json({ entity: process.env.SYNC_ENTITY, url: process.env.COUCH_URL });
 };
 
 exports.getCountryList = function(req, res) {
-  console.log('inside getCountryLIst');
   request.get('https://' + process.env.COUCH_URL
       + '/country_list/liahona_kids_countries_stakes', function (error, response, body) {
     if (!error && response.statusCode === 200) {

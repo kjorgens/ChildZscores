@@ -5,9 +5,9 @@
     .module('children.pouchService')
     .factory('PouchService', PouchService);
 
-  PouchService.$inject = ['$q', 'pouchDB', 'moment', 'ChildrenStakes'];
+  PouchService.$inject = ['$q', 'pouchDB', 'moment', 'ChildrenStakes', 'Obesity'];
 
-  function PouchService($q, pouchDB, moment, ChildrenStakes) {
+  function PouchService($q, pouchDB, moment, ChildrenStakes, Obesity) {
     var factory = {};
     var database;
     var countryDataBase;
@@ -236,7 +236,7 @@
         selector: {
           ward: { $eq: wardName },
           firstName: { $gt: null }
-        },
+        }
         // sort: ['firstName']
       };
       return database.find(findObj).then(function(response) {
@@ -390,9 +390,9 @@
         zscoreStatus = 'Acute: supplements required';
       } else if ((screeningObj.zScore.ha < -2 || screeningObj.zScore.wa < -2) && screeningObj.monthAge > 36 && screeningObj.monthAge < 48) {
         zscoreStatus = 'Micro nutrients required';
-      } else if (screeningObj.zScore.ha < -1 ||
-        screeningObj.zScore.wa < -1 ||
-        screeningObj.zScore.wl < -1) {
+      } else if (screeningObj.zScore.ha < -1
+        || screeningObj.zScore.wa < -1
+        || screeningObj.zScore.wl < -1) {
         zscoreStatus = 'At Risk: Come to next screening';
       } else {
         zscoreStatus = 'Normal';
@@ -401,11 +401,11 @@
     }
 
     function statusColor(status) {
-      if (status.indexOf('Acute') > -1) {
+      if (~status.indexOf('Acute')) {
         return 'redZoneZscore';
-      } else if (status.indexOf('Micro') > -1) {
+      } else if (~status.indexOf('Micro')) {
         return 'redZoneZscore';
-      } else if (status.indexOf('Risk') > -1) {
+      } else if (~status.indexOf('Risk')) {
         return 'marginalZscore';
       } else {
         return 'normalZscore';
@@ -466,11 +466,65 @@
       return statusColor(status);
     };
 
+    factory.updateChildSups = function(childId, callBack, errCallback) {
+      database.find({
+        selector: {
+          owner: { $eq: childId },
+          surveyDate: { $gt: null }
+        },
+        sort: [{ surveyDate: 'desc' }]
+      }).then((screenList) => {
+        var supType = 'none';
+        var currentSupType = 'none';
+        var priorMalnurished = 'no';
+        database.get(childId)
+          .then((childInfo) => {
+            var currentAge = moment().diff(moment(new Date(childInfo.birthDate)), 'months');
+            screenList.docs.forEach(function (screening, index) {
+              if ((screening.zScore.ha < -2 || screening.zScore.wa < -2)) {
+                priorMalnurished = 'yes';
+                supType = 'sup';
+                if (currentAge > 36 && currentAge <= 60) {
+                  supType = 'mic';
+                }
+              }
+              if (screening.zScore.wl < -2) {
+                priorMalnurished = 'yes';
+                supType = 'MAM';
+                if (screening.zScore.wl < -3) {
+                  supType = 'SAM';
+                }
+              }
+              if (index === 0) {
+                currentSupType = supType;
+              }
+            });
+            let timeSinceLastScreen = moment().diff(moment(new Date(screenList.docs[0].surveyDate)), 'months');
+            if (timeSinceLastScreen > 6) {
+              currentSupType = 'none';
+            }
+            childInfo.supType = currentSupType;
+            const bmiInfo = Obesity.getObesity(childInfo, screenList.docs[0]);
+            childInfo.bmi = bmiInfo.currentBMI;
+            childInfo.obese = bmiInfo.obese;
+            const statusInfo = calculateStatus(screenList.docs[0]);
+            childInfo.zscoreStatus = statusInfo.zscoreStatus;
+            childInfo.statusColor = statusColor(childInfo.zscoreStatus);
+            childInfo.lastScreening = screenList.docs[0]._id;
+            database.put(childInfo)
+              .then(callBack);
+          });
+      }).catch(err => {
+        console.log(err.message);
+      });
+    };
+
     factory.addScreening = function (screening, childId, callBack, errCallback) {
       getScreeningInfo({ screening: screening.id, child: childId })
         .then(calculateStatus)
         .then(updateChildRecord)
-        .then(callBack).catch(function(err) {
+        .then(callBack)
+        .catch(function(err) {
           console.log(err);
         });
     };

@@ -929,10 +929,17 @@
         sugAction.push('REVIEW_HEALTH_LESSONS');
       }
 
-      callback({ ha: heightForAge, haStatus: haStatus,
-        wa: weightForAge, waStatus: waStatus,
-        wl: weightForLength, wlStatus: wlStatus,
-        zscoreString: zscoreString, status: status, actions: sugAction });
+      callback({
+        ha: heightForAge,
+        haStatus: haStatus,
+        wa: weightForAge,
+        waStatus: waStatus,
+        wl: weightForLength,
+        wlStatus: wlStatus,
+        zscoreString: zscoreString,
+        status: status,
+        actions: sugAction
+      });
     };
     return { getMethod: getMethod, getStatus: getStatus };
   }

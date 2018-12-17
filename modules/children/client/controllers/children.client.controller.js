@@ -16,11 +16,9 @@
     vm.zscoreHa = [];
     vm.zscoreWa = [];
     vm.zscoreWH = [];
-    // performTranslation();
     vm.callback = callback;
 
     vm.supInfo = screens.sup;
-    // setSurveyList(screens.child, screens.screens);
 
     function callback(scope, element) {
       var api = scope.api;

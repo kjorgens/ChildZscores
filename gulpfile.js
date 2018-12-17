@@ -9,7 +9,6 @@ var _ = require('lodash'),
   pump = require('pump'),
   merge = require('merge-stream'),
   uglify = require('gulp-uglify-es').default,
-  // uglify = require('gulp-uglify-es'),
   terser = require('gulp-terser'),
   defaultAssets = require('./config/assets/default'),
   testAssets = require('./config/assets/test'),
@@ -35,7 +34,6 @@ var _ = require('lodash'),
   webdriver_update = require('gulp-protractor').webdriver_update,
   webdriver_standalone = require('gulp-protractor').webdriver_standalone,
   KarmaServer = require('karma').Server,
-  swPrecache = require('./sw-precache.js'),
   workboxBuild = require('workbox-build');
 
 var DEV_DIR = 'public';
@@ -68,75 +66,9 @@ gulp.task('nodemon', function () {
   });
 });
 
-gulp.task('zipit', function() {
-  return gulp.src([
-    'package.json',
-    '.ebextensions/*',
-    'server.js',
-    'README.md',
-    '.npmrc',
-    'config/**',
-    'modules/**',
-    'public/dist/**',
-    'public/lib/angular/angular.min.js',
-    'public/lib/angular-resource/angular-resource.min.js',
-    'public/lib/angular-animate/angular-animate.min.js',
-    'public/lib/angular-messages/angular-messages.min.js',
-    'public/lib/angular-ui-router/release/angular-ui-router.min.js',
-    'public/lib/spin.js/spin.min.js',
-    'public/lib/angular-spinner/dist/angular-spinner.min.js',
-    'public/lib/angular-ui-utils/ui-utils.min.js',
-    'public/lib/angular-bootstrap/ui-bootstrap.min.js',
-    'public/lib/angular-bootstrap/ui-bootstrap-tpls.min.js',
-    'public/lib/angular-file-upload/dist/angular-file-upload.min.js',
-    'public/lib/jquery/dist/jquery.min.js',
-    'public/lib/owasp-password-strength-test/owasp-password-strength-test.js',
-    'public/lib/pouchdb/dist/pouchdb.min.js',
-    'public/lib/pouchdb-all-dbs/dist/pouchdb.all-dbs.min.js',
-    'public/lib/pouchdb-find/dist/pouchdb.find.min.js',
-    'public/lib/angular-pouchdb/angular-pouchdb.min.js',
-    'public/lib/angular-ui-router-uib-modal/angular-ui-router-uib-modal.js',
-    'public/lib/moment/min/moment.min.js',
-    'public/lib/angular-moment/angular-moment.min.js',
-    'public/lib/angular-translate/angular-translate.min.js',
-    'public/lib/angular-sanitize/angular-sanitize.min.js',
-    'public/lib/angular-ui-validate/dist/validate.min.js',
-    'public/lib/angular-ui-event/dist/event.min.js',
-    'public/lib/angular-ui-inderminate/dist/inderminate.min.js',
-    'public/lib/angular-ui-mask/dist/mask.min.js',
-    'public/lib/angular-ui-scroll/dist/scroll.min.js',
-    'public/lib/angular-ui-scrollpoint/dist/scrollpoint.min.js',
-    'public/lib/d3/d3.min.js',
-    'public/lib/nvd3/build/nv.d3.min.js',
-    'public/lib/angular-nvd3/dist/angular-nvd3.min.js',
-    'public/lib/bootstrap/dist/css/bootstrap.min.css',
-    'public/lib/bootstrap/dist/fonts/*',
-    'public/lib/bootstrap/dist/css/bootstrap-theme.min.css',
-    'public/lib/nvd3/build/nv.d3.min.css',
-    'public/*.js',
-    'files/**',
-    'scripts/**'
-  ], { base: "." })
-    .pipe(plugins.plumber())
-    .pipe(zip('liahonaKidsOld.zip'))
-    .pipe(gulp.dest('./'));
-});
-
 gulp.task('zipitNew', function() {
   return gulp.src([
     'dist/**/*'
-    // 'dist/package.json',
-    // 'dist/.ebextensions/*',
-    // 'dist/server.js',
-    // 'dist/README.md',
-    // 'dist/.npmrc',
-    // 'dist/config/**',
-    // 'dist/files/**',
-    // 'dist/modules/**/*',
-    // 'dist/scripts/**',
-    // 'dist/public/dist/**',
-    // 'dist/public/lib/**/*',
-    // 'dist/public/*.js'
   ], { base: 'dist/', dot: true })
     .pipe(plugins.plumber())
     .pipe(zip('liahonaKids.zip'))
@@ -267,13 +199,6 @@ gulp.task('uglify', function(cb) {
 
   del(['public/dist/*']);
 
-  // pump([
-  //   gulp.src(assets),
-  //   plugins.ngAnnotatePatched(),
-  //   plugins.terser(),
-  //   plugins.concat('application.min.js'),
-  //   gulp.dest('public/dist')
-  // ], cb);
   return gulp.src(assets)
     .pipe(plugins.ngAnnotatePatched({
       add: true
@@ -632,7 +557,6 @@ gulp.task('copy-bundle-stuff', function() {
   var html = gulp.src([
     'modules/**',
     '!modules/**/*.tests.js'
-    // '!modules/**/*/server/**'
   ]).pipe(gulp.dest('dist/modules/'));
   var libmin = gulp.src([
     'public/lib/angular/angular.min.js',
