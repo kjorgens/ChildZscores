@@ -1,6 +1,3 @@
-/**
- * Created by karljorgensen on 1/26/16.
- */
 (function () {
   'use strict';
 
@@ -142,8 +139,8 @@
     vm.reportReady = false;
     vm.stakeDB = $stateParams.stakeDB;
     vm.screenType = $stateParams.screenType;
-//    vm.stakeDB = localStorage.getItem('selectedDBName');
- //   vm.selectedStake = localStorage.getItem('selectedStake');
+    //    vm.stakeDB = localStorage.getItem('selectedDBName');
+    //   vm.selectedStake = localStorage.getItem('selectedStake');
     vm.selectedStake = $stateParams.stakeName;
     vm.selectedCountry = localStorage.getItem('selectedCountry');
     vm.selectedCountryCode = localStorage.getItem('selectedCountryCode');
@@ -192,7 +189,7 @@
       // vm.stopSpin();
       console.log('couchdb sync complete');
       goBack();
-  //    $state.go('children.list', { stakeDB: vm.stakeDB, stakeName: vm.selectedStake, searchFilter: '', colorFilter: '' });
+      //    $state.go('children.list', { stakeDB: vm.stakeDB, stakeName: vm.selectedStake, searchFilter: '', colorFilter: '' });
     }
 
     function replicateUp (input) {
@@ -257,8 +254,13 @@
         url = `${ url }?stake=${ encodeURIComponent(vm.selectedStake) }`;
       }
 
-      return $http.get(url)
-        .then(returnReport, getCsvError);
+      return $http({
+        method: 'GET',
+        url: url,
+        timeout: 300000
+      })
+        .then(returnReport,
+          getCsvError);
     }
 
     function updateStakeChildStatus(stakeDB, cCode, scopeType, func) {
@@ -269,10 +271,8 @@
 
     function getCsvError(error) {
       vm.stopSpin();
-      console.log(error);
-      vm.reportError('CSV creation error', error.message, false);
-//      return ModalService.infoModal('some dumb error' + ' :\n', error + (notifyKarl ? '\n Please contact kjorgens@yahoo.com' : ''));
-//      vm.reportError('Download csv error', error.data.error.message, error.data.error.name.indexOf('Empty database') < 0);
+      console.log(error.toString);
+      vm.reportError('CSV creation error', `${ error.status } ${ error.statusText }`, false);
     }
 
     function createReport(scope, scopeID, sortField, csvType, stakeName) {
@@ -307,7 +307,8 @@
     function viewUpdateComplete() {
       console.log('couch view update complete');
       // Clear messages
-      vm.success = vm.error = null;
+      vm.success = null;
+      vm.error = null;
       vm.onComplete = null;
       // Start upload
       vm.uploader.uploadAll();
@@ -329,6 +330,5 @@
     }
 
     vm.reportError = reportError;
-//    createReport();
   }
 }());

@@ -27,7 +27,8 @@
 
     // Remove a user social account
     function removeUserSocialAccount(provider) {
-      vm.success = vm.error = null;
+      vm.success = null;
+      vm.error = null;
 
       $http.delete('/api/users/accounts', {
         params: {
@@ -36,7 +37,8 @@
       }).then(function (response) {
         // If successful show success message and clear form
         vm.success = true;
-        vm.user = Authentication.user = response;
+        vm.user = response;
+        Authentication.user = response;
       }).catch(function (response) {
         vm.error = response.data.message;
       });

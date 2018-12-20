@@ -173,6 +173,14 @@
       }
     }
 
+    function setChildren(results) {
+      vm.childList = results.docs;
+    }
+
+    function listChildrenErrors(error) {
+      console.log(error.message);
+    }
+
     function selectWard() {
       if (vm.selectedWard === undefined) {
         return PouchService.queryChildren(setChildren, listChildrenErrors);

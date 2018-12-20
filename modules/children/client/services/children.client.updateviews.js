@@ -2,8 +2,8 @@
   'use strict';
 
   angular
-      .module('children.updateviews')
-      .factory('ChildrenViews', ChildrenViews);
+    .module('children.updateviews')
+    .factory('ChildrenViews', ChildrenViews);
 
   ChildrenViews.$inject = ['$http'];
 

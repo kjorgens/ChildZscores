@@ -17,7 +17,7 @@
       <span ng-bind="vm.child.birthDate | date:'mediumDate'"></span>
       <!--Current Supplement <span ng-bind="vm.supInfo"></span>-->
     </div>
-    <small>
+    <small ng-if="vm.surveys.length > 0">
       <!--<h4>{{'ACTIONS' | translate}}:-->
         <!--<a ng-repeat="action in vm.actions" >-->
           <!--<li>-->
@@ -25,7 +25,7 @@
           <!--</li>-->
         <!--</a>-->
       <!--</h4>-->
-      <h4>
+      <h4 >
         <div style="height:10px;"></div>
         <div class="container">
           <div class="row">

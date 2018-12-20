@@ -106,9 +106,11 @@
       editChild = true;
       vm.surveys = screens.screens;
       vm.child = screens.child;
-      let obeseInfo = Obesity.getObesity(vm.child, vm.surveys[0]);
-      vm.obese = obeseInfo.obese;
-      vm.bmi = obeseInfo.currentBMI;
+      if (vm.surveys.length > 0) {
+        let obeseInfo = Obesity.getObesity(vm.child, vm.surveys[0]);
+        vm.obese = obeseInfo.obese;
+        vm.bmi = obeseInfo.currentBMI;
+      }
       vm.checkAge();
       vm.ageIsValid = true;
       vm.firstNameIsValid = true;
@@ -587,8 +589,13 @@
         });
         PouchService.remove(child, removeResponse, removeError);
         vm.startSpin();
-        $state.go('children.list', { stakeDB: vm.selectedDB, stakeName: vm.selectedStake, screenType: 'children',
-          searchFilter: FilterService.currentListFilter(), colorFilter: FilterService.currentColorFilter() });
+        $state.go('children.list', {
+          stakeDB: vm.selectedDB,
+          stakeName: vm.selectedStake,
+          screenType: 'children',
+          searchFilter: FilterService.currentListFilter(),
+          colorFilter: FilterService.currentColorFilter()
+        });
       }
     }
 

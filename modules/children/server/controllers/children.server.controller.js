@@ -330,7 +330,7 @@ function getScreeningsList(childId, screeningList) {
     }
   });
   if (screenList.length === 0) {
-    console.log('no screens found for ' + childId);
+    console.log('no screens for ' + childId);
   } else {
     screenList.sort(function (x, y) {
       if (x.surveyDate > y.surveyDate) {
@@ -604,11 +604,13 @@ function getWomen(parmObj) {
 async function getChildAndData(parmObj, multiplier) {
   return new Promise((resolve) => {
     function accessDB(parmObj) {
+      console.log(`access ${ parmObj.stakeName }`);
       var newObj = Object.assign({}, parmObj);
       var stake = parmObj.stakeDB;
       return resolve(Promise.join(newDBRequest(stake, parmObj.stakename, newObj, 'children_list'), newDBRequest(stake, parmObj.stakename, newObj, 'scr_list')));
     }
-    return setTimeout(accessDB, 1000 * multiplier, parmObj);
+    console.log(`start ${ parmObj.stakeName } in ${ multiplier } seconds`);
+    return setTimeout(accessDB, 250 * multiplier, parmObj);
   });
 }
 
@@ -1007,6 +1009,7 @@ exports.createCSVFromDB = async function (req, res) {
       }
     });
     if (toRetry.length === 0) {
+      console.log(`done creating CSV`);
       return res.status(200).send({
         message: input[0]
       });
@@ -1026,7 +1029,7 @@ exports.createCSVFromDB = async function (req, res) {
         return (stakeToSave);
       }, { concurrancy: 1 })
         .then((results) => {
-          setTimeout(reportAggregateComplete, 30000, results, retryCount - 1, processToExec);
+          setTimeout(reportAggregateComplete, 10000, results, retryCount - 1, processToExec);
         }).catch((error) => {
           console.log(error.message);
           return res.status(400).send({
@@ -1477,14 +1480,16 @@ function getDBListFromFile(parmsIn) {
               }
             });
           } else if (parmsIn.scopeType === 'countries') {
+            let stakeCount = 0;
             countryList.forEach((country) => {
               country.stakes.forEach((stake, index) => {
+                stakeCount += 1;
                 if (!stake.stakeDB.startsWith('test')) {
                   let parmObj = Object.assign({}, parmsIn);
                   parmObj.stakeDB = stake.stakeDB;
                   parmObj.stakeName = stake.stakeName;
                   parmObj.cCode = country.code;
-                  stakeList.push(parmObj.updateProcess(parmObj, index));
+                  stakeList.push(parmObj.updateProcess(parmObj, stakeCount));
                 }
               });
             });
