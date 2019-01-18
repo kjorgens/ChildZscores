@@ -86,7 +86,7 @@ describe('Children CRUD tests', function () {
 
             // obtain the sync creds
             agent.get('/api/children/sync')
-                .set('Authorization', 'JWT ' + signinRes.body.token)
+                .set('authorization', 'JWT ' + signinRes.body.token)
                 .expect(200)
                 .end(function (getSyncErr, getSyncRes) {
                   // Handle child save error
@@ -119,7 +119,7 @@ describe('Children CRUD tests', function () {
 
             // obtain the sync creds
             agent.get('/api/children/sync')
-                .set('Authorization', 'JWT ' + signinRes.body.token)
+                .set('authorization', 'JWT ' + signinRes.body.token)
                 .expect(403)
                 .end(function (getSyncErr, getSyncRes) {
                   // Handle child save error

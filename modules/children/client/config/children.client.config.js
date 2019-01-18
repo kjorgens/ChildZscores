@@ -1,7 +1,7 @@
 (function () {
   'use strict';
 
-// Configuring the liahona kids database module
+  // Configuring the liahona kids database module
   angular
     .module('children')
     .run(dataConfig);

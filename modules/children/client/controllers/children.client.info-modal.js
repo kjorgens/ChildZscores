@@ -2,8 +2,8 @@
   'use strict';
 
   angular
-      .module('children')
-      .controller('InfoModalController', InfoModalController);
+    .module('children')
+    .controller('InfoModalController', InfoModalController);
 
   InfoModalController.$inject = ['$scope', '$uibModalInstance', 'input'];
 
@@ -19,14 +19,5 @@
         $scope.cb();
       }
     };
-
-    // setTimeout(function() {
-    //   $uibModalInstance.dismiss();
-    //   if ($scope.cb) {
-    //     $scope.cb();
-    //   }
-    // }, 10000);
-
   }
 }());
-

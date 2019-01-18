@@ -12,6 +12,7 @@
     countryData, $stateParams) {
     var vm = this;
     vm.selectedCountry = countryData;
+    vm.selectedCountry.image = `/${ countryData.image }`;
     sessionStorage.setItem('selectedCountry', vm.selectedCountry.name);
     localStorage.setItem('selectedCountry', vm.selectedCountry.name);
     localStorage.setItem('selectecCountryCode', vm.selectedCountry.code);
@@ -60,16 +61,9 @@
     $rootScope.$on('us-spinner:stop', function(event, key) {
       vm.spinneractive = false;
     });
-    // function refreshCountryList() {
-    //   vm.startSpin();
-    //   ChildrenStakes.get(function(retVal) {
-    //     vm.liahonaStakes = retVal;
-    //     PouchService.createCountryDatabase();
-    //     PouchService.putStakesLocal(retVal, returnFromPut, handleError);
-    //   });
-    // }
+
     function storeDbList(input) {
-          // sessionStorage.setItem('liahonaStakesObject', input);
+      // sessionStorage.setItem('liahonaStakesObject', input);
       vm.liahonaStakes = input;
       vm.selectedCountry = vm.liahonaStakes.countries.find(findCountry);
       // localStorage.setItem(vm.selectedCountry, 'selectedCountry');
@@ -77,39 +71,46 @@
       localStorage.setItem('selectedCountry', vm.selectedCountry.name);
       localStorage.setItem('selectecCountryCode', vm.selectedCountry.code);
       sessionStorage.setItem('selectecCountryCode', vm.selectedCountry.code);
-      sessionStorage.getItem('selectedCountryImage', vm.selectedCountry.image);
-      localStorage.setItem('selectedCountryImage', vm.selectedCountry.image);
+      sessionStorage.getItem('selectedCountryImage', `/${ vm.selectedCountry.image }`);
+      localStorage.setItem('selectedCountryImage', `/${ vm.selectedCountry.image }`);
     }
 
     function screenChildren(stakeName, stakeDB) {
       vm.startSpin();
-      document.body.scrollTop = document.documentElement.scrollTop = 0;
-      $state.go('children.list', { countryName: vm.selectedCountry.name, countryCode: vm.selectedCountry.code, stakeDB: stakeDB, stakeName: stakeName, searchFilter: '', colorFilter: '', screenType: 'children' });
+      // document.body.scrollTop = document.documentElement.scrollTop = 0;
+      $state.go('children.list', {
+        countryName: vm.selectedCountry.name,
+        countryCode: vm.selectedCountry.code,
+        stakeDB: stakeDB,
+        stakeName: stakeName,
+        searchFilter: '',
+        colorFilter: '',
+        screenType: 'children'
+      });
     }
 
     function screenPregnantWomen(stakeName, stakeDB) {
       vm.startSpin();
-      document.body.scrollTop = document.documentElement.scrollTop = 0;
-      $state.go('children.listMothers', { stakeDB: stakeDB, stakeName: stakeName, searchFilter: '', colorFilter: '', screenType: 'pregnant' });
+      // document.body.scrollTop = document.documentElement.scrollTop = 0;
+      $state.go('children.listMothers', {
+        stakeDB: stakeDB,
+        stakeName: stakeName,
+        searchFilter: '',
+        colorFilter: '',
+        screenType: 'pregnant'
+      });
     }
 
     function screenNursingMothers(stakeName, stakeDB) {
       vm.startSpin();
-      document.body.scrollTop = document.documentElement.scrollTop = 0;
-      $state.go('children.listMothers', { stakeDB: stakeDB, stakeName: stakeName, searchFilter: '', colorFilter: '', screenType: 'nursing' });
+      // document.body.scrollTop = document.documentElement.scrollTop = 0;
+      $state.go('children.listMothers', {
+        stakeDB: stakeDB,
+        stakeName: stakeName,
+        searchFilter: '',
+        colorFilter: '',
+        screenType: 'nursing'
+      });
     }
-
-    // function getStakesDB() {
-    //   if (navigator.onLine) {
-    //     ChildrenStakes.get(function(retVal) {
-    //       vm.liahonaStakes = retVal;
-    //       PouchService.createCountryDatabase();
-    //       PouchService.putStakesLocal(retVal, returnFromPut, handleError);
-    //     });
-    //   }
-    // }
-    // PouchService.createCountryDatabase();
-    // PouchService.getCountriesLocal(storeDbList, handleError);
   }
 }());
-

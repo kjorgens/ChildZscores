@@ -17,7 +17,7 @@
     vm.whereFrom = $location;
 
     vm.nursingMother = false;
-    if(~$stateParams.screenType.indexOf('nursing')) {
+    if (~$stateParams.screenType.indexOf('nursing')) {
       vm.nursingMother = true;
     }
     var editMother = false;
@@ -37,7 +37,7 @@
     vm.selectedWard = $stateParams.ward;
     // vm.selectedStake = localStorage.getItem('selectedStake');
     // vm.selectedDB = sessionStorage.getItem('selectedDBName');
-    //vm.selectedWard = localStorage.getItem('selectedWard');
+    // vm.selectedWard = localStorage.getItem('selectedWard');
 
     // if(vm.selectedWard.indexOf('All Wards') === -1){
     //   vm.mother.ward = vm.selectedWard;
@@ -47,32 +47,32 @@
     vm.selectedCountryImage = sessionStorage.getItem('selectedCountryImage');
     vm.online = $rootScope.appOnline;
     vm.interviewer = localStorage.getItem('lastInterviewer');
-//    vm.find();
+    //    vm.find();
 
     vm.yesNo = [{ value: 'Yes', translationId: 'YES' }, { value: 'No', translationId: 'NO' }, { value: 'Unknown', translationId: 'UNKNOWN' }];
-//     if ($state.params.hasOwnProperty('motherId')) {
-//       editMother = true;
-//       vm.mother = mother;
-//       vm.firstNameIsValid = true;
-//       vm.lastNameIsValid = true;
-//       vm.deliveryDateIsValid = true;
-//       vm.membershipIsValid = true;
-//
-//       vm.mother.birthDate = new Date(vm.mother.birthDate);
-//       vm.mother.deliveryDate = new Date(vm.mother.deliveryDate);
-//
-// //      PouchService.getSurveys(vm.mother._id, setSurveyList, surveyErrors);
-//     } else {
-//       vm.mother = {};
-//
-//       vm.ageIsValid = undefined;
-//       vm.firstNameIsValid = undefined;
-//       vm.lastNameIsValid = undefined;
-//       vm.membershipIsValid = undefined;
-//       vm.surveyDate = new Date();
-//       vm.mother.ward = vm.selectedWard;
-//       // vm.checkMembershipIsValid = false;
-//     }
+    //     if ($state.params.hasOwnProperty('motherId')) {
+    //       editMother = true;
+    //       vm.mother = mother;
+    //       vm.firstNameIsValid = true;
+    //       vm.lastNameIsValid = true;
+    //       vm.deliveryDateIsValid = true;
+    //       vm.membershipIsValid = true;
+    //
+    //       vm.mother.birthDate = new Date(vm.mother.birthDate);
+    //       vm.mother.deliveryDate = new Date(vm.mother.deliveryDate);
+    //
+    // //      PouchService.getSurveys(vm.mother._id, setSurveyList, surveyErrors);
+    //     } else {
+    //       vm.mother = {};
+    //
+    //       vm.ageIsValid = undefined;
+    //       vm.firstNameIsValid = undefined;
+    //       vm.lastNameIsValid = undefined;
+    //       vm.membershipIsValid = undefined;
+    //       vm.surveyDate = new Date();
+    //       vm.mother.ward = vm.selectedWard;
+    //       // vm.checkMembershipIsValid = false;
+    //     }
 
     vm.appIsOffline = !$rootScope.appOnline;
 
@@ -95,20 +95,24 @@
 
     function searchStarted() {
       vm.motherList = FilterService.searchAndFilter(vm.motherList, vm.searchString, FilterService.currentColorFilter(), 'firstName');
-      if ( FilterService.displayCount() === 1 ){
+      if (FilterService.displayCount() === 1) {
         FilterService.setSearchFilter(vm.searchString.slice(0, -1));
-        vm.focusSearch++;
+        vm.focusSearch += 1;
         $state.go('children.mothers', { motherId: FilterService.getSingleChildId() });
       }
     }
 
-    vm.clearSearch = function(){
+    vm.clearSearch = function() {
       vm.searchString = '';
       vm.motherList = FilterService.searchAndFilter(vm.motherList, '', FilterService.currentColorFilter(), 'firstName');
     };
 
-    vm.goSync = function(){
-      $state.go('children.sync', { stakeDB: vm.selectedDB, stakeName: vm.selectedStake, screenType: vm.screenType});
+    vm.goSync = function() {
+      $state.go('children.sync', {
+        stakeDB: vm.selectedDB,
+        stakeName: vm.selectedStake,
+        screenType: vm.screenType
+      });
     };
 
     function performTranslation() {
@@ -149,9 +153,14 @@
 
 
     function motherUpdated(mother) {
-      $state.go('children.mothers', { stakeDB: vm.selectedDB, stakeName: vm.selectedStake, screenType: 'mothers',
-        searchFilter: FilterService.currentListFilter(), colorFilter: FilterService.currentColorFilter()});
- //     $state.go('mother.view', { motherId: mother.id });
+      $state.go('children.mothers', {
+        stakeDB: vm.selectedDB,
+        stakeName: vm.selectedStake,
+        screenType: 'mothers',
+        searchFilter: FilterService.currentListFilter(),
+        colorFilter: FilterService.currentColorFilter()
+      });
+      //     $state.go('mother.view', { motherId: mother.id });
     }
 
     var removeResponse = function (res) {
@@ -169,8 +178,13 @@
           PouchService.remove(toRemove, removeResponse, removeError);
         });
         PouchService.remove(mother, removeResponse, removeError);
-        $state.go('children.mothers', { stakeDB: vm.selectedDB, stakeName: vm.selectedStake, screenType: 'mothers',
-          searchFilter: FilterService.currentListFilter(), colorFilter: FilterService.currentColorFilter()});
+        $state.go('children.mothers', {
+          stakeDB: vm.selectedDB,
+          stakeName: vm.selectedStake,
+          screenType: 'mothers',
+          searchFilter: FilterService.currentListFilter(),
+          colorFilter: FilterService.currentColorFilter()
+        });
       }
     }
 

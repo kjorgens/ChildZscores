@@ -11,9 +11,8 @@ var passport = require('passport'),
 /**
  * Module init function
  */
-module.exports = function (app, db) {
+module.exports = function (app) {
   // Serialize sessions
-  /*
   passport.serializeUser(function (user, done) {
     done(null, user.id);
   });
@@ -23,10 +22,12 @@ module.exports = function (app, db) {
     User.findOne({
       _id: id
     }, '-salt -password', function (err, user) {
+      if (user._doc.firstName !== 'Karl') {
+        console.log('what the heck');
+      }
       done(err, user);
     });
   });
-  */
 
   // Initialize strategies
   config.utils.getGlobbedPaths(path.join(__dirname, './strategies/**/*.js')).forEach(function (strategy) {
@@ -35,5 +36,5 @@ module.exports = function (app, db) {
 
   // Add passport's middleware
   app.use(passport.initialize());
-  // app.use(passport.session());
+  app.use(passport.session());
 };

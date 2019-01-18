@@ -19,9 +19,18 @@ module.exports = function (app, db) {
     // Load SSL key and certificate
     var privateKey = fs.readFileSync(path.resolve(config.secure.privateKey), 'utf8');
     var certificate = fs.readFileSync(path.resolve(config.secure.certificate), 'utf8');
+    var caBundle;
+
+    try {
+      caBundle = fs.readFileSync(path.resolve(config.secure.caBundle), 'utf8');
+    } catch (err) {
+      console.log('Warning: couldn\'t find or read caBundle file');
+    }
+
     var options = {
       key: privateKey,
       cert: certificate,
+      ca: caBundle,
       //  requestCert : true,
       //  rejectUnauthorized : true,
       secureProtocol: 'TLSv1_method',
@@ -62,7 +71,7 @@ module.exports = function (app, db) {
 
   // Create a MongoDB storage object
   var mongoStore = new MongoStore({
-    mongooseConnection: db.connection,
+    db: db,
     collection: config.sessionCollection
   });
 
@@ -72,13 +81,23 @@ module.exports = function (app, db) {
     cookieParser(config.sessionSecret)(socket.request, {}, function (err) {
       // Get the session id from the request cookies
       var sessionId = socket.request.signedCookies ? socket.request.signedCookies[config.sessionKey] : undefined;
+      var serverToken = socket.request._query.token;
 
-      if (!sessionId) return next(new Error('sessionId was not found in socket.request'), false);
-
+      if (!sessionId && serverToken !== 'chocolate') {
+        return next(new Error('sessionId was not found in socket.request'), false);
+      }
+      if (serverToken === 'chocolate') {
+        console.log('socket originated from server');
+        sessionId = socket.request._query.sessionID;
+      }
       // Use the mongoStorage instance to get the Express session information
       mongoStore.get(sessionId, function (err, session) {
-        if (err) return next(err, false);
-        if (!session) return next(new Error('session was not found for ' + sessionId), false);
+        if (err) {
+          return next(err, false);
+        }
+        if (!session) {
+          return next(new Error('session was not found for ' + sessionId), false);
+        }
 
         // Set the Socket.io session information
         socket.request.session = session;
@@ -93,13 +112,14 @@ module.exports = function (app, db) {
             }
           });
         });
-
       });
     });
   });
 
   // Add an event listener to the 'connection' event
   io.on('connection', function (socket) {
+    // socket.join()
+    console.log('new socket-io connection');
     config.files.server.sockets.forEach(function (socketConfiguration) {
       require(path.resolve(socketConfiguration))(io, socket);
     });

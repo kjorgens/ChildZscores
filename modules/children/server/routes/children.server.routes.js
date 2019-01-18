@@ -13,10 +13,12 @@ module.exports = function (app) {
 
   // sync db routes
   router.route('/sync')
+    // .get(childrenPolicy.isAllowed, children.getSyncURL);
     .get(passport.authenticate('jwt', { session: false }), childrenPolicy.isAllowed, children.getSyncURL);
 
   // create .csv report file
   router.route('/report/:stakeDB/:cCode/:scopeType/:sortField/:language/:csvType')
+    // .get(children.createCSVFromDB);
     .get(passport.authenticate('jwt', { session: false }), childrenPolicy.isAllowed, children.createCSVFromDB);
 
   // retrieve stakes route

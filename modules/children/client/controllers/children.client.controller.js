@@ -220,34 +220,26 @@
       if (survey.zScore.ha < -2) {
         vm.haStatus = 'redZoneZscore';
         vm.child.screeningStatus = 'redZoneZscore';
-      } else {
-        if (survey.zScore.ha < -1 && survey.zScore.ha > -2) {
-          vm.haStatus = 'marginalZscore';
-          vm.child.screeningStatus = 'marginalZscore';
-        }
+      } else if (survey.zScore.ha < -1 && survey.zScore.ha > -2) {
+        vm.haStatus = 'marginalZscore';
+        vm.child.screeningStatus = 'marginalZscore';
       }
       if (survey.zScore.wa < -2) {
         vm.waStatus = 'redZoneZscore';
         vm.child.screeningStatus = 'redZoneZscore';
-      } else {
-        if (survey.zScore.wa < -1 && survey.zScore.wa > -2) {
-          vm.child.screeningStatus = 'marginalZscore';
-          vm.waStatus = 'marginalZscore';
-        }
+      } else if (survey.zScore.wa < -1 && survey.zScore.wa > -2) {
+        vm.child.screeningStatus = 'marginalZscore';
+        vm.waStatus = 'marginalZscore';
       }
       if (survey.zScore.wl < -3) {
         vm.wlStatus = 'dangerZscore';
         vm.child.screeningStatus = 'dangerZscore';
-      } else {
-        if (survey.zScore.wl < -2 && survey.zScore.wl > -3) {
-          vm.child.screeningStatus = 'redZoneZscore';
-          vm.wlStatus = 'redZoneZscore';
-        } else {
-          if (survey.zScore.wl < -1 && survey.zScore.wl > -2) {
-            vm.wlStatus = 'marginalZscore';
-            vm.child.screeningStatus = 'marginalZscore';
-          }
-        }
+      } else if (survey.zScore.wl < -2 && survey.zScore.wl > -3) {
+        vm.child.screeningStatus = 'redZoneZscore';
+        vm.wlStatus = 'redZoneZscore';
+      } else if (survey.zScore.wl < -1 && survey.zScore.wl > -2) {
+        vm.wlStatus = 'marginalZscore';
+        vm.child.screeningStatus = 'marginalZscore';
       }
     }
 
@@ -295,31 +287,27 @@
     }
 
     function checkAllFieldsValid() {
-      if (vm.firstNameIsValid === true &&
-          vm.lastNameIsValid === true &&
-          vm.genderIsValid === true &&
-          vm.ageIsValid === true &&
-          vm.membershipIsValid === true) {
+      if (vm.firstNameIsValid === true
+        && vm.lastNameIsValid === true
+        && vm.genderIsValid === true
+        && vm.ageIsValid === true
+        && vm.membershipIsValid === true) {
         vm.allFieldsValid = true;
         vm.invalidFields = false;
-      } else if (vm.firstNameIsValid === false ||
-          vm.lastNameIsValid === false ||
-          vm.genderIsValid === false ||
-          vm.ageIsValid === false ||
-          vm.membershipIsValid === false) {
+      } else if (vm.firstNameIsValid === false
+        || vm.lastNameIsValid === false
+        || vm.genderIsValid === false
+        || vm.ageIsValid === false
+        || vm.membershipIsValid === false) {
         vm.allFieldsValid = false;
         vm.invalidFields = true;
-      } else if ((vm.firstNameIsValid === undefined || vm.firstNameIsValid === true) &&
-          (vm.lastNameIsValid === undefined || vm.lastNameIsValid === true) &&
-          (vm.genderIsValid === undefined || vm.genderIsValid === true) &&
-          (vm.ageIsValid === undefined || vm.ageIsValid === true) &&
-          (vm.membershipIsValid === undefined || vm.membershipIsValid === true)) {
+      } else if ((vm.firstNameIsValid === undefined || vm.firstNameIsValid === true)
+        && (vm.lastNameIsValid === undefined || vm.lastNameIsValid === true)
+        && (vm.genderIsValid === undefined || vm.genderIsValid === true)
+        && (vm.ageIsValid === undefined || vm.ageIsValid === true)
+        && (vm.membershipIsValid === undefined || vm.membershipIsValid === true)) {
         vm.allFieldsValid = true;
       }
-    }
-
-    function setMonthAge() {
-
     }
 
     function setMonthCount() {

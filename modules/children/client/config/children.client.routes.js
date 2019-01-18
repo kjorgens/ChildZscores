@@ -16,7 +16,7 @@
       })
       .state('children.list', {
         url: '/list/:stakeDB/:stakeName/:searchFilter/:colorFilter/:screenType?countryName&countryCode',
-        templateUrl: 'modules/children/client/views/list-children.client.view.html',
+        templateUrl: '/modules/children/client/views/list-children.client.view.html',
         controller: 'ChildrenListController',
         controllerAs: 'vm',
         resolve: {
@@ -26,7 +26,7 @@
       })
       .state('children.remove', {
         url: '/remove/:childId',
-        templateUrl: 'modules/children/client/views/remove-child.client.view.html',
+        templateUrl: '/modules/children/client/views/remove-child.client.view.html',
         controller: 'ChildrenRemoveController',
         controllerAs: 'vm',
         resolve: {
@@ -39,12 +39,12 @@
       })
       .state('children.sync', {
         url: '/sync/:stakeDB/:stakeName/:screenType?countryName&countryCode&language',
-        templateUrl: 'modules/children/client/views/sync-children.client.view.html',
+        templateUrl: '/modules/children/client/views/sync-children.client.view.html',
         controller: 'ChildrenSyncController',
         controllerAs: 'vm',
-        resolve: {
-          childSync: listCountries
-        },
+        // resolve: {
+        //   childSync: listCountries
+        // },
         data: {
           roles: ['admin', 'sync']
           //       pageTitle: 'Sync database {{ database.title }}'
@@ -52,7 +52,7 @@
       })
       .state('children.report', {
         url: '/report/:stakeDB/:cCode/:scopeType/:sortField/:language/:csvType',
-        templateUrl: 'modules/children/client/views/sync-children.client.view.html',
+        templateUrl: '/modules/children/client/views/sync-children.client.view.html',
         controller: 'ChildrenSyncController',
         controllerAs: 'vm',
         resolve: {
@@ -65,7 +65,7 @@
       })
       // .state('children.getsync', {
       //   url: '/syncinfo/',
-      //   templateUrl: 'modules/children/client/views/sync-children.client.view.html',
+      //   templateUrl: '/modules/children/client/views/sync-children.client.view.html',
       //   controller: 'ChildrenSyncController',
       //   controllerAs: 'vm',
       //   resolve: {
@@ -78,7 +78,7 @@
       // })
       .state('children.countries', {
         url: '/countries/:networkFirst',
-        templateUrl: 'modules/children/client/views/country.client.view.html',
+        templateUrl: '/modules/children/client/views/country.client.view.html',
         controller: 'ChildrenCountryController',
         controllerAs: 'vm',
         resolve: {
@@ -89,7 +89,7 @@
       })
       .state('children.stake', {
         url: 'list/stakes/:country',
-        templateUrl: 'modules/children/client/views/stakes.client.view.html',
+        templateUrl: '/modules/children/client/views/stakes.client.view.html',
         controller: 'ChildrenStakeController',
         controllerAs: 'vm',
         resolve: {
@@ -99,7 +99,7 @@
       })
       .state('children.newsurvey', {
         url: '/survey/:childId',
-        templateUrl: 'modules/children/client/views/add-survey.client.view.html',
+        templateUrl: '/modules/children/client/views/add-survey.client.view.html',
         controller: 'SurveyController',
         controllerAs: 'vm',
         resolve: {
@@ -109,7 +109,7 @@
       })
       .state('children.create', {
         url: '/create/:dbName',
-        templateUrl: 'modules/children/client/views/form-child.client.view.html',
+        templateUrl: '/modules/children/client/views/form-child.client.view.html',
         controller: 'ChildrenController',
         controllerAs: 'vm',
         resolve: {
@@ -121,7 +121,7 @@
       })
       .state('children.edit', {
         url: '/edit/:childId',
-        templateUrl: 'modules/children/client/views/form-child.client.view.html',
+        templateUrl: '/modules/children/client/views/form-child.client.view.html',
         controller: 'ChildrenController',
         controllerAs: 'vm',
         resolve: {
@@ -133,7 +133,7 @@
       })
       .state('children.editsurvey', {
         url: '/survey/edit/:childId/:surveyId',
-        templateUrl: 'modules/children/client/views/add-survey.client.view.html',
+        templateUrl: '/modules/children/client/views/add-survey.client.view.html',
         controller: 'SurveyController',
         controllerAs: 'vm',
         resolve: {
@@ -143,7 +143,7 @@
       })
       .state('children.removeSurvey', {
         url: '/survey/remove/:childId/:surveyId',
-        templateUrl: 'modules/children/client/views/remove-screening.client.view.html',
+        templateUrl: '/modules/children/client/views/remove-screening.client.view.html',
         controller: 'SurveyController',
         controllerAs: 'vm',
         resolve: {
@@ -153,7 +153,7 @@
       })
       .state('children.view', {
         url: '/view/:childId',
-        templateUrl: 'modules/children/client/views/view-child.client.view.html',
+        templateUrl: '/modules/children/client/views/view-child.client.view.html',
         controller: 'ChildrenController',
         controllerAs: 'vm',
         resolve: {
@@ -163,7 +163,7 @@
       })
       .state('children.editMother', {
         url: '/mothers/:motherId/:stakeDB/:stakeName/:screenType',
-        templateUrl: 'modules/children/client/views/form-mother.client.view.html',
+        templateUrl: '/modules/children/client/views/form-mother.client.view.html',
         controller: 'WomenCreateController',
         controllerAs: 'vm',
         resolve: {
@@ -173,7 +173,7 @@
       })
       .state('children.listMothers', {
         url: '/mothers/list/:stakeDB/:stakeName/:screenType',
-        templateUrl: 'modules/children/client/views/list-mothers.client.view.html',
+        templateUrl: '/modules/children/client/views/list-mothers.client.view.html',
         controller: 'MotherController',
         controllerAs: 'vm',
         resolve: {
@@ -183,7 +183,7 @@
       })
       .state('children.createMother', {
         url: '/mothers/create/:stakeDB/:stakeName/:screenType',
-        templateUrl: 'modules/children/client/views/form-mother.client.view.html',
+        templateUrl: '/modules/children/client/views/form-mother.client.view.html',
         controller: 'WomenCreateController',
         controllerAs: 'vm',
         resolve: {
@@ -215,15 +215,10 @@
     return (PouchService.createDatabase($stateParams.stakeDB, PouchService.queryWardPromise, $stateParams.wardId));
   }
 
-  // listCountries.$inject = ['$stateParams', 'ChildrenStakes'];
-  // function listCountries($stateParams, ChildrenStakes) {
-  //   return ChildrenStakes;
-  // }
-
   listCountries.$inject = ['$stateParams', 'PouchService'];
 
   function listCountries($stateParams, PouchService) {
-    return (PouchService.getCountriesList($stateParams.networkFirst));
+    return PouchService.getCountriesList($stateParams.networkFirst);
   }
 
   generateCSV.$inject = ['$stateParams', 'ChildrenReport'];
@@ -275,7 +270,7 @@
   getSyncInfo.$inject = ['$stateParams', 'ChildrenGetSync', 'Authentication'];
 
   function getSyncInfo($stateParams, ChildrenGetSync) {
-    return ChildrenGetSync.get();
+    return ChildrenGetSync.syncDb();
   }
 
   getCountryData.$inject = ['$stateParams', 'PouchService'];

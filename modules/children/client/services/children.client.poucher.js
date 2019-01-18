@@ -114,22 +114,23 @@
         if (navigator.onLine) {
           if (networkFirst) {
             countryDataBase = pouchDB('country_list');
-            countryDataBase.info()
-              .then((info) => {
-                if (info.doc_count === 0 || networkFirst) {
+            // countryDataBase.info()
+            //   .then((info) => {
+            //     if (info.doc_count === 0 || networkFirst) {
                   ChildrenStakes.getStakes()
-                    .then(function(countries) {
+                    .then((countries) => {
                       var docToSave = {
                         _id: 'liahona_kids_countries_stakes',
-                        countries: countries
+                        countries: countries.countries
                       };
                       countryDataBase.get('liahona_kids_countries_stakes')
                         .then((doc) => {
-                          if (info.doc_count !== 0) {
+                          // if (info.doc_count !== 0) {
                             docToSave._rev = doc._rev;
-                          }
+                            docToSave.countries = countries.countries;
+                          // }
                           countryDataBase.put(docToSave).then(function (results) {
-                            resolve(countries);
+                            resolve(countries.countries);
                           }).catch(function (err) {
                             console.log(err);
                           });
@@ -144,8 +145,8 @@
                           }
                         });
                     });
-                }
-              });
+              //   }
+              // });
           } else {
             resolve(getCountriesLocalDB());
           }
@@ -226,7 +227,7 @@
 
     factory.queryByWardPromise = function (wardId) {
       var findObj = {
-        selector: { ward: { $eq: wardId } },
+        selector: { ward: { $eq: wardId } }
       };
       return database.find(findObj);
     };
@@ -452,9 +453,9 @@
         zscoreStatus = 'redZoneZscoreBackground';
       } else if ((screeningObj.zScore.ha < -2 || screeningObj.zScore.wa < -2) && screeningObj.monthAge > 36 && screeningObj.monthAge < 48) {
         zscoreStatus = 'redZoneZscoreBackground';
-      } else if (screeningObj.zScore.ha < -1 ||
-          screeningObj.zScore.wa < -1 ||
-          screeningObj.zScore.wl < -1) {
+      } else if (screeningObj.zScore.ha < -1
+          || screeningObj.zScore.wa < -1
+          || screeningObj.zScore.wl < -1) {
         zscoreStatus = 'marginalZscoreBackground';
       } else {
         zscoreStatus = 'normalZscoreBackground';
@@ -599,13 +600,16 @@
         // replication paused (e.g. replication up to date, user went offline)
         }).on('active', function () {
         // replicate resumed (e.g. new changes replicating, user went back online)
-        }).on('denied', function (err) {
+        })
+        .on('denied', function (err) {
           console.log('failure to replicate on sync up');
         // a document failed to replicate (e.g. due to permissions)
-        }).on('complete', function (response) {
+        })
+        .on('complete', function (response) {
           console.log('sync up complete');
           callback(response);
-        }).on('error', function (err) {
+        })
+        .on('error', function (err) {
           errorCallback(err);
         });
     };
@@ -619,13 +623,16 @@
         // replication paused (e.g. replication up to date, user went offline)
         }).on('active', function () {
         // replicate resumed (e.g. new changes replicating, user went back online)
-        }).on('denied', function (err) {
+        })
+        .on('denied', function (err) {
           console.log('failure to replicate on sync down');
         // a document failed to replicate (e.g. due to permissions)
-        }).on('complete', function (response) {
+        })
+        .on('complete', function (response) {
           console.log('sync down complete');
           callback(response);
-        }).on('error', function (err) {
+        })
+        .on('error', function (err) {
           errorCallback(err);
         });
     };

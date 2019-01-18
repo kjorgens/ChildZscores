@@ -80,6 +80,10 @@
 
     $scope.$on('$stateChangeSuccess', stateChangeSuccess);
 
+    vm.countryMenu = function() {
+      $state.go('home', { networkFirst: 'true' });
+    };
+
     function toggleLanguage() {
       if (vm.language === 'English') {
         vm.language = 'Español';

@@ -1,5 +1,7 @@
 'use strict';
 
+var fs = require('fs');
+
 module.exports = {
   secure: {
     ssl: false,
@@ -10,8 +12,24 @@ module.exports = {
   // Binding to 127.0.0.1 is safer in production.
   host: process.env.HOST || '0.0.0.0',
   db: {
-    uri: process.env.MONGOHQ_URL || process.env.MONGOLAB_URI || 'mongodb://' + (process.env.MONGO_PORT || process.env.DB_1_PORT_27017_TCP_ADDR || 'localhost') + '/mean',
-    options: {},
+    uri: process.env.MONGOHQ_URL || process.env.MONGODB_URI || 'mongodb://' + (process.env.DB_1_PORT_27017_TCP_ADDR || 'localhost') + '/mean',
+    options: {
+      /**
+      * Uncomment to enable ssl certificate based authentication to mongodb
+      * servers. Adjust the settings below for your specific certificate
+      * setup.
+      * for connect to a replicaset, rename server:{...} to replset:{...}
+
+      ssl: true,
+      sslValidate: false,
+      checkServerIdentity: false,
+      sslCA: fs.readFileSync('./config/sslcerts/ssl-ca.pem'),
+      sslCert: fs.readFileSync('./config/sslcerts/ssl-cert.pem'),
+      sslKey: fs.readFileSync('./config/sslcerts/ssl-key.pem'),
+      sslPass: '1234'
+
+      */
+    },
     // Enable mongoose debug mode
     debug: process.env.MONGODB_DEBUG || false
   },
@@ -22,19 +40,12 @@ module.exports = {
     // logging with Morgan - https://github.com/expressjs/morgan
     // Can specify one of 'combined', 'common', 'dev', 'short', 'tiny'
     format: process.env.LOG_FORMAT || 'combined',
-    options: {
-      // Stream defaults to process.stdout
-      // Uncomment/comment to toggle the logging to a log on the file system
-      stream: {
-        directoryPath: process.env.LOG_DIR_PATH || process.cwd(),
-        fileName: process.env.LOG_FILE || 'access.log',
-        rotatingLogs: { // for more info on rotating logs - https://github.com/holidayextras/file-stream-rotator#usage
-          active: process.env.LOG_ROTATING_ACTIVE === 'true', // activate to use rotating logs
-          fileName: process.env.LOG_ROTATING_FILE || 'access-%DATE%.log', // if rotating logs are active, this fileName setting will be used
-          frequency: process.env.LOG_ROTATING_FREQUENCY || 'daily',
-          verbose: process.env.LOG_ROTATING_VERBOSE === 'true'
-        }
-      }
+    fileLogger: {
+      directoryPath: process.env.LOG_DIR_PATH || process.cwd(),
+      fileName: process.env.LOG_FILE || 'app.log',
+      maxsize: 10485760,
+      maxFiles: 2,
+      json: false
     }
   },
   facebook: {
@@ -43,6 +54,7 @@ module.exports = {
     callbackURL: '/api/auth/facebook/callback'
   },
   twitter: {
+    username: '@TWITTER_USERNAME',
     clientID: process.env.TWITTER_KEY || 'CONSUMER_KEY',
     clientSecret: process.env.TWITTER_SECRET || 'CONSUMER_SECRET',
     callbackURL: '/api/auth/twitter/callback'
@@ -81,25 +93,19 @@ module.exports = {
   seedDB: {
     seed: process.env.MONGO_SEED === 'true',
     options: {
-      logResults: process.env.MONGO_SEED_LOG_RESULTS !== 'false',
-      seedUser: {
-        username: process.env.MONGO_SEED_USER_USERNAME || 'user',
-        provider: 'local',
-        email: process.env.MONGO_SEED_USER_EMAIL || 'user@localhost.com',
-        firstName: 'User',
-        lastName: 'Local',
-        displayName: 'User Local',
-        roles: ['user']
-      },
-      seedAdmin: {
-        username: process.env.MONGO_SEED_ADMIN_USERNAME || 'admin',
-        provider: 'local',
-        email: process.env.MONGO_SEED_ADMIN_EMAIL || 'admin@localhost.com',
-        firstName: 'Admin',
-        lastName: 'Local',
-        displayName: 'Admin Local',
-        roles: ['user', 'admin']
-      }
-    }
+      logResults: process.env.MONGO_SEED_LOG_RESULTS !== 'false'
+    },
+    collections: [{
+      model: 'User',
+      docs: [{
+        data: {
+          username: 'local-admin',
+          email: 'admin@localhost.com',
+          firstName: 'Admin',
+          lastName: 'Local',
+          roles: ['admin', 'user']
+        }
+      }]
+    }]
   }
 };

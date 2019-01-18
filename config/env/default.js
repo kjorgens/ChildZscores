@@ -12,7 +12,9 @@ module.exports = {
   },
   port: process.env.PORT || 3000,
   host: process.env.HOST || '0.0.0.0',
-  templateEngine: 'swig',
+  // DOMAIN config should be set to the fully qualified application accessible
+  // URL. For example: https://www.myapp.com (including port if required).
+  domain: process.env.DOMAIN,
   // Session Cookie settings
   sessionCookie: {
     // session expiration is set by default to 24 hours
@@ -47,11 +49,24 @@ module.exports = {
   },
   logo: 'modules/core/client/img/brand/logo_small.png',
   favicon: 'modules/core/client/img/brand/favicon.ico',
+  illegalUsernames: ['meanjs', 'administrator', 'password', 'admin', 'user',
+    'unknown', 'anonymous', 'null', 'undefined', 'api'
+  ],
+  aws: {
+    s3: {
+      accessKeyId: process.env.S3_ACCESS_KEY_ID,
+      secretAccessKey: process.env.S3_SECRET_ACCESS_KEY,
+      bucket: process.env.S3_BUCKET
+    }
+  },
   uploads: {
-    profileUpload: {
-      dest: './modules/users/client/img/profile/uploads/', // Profile upload destination path
-      limits: {
-        fileSize: 1 * 1024 * 1024 // Max file size in bytes (1 MB)
+    storage: process.env.UPLOADS_STORAGE || 'local',
+    profile: {
+      image: {
+        dest: './modules/users/client/img/profile/uploads/',
+        limits: {
+          fileSize: 1 * 1024 * 1024 // Max file size in bytes (1 MB)
+        }
       }
     },
     csvUpload: {
@@ -61,9 +76,18 @@ module.exports = {
       }
     }
   },
+  shared: {
+    owasp: {
+      allowPassphrases: true,
+      maxLength: 128,
+      minLength: 10,
+      minPhraseLength: 20,
+      minOptionalTestsToPass: 4
+    }
+  },
   jwt: {
     secret: process.env.TOKEN_AUTH_SECRET || 'M3@NK1D5R0CK5!',
-    options: {  // Anything From https://www.npmjs.com/package/jsonwebtoken
+    options: { // Anything From https://www.npmjs.com/package/jsonwebtoken
       expiresIn: process.env.TOKEN_EXPIRES || '5d'
     }
   }

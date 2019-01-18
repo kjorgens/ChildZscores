@@ -7,6 +7,7 @@ var path = require('path'),
   jwt_decode = require('jwt-decode'),
   request = require('request'),
   fs = require('fs'),
+  io = require('socket.io-client'),
   csvParse = require('babyparse'),
   moment = require('moment'),
   uuid = require('uuid4'),
@@ -231,10 +232,15 @@ var removeFilterList = [
   }
 ];
 
-function calcObesity(child, latestScreen) {
+function calcObesity(latestScreen) {
   var bmi = latestScreen.weight / (Math.pow(latestScreen.height / 100, 2));
   var tableBMI = latestScreen.gender === 'Girl' ? obesityGirls[Math.round(latestScreen.monthAge)] : obesityBoys[Math.round(latestScreen.monthAge)];
   return ({ obese: bmi > tableBMI, currentBMI: bmi });
+}
+
+async function updateScreen(screenObj, stakeDB) {
+  var stakeDb = nano('https://' + process.env.SYNC_ENTITY + '@' + process.env.COUCH_URL + '/' + stakeDB);
+  return stakeDb.insert(screenObj, screenObj);
 }
 
 function validateView(type, stakeDB, view) {
@@ -416,7 +422,7 @@ function updateSupplementStatus(childList, stakeDB) {
             //   childEntry.zscoreStatus = calculateStatus(sortedScreenList[0]).zscoreStatus;
             //   console.log('stop');
             // }
-            const bmiInfo = calcObesity(childEntry, sortedScreenList[0]);
+            const bmiInfo = calcObesity(sortedScreenList[0]);
             childEntry.bmi = bmiInfo.bmi;
             childEntry.obese = bmiInfo.obese;
             childEntry.zscoreStatus = calculateStatus(sortedScreenList[0]).zscoreStatus;
@@ -442,7 +448,7 @@ function listAllChildren(childScreenList, screenType) {
   var lineAccumulator = [];
 
   if (childScreenList[0].data.total_rows > 0) {
-    childScreenList[0].data.rows.forEach(function (childEntry, childIndex) {
+    childScreenList[0].data.rows.forEach(async (childEntry, childIndex) => {
       var currentAge = moment().diff(moment(new Date(childEntry.key.birthDate)), 'months');
       if (!~childEntry.id.indexOf('mthr')) {
         if (screenType === 'sup') {
@@ -466,7 +472,15 @@ function listAllChildren(childScreenList, screenType) {
               supType = 'none';
               priorMalnurished = 'no';
               currentSupType = 'none';
-              sortedScreenList.forEach(function (screening, screenIndex) {
+              sortedScreenList.forEach(async (screening, screenIndex) => {
+                // if (!screening.obese) {
+                //   let newScreening = screening;
+                //   const obeseObj = calcObesity(screening);
+                //   newScreening.obese = obeseObj.obese;
+                //   newScreening.currentBmi = obeseObj.currentBMI;
+                //   const results = await updateScreen(newScreening, childScreenList[0].parms.stakeDB);
+                //   console.log(results);
+                // }
                 if ((screening.zScore.ha < -2 || screening.zScore.wa < -2)) {
                   priorMalnurished = 'yes';
                   supType = 'sup';
@@ -504,7 +518,7 @@ function listAllChildren(childScreenList, screenType) {
           try {
             if (childScreenList[1].data.total_rows > 0) {
               sortedScreenList = getScreeningsList(childEntry.id, childScreenList[1].data.rows);
-              sortedScreenList.forEach(function (entry, screenIndex) {
+              sortedScreenList.forEach(async (entry, screenIndex) => {
                 lineAccumulator.push(addLineToStack(childIndex + 1, screenIndex + 1, childEntry.key, entry, childScreenList[0].parms.sortField, childScreenList[0].stake, childScreenList[0].parms.stakeName, childScreenList[0].parms.language, childScreenList[0].parms.cCode));
               });
             }
@@ -604,12 +618,16 @@ function getWomen(parmObj) {
 async function getChildAndData(parmObj, multiplier) {
   return new Promise((resolve) => {
     function accessDB(parmObj) {
-      console.log(`access ${ parmObj.stakeName }`);
+      // console.log('emit CSV_progress');
+      parmObj.socketObj.emit('CSV_status', {
+        type: 'CSV_progress',
+        text: `${parmObj.stakeName} being processed`
+      });
       var newObj = Object.assign({}, parmObj);
       var stake = parmObj.stakeDB;
       return resolve(Promise.join(newDBRequest(stake, parmObj.stakename, newObj, 'children_list'), newDBRequest(stake, parmObj.stakename, newObj, 'scr_list')));
     }
-    console.log(`start ${ parmObj.stakeName } in ${ multiplier } seconds`);
+    // console.log(`start ${ parmObj.stakeName } in ${ multiplier } seconds`);
     return setTimeout(accessDB, 250 * multiplier, parmObj);
   });
 }
@@ -621,7 +639,6 @@ async function writeHeader(fileToWrite, headerLine) {
         console.log(err);
         reject(err.message);
       } else {
-        console.log('saving header');
         resolve(fileToWrite);
       }
     });
@@ -632,7 +649,7 @@ async function appendStake(fileToWrite, data) {
   return new Promise((resolve, reject) => {
     fs.appendFile(`files/${ fileToWrite }`, data, (err) => {
       if (err) {
-        console.log(err);
+        // console.log(err);
         reject(err.message);
       }
       resolve(fileToWrite);
@@ -950,7 +967,8 @@ function oneStakeWomen(parmObj) {
 }
 
 function parseJwt (token) {
-  return jwt_decode(token);
+  let parts = token.split(' ');
+  return jwt_decode(parts[1]);
 }
 
 exports.compactDB = function (req, res) {
@@ -1002,23 +1020,35 @@ exports.createCSVFromDB = async function (req, res) {
     });
   }
 
-  function reportAggregateComplete(input, retryCount, processToExec) {
+  function reportAggregateComplete(input, retryCount, processToExec, socketObj, socketRoomId) {
     const toRetry = input.filter((retVal) => {
-      if (typeof retVal !== 'string') {
-        return (retVal);
-      }
+      return typeof retval === 'string';
     });
     if (toRetry.length === 0) {
-      console.log(`done creating CSV`);
-      return res.status(200).send({
-        message: input[0]
+      socketObj.emit('CSV_status', {
+        type: 'CSV_complete',
+        text: `${ input[0] } created and ready for download`,
+        fileName: input[0]
       });
+      // socketObj.removeListener('CSV_status');
+      socketObj.close();
+      return;
+      // return res.status(200).send({
+      //   message: input[0]
+      // });
     }
     console.log(`stakes to retry = ${ toRetry.length }`);
     if (retryCount < 1) {
-      return res.status(408).send({
-        message: `failed after ${ retryCount } retries`
+      socketObj.emit('CSV_status', {
+        type: 'CSV_error',
+        text: `CSV creation failed after ${ retryCount } retries`,
+        fileName: input.fileToSave
       });
+      socketObj.close();
+      return;
+      // return res.status(408).send({
+      //   message: `failed after ${ retryCount } retries`
+      // });
     }
     const stakeRetryList = [];
     toRetry.forEach((stakeToRetry) => {
@@ -1029,22 +1059,50 @@ exports.createCSVFromDB = async function (req, res) {
         return (stakeToSave);
       }, { concurrancy: 1 })
         .then((results) => {
-          setTimeout(reportAggregateComplete, 10000, results, retryCount - 1, processToExec);
+          setTimeout(reportAggregateComplete, 10000, results, retryCount - 1, processToExec, socketObj, socketRoomId);
         }).catch((error) => {
           console.log(error.message);
-          return res.status(400).send({
-            message: errorHandler.getErrorMessage(error)
+          socketObj.emit('CSV_status', {
+            type: 'CSV_error',
+            text: errorHandler.getErrorMessage(error),
+            fileName: input.fileToSave
           });
+          socketObj.close();
+          // return res.status(400).send({
+          //   message: errorHandler.getErrorMessage(error)
+          // });
         });
     } catch (err) {
       console.log(err);
     }
   }
-
   const tokenInfo = parseJwt(req.headers.authorization);
+
+  let socketClient = io(`http://localhost:${process.env.PORT}`, {
+    transports: ['websocket'],
+    agent: false, // [2] Please don't set this to true
+    upgrade: false,
+    rejectUnauthorized: true,
+    query: `token=chocolate&sessionID=${ req.sessionID }&nsp=${ req.query.nsp }`
+  });
+
+  socketClient.on('connect', (dataIn) => {
+    console.log('server client connected');
+
+    socketClient.on('CSV_status', (data) => {
+      console.log(`we have data ${ data.text }`);
+    });
+
+    socketClient.on('disconnect', () => {
+      console.log('disconnected remove listener');
+      socketClient.removeListener('CSV_status');
+    });
+  });
+
   moment.locale(req.params.language);
   var parmObj = {
-    stakeName: req.query.stake,
+    responseObj: res,
+    stakeName: req.query.stakeName,
     stakeDB: req.params.stakeDB,
     scopeType: req.params.scopeType,
     cCode: req.params.cCode,
@@ -1052,6 +1110,9 @@ exports.createCSVFromDB = async function (req, res) {
     language: req.params.language,
     csvType: req.params.csvType,
     fileToSave: `${ req.params.stakeDB }_${tokenInfo.iat}_dbDump.csv`,
+    socketRoomId: req.query.socketRoomId,
+    socketObj: socketClient,
+
     updateProcess: saveStake
   };
   if (parmObj.csvType === 'women') {
@@ -1060,9 +1121,14 @@ exports.createCSVFromDB = async function (req, res) {
     await writeHeader(parmObj.fileToSave, headerLine);
     oneStakeWomen(parmObj)
       .then(reportCSVComplete).catch(function (error) {
-        return res.status(400).send({
-          message: errorHandler.getErrorMessage(error)
+        socketClient.emit('CSV_status', {
+          type: 'CSV_error',
+          text: errorHandler.getErrorMessage(error)
         });
+        socketClient.close();
+        // return res.status(400).send({
+        //   message: errorHandler.getErrorMessage(error)
+        // });
       });
   } else {
     parmObj.fileToSave = `sup_list_${ req.params.stakeDB }_${tokenInfo.iat}_dbDump.csv`;
@@ -1077,16 +1143,32 @@ exports.createCSVFromDB = async function (req, res) {
     if (parmObj.scopeType === 'countries') {
       parmObj.fileToSave = `${ tokenInfo.iat }_all_data_${ req.params.csvType }_dbDump.csv`;
     }
+    // res.status(202).write(`Received request to create${ parmObj.fileToSave }`);
+
+    res.status(202).send({ message: 'Request has been received ', nsp: req.query.socketId });
+
+    socketClient.emit('CSV_status', {
+      type: 'CSV_start',
+      text: `Received request to create${ parmObj.fileToSave }`,
+      fileName: parmObj.fileToSave
+    }, (data) => {
+      console.log(data);
+    });
     await writeHeader(parmObj.fileToSave, headerLine);
     getDBListFromFile(parmObj).map((stakeToSave) => {
       return stakeToSave;
     }, { concurrancy: 1 })
       .then((results) => {
-        reportAggregateComplete(results, retryLimit, parmObj.updateProcess);
+        reportAggregateComplete(results, retryLimit, parmObj.updateProcess, socketClient, parmObj.socketRoomId);
       }).catch((error) => {
-        return res.status(400).send({
-          message: errorHandler.getErrorMessage(error)
+        socketClient.emit('CSV_status', {
+          type: 'CSV_error',
+          text: errorHandler.getErrorMessage(error)
         });
+        socketClient.close();
+        // return res.status(400).send({
+        //   message: errorHandler.getErrorMessage(error)
+        // });
       });
   }
 };
@@ -1447,6 +1529,103 @@ exports.listDbs = function(req, res) {
     }
   });
 };
+
+exports.removeCSV = function removeCsvFile(req, res) {
+  fs.unlink(req.params.csvName, (err) => {
+    if (err) {
+      return res.status(400).send({
+        message: errorHandler.getErrorMessage(err)
+      });
+    } else {
+      return res.status(200).send({});
+    }
+  });
+};
+
+// var parmObj = {
+//   responseObj: res,
+//   stakeName: req.query.stake,
+//   stakeDB: req.params.stakeDB,
+//   scopeType: req.params.scopeType,
+//   cCode: req.params.cCode,
+//   sortField: req.params.sortField,
+//   language: req.params.language,
+//   csvType: req.params.csvType,
+//   fileToSave: `${ req.params.stakeDB }_${tokenInfo.iat}_dbDump.csv`,
+//   updateProcess: saveStake
+// };
+// exports.queueCsvJob = function(req, res) {
+//   sqs.createQueue({
+//     QueueName: CSV_QUEUE
+//   }, (err, data) => {
+//     if (err) {
+//       return res.status(400).send({
+//         message: errorHandler.getErrorMessage(err)
+//       });
+//     } else {
+//       sqs.sendMessage({
+//         MessageBody: 'requesting csv creation',
+//         QueueUrl: data.QueueUrl,
+//         MessageAttributes: {
+//           'CSVFileName': {
+//             DataType: 'String',
+//             StringValue: req.params.csvName
+//           },
+//           'CSVScope': {
+//             DataType: 'String',
+//             StringValue: req.params.csvScope
+//           },
+//           'CSVCountryCode': {
+//             DataType: 'String',
+//             StringValue: req.params.csvCCode
+//           }
+//         }
+//       }, (err, data) => {
+//         if (err) {
+//           return res.status(400).send({
+//             message: errorHandler.getErrorMessage(err)
+//           });
+//         } else {
+//           return res.status(200).send({ queue: data.QueueUrl });
+//         }
+//       });
+//     }
+//   });
+// };
+
+// exports.progressCsvJob = function(req, res) {
+//   sqs.getQueueAttributes({
+//     QueueUrl: req.params.QueueUrl,
+//     AttributeNames: 'ApproximateNumberOfMessages'
+//   }, (err, data) => {
+//     if (err) {
+//       return res.status(400).send({
+//         message: errorHandler.getErrorMessage(err)
+//       });
+//     } else {
+//       return res.status(200).send({ queue: data.QueueUrl });
+//     }
+//   });
+//   sqs.receiveMessage({
+//     QueueUrl: req.params.QueueUrl,
+//     // AttributeNames: [
+//     //   'All'
+//     // ],
+//     MessageAttributeNames: [
+//       'All'
+//     ],
+//     MaxNumberOfMessages: 10,
+//     VisibilityTimeout: 1
+//   }, (err, data) => {
+//     if (err) {
+//       return res.status(400).send({
+//         message: errorHandler.getErrorMessage(err)
+//       });
+//     } else {
+//       return res.status(200).send({ queue: data.QueueUrl });
+//     }
+//   });
+// };
 
 function getDBListFromFile(parmsIn) {
   return new Promise(function(resolve, reject) {

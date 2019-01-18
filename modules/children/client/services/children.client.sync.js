@@ -2,12 +2,26 @@
   'use strict';
 
   angular
-      .module('children.getsync')
-      .factory('ChildrenGetSync', ChildrenGetSync);
+    .module('children.getsync')
+    .factory('ChildrenGetSync', ChildrenGetSync);
 
-  ChildrenGetSync.$inject = ['$resource'];
+  ChildrenGetSync.$inject = ['$resource', 'Authentication'];
 
-  function ChildrenGetSync($resource) {
-    return $resource('api/children/sync');
+  function ChildrenGetSync($resource, Authentication) {
+    let ChildrenGetSync = $resource('api/children/sync', {}, {
+      generate: {
+        method: 'GET',
+        headers: { authorization: `JWT ${ Authentication.token }` },
+        url: '/api/children/sync'
+      }
+    });
+
+    angular.extend(ChildrenGetSync, {
+      syncDb: function () {
+        return this.generate().$promise;
+      }
+    });
+
+    return ChildrenGetSync;
   }
 }());

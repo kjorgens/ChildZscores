@@ -29,7 +29,7 @@
     $stateProvider
       .state('home', {
         url: '/',
-        templateUrl: 'modules/children/client/views/country.client.view.html',
+        templateUrl: '/modules/children/client/views/country.client.view.html',
         controller: 'ChildrenCountryController',
         controllerAs: 'vm',
         resolve: {
@@ -52,24 +52,28 @@
       })
       .state('not-found', {
         url: '/not-found',
-        templateUrl: 'modules/core/client/views/404.client.view.html',
+        templateUrl: '/modules/core/client/views/404.client.view.html',
+        controller: 'ErrorController',
+        controllerAs: 'vm',
+        params: {
+          message: function ($stateParams) {
+            return $stateParams.message;
+          }
+        },
         data: {
-          ignoreState: true,
-          pageTitle: 'Not-Found'
+          ignoreState: true
         }
       })
       .state('bad-request', {
         url: '/bad-request',
-        templateUrl: 'modules/core/client/views/400.client.view.html',
-        data: {
-          ignoreState: true,
-          pageTitle: 'Bad-Request'
-        }
-      })
-      .state('chrome-only', {
-        url: '/chrome-only',
-        templateUrl: 'modules/core/client/views/chromeonly.client.view.html',
-        controller: 'HeaderController',
+        templateUrl: '/modules/core/client/views/400.client.view.html',
+        controller: 'ErrorController',
+        controllerAs: 'vm',
+        params: {
+          message: function ($stateParams) {
+            return $stateParams.message;
+          }
+        },
         data: {
           ignoreState: true,
           pageTitle: 'Chrome Only Please'
@@ -77,7 +81,7 @@
       })
       .state('sync-error', {
         url: '/sync-error',
-        templateUrl: 'modules/core/client/views/syncerror.client.view.html',
+        templateUrl: '/modules/core/client/views/syncerror.client.view.html',
         data: {
           ignoreState: true,
           pageTitle: 'Database Sync error'
@@ -85,7 +89,7 @@
       })
       .state('500-error', {
         url: '/server-error',
-        templateUrl: 'modules/core/client/views/500.client.view.html',
+        templateUrl: '/modules/core/client/views/500.client.view.html',
         controller: 'HeaderController',
         data: {
           ignoreState: true,
@@ -94,12 +98,12 @@
       })
       .state('forbidden', {
         url: '/forbidden',
-        templateUrl: 'modules/core/client/views/403.client.view.html',
+        templateUrl: '/modules/core/client/views/403.client.view.html',
         data: {
-          ignoreState: true,
-          pageTitle: 'Forbidden'
+          ignoreState: true
         }
       });
+
     listCountries.$inject = ['$stateParams', 'PouchService'];
 
     function listCountries($stateParams, PouchService) {

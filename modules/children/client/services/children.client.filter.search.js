@@ -58,12 +58,8 @@
 
     factory.filterByColor = function(list, statusColor) {
       currentColorFilter = statusColor;
-      list.forEach(function(child){
-        if (~child.statusColor.indexOf(statusColor)) {
-          child.display = true;
-        } else {
-          child.display = false;
-        }
+      list.forEach(function(child) {
+        child.display = !!(~child.statusColor.indexOf(statusColor));
       });
     };
 
@@ -168,13 +164,13 @@
           child.statusColor = '';
         }
         child.monthAge = currentAge;
-        if ((currentSearch === '' || child.firstName.toUpperCase().startsWith(currentSearch.toUpperCase())) &&
-          (currentColorFilter === '' || ~child.statusColor.indexOf(currentColorFilter)) &&
+        if ((currentSearch === '' || child.firstName.toUpperCase().startsWith(currentSearch.toUpperCase()))
+          && (currentColorFilter === '' || ~child.statusColor.indexOf(currentColorFilter))
           // (currentAge < 72 || currentAge > 180)) {
-          (currentAge < 60)) {
+          && (currentAge < 60)) {
           child.display = true;
           child.backGroundColor = child.statusColor + 'Background';
-          displayCount++;
+          displayCount += 1;
           childId = child._id;
         } else {
           child.display = false;

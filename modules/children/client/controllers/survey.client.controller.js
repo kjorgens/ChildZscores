@@ -52,12 +52,12 @@
     };
 
     if (vm.survey._id) {
-  //    vm.ageIsValid = true;
- //    vm.childHeightIsValid = true;
- //     vm.childWeightIsValid = true;
+    //    vm.ageIsValid = true;
+    //    vm.childHeightIsValid = true;
+    //     vm.childWeightIsValid = true;
       vm.surveyDate = new Date(vm.survey.surveyDate);
     } else {
- //     vm.invalidFields = true;
+    //     vm.invalidFields = true;
       vm.survey.height = '';
       vm.survey.weight = '';
       vm.survey.comments = '';
@@ -114,7 +114,6 @@
     vm.selectedCountry = localStorage.getItem('selectedCountry');
     vm.selectedCountryImage = localStorage.getItem('selectedCountryImage');
     vm.selectedDB = localStorage.getItem('selectedDBName');
-    vm.authentication = Authentication;
     vm.interviewer = localStorage.getItem('lastInterviewer');
     vm.error = null;
     vm.form = {};

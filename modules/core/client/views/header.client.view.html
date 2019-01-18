@@ -6,7 +6,7 @@
       <span class="icon-bar"></span>
       <span class="icon-bar"></span>
     </button>
-    <span ><a ui-sref="home" class="navbar-brand">Liahona Kids <span ng-class="vm.onlineStatusColor">{{vm.appStatus}}</span></a></span>
+    <span ><a ui-sref="children.countries({networkFirst: 'true'})" class="navbar-brand">Liahona Kids <span ng-class="vm.onlineStatusColor">{{vm.appStatus}}</span></a></span>
     <span ><a ng-click="vm.toggleLanguage()" class="navbar-brand"> {{vm.language}}</a></span>
   </div>
   <nav class="navbar-collapse" uib-collapse="!vm.isCollapsed" role="navigation">
@@ -15,13 +15,13 @@
         <a ng-switch-when="dropdown" class="dropdown-toggle" uib-dropdown-toggle role="button">{{::item.title}}&nbsp;<span class="caret"></span></a>
         <ul ng-switch-when="dropdown" class="dropdown-menu">
           <li ng-repeat="subitem in item.items | orderBy: 'position'" ng-if="subitem.shouldRender(vm.authentication.user);">
-            <a ui-sref="{{subitem.state}}" ng-bind="subitem.title"></a>
+            <a ui-sref="{{subitem.state}}({{subitem.params}})" ng-bind="subitem.title"></a>
           </li>
         </ul>
         <a ng-switch-default ui-sref="{{item.state}}" ng-bind="item.title"></a>
       </li>
     </ul>
-    <ul class="nav navbar-nav navbar-right" ng-hide="vm.authentication.user || vm.appOnline">
+    <ul class="nav navbar-nav navbar-right" ng-hide="vm.authentication.user">
       <li ui-sref-active="active">
         <a ui-sref="authentication.signup">Sign Up</a>
       </li>
@@ -30,7 +30,7 @@
         <a ui-sref="authentication.signin">Sign In</a>
       </li>
     </ul>
-    <ul class="nav navbar-nav navbar-right" ng-show="vm.authentication.user || !appIsOffline">
+    <ul class="nav navbar-nav navbar-right" ng-show="vm.authentication.user">
       <li class="dropdown" uib-dropdown>
         <a class="dropdown-toggle user-header-dropdown-toggle" uib-dropdown-toggle role="button">
           <img ng-src="{{vm.authentication.user.profileImageURL}}" alt="{{vm.authentication.user.displayName}}" class="header-profile-image" />
@@ -41,8 +41,8 @@
             <a ui-sref="{{item.state}}" ng-bind="item.title"></a>
           </li>
           <li class="divider"></li>
-          <li ng-if="vm.appOnLine">
-            <a href="#" ng-click="vm.authentication.signout()">Signout</a>
+          <li>
+            <a href="/api/auth/signout" target="_self">Signout</a>
           </li>
         </ul>
       </li>

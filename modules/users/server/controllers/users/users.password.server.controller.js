@@ -29,17 +29,23 @@ exports.forgot = function (req, res, next) {
     },
     // Lookup user by username
     function (token, done) {
-      if (req.body.username) {
+      if (req.body.usernameOrEmail) {
+
+        var usernameOrEmail = String(req.body.usernameOrEmail).toLowerCase();
+
         User.findOne({
-          username: req.body.username.toLowerCase()
+          $or: [
+            { username: usernameOrEmail },
+            { email: usernameOrEmail }
+          ]
         }, '-salt -password', function (err, user) {
           if (err || !user) {
             return res.status(400).send({
-              message: 'No account with that username has been found'
+              message: 'No account with that username or email has been found'
             });
           } else if (user.provider !== 'local') {
             return res.status(400).send({
-              message: 'It seems like you signed up using your ' + user.provider + ' account'
+              message: 'It seems like you signed up using your ' + user.provider + ' account, please sign in using that provider.'
             });
           } else {
             user.resetPasswordToken = token;
@@ -51,8 +57,8 @@ exports.forgot = function (req, res, next) {
           }
         });
       } else {
-        return res.status(400).send({
-          message: 'Username field must not be blank'
+        return res.status(422).send({
+          message: 'Username/email field must not be blank'
         });
       }
     },
@@ -62,10 +68,11 @@ exports.forgot = function (req, res, next) {
       if (config.secure && config.secure.ssl === true) {
         httpTransport = 'https://';
       }
+      var baseUrl = config.domain || httpTransport + req.headers.host;
       res.render(path.resolve('modules/users/server/templates/reset-password-email'), {
         name: user.displayName,
         appName: config.app.title,
-        url: httpTransport + req.headers.host + '/api/auth/reset/' + token
+        url: baseUrl + '/api/auth/reset/' + token
       }, function (err, emailHTML) {
         done(err, emailHTML, user);
       });
@@ -141,22 +148,28 @@ exports.reset = function (req, res, next) {
 
             user.save(function (err) {
               if (err) {
-                return res.status(400).send({
+                return res.status(422).send({
                   message: errorHandler.getErrorMessage(err)
                 });
               } else {
-                // Remove sensitive data before return authenticated user
-                user.password = undefined;
-                user.salt = undefined;
+                req.login(user, function (err) {
+                  if (err) {
+                    res.status(400).send(err);
+                  } else {
+                    // Remove sensitive data before return authenticated user
+                    user.password = undefined;
+                    user.salt = undefined;
 
-                var jwtToken = authentication.signToken(user);
-                res.json({ user: user, token: jwtToken });
+                    // var jwtToken = authentication.signToken(user);
+                    res.json(user);
 
-                done(err, user);
+                    done(err, user);
+                  }
+                });
               }
             });
           } else {
-            return res.status(400).send({
+            return res.status(422).send({
               message: 'Passwords do not match'
             });
           }
@@ -201,7 +214,6 @@ exports.reset = function (req, res, next) {
 exports.changePassword = function (req, res, next) {
   // Init Variables
   var passwordDetails = req.body;
-  var message = null;
 
   if (req.user) {
     if (passwordDetails.newPassword) {
@@ -213,22 +225,28 @@ exports.changePassword = function (req, res, next) {
 
               user.save(function (err) {
                 if (err) {
-                  return res.status(400).send({
+                  return res.status(422).send({
                     message: errorHandler.getErrorMessage(err)
                   });
                 } else {
-                  res.send({
-                    message: 'Password changed successfully'
+                  req.login(user, function (err) {
+                    if (err) {
+                      res.status(400).send(err);
+                    } else {
+                      res.send({
+                        message: 'Password changed successfully'
+                      });
+                    }
                   });
                 }
               });
             } else {
-              res.status(400).send({
+              res.status(422).send({
                 message: 'Passwords do not match'
               });
             }
           } else {
-            res.status(400).send({
+            res.status(422).send({
               message: 'Current password is incorrect'
             });
           }
@@ -239,12 +257,12 @@ exports.changePassword = function (req, res, next) {
         }
       });
     } else {
-      res.status(400).send({
+      res.status(422).send({
         message: 'Please provide a new password'
       });
     }
   } else {
-    res.status(400).send({
+    res.status(401).send({
       message: 'User is not signed in'
     });
   }

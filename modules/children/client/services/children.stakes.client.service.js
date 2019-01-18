@@ -5,16 +5,22 @@
     .module('children.stakes')
     .factory('ChildrenStakes', ChildrenStakes);
 
-  ChildrenStakes.$inject = ['$http'];
+  ChildrenStakes.$inject = ['$resource'];
 
-  function ChildrenStakes($http) {
-    var factory = {};
-    factory.getStakes = function () {
-      return $http.get('api/children/stakes')
-        .then(function (results) {
-          return results.data.countries;
-        });
-    };
-    return factory;
+  function ChildrenStakes($resource) {
+    var ChildrenStakes = $resource('/api/children', {}, {
+      getStakesRemote: {
+        method: 'GET',
+        url: '/api/children/stakes'
+      }
+    });
+
+    angular.extend(ChildrenStakes, {
+      getStakes: function () {
+        return this.getStakesRemote().$promise;
+      }
+    });
+
+    return ChildrenStakes;
   }
 }());
