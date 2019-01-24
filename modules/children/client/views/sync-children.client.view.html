@@ -24,6 +24,7 @@
           <span class="btn btn-default btn-file">
               <h4>Upload Excel file, populate database <input type="file" nv-file-select uploader="vm.uploader"></h4>
           </span>
+
             </div>
             <div class="text-center form-group" ng-show="vm.uploader.queue.length">
                 <span><h2>{{vm.fileToUpload}}</h2></span>
@@ -74,6 +75,9 @@
           <i class="glyphicon glyphicon-share"></i>
         </h3>
       </a>
+      <div ng-if="vm.showProgress">
+        <uib-progressbar max="max" value="dynamic"><span style="color:white; white-space:nowrap;">{{vm.currentStakeCount}} / {{vm.stakeCount}}</span></uib-progressbar>
+      </div>
         <a ng-click="vm.updateViews(vm.selectedStakeDB)">
           <h3><span> Update Views {{vm.selectedStake}} </span>
             <i class="glyphicon glyphicon-share"></i>

@@ -1783,12 +1783,11 @@
         wa = weightForAgeBoys[Math.round(age)];
         wl = null;
         tableByAge = Math.round(age) >= 24 ? weightForLengthBoys24 : weightForLengthBoys;
-        for (var j = 0; j < tableByAge.length; j + 1) {
-          if (tableByAge[j].y === (Math.round(Number(height) * 2) / 2)) {
-            wl = tableByAge[j];
-            break;
-          }
-        }
+        wl = tableByAge.find((tEntry) => {
+
+          return tEntry.y === Math.round(Number(height) * 2) / 2;
+        });
+
         if (wl === null) {
           console.log('out of range');
         }

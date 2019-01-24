@@ -336,7 +336,7 @@ function getScreeningsList(childId, screeningList) {
     }
   });
   if (screenList.length === 0) {
-    console.log('no screens for ' + childId);
+    // console.log('no screens for ' + childId);
   } else {
     screenList.sort(function (x, y) {
       if (x.surveyDate > y.surveyDate) {
@@ -618,11 +618,13 @@ function getWomen(parmObj) {
 async function getChildAndData(parmObj, multiplier) {
   return new Promise((resolve) => {
     function accessDB(parmObj) {
-      // console.log('emit CSV_progress');
-      parmObj.socketObj.emit('CSV_status', {
-        type: 'CSV_progress',
-        text: `${parmObj.stakeName} being processed`
+      console.log(`emit CSV_progress ${ parmObj.stakeName }from getChildAndData`);
+      parmObj.socketObj.emit('CSV_progress', {
+        room: parmObj.socketRoom,
+        text: `${parmObj.stakeName} being processed`,
+        count: multiplier
       });
+      // console.log(`${parmObj.stakeName} just emitted from get childAndData on server`);
       var newObj = Object.assign({}, parmObj);
       var stake = parmObj.stakeDB;
       return resolve(Promise.join(newDBRequest(stake, parmObj.stakename, newObj, 'children_list'), newDBRequest(stake, parmObj.stakename, newObj, 'scr_list')));
@@ -940,12 +942,14 @@ async function updateStatusStake(stakeInfo, timeOutMultiplier) {
 async function saveStake(stakeInfo, timeOutMultiplier) {
   try {
     let childData;
+    console.log(`calling getChildAndData from saveStake ${ stakeInfo.stakeName }`);
     const screeningData = await getChildAndData(stakeInfo, timeOutMultiplier);
     if (stakeInfo.csvType === 'sup') {
       childData = buildOutputData(splitSups(sortList(listAllChildren(screeningData, stakeInfo.csvType))));
     } else {
       childData = buildOutputData(sortList(listAllChildren(screeningData, stakeInfo.csvType)));
     }
+    console.log(`saving stake ${ stakeInfo.stakeName } and multiplier ${ timeOutMultiplier }`);
     return appendStake(stakeInfo.fileToSave, childData);
   } catch (err) {
     return (stakeInfo);
@@ -1014,23 +1018,27 @@ exports.updateZscoreStatus = async function (req, res) {
 };
 
 exports.createCSVFromDB = async function (req, res) {
+  let serverReady = false;
+
   function reportCSVComplete(input) {
     return res.status(200).send({
       message: input
     });
   }
 
-  function reportAggregateComplete(input, retryCount, processToExec, socketObj, socketRoomId) {
+  function reportAggregateComplete(input, retryCount, processToExec, socketObj, socketRoom) {
     const toRetry = input.filter((retVal) => {
       return typeof retval === 'string';
     });
     if (toRetry.length === 0) {
-      socketObj.emit('CSV_status', {
-        type: 'CSV_complete',
+      // console.log(`emit CSV_complete ${ input[0] }`);
+      socketObj.emit('CSV_complete', {
+        room: socketRoom,
         text: `${ input[0] } created and ready for download`,
         fileName: input[0]
       });
       // socketObj.removeListener('CSV_status');
+      socketObj.removeAllListeners();
       socketObj.close();
       return;
       // return res.status(200).send({
@@ -1039,16 +1047,13 @@ exports.createCSVFromDB = async function (req, res) {
     }
     console.log(`stakes to retry = ${ toRetry.length }`);
     if (retryCount < 1) {
-      socketObj.emit('CSV_status', {
-        type: 'CSV_error',
+      socketObj.emit('CSV_error', {
+        room: input.socketRoom,
         text: `CSV creation failed after ${ retryCount } retries`,
         fileName: input.fileToSave
       });
       socketObj.close();
       return;
-      // return res.status(408).send({
-      //   message: `failed after ${ retryCount } retries`
-      // });
     }
     const stakeRetryList = [];
     toRetry.forEach((stakeToRetry) => {
@@ -1059,118 +1064,110 @@ exports.createCSVFromDB = async function (req, res) {
         return (stakeToSave);
       }, { concurrancy: 1 })
         .then((results) => {
-          setTimeout(reportAggregateComplete, 10000, results, retryCount - 1, processToExec, socketObj, socketRoomId);
+          setTimeout(reportAggregateComplete, 10000, results, retryCount - 1, processToExec, socketObj, socketRoom);
         }).catch((error) => {
-          console.log(error.message);
-          socketObj.emit('CSV_status', {
-            type: 'CSV_error',
+          // console.log(error.message);
+          socketObj.emit('CSV_error', {
+            room: input.socketRoom,
             text: errorHandler.getErrorMessage(error),
             fileName: input.fileToSave
           });
           socketObj.close();
-          // return res.status(400).send({
-          //   message: errorHandler.getErrorMessage(error)
-          // });
         });
     } catch (err) {
       console.log(err);
     }
   }
   const tokenInfo = parseJwt(req.headers.authorization);
-
-  let socketClient = io(`http://localhost:${process.env.PORT}`, {
-    transports: ['websocket'],
+  // console.log('open the socket from the server');
+  let socketClient = io(`http://localhost:${process.env.PORT}/csvStatus`, {
     agent: false, // [2] Please don't set this to true
     upgrade: false,
     rejectUnauthorized: true,
     query: `token=chocolate&sessionID=${ req.sessionID }&nsp=${ req.query.nsp }`
   });
 
-  socketClient.on('connect', (dataIn) => {
-    console.log('server client connected');
-
-    socketClient.on('CSV_status', (data) => {
-      console.log(`we have data ${ data.text }`);
-    });
-
-    socketClient.on('disconnect', () => {
-      console.log('disconnected remove listener');
-      socketClient.removeListener('CSV_status');
-    });
+  // socketClient.removeAllListeners();
+  socketClient.on('connect', () => {
+    // console.log('server client connected');
+    socketClient.emit('room', { room: req.query.socketRoomId, src: 'server client' });
   });
 
-  moment.locale(req.params.language);
-  var parmObj = {
-    responseObj: res,
-    stakeName: req.query.stakeName,
-    stakeDB: req.params.stakeDB,
-    scopeType: req.params.scopeType,
-    cCode: req.params.cCode,
-    sortField: req.params.sortField,
-    language: req.params.language,
-    csvType: req.params.csvType,
-    fileToSave: `${ req.params.stakeDB }_${tokenInfo.iat}_dbDump.csv`,
-    socketRoomId: req.query.socketRoomId,
-    socketObj: socketClient,
+  socketClient.on('Server_ready', async(data) => {
 
-    updateProcess: saveStake
-  };
-  if (parmObj.csvType === 'women') {
-    const headerLine = parmObj.language === 'en' ? 'country,stakeName,id,firstName,lastName,idGroup,phone,address,city,ward,lds,screenDate,other date\n'
-      : 'País,Estaca,carné de identidad,nombre de pila,apellido,grupo de identificación,teléfono,dirección,ciudad,sala,miembro lds,fecha de la pantalla, otra fecha\n';
-    await writeHeader(parmObj.fileToSave, headerLine);
-    oneStakeWomen(parmObj)
-      .then(reportCSVComplete).catch(function (error) {
-        socketClient.emit('CSV_status', {
-          type: 'CSV_error',
-          text: errorHandler.getErrorMessage(error)
-        });
-        socketClient.close();
-        // return res.status(400).send({
-        //   message: errorHandler.getErrorMessage(error)
-        // });
-      });
-  } else {
-    parmObj.fileToSave = `sup_list_${ req.params.stakeDB }_${tokenInfo.iat}_dbDump.csv`;
-    let headerLine = parmObj.language === 'en' ? '1,2,3,4,5,6,Sup,age,Prior Sup,firstName,lastName,ward,mother,months since last screening\n' : '1,2,3,4,5,6,Sup,anos,Anterior Sup,nombre de pila,apellido,sala,madre,meses desde la última evaluación\n';
-    if (parmObj.stakeName) {
-      headerLine = '1,2,3,4,5,6,Sup,age,Prior Sup,firstName,lastName,ward,mother,months since last screening,country,stake\n';
-    }
-    if (parmObj.csvType !== 'sup') {
-      parmObj.fileToSave = `${ tokenInfo.iat }_${ req.params.cCode }_${ req.params.csvType }_dbDump.csv`;
-      headerLine = 'Country,Stake,child Index,stake db name,screen Count,id,gender,firstName,lastName,birthdate,idGroup,mother,father,phone,address,city,ward,lds,screenId,screenDate,weight,height,age,obese,ha,wa,wh,status\n';
-    }
-    if (parmObj.scopeType === 'countries') {
-      parmObj.fileToSave = `${ tokenInfo.iat }_all_data_${ req.params.csvType }_dbDump.csv`;
-    }
-    // res.status(202).write(`Received request to create${ parmObj.fileToSave }`);
+    // console.log(`we have server ready ${ data.text }`);
+    moment.locale(req.params.language);
+    var parmObj = {
+      responseObj: res,
+      stakeName: req.query.stakeName,
+      stakeDB: req.params.stakeDB,
+      scopeType: req.params.scopeType,
+      cCode: req.params.cCode,
+      sortField: req.params.sortField,
+      language: req.params.language,
+      csvType: req.params.csvType,
+      fileToSave: `${ req.params.stakeDB }_${tokenInfo.iat}_dbDump.csv`,
+      socketRoom: req.query.socketRoomId,
+      socketObj: socketClient,
 
+      updateProcess: saveStake
+    };
+    // let stakeList = await getDBListFromFile(parmObj);
     res.status(202).send({ message: 'Request has been received ', nsp: req.query.socketId });
-
-    socketClient.emit('CSV_status', {
-      type: 'CSV_start',
-      text: `Received request to create${ parmObj.fileToSave }`,
-      fileName: parmObj.fileToSave
-    }, (data) => {
-      console.log(data);
-    });
-    await writeHeader(parmObj.fileToSave, headerLine);
-    getDBListFromFile(parmObj).map((stakeToSave) => {
-      return stakeToSave;
-    }, { concurrancy: 1 })
-      .then((results) => {
-        reportAggregateComplete(results, retryLimit, parmObj.updateProcess, socketClient, parmObj.socketRoomId);
-      }).catch((error) => {
-        socketClient.emit('CSV_status', {
-          type: 'CSV_error',
-          text: errorHandler.getErrorMessage(error)
+    if (parmObj.csvType === 'women') {
+      const headerLine = parmObj.language === 'en' ? 'country,stakeName,id,firstName,lastName,idGroup,phone,address,city,ward,lds,screenDate,other date\n'
+        : 'País,Estaca,carné de identidad,nombre de pila,apellido,grupo de identificación,teléfono,dirección,ciudad,sala,miembro lds,fecha de la pantalla, otra fecha\n';
+      await writeHeader(parmObj.fileToSave, headerLine);
+      oneStakeWomen(parmObj)
+        .then(reportCSVComplete).catch(function (error) {
+          socketClient.emit('CSV_error', {
+            room: parmObj.socketRoom,
+            text: errorHandler.getErrorMessage(error)
+          });
+          socketClient.removeAllListeners();
+          socketClient.close();
         });
-        socketClient.close();
-        // return res.status(400).send({
-        //   message: errorHandler.getErrorMessage(error)
-        // });
-      });
-  }
+    } else {
+      parmObj.fileToSave = `sup_list_${ req.params.stakeDB }_${tokenInfo.iat}_dbDump.csv`;
+      let headerLine = parmObj.language === 'en' ? '1,2,3,4,5,6,Sup,age,Prior Sup,firstName,lastName,ward,mother,months since last screening\n' : '1,2,3,4,5,6,Sup,anos,Anterior Sup,nombre de pila,apellido,sala,madre,meses desde la última evaluación\n';
+      if (parmObj.stakeName) {
+        headerLine = '1,2,3,4,5,6,Sup,age,Prior Sup,firstName,lastName,ward,mother,months since last screening,country,stake\n';
+      }
+      if (parmObj.csvType !== 'sup') {
+        parmObj.fileToSave = `${ tokenInfo.iat }_${ req.params.cCode }_${ req.params.csvType }_dbDump.csv`;
+        headerLine = 'Country,Stake,child Index,stake db name,screen Count,id,gender,firstName,lastName,birthdate,idGroup,mother,father,phone,address,city,ward,lds,screenId,screenDate,weight,height,age,obese,ha,wa,wh,status\n';
+      }
+      if (parmObj.scopeType === 'countries') {
+        parmObj.fileToSave = `${ tokenInfo.iat }_all_data_${ req.params.csvType }_dbDump.csv`;
+      }
+      // res.status(202).write(`Received request to create${ parmObj.fileToSave }`);
+
+      // socketClient.emit('CSV_start', {
+      //   room: parmObj.socketRoom,
+      //   text: `Received request to create${ parmObj.fileToSave }`,
+      //   fileName: parmObj.fileToSave
+      // });
+      await writeHeader(parmObj.fileToSave, headerLine);
+      getDBListFromFile(parmObj).map((stakeToSave) => {
+        return stakeToSave;
+      }, { concurrancy: 1 })
+        .then((results) => {
+          reportAggregateComplete(results, retryLimit, parmObj.updateProcess, socketClient, parmObj.socketRoom);
+        }).catch((error) => {
+          socketClient.emit('CSV_error', {
+            room: parmObj.socketRoom,
+            text: errorHandler.getErrorMessage(error)
+          });
+          socketClient.close();
+        });
+    }
+    serverReady = true;
+  });
+
+  socketClient.on('disconnect', () => {
+    // console.log('disconnected remove listener at server');
+    socketClient.removeAllListeners();
+  });
 };
 
 exports.getSyncURL = function(req, res) {
@@ -1187,7 +1184,7 @@ exports.getCountryList = function(req, res) {
         jsonObj = JSON.parse(response.body);
         res.json(jsonObj);
       } catch (error) {
-        console.log('JSON.parse error');
+        // console.log('JSON.parse error');
         reasons.error = 'JSON.parse error';
         reasons.reason = '?';
         return res.status(400).send({
@@ -1517,7 +1514,7 @@ exports.listDbs = function(req, res) {
         jsonObj = JSON.parse(body);
         res.json(jsonObj);
       } catch (error) {
-        console.log('error in JSON.parse listDbs');
+        // console.log('error in JSON.parse listDbs');
         return res.status(400).send({
           message: errorHandler.getErrorMessage(error)
         });
@@ -1673,7 +1670,12 @@ function getDBListFromFile(parmsIn) {
               });
             });
           }
-
+          // console.log('we have a stakelist ready to process');
+          parmsIn.socketObj.emit('CSV_progress', {
+            room: parmsIn.socketRoom,
+            text: 'sending back the count',
+            maxCount: stakeList.length
+          });
           resolve(stakeList);
         } catch (err) {
           console.log('JSON.parse error');

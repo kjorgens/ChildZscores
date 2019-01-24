@@ -13,8 +13,10 @@
       connect: connect,
       connectNSP: connectNSP,
       emit: emit,
+      emitRoom: emitRoom,
       on: on,
       removeListener: removeListener,
+      removeAllListeners: removeAllListeners,
       close: close,
       socket: null
     };
@@ -26,16 +28,25 @@
       // Connect only when authenticated
       console.log(`connecting ${ connection } from the client`);
       if (Authentication.user) {
-        service.socket = io(connection, query);
+        service.socket = io('/csvStatus');
       }
     }
 
     function connectNSP(namespace) {
       console.log(`connecting to nameSpace ${ namespace } from the client`);
-      service.socket = io({ query: { nsp: namespace } });
+      if (Authentication.user) {
+        console.log('yep, have a user so connect');
+        service.socket = io(`${ namespace }`);
+      }
     }
 
     // Wrap the Socket.io 'emit' method
+    function emitRoom(eventName, room, data) {
+      if (service.socket) {
+        service.socket.emit(eventName, room);
+      }
+    }
+
     function emit(eventName, data) {
       if (service.socket) {
         service.socket.emit(eventName, data);
@@ -53,6 +64,11 @@
       }
     }
 
+    function removeAllListeners(eventName) {
+      if (service.socket) {
+        service.socket.removeAllListeners();
+      }
+    }
     // Wrap the Socket.io 'removeListener' method
     function removeListener(eventName) {
       if (service.socket) {

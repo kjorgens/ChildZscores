@@ -29,11 +29,6 @@
       });
     }
 
-    // $scope.$on('$destroy', function () {
-    //   Socket.emit('end');
-    //   Socket.close();
-    // });
-
     vm.uploadExcelCsv = uploadExcelCsv;
     vm.cancelUpload = cancelUpload;
     vm.updateViews = updateViews;
@@ -75,7 +70,6 @@
       vm.progress = 0;
     }
 
-    // Called after the user has failed to upload a new picture
     function onErrorItem(response) {
       vm.fileSelected = false;
       vm.progress = 0;
@@ -155,31 +149,6 @@
       }
     }
 
-    // vm.uploader.onCompleteItem = function(fileItem, response, status, headers) {
-    //   if (status !== 200) {
-    //     console.log(status + ' ' + response);
-    //     vm.reportError('Error uploading to database', response, true);
-    //   } else {
-    //     console.log(response);
-    //   }
-    //   // console.info('onComplete', fileItem, response, status, headers);
-    //   vm.onComplete = true;
-    //   cancelUpload();
-    //   vm.stopSpin();
-    //   syncUpstream();
-    // };
-    // // Called after the user has failed to uploaded a new picture
-    // vm.uploader.onErrorItem = function(fileItem, response, status, headers) {
-    //   // Clear upload buttons
-    //   cancelUpload();
-    //
-    //   // Show error message
-    //   vm.error = response.message;
-    // };
-
-    // Change user profile picture
-
-
     // Cancel the upload process
     function cancelUpload() {
       vm.uploader.clearQueue();
@@ -190,8 +159,6 @@
     vm.reportReady = false;
     vm.stakeDB = $stateParams.stakeDB;
     vm.screenType = $stateParams.screenType;
-    //   vm.stakeDB = localStorage.getItem('selectedDBName');
-    //   vm.selectedStake = localStorage.getItem('selectedStake');
     vm.selectedStake = $stateParams.stakeName;
     vm.selectedCountry = localStorage.getItem('selectedCountry');
     vm.selectedCountryCode = localStorage.getItem('selectedCountryCode');
@@ -199,8 +166,6 @@
     // vm.filterSelect = 'All Children';
     vm.authentication = Authentication;
 
-    // vm.selectedStake = $stateParams.stakeName;
-    //   vm.selectedCountryObject = sessionStorage.getItem('selectedCountryObject');
     vm.createReport = createReport;
     vm.syncUpstream = syncUpstream;
     vm.online = $rootScope.appOnline;
@@ -236,16 +201,13 @@
     }
 
     function whenDoneDown() {
-      // find();
-      // vm.stopSpin();
-      console.log('couchdb sync complete');
+      // console.log('couchdb sync complete');
       goBack();
-      //    $state.go('children.list', { stakeDB: vm.stakeDB, stakeName: vm.selectedStake, searchFilter: '', colorFilter: '' });
     }
 
     function replicateUp (input) {
       vm.repUpStats = input;
-      console.log(JSON.stringify(input));
+      // console.log(JSON.stringify(input));
       vm.repUpData = input;
       PouchService.newSyncFrom('https://' + vm.syncStuff.entity + '@'
         + vm.syncStuff.url + '/' + vm.stakeDB, replicateDown, replicateErrorDown);
@@ -253,7 +215,7 @@
 
     function replicateDown (input) {
       vm.repDownStats = input;
-      console.log(JSON.stringify(input));
+      // console.log(JSON.stringify(input));
       vm.repDownData = input;
       whenDoneDown();
     }
@@ -261,7 +223,7 @@
     function replicateErrorUp(err) {
       vm.repError = err;
       vm.stopSpin();
-      console.log('There was an error');
+      // console.log('There was an error');
       console.log(err.message);
       vm.reportError('Replication Error Sync up', err.message, true);
     }
@@ -269,35 +231,28 @@
     function replicateErrorDown(err) {
       vm.repError = err;
       vm.stopSpin();
-      console.log('There was an error');
-      console.log(err.message);
+      // console.log('There was an error');
+      // console.log(err.message);
       vm.reportError('Replication Error Sync Down', err.message, true);
     }
 
     function syncUpstream() {
       vm.startSpin();
-      console.log('start sync for ' + vm.stakeDB);
+      // console.log('start sync for ' + vm.stakeDB);
       ChildrenGetSync.syncDb()
         .then(function(input) {
           vm.syncStuff = input;
-          console.log('Ready to sync https://' + vm.syncStuff.url + '/' + vm.stakeDB);
+          // console.log('Ready to sync https://' + vm.syncStuff.url + '/' + vm.stakeDB);
           PouchService.newSyncTo('https://' + vm.syncStuff.entity + '@'
             + vm.syncStuff.url + '/' + vm.stakeDB, replicateUp, replicateErrorUp);
         });
     }
 
     function returnReport(input) {
-      console.log(`${ input.message } received from server`);
+      // console.log(`${ input.message } received from server`);
       if (input.$status !== 202) {
         Notification.error({ message: `<i class="glyphicon glyphicon-remove"></i> ${ input.message }` });
       }
-
-      // vm.stopSpin();
-      // vm.reportReady = true;
-      // vm.reportToDownload = '/files/' + input.message;
-      // vm.reportName = input.message;
-      // vm.reportFileName = { reportName: vm.reportName };
-      // Notification.success({ message: vm.reportName, title: '<i class="glyphicon glyphicon-ok"></i> csv ready to download', delay: 10000 });
     }
 
     function updateComplete() {
@@ -305,77 +260,84 @@
       syncUpstream();
     }
 
-    // function setupSocket(input) {
-    //   if (!Socket.socket) {
-    //     Socket.connectNSP({ query: { nsp: input.nsp } });
-    //   }
-    //
-    //   Socket.on('CSV_status', function (message) {
-    //     console.log(`just received ${message.text} at the client`);
-    //     if (message.type === 'CSV_error') {
-    //       Notification.error({message: `<i class="glyphicon glyphicon-remove"></i> ${message.text}`});
-    //     } else if (message.type === 'CSV_progress') {
-    //       Notification.success({message: `<i class="glyphicon glyphicon-ok"></i> ${message.text}`});
-    //     }
-    //
-    //     if (message.type === 'CSV_complete') {
-    //       vm.stopSpin();
-    //       vm.reportReady = true;
-    //       vm.reportToDownload = '/files/' + message.fileName;
-    //       vm.reportName = message.fileName;
-    //       vm.reportFileName = { reportName: vm.reportName };
-    //       Notification.success({ message: `<i class="glyphicon glyphicon-ok"></i> ${ message.text }`, delay: 10000 });
-    //     }
-    //   });
-    //
-    //   Socket.on('connect', (input) => {
-    //   });
-    //
-    //   Socket.on('disconnect', () => {
-    //     console.log('removing listener from the client');
-    //     Socket.removeListener('CSV_status');
-    //   });
-    // }
-
     function genReport(input) {
       const inputValues = input;
       let timeouts = [];
       vm.reportReady = false;
+      let stakeCount = 0;
 
       function requestReceived(input) {
-        console.log(`${ input.message } from the server`);
+        // console.log(`http ${ input.message } from the server`);
 
+        stakeCount = vm.stakeCount;
+        let startCount = 0;
+        vm.currentStakeCount = 0;
+        vm.showProgress = true;
+        function waitingForComplete(count) {
+          if (count > stakeCount) {
+            Notification.error({ message: '<i class="glyphicon glyphicon-remove"></i> Timeout waiting for csv completion' });
+            vm.stopSpin();
+            return;
+          }
+          if (vm.reportReady) {
+            timeouts.forEach(timeOutWaiting => {
+              clearTimeout(timeOutWaiting);
+            });
+            return;
+          }
+          timeouts.push(setTimeout(waitingForComplete, 1000, count + 1));
+        }
+
+        timeouts.push(setTimeout(waitingForComplete, 1000, startCount));
         if (input.$status !== 202) {
           Notification.error({ message: `<i class="glyphicon glyphicon-remove"></i> ${ input.message }` });
         }
       }
 
       if (!Socket.socket) {
-        Socket.connectNSP(input.nsp);
+        Socket.connectNSP('/csvStatus');
+      } else {
+        Socket.removeListener('connect');
+        Socket.removeListener('startNow');
       }
 
-      Socket.on('CSV_status', function (message) {
-        console.log(`just received ${ message.text } at the client`);
-        if (message.type === 'CSV_error') {
-          Notification.error({ message: `<i class="glyphicon glyphicon-remove"></i> ${ message.text }`});
-        } else if (message.type === 'CSV_progress') {
-          Notification.success({ message: `<i class="glyphicon glyphicon-ok"></i> ${ message.text }`});
+      Socket.on('CSV_progress', (message) => {
+        if (message.maxCount) {
+          vm.stakeCount = message.maxCount;
+          return;
         }
 
-        if (message.type === 'CSV_complete') {
-          vm.stopSpin();
-          vm.reportReady = true;
-          vm.reportToDownload = '/files/' + message.fileName;
-          vm.reportName = message.fileName;
-          vm.reportFileName = { reportName: vm.reportName };
-          Notification.success({ message: `<i class="glyphicon glyphicon-ok"></i> ${ message.text }`, delay: 10000 });
-          console.log('remove the socket at the client');
-          Socket.close();
-        }
+        vm.currentStakeCount = message.count;
+        // Notification.success({ message: `<i class="glyphicon glyphicon-ok"></i> ${ message.text }` });
+      });
+
+      Socket.on('CSV_complete', (message) => {
+        vm.showProgress = false;
+        vm.stopSpin();
+        vm.reportReady = true;
+        vm.reportToDownload = '/files/' + message.fileName;
+        vm.reportName = message.fileName;
+        vm.reportFileName = { reportName: vm.reportName };
+        Notification.success({ message: `<i class="glyphicon glyphicon-ok"></i> ${ message.text }`, delay: 10000 });
+        // console.log('remove the socket at the client');
+        // Socket.emit('leaveRoom', input.socketRoomId);
+        Socket.removeAllListeners();
+        // Socket.removeListener('CSV_complete', this);
+        Socket.close();
+      });
+
+      Socket.on('CSV_error', function (message) {
+        console.log(`just received CSV_error event ${ message.text } at the client`);
+        Notification.error({ message: `<i class="glyphicon glyphicon-remove"></i> ${ message.text }` });
       });
 
       Socket.on('connect', () => {
-        console.log('client just got connect event, start building report');
+        // console.log('client just got connect event, get a room');
+        Socket.emit('room', { room: input.socketRoomId, src: 'client', destSocket: 'startNow' });
+      });
+
+      Socket.on('Client_ready', (message) => {
+        // console.log(`client just got startNow event ${ message.text } from room creation, tell the server to start building report`);
         ChildrenReport.buildReport(inputValues)
           .then(requestReceived)
           .catch(err => {
@@ -384,35 +346,13 @@
       });
 
       Socket.on('disconnect', () => {
-        console.log('removing listener from the client');
-        Socket.removeListener('CSV_status');
+        // console.log('removing listener from the client');
+        Socket.removeAllListeners();
       });
       // Remove the event listener when the controller instance is destroyed
       $scope.$on('$destroy', function () {
-        Socket.removeListener('CSV_status');
+        Socket.removeAllListeners();
       });
-
-      var nameSpace = `/${ Authentication.user.firstName }_${ Authentication.user.lastName }_${ moment.now() }`;
-
-      let count = 24;
-      function waitingForComplete(count) {
-        if (count > 24) {
-          Notification.error({ message: '<i class="glyphicon glyphicon-remove"></i> Timeout waiting for csv completion' });
-          return;
-        }
-        if (vm.reportReady) {
-          timeouts.forEach(timeOutWaiting => {
-            clearTimeout(timeOutWaiting);
-          });
-          return;
-        }
-        timeouts.push(setTimeout(waitingForComplete, 5000, count + 1));
-      }
-
-      timeouts.push(setTimeout(waitingForComplete, 5000, count));
-
-
-      // console.log('about to leave');
     }
 
     function updateStakeChildStatus(stakeDB, cCode, scopeType, func) {
@@ -445,7 +385,7 @@
         sortField: sortField,
         language: $rootScope.SelectedLanguage,
         stakeName: stakeName,
-        nsp: `${ Authentication.user.firstName }_${ Authentication.user.lastName }_${ moment.now() }`
+        socketRoomId: `${ Authentication.user.firstName }_${ Authentication.user.lastName }_${ moment.now() }`
       };
 
       return genReport(reportParams, getCsvError);
@@ -460,7 +400,7 @@
     }
 
     function viewUpdateComplete() {
-      console.log('couch view update complete');
+      // console.log('couch view update complete');
       // Clear messages
       vm.success = null;
       vm.error = null;
@@ -471,7 +411,7 @@
 
     function viewUpdateError(err) {
       vm.stopSpin();
-      console.log('couch view update error');
+      // console.log('couch view update error');
       vm.reportError('couch view update error', err.data.message, true);
     }
 

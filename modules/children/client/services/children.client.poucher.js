@@ -114,22 +114,28 @@
         if (navigator.onLine) {
           if (networkFirst) {
             countryDataBase = pouchDB('country_list');
-            // countryDataBase.info()
-            //   .then((info) => {
-            //     if (info.doc_count === 0 || networkFirst) {
+            countryDataBase.info()
+              .then((info) => {
+                if (info.doc_count === 0 || networkFirst) {
+                  console.log('get the country list from the network');
                   ChildrenStakes.getStakes()
                     .then((countries) => {
+                      console.log('have the stake list from the network');
                       var docToSave = {
                         _id: 'liahona_kids_countries_stakes',
                         countries: countries.countries
                       };
+                      console.log('now put the data in the local database');
                       countryDataBase.get('liahona_kids_countries_stakes')
                         .then((doc) => {
-                          // if (info.doc_count !== 0) {
+                          console.log('the database does exist locally, update it');
+                          if (info.doc_count !== 0) {
+                            console.log('database exists, but no document');
                             docToSave._rev = doc._rev;
                             docToSave.countries = countries.countries;
-                          // }
+                          }
                           countryDataBase.put(docToSave).then(function (results) {
+                            console.log('document is saved, resolve country list');
                             resolve(countries.countries);
                           }).catch(function (err) {
                             console.log(err);
@@ -137,6 +143,7 @@
                         }).catch((err) => {
                           console.log(err);
                           if (err.status === 404) {
+                            console.log('got 404, save data and resolve');
                             countryDataBase.put(docToSave).then(function (results) {
                               resolve(countries);
                             }).catch(function (err) {
@@ -145,12 +152,14 @@
                           }
                         });
                     });
-              //   }
-              // });
+                }
+              });
           } else {
+            console.log('go local first for country list');
             resolve(getCountriesLocalDB());
           }
         } else {
+          console.log('go local if we are offline');
           resolve(getCountriesLocalDB());
         }
       });

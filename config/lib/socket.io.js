@@ -116,14 +116,111 @@ module.exports = function (app, db) {
     });
   });
 
-  // Add an event listener to the 'connection' event
-  io.on('connection', function (socket) {
-    // socket.join()
-    console.log('new socket-io connection');
-    config.files.server.sockets.forEach(function (socketConfiguration) {
-      require(path.resolve(socketConfiguration))(io, socket);
+  const csvNSP = io.of('/csvStatus');
+  csvNSP.on('connect', (socket) => {
+    socket.removeAllListeners();
+    // console.log(`just got a connection on /csvStatus and removed all listeners`);
+
+    // socket.on('leaveRoom', (message) => {
+    //   console.log(`leaving room ${ message.room }`);
+    //   csvNSP.leave(message.room);
+    // });
+
+    socket.on('room', (message) => {
+      // console.log(`joining room ${ message.room } from ${ message.src }`);
+      socket.join(message.room);
+      if (message.src === 'client') {
+        csvNSP.to(message.room).emit('Client_ready', { text: 'does this work?' });
+      } else {
+        csvNSP.to(message.room).emit('Server_ready', { text: 'start processing' });
+      }
+    });
+
+    socket.on('CSV_progress', (message) => {
+      // console.log(`emit event CSV_Progress ${ message.text } from server`);
+      csvNSP.to(message.room).emit('CSV_progress', message);
+    });
+
+    socket.on('CSV_complete', (message) => {
+      // console.log(`emit event CSV_complete ${ message.text } from server`);
+      csvNSP.to(message.room).emit('CSV_complete', message);
+    });
+
+    socket.on('CSV_error', (message) => {
+      // console.log(`send CSV_error event ${ message.text } to room ${ message.room }`);
+      csvNSP.to(message.room).emit('CSV_error', message);
+    });
+
+    socket.on('disconnect', function () {
+      io.emit('disconnect', {
+        type: 'status',
+        text: 'disconnected'
+      });
+      // console.log('disconnect received at the server');
+      io.removeAllListeners();
+    });
+
+    socket.on('end', () => {
+      socket.disconnect(true);
     });
   });
+
+  // const adminNSP = io.of('/admin').on('connect', (socket) => {
+  //   socket.on('room', (room) => {
+  //     socket.join(room);
+  //   });
+  //
+  //   socket.on('CSV_status', (message) => {
+  //     io.in(message.room).emit('CSV_status', message);
+  //   });
+  //
+  //   socket.on('disconnect', function () {
+  //     io.emit('CSV_status', {
+  //       type: 'status',
+  //       text: 'disconnected'
+  //     });
+  //     console.log('disconnect received at the server');
+  //     io.removeAllListeners('CSV_status');
+  //   });
+  //
+  //   socket.on('end', () => {
+  //     socket.disconnect(true);
+  //   });
+  // });
+  // Add an event listener to the 'connection' event
+  // io.on('connection', function (socket) {
+  //
+  //   console.log('connecting at the server');
+  //   if (socket.handshake.query.name)
+  //   // if (socket.)
+  //   // if (socket.handshake.query.room) {
+  //   //   socket.join(socket.handshake.query.room);
+  //   // }
+  //   socket.on('room', (room) => {
+  //     socket.join(room);
+  //   });
+  //
+  //   socket.on('CSV_status', (message) => {
+  //     io.in(message.room).emit('CSV_status', message);
+  //   });
+  //
+  //   socket.on('disconnect', function () {
+  //     io.emit('CSV_status', {
+  //       type: 'status',
+  //       text: 'disconnected'
+  //     });
+  //     console.log('disconnect received at the server');
+  //     io.removeAllListeners('CSV_status');
+  //   });
+  //
+  //   socket.on('end', () => {
+  //     socket.disconnect(true);
+  //   });
+  //   // console.log('new socket-io connection');
+  //   // config.files.server.sockets.forEach(function (socketConfiguration) {
+  //   //   require(path.resolve(socketConfiguration))(io, socket);
+  //   // });
+  // });
 
   return server;
 };
