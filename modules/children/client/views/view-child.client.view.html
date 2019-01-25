@@ -4,7 +4,7 @@
             <span><a ui-sref="children.list({stakeDB: vm.selectedDB, stakeName:vm.selectedStake, searchFilter: '', colorFilter: '', screenType: 'children'})">{{vm.selectedStake}} <i class="glyphicon glyphicon-list"></i></a></span>
         </h3>
         <h3>
-            <a ui-sref="children.create({ward:vm.selectedWard.wardName})">{{'ADD_NEW_CHILD' | translate}} <i class="glyphicon glyphicon-plus"></i></a>
+            <a ui-sref="children.create({dbName: vm.selectedDB})">{{'ADD_NEW_CHILD' | translate}} <i class="glyphicon glyphicon-plus"></i></a>
         </h3>
         <h3>
             <span><a ui-sref="children.newsurvey({childId:vm.child._id})">{{'ADD_SCREENING' | translate}} <i class="glyphicon glyphicon-plus"></i></a></span>
@@ -15,8 +15,9 @@
       </h1>
       {{'BIRTHDATE' | translate}}
       <span ng-bind="vm.child.birthDate | date:'mediumDate'"></span>
+      <!--Current Supplement <span ng-bind="vm.supInfo"></span>-->
     </div>
-    <small>
+    <small ng-if="vm.surveys.length > 0">
       <!--<h4>{{'ACTIONS' | translate}}:-->
         <!--<a ng-repeat="action in vm.actions" >-->
           <!--<li>-->
@@ -24,7 +25,7 @@
           <!--</li>-->
         <!--</a>-->
       <!--</h4>-->
-      <h4>
+      <h4 >
         <div style="height:10px;"></div>
         <div class="container">
           <div class="row">

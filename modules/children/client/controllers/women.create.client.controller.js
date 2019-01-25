@@ -2,8 +2,8 @@
   'use strict';
 
   angular
-      .module('children')
-      .controller('WomenCreateController', WomenCreateController);
+    .module('children')
+    .controller('WomenCreateController', WomenCreateController);
 
   WomenCreateController.$inject = ['$rootScope', '$scope', '$state', '$stateParams', '$translate', 'FilterService',
     'moment', 'MotherResolve', 'Authentication', 'PouchService', 'ModalService'];
@@ -16,35 +16,39 @@
     vm.selectedStake = $stateParams.stakeName;
     vm.stakeName = $stateParams.stakeName;
     vm.stakeDB = $stateParams.stakeDB;
-    if(mother.hasOwnProperty('_id')) {
+    if (Object.prototype.hasOwnProperty.call(mother, '_id')) {
       vm.editMother = true;
-      if(mother.hasOwnProperty('childsBirthDate')){
+      if (Object.prototype.hasOwnProperty.call(mother, 'childsBirthDate')) {
         vm.nursingMother = true;
       }
-    } else if(~$stateParams.screenType.indexOf('nursing')) {
+    } else if (~$stateParams.screenType.indexOf('nursing')) {
       vm.nursingMother = true;
     }
 
-    vm.goBack = function(){
-      $state.go('children.listMothers', { stakeDB: vm.stakeDB, stakeName: vm.stakeName,
-        searchFilter: FilterService.currentListFilter(), colorFilter: FilterService.currentColorFilter(),
-        screenType: vm.nursingMother ? 'nursing' : 'pregnant'});
-//      $window.history.back();
+    vm.goBack = function() {
+      $state.go('children.listMothers', {
+        stakeDB: vm.stakeDB,
+        stakeName: vm.stakeName,
+        searchFilter: FilterService.currentListFilter(),
+        colorFilter: FilterService.currentColorFilter(),
+        screenType: vm.nursingMother ? 'nursing' : 'pregnant'
+      });
+    // $window.history.back();
     };
 
     vm.newMother = newMother;
-    if (vm.editMother){
+    if (vm.editMother) {
       vm.mother = mother;
       vm.firstNameIsValid = true;
       vm.lastNameIsValid = true;
       vm.membershipIsValid = true;
 
- //     vm.mother.birthDate = new Date(vm.mother.birthDate);
-      if(vm.mother.hasOwnProperty('deliveryDate')) {
+      // vm.mother.birthDate = new Date(vm.mother.birthDate);
+      if (Object.prototype.hasOwnProperty.call(vm.mother, 'deliveryDate')) {
         vm.deliveryDateIsValid = true;
         vm.mother.deliveryDate = new Date(vm.mother.deliveryDate);
       }
-      if(vm.mother.hasOwnProperty('childsBirthDate')){
+      if (Object.prototype.hasOwnProperty.call(vm.mother, 'childsBirthDate')) {
         vm.childsBirthDateIsValid = true;
         vm.mother.childsBirthDate = new Date(vm.mother.childsBirthDate);
       }
@@ -67,7 +71,7 @@
 
     vm.online = $rootScope.appOnline;
     vm.interviewer = localStorage.getItem('lastInterviewer');
-//    vm.find();
+    // vm.find();
 
     vm.yesNo = [{ value: 'Yes', translationId: 'YES' }, { value: 'No', translationId: 'NO' }, { value: 'Unknown', translationId: 'UNKNOWN' }];
     // if ($state.params.motherId) {
@@ -108,7 +112,7 @@
     vm.remove = remove;
     vm.create = create;
     vm.update = update;
-    vm.find = find;
+    // vm.find = find;
     // vm.findOne = findOne;
     vm.today = today;
 
@@ -150,19 +154,19 @@
     }
 
     function checkAllFieldsValid() {
-      if (vm.firstNameIsValid === true &&
-          vm.lastNameIsValid === true &&
-          vm.membershipIsValid === true) {
+      if (vm.firstNameIsValid === true
+          && vm.lastNameIsValid === true
+          && vm.membershipIsValid === true) {
         vm.allFieldsValid = true;
         vm.invalidFields = false;
-      } else if (vm.firstNameIsValid === false ||
-          vm.lastNameIsValid === false ||
-          vm.membershipIsValid === false) {
+      } else if (vm.firstNameIsValid === false
+          || vm.lastNameIsValid === false
+          || vm.membershipIsValid === false) {
         vm.allFieldsValid = false;
         vm.invalidFields = true;
-      } else if ((vm.firstNameIsValid === undefined || vm.firstNameIsValid === true) &&
-          (vm.lastNameIsValid === undefined || vm.lastNameIsValid === true) &&
-          (vm.membershipIsValid === undefined || vm.membershipIsValid === true)) {
+      } else if ((vm.firstNameIsValid === undefined || vm.firstNameIsValid === true)
+          && (vm.lastNameIsValid === undefined || vm.lastNameIsValid === true)
+          && (vm.membershipIsValid === undefined || vm.membershipIsValid === true)) {
         vm.allFieldsValid = true;
       }
     }
@@ -249,9 +253,13 @@
     }
 
     function motherUpdated(mother) {
-      $state.go('children.listMothers', { stakeDB: vm.stakeDB, stakeName: vm.stakeName,
-        searchFilter: FilterService.currentListFilter(), colorFilter: FilterService.currentColorFilter(),
-        screenType: vm.nursingMother ? 'nursing' : 'pregnant'});
+      $state.go('children.listMothers', {
+        stakeDB: vm.stakeDB,
+        stakeName: vm.stakeName,
+        searchFilter: FilterService.currentListFilter(),
+        colorFilter: FilterService.currentColorFilter(),
+        screenType: vm.nursingMother ? 'nursing' : 'pregnant'
+      });
     }
 
     function addedError(error) {
@@ -260,9 +268,13 @@
 
     function newMother(motherCreated) {
       vm.mother = motherCreated;
-      $state.go('children.listMothers', { stakeDB: vm.stakeDB, stakeName: vm.stakeName,
-        searchFilter: FilterService.currentListFilter(), colorFilter: FilterService.currentColorFilter(),
-        screenType: vm.nursingMother ? 'nursing' : 'pregnant'});
+      $state.go('children.listMothers', {
+        stakeDB: vm.stakeDB,
+        stakeName: vm.stakeName,
+        searchFilter: FilterService.currentListFilter(),
+        colorFilter: FilterService.currentColorFilter(),
+        screenType: vm.nursingMother ? 'nursing' : 'pregnant'
+      });
     }
 
     function errorHandle(error) {
@@ -270,7 +282,7 @@
     }
     // Create new Mother
     function create(isValid) {
-      if (vm.mother.hasOwnProperty('_id')) {
+      if (Object.prototype.hasOwnProperty.call(vm.mother, '_id')) {
         PouchService.insert(vm.mother, motherUpdated, addedError);
       } else {
         vm.error = null;
@@ -285,7 +297,7 @@
 
         var motherObject = {
           created: vm.dt,
-//          birthDate: vm.mother.birthDate,
+          // birthDate: vm.mother.birthDate,
           firstName: vm.mother.firstName,
           lastName: vm.mother.lastName,
           comments: vm.mother.comments,
@@ -297,7 +309,7 @@
           _id: 'mthr_',
           interviewer: localStorage.getItem('lastInterviewer')
         };
-        vm.nursingMother ? motherObject.childsBirthDate = vm.mother.childsBirthDate : motherObject.deliveryDate = vm.mother.deliveryDate ;
+        vm.nursingMother ? motherObject.childsBirthDate = vm.mother.childsBirthDate : motherObject.deliveryDate = vm.mother.deliveryDate;
 
         PouchService.insert(motherObject, newMother, errorHandle);
 
@@ -315,9 +327,13 @@
 
     var removeResponse = function (res) {
       vm.remResponse = res;
-      $state.go('children.listMothers', { stakeDB: vm.stakeDB, stakeName: vm.stakeName,
-        searchFilter: FilterService.currentListFilter(), colorFilter: FilterService.currentColorFilter(),
-        screenType: vm.nursingMother ? 'nursing' : 'pregnant'});
+      $state.go('children.listMothers', {
+        stakeDB: vm.stakeDB,
+        stakeName: vm.stakeName,
+        searchFilter: FilterService.currentListFilter(),
+        colorFilter: FilterService.currentColorFilter(),
+        screenType: vm.nursingMother ? 'nursing' : 'pregnant'
+      });
     };
 
     var removeError = function (error) {
@@ -370,11 +386,12 @@
     // }
 
     function invalidChildsAge() {
-      return ModalService.infoModal('INVALID_CHILDS_BDATE' , 'CORRECT_CHILD_BDATE', '');
-    };
+      return ModalService.infoModal('INVALID_CHILDS_BDATE', 'CORRECT_CHILD_BDATE', '');
+    }
+
     function invalidDeliveryDate() {
-      return ModalService.infoModal('INVALID_DELIVERY_DATE' , 'CORRECT_DELIVERY_DATE', '');
-    };
+      return ModalService.infoModal('INVALID_DELIVERY_DATE', 'CORRECT_DELIVERY_DATE', '');
+    }
     // find();
   }
 }());

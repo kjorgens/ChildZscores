@@ -2,8 +2,8 @@
   'use strict';
 
   angular
-      .module('children.translate')
-      .config(translateConfig);
+    .module('children.translate')
+    .config(translateConfig);
 
   translateConfig.$inject = ['$translateProvider'];
 

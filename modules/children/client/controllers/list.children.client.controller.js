@@ -5,14 +5,14 @@
   'use strict';
 
   angular
-      .module('children')
-      .controller('ChildrenListController', ChildrenListController);
+    .module('children')
+    .controller('ChildrenListController', ChildrenListController);
 
   ChildrenListController.$inject = ['$rootScope', '$scope', '$state', '$stateParams', '$window', '$translate',
     'FilterService', 'childResolve', 'usSpinnerService', 'PouchService'];
 
   function ChildrenListController($rootScope, $scope, $state, $stateParams, $window, $translate,
-     FilterService, childResolve, usSpinnerService, PouchService) {
+    FilterService, childResolve, usSpinnerService, PouchService) {
     var vm = this;
     vm.countryCode = $stateParams.countryCode;
     vm.countryName = $stateParams.countryName;
@@ -23,17 +23,24 @@
     vm.focusSearch = 1;
     vm.searchString = FilterService.currentListFilter();
     vm.noSelection = FilterService.getCurrentScreenType() === '';
-    vm.childList = FilterService.searchAndFilter(childResolve.docs, FilterService.currentListFilter(), FilterService.currentColorFilter(), 'firstName');
+    vm.childList = FilterService.searchAndFilterRegex(childResolve.docs, FilterService.currentListFilter(), FilterService.currentColorFilter(), 'firstName');
     $translate.use($rootScope.SelectedLanguage);
 
     sessionStorage.setItem('selectedStake', $stateParams.stakeName);
     sessionStorage.setItem('selectedDBName', $stateParams.stakeDB);
+    sessionStorage.setItem('selectedCountryCode', $stateParams.countryCode);
+    localStorage.setItem('selectedCountryCode', $stateParams.countryCode);
     localStorage.setItem('selectedStake', $stateParams.stakeName);
     localStorage.setItem('selectedDBName', $stateParams.stakeDB);
     FilterService.setCurrentChildList(vm.childList);
 
     vm.selectedStake = $stateParams.stakeName;
     vm.selectedStakeDB = $stateParams.stakeDB;
+    vm.addChild = addNewChild;
+
+    function addNewChild(input) {
+      console.log('here we are' + input);
+    }
 
     function performTranslation() {
       $translate(['BOY', 'GIRL', 'ACUTE_ZSCORE', 'MICRO_NUTRITION_ZSCORE', 'AT_RISK_ZSCORE', 'NORMAL_ZSCORE', 'CHILD_GRADUATED'])
@@ -52,6 +59,8 @@
     vm.onLine = navigator.onLine;
 
     vm.selectWard = selectWard;
+
+    vm.obeseMsg = "Child is obese";
 
     $rootScope.$on('$translateChangeSuccess', function () {
       performTranslation();
@@ -73,18 +82,19 @@
     }, false);
 
     vm.selectedCountry = sessionStorage.getItem('selectedCountry');
+    vm.selectedCountryCode = sessionStorage.getItem('selectedCountryCode');
     vm.selectedCountryImage = sessionStorage.getItem('selectedCountryImage');
 
-    vm.clearSearch = function(){
+    vm.clearSearch = function() {
       vm.searchString = '';
-      FilterService.searchAndFilter(vm.childList, '', FilterService.currentColorFilter(), 'firstName');
+      FilterService.searchAndFilterRegex(vm.childList, '', FilterService.currentColorFilter(), 'firstName');
     };
 
     function searchStarted() {
-      vm.childList = FilterService.searchAndFilter(vm.childList, vm.searchString, FilterService.currentColorFilter(), 'firstName');
-      if ( FilterService.displayCount() === 1 ){
+      vm.childList = FilterService.searchAndFilterRegex(vm.childList, vm.searchString, FilterService.currentColorFilter(), 'firstName');
+      if (FilterService.displayCount() === 1) {
         FilterService.setSearchFilter(vm.searchString.slice(0, -1));
-        vm.focusSearch++;
+        vm.focusSearch += 1;
         $state.go('children.view', { childId: FilterService.getSingleChildId() });
       }
     }
@@ -94,9 +104,9 @@
     }
 
     function childInfoString(child) {
-      return child.doc.firstName + ' ' + child.doc.lastName + ' --- Birth age: ' + child.doc.monthAge.toFixed(2) + ' months,' +
-          '  Z Scores: height/age: ' + child.doc.zScore.ha.toFixed(2) + ' weight/age: ' + child.doc.zScore.wa.toFixed(2) + ' weight/height: ' +
-          child.doc.zScore.wl.toFixed(2);
+      return child.doc.firstName + ' ' + child.doc.lastName + ' --- Birth age: ' + child.doc.monthAge.toFixed(2) + ' months,'
+        + '  Z Scores: height/age: ' + child.doc.zScore.ha.toFixed(2) + ' weight/age: ' + child.doc.zScore.wa.toFixed(2)
+        + ' weight/height: ' + child.doc.zScore.wl.toFixed(2);
     }
 
     vm.startSpin = function() {
@@ -123,36 +133,36 @@
 
     vm.filterDanger = function() {
       vm.startSpin();
-      vm.childList = FilterService.searchAndFilter(vm.childList, FilterService.currentListFilter(), 'redZoneZscore', 'firstName');
+      vm.childList = FilterService.searchAndFilterRegex(vm.childList, FilterService.currentListFilter(), 'redZoneZscore', 'firstName');
       vm.childFilter = 'r';
-      localStorage.setItem('childFilter','r');
+      localStorage.setItem('childFilter', 'r');
       vm.stopSpin();
-      vm.focusSearch++;
+      vm.focusSearch += 1;
     };
 
     vm.filterWarning = function() {
       vm.startSpin();
-      vm.childList = FilterService.searchAndFilter(vm.childList, FilterService.currentListFilter(), 'marginalZscore', 'firstName');
+      vm.childList = FilterService.searchAndFilterRegex(vm.childList, FilterService.currentListFilter(), 'marginalZscore', 'firstName');
       vm.childFilter = 'w';
-      localStorage.setItem('childFilter','w');
+      localStorage.setItem('childFilter', 'w');
       vm.stopSpin();
-      vm.focusSearch++;
+      vm.focusSearch += 1;
     };
 
     vm.filterSuccess = function() {
       vm.startSpin();
-      vm.childList = FilterService.searchAndFilter(vm.childList, FilterService.currentListFilter(), 'normalZscore', 'firstName');
+      vm.childList = FilterService.searchAndFilterRegex(vm.childList, FilterService.currentListFilter(), 'normalZscore', 'firstName');
       vm.childFilter = 'n';
-      localStorage.setItem('childFilter','n');
+      localStorage.setItem('childFilter', 'n');
       vm.stopSpin();
-      vm.focusSearch++;
+      vm.focusSearch += 1;
     };
 
     vm.filterNone = function() {
       vm.startSpin();
-      vm.childList = FilterService.searchAndFilter(vm.childList, FilterService.currentListFilter(), '', 'firstName');
+      vm.childList = FilterService.searchAndFilterRegex(vm.childList, FilterService.currentListFilter(), '', 'firstName');
       vm.childFilter = 'a';
-      localStorage.setItem('childFilter','a');
+      localStorage.setItem('childFilter', 'a');
       vm.stopSpin();
       vm.focusSearch = true;
     };
@@ -161,6 +171,14 @@
       if (input !== null) {
         vm.wardList = input;
       }
+    }
+
+    function setChildren(results) {
+      vm.childList = results.docs;
+    }
+
+    function listChildrenErrors(error) {
+      console.log(error.message);
     }
 
     function selectWard() {

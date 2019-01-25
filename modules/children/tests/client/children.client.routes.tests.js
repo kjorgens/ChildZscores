@@ -53,7 +53,7 @@
         });
 
         it('Should have template', function () {
-          expect(liststate.templateUrl).toBe('modules/articles/client/views/list-articles.client.view.html');
+          expect(liststate.templateUrl).toBe('/modules/articles/client/views/list-articles.client.view.html');
         });
       });
 
@@ -64,7 +64,7 @@
 
         beforeEach(inject(function ($controller, $state, $templateCache) {
           viewstate = $state.get('articles.view');
-          $templateCache.put('modules/articles/client/views/view-article.client.view.html', '');
+          $templateCache.put('/modules/articles/client/views/view-article.client.view.html', '');
 
           // create mock article
           mockArticle = new ArticlesService({
@@ -104,7 +104,7 @@
         });
 
         it('Should have templateUrl', function () {
-          expect(viewstate.templateUrl).toBe('modules/articles/client/views/view-article.client.view.html');
+          expect(viewstate.templateUrl).toBe('/modules/articles/client/views/view-article.client.view.html');
         });
       });
 
@@ -115,7 +115,7 @@
 
         beforeEach(inject(function ($controller, $state, $templateCache) {
           createstate = $state.get('articles.create');
-          $templateCache.put('modules/articles/client/views/form-article.client.view.html', '');
+          $templateCache.put('/modules/articles/client/views/form-article.client.view.html', '');
 
           // create mock article
           mockArticle = new ArticlesService();
@@ -150,7 +150,7 @@
         });
 
         it('Should have templateUrl', function () {
-          expect(createstate.templateUrl).toBe('modules/articles/client/views/form-article.client.view.html');
+          expect(createstate.templateUrl).toBe('/modules/articles/client/views/form-article.client.view.html');
         });
       });
 
@@ -161,7 +161,7 @@
 
         beforeEach(inject(function ($controller, $state, $templateCache) {
           editstate = $state.get('articles.edit');
-          $templateCache.put('modules/articles/client/views/form-article.client.view.html', '');
+          $templateCache.put('/modules/articles/client/views/form-article.client.view.html', '');
 
           // create mock article
           mockArticle = new ArticlesService({
@@ -201,7 +201,7 @@
         });
 
         it('Should have templateUrl', function () {
-          expect(editstate.templateUrl).toBe('modules/articles/client/views/form-article.client.view.html');
+          expect(editstate.templateUrl).toBe('/modules/articles/client/views/form-article.client.view.html');
         });
 
         xit('Should go to unauthorized route', function () {
@@ -211,16 +211,16 @@
 
       describe('Handle Trailing Slash', function () {
         beforeEach(inject(function ($state, $rootScope) {
-          $state.go('articles.list');
+          $state.go('children.list');
           $rootScope.$digest();
         }));
 
         it('Should remove trailing slash', inject(function ($state, $location, $rootScope) {
-          $location.path('articles/');
+          $location.path('children/');
           $rootScope.$digest();
 
           expect($location.path()).toBe('/articles');
-          expect($state.current.templateUrl).toBe('modules/articles/client/views/list-articles.client.view.html');
+          expect($state.current.templateUrl).toBe('/modules/articles/client/views/list-articles.client.view.html');
         }));
       });
     });

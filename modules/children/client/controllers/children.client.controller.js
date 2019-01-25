@@ -6,26 +6,26 @@
     .controller('ChildrenController', ChildrenController);
 
   ChildrenController.$inject = ['$rootScope', '$scope', '$state', '$stateParams', '$translate', '$window', 'GraphService',
-    'FilterService', 'moment', 'childResolve', 'Authentication', 'ZScores', 'usSpinnerService', 'PouchService', 'ModalService'];
+    'FilterService', 'moment', 'screenResolve', 'Authentication', 'ZScores', 'Obesity', 'usSpinnerService', 'PouchService', 'ModalService'];
 
   function ChildrenController($rootScope, $scope, $state, $stateParams, $translate, $window, GraphService,
-     FilterService, moment, child, Authentication, ZScores, usSpinnerService, PouchService, ModalService) {
+    FilterService, moment, screens, Authentication, ZScores, Obesity, usSpinnerService, PouchService, ModalService) {
     var vm = this;
     vm.options = {};
     vm.data = {};
     vm.zscoreHa = [];
     vm.zscoreWa = [];
     vm.zscoreWH = [];
-    performTranslation();
     vm.callback = callback;
 
+    vm.supInfo = screens.sup;
 
     function callback(scope, element) {
       var api = scope.api;
       var chart = scope.chart;
       var svg = scope.svg;
     }
-//var getMethod(firstScreening);
+
     var editChild = false;
     vm.checkAge = checkAge;
     vm.childTooOld = childTooOld;
@@ -40,14 +40,15 @@
     // vm.selectedWard = localStorage.getItem('selectedWard');
     vm.selectedWard = $stateParams.ward;
     // if(vm.selectedWard.indexOf('All Wards') === -1){
-    //   vm.child.ward = vm.selectedWard;
+    // vm.child.ward = vm.selectedWard;
     // }
     vm.selectedCountry = sessionStorage.getItem('selectedCountry');
+    vm.selectedCountryCode = sessionStorage.getItem('selectedCountryCode');
     vm.selectedCountryImage = sessionStorage.getItem('selectedCountryImage');
     vm.online = $rootScope.appOnline;
     vm.interviewer = localStorage.getItem('lastInterviewer');
 
- //   getChildrenList();
+    // getChildrenList();
     vm.genders = [{ value: 'Boy', translationId: 'TXT_MALE' }, { value: 'Girl', translationId: 'TXT_FEMALE' }];
     vm.yesNo = [{ value: 'Yes', translationId: 'YES' }, { value: 'No', translationId: 'NO' }, { value: 'Unknown', translationId: 'UNKNOWN' }];
     vm.startSpin = function() {
@@ -73,8 +74,13 @@
     });
 
     function goBack() {
-      $state.go('children.list', { stakeDB: vm.selectedDB, stakeName: vm.selectedStake, screenType: 'children',
-        searchFilter: FilterService.currentListFilter(), colorFilter: FilterService.currentColorFilter() });
+      $state.go('children.list', {
+        stakeDB: vm.selectedDB,
+        stakeName: vm.selectedStake,
+        screenType: 'children',
+        searchFilter: FilterService.currentListFilter(),
+        colorFilter: FilterService.currentColorFilter()
+      });
     }
 
     function checkAge() {
@@ -83,9 +89,14 @@
       var currentAgeMonths = moment(rightNow).diff(moment(vm.child.birthDate), 'months');
       if (currentAgeMonths > 60) {
         vm.childTooOld();
- //       vm.startSpin();
-        $state.go('children.list', { stakeDB: vm.selectedDB, stakeName: vm.selectedStake, screenType: 'children',
-          searchFilter: FilterService.currentListFilter(), colorFilter: FilterService.currentColorFilter() });
+        // vm.startSpin();
+        $state.go('children.list', {
+          stakeDB: vm.selectedDB,
+          stakeName: vm.selectedStake,
+          screenType: 'children',
+          searchFilter: FilterService.currentListFilter(),
+          colorFilter: FilterService.currentColorFilter()
+        });
       } else if (vm.initialScreening && currentAgeMonths > 36) {
         childDoesNotQualify();
       }
@@ -93,7 +104,13 @@
 
     if ($state.params.childId) {
       editChild = true;
-      vm.child = child;
+      vm.surveys = screens.screens;
+      vm.child = screens.child;
+      if (vm.surveys.length > 0) {
+        let obeseInfo = Obesity.getObesity(vm.child, vm.surveys[0]);
+        vm.obese = obeseInfo.obese;
+        vm.bmi = obeseInfo.currentBMI;
+      }
       vm.checkAge();
       vm.ageIsValid = true;
       vm.firstNameIsValid = true;
@@ -106,8 +123,8 @@
       vm.wardIsValid = true;
 
       vm.child.birthDate = new Date(vm.child.birthDate);
-      vm.startSpin();
-      PouchService.getSurveys(vm.child._id, setSurveyList, surveyErrors);
+      translationGraphs();
+      setSurveyList(screens.child, screens.screens);
     } else {
       vm.child = {};
       // vm.child.gender = 'Boy';
@@ -146,47 +163,52 @@
     vm.checkAgeIsValid = checkAgeIsValid;
     vm.checkEnteredAgeIsValid = checkEnteredAgeIsValid;
     vm.checkAllFieldsValid = checkAllFieldsValid;
+
+    function translationGraphs() {
+      $translate([
+        'MIN_HEALTH_WEIGHT', 'CHILD_WEIGHT_GRAPH', 'MIN_HEALTH_WEIGHT_HEIGHT', 'WEIGHT_AGE_GRAPH',
+        'CHILD_WEIGHT_KEY', 'WEIGHT_HEIGHT_GRAPH', 'CHILD_AGE_GRAPH', 'CHILD_HEIGHT_KEY',
+        'MIN_HEALTH_HEIGHT', 'CHILD_HEIGHT_GRAPH', 'HEIGHT_AGE_CURVE']).then(function (translations) {
+        vm.minHealthW = translations.MIN_HEALTH_WEIGHT;
+        vm.childWeightW = translations.CHILD_WEIGHT_GRAPH;
+        vm.minHealthWH = translations.MIN_HEALTH_WEIGHT_HEIGHT;
+        vm.weightC = translations.WEIGHT_AGE_GRAPH;
+        vm.weightKey = translations.CHILD_WEIGHT_KEY;
+        vm.heightWeightC = translations.WEIGHT_HEIGHT_GRAPH;
+        vm.childAge = translations.CHILD_AGE_GRAPH;
+        vm.heightAgeH = translations.CHILD_HEIGHT_KEY;
+        vm.minHealthH = translations.MIN_HEALTH_HEIGHT;
+        vm.childHeightH = translations.CHILD_HEIGHT_GRAPH;
+        vm.heightAgeC = translations.HEIGHT_AGE_CURVE;
+        vm.optionsHeight = GraphService.setupHeightChart(vm.minHealthH, vm.childHeightH, vm.childAge);
+        vm.optionsWeight = GraphService.setupWeightChart(vm.minHealthW, vm.childWeightW, vm.childAge);
+        vm.optionsWeightPerHeight = GraphService.setupWeightPerHeightChart(vm.minHealthWH, vm.childWeightW, vm.childHeightH);
+        vm.dataHeight = GraphService.getChartDataHeight(vm.zscoreHa, vm.child.gender, vm.heightAgeC, vm.heightAgeH);
+        vm.dataWeight = GraphService.getChartDataWeight(vm.zscoreWa, vm.child.gender, vm.weightC, vm.weightKey);
+        vm.dataWeightPerHeight = GraphService.getChartDataWeightPerHeight(vm.zscoreWH, vm.child.gender, vm.heightWeightC);
+      });
+    }
+
     function performTranslation() {
       $translate(['BOY', 'GIRL', 'CHILD_RECORD', 'UPDATE', 'CREATE',
         'EDIT_EXISTING_CHILD', 'ADD_NEW_CHILD', 'CHILD_GT_5', 'CHILD_GRAD',
-        'INPUT_ERROR', 'INVALID_DATA', 'PLEASE_CORRECT', 'MIN_HEALTH_HEIGHT',
-         'CHILD_HEIGHT_GRAPH', 'CHILD_AGE_GRAPH', 'HEIGHT_AGE_CURVE', 'CHILD_HEIGHT_KEY',
-          'MIN_HEALTH_WEIGHT', 'CHILD_WEIGHT_GRAPH', 'MIN_HEALTH_WEIGHT_HEIGHT', 'WEIGHT_AGE_GRAPH',
-          'CHILD_WEIGHT_KEY', 'WEIGHT_HEIGHT_GRAPH']).then(function (translations) {
-            vm.boy = translations.BOY;
-            vm.girl = translations.GIRL;
-            vm.childRec = translations.CHILD_RECORD;
-            vm.update = translations.UPDATE;
-            vm.createRec = translations.CREATE;
-            vm.edit_existing = translations.EDIT_EXISTING_CHILD;
-            vm.add_new = translations.ADD_NEW_CHILD;
-            vm.childGT5 = translations.CHILD_GT_5;
-            vm.childGrad = translations.CHILD_GRAD;
-            vm.inputError = translations.INPUT_ERROR;
-            vm.invalidData = translations.INVALID_DATA;
-            vm.pleaseCorrect = translations.PLEASE_CORRECT;
-            vm.minHealthH = translations.MIN_HEALTH_HEIGHT;
-            vm.childHeightH = translations.CHILD_HEIGHT_GRAPH;
-            vm.childAge = translations.CHILD_AGE_GRAPH;
-            vm.heightAgeC = translations.HEIGHT_AGE_CURVE;
-            vm.heightAgeH = translations.CHILD_HEIGHT_KEY;
-            vm.optionsHeight = GraphService.setupHeightChart(vm.minHealthH, vm.childHeightH, vm.childAge);
-            vm.minHealthW = translations.MIN_HEALTH_WEIGHT;
-            vm.childWeightW = translations.CHILD_WEIGHT_GRAPH;
-            vm.weightC = translations.WEIGHT_AGE_GRAPH;
-            vm.weightKey = translations.CHILD_WEIGHT_KEY;
-            vm.optionsWeight = GraphService.setupWeightChart(vm.minHealthW, vm.childWeightW, vm.childAge);
-            vm.minHealthWH = translations.MIN_HEALTH_WEIGHT_HEIGHT;
-            vm.heightWeightC = translations.WEIGHT_HEIGHT_GRAPH;
-            vm.optionsWeightPerHeight = GraphService.setupWeightPerHeightChart(vm.minHealthWH, vm.childWeightW, vm.childHeightH);
-            vm.dataHeight = GraphService.getChartDataHeight(vm.zscoreHa, vm.child.gender, vm.heightAgeC, vm.heightAgeH);
-            vm.dataWeight = GraphService.getChartDataWeight(vm.zscoreWa, vm.child.gender, vm.weightC, vm.weightKey);
-            vm.dataWeightPerHeight = GraphService.getChartDataWeightPerHeight(vm.zscoreWH, vm.child.gender, vm.heightWeightC);
-          });
+        'INPUT_ERROR', 'INVALID_DATA', 'PLEASE_CORRECT']).then(function (translations) {
+        vm.boy = translations.BOY;
+        vm.girl = translations.GIRL;
+        vm.childRec = translations.CHILD_RECORD;
+        vm.update = translations.UPDATE;
+        vm.createRec = translations.CREATE;
+        vm.edit_existing = translations.EDIT_EXISTING_CHILD;
+        vm.add_new = translations.ADD_NEW_CHILD;
+        vm.childGT5 = translations.CHILD_GT_5;
+        vm.childGrad = translations.CHILD_GRAD;
+        vm.inputError = translations.INPUT_ERROR;
+        vm.invalidData = translations.INVALID_DATA;
+        vm.pleaseCorrect = translations.PLEASE_CORRECT;
+      });
     }
 
-
-    // performTranslation();
+    performTranslation();
     $rootScope.$on('$translateChangeSuccess', function () {
       performTranslation();
     });
@@ -198,62 +220,48 @@
       if (survey.zScore.ha < -2) {
         vm.haStatus = 'redZoneZscore';
         vm.child.screeningStatus = 'redZoneZscore';
-      } else {
-        if (survey.zScore.ha < -1 && survey.zScore.ha > -2) {
-          vm.haStatus = 'marginalZscore';
-          vm.child.screeningStatus = 'marginalZscore';
-        }
+      } else if (survey.zScore.ha < -1 && survey.zScore.ha > -2) {
+        vm.haStatus = 'marginalZscore';
+        vm.child.screeningStatus = 'marginalZscore';
       }
       if (survey.zScore.wa < -2) {
         vm.waStatus = 'redZoneZscore';
         vm.child.screeningStatus = 'redZoneZscore';
-      } else {
-        if (survey.zScore.wa < -1 && survey.zScore.wa > -2) {
-          vm.child.screeningStatus = 'marginalZscore';
-          vm.waStatus = 'marginalZscore';
-        }
+      } else if (survey.zScore.wa < -1 && survey.zScore.wa > -2) {
+        vm.child.screeningStatus = 'marginalZscore';
+        vm.waStatus = 'marginalZscore';
       }
       if (survey.zScore.wl < -3) {
         vm.wlStatus = 'dangerZscore';
         vm.child.screeningStatus = 'dangerZscore';
-      } else {
-        if (survey.zScore.wl < -2 && survey.zScore.wl > -3) {
-          vm.child.screeningStatus = 'redZoneZscore';
-          vm.wlStatus = 'redZoneZscore';
-        } else {
-          if (survey.zScore.wl < -1 && survey.zScore.wl > -2) {
-            vm.wlStatus = 'marginalZscore';
-            vm.child.screeningStatus = 'marginalZscore';
-          }
-        }
+      } else if (survey.zScore.wl < -2 && survey.zScore.wl > -3) {
+        vm.child.screeningStatus = 'redZoneZscore';
+        vm.wlStatus = 'redZoneZscore';
+      } else if (survey.zScore.wl < -1 && survey.zScore.wl > -2) {
+        vm.wlStatus = 'marginalZscore';
+        vm.child.screeningStatus = 'marginalZscore';
       }
     }
 
-    function setSurveyList(surveys) {
-      vm.stopSpin();
-      if (surveys.docs.length === 1) {
+    function setSurveyList(child, surveys) {
+      // vm.stopSpin();
+      if (surveys.length === 1) {
         vm.initialScreening = true;
       }
-      surveys.docs.forEach(function(survey) {
+      surveys.forEach(function(survey) {
         survey.colorStatus = PouchService.calcSurveyStatus(survey);
-        vm.zscoreHa.push({ x: survey.monthAge, y: survey.height, size: 1, shape: 'diamond' });
-        vm.zscoreWa.push({ x: survey.monthAge, y: survey.weight, size: 1, shape: 'diamond' });
-        vm.zscoreWH.push({ x: survey.height, y: survey.weight, size: 1, shape: 'diamond' });
-      });
-
-      $scope.$apply(function () {
-        vm.surveys = surveys.docs;
-        vm.zScoreGetter(vm.child.gender, vm.surveys[0].monthAge, vm.surveys[0].height, vm.surveys[0].weight, vm.surveys.length === 1 ? true : false, function (zscore) {
-          vm.zScore = zscore;
-          vm.actions = zscore.actions;
+        vm.zscoreHa.push({
+          x: survey.monthAge, y: survey.height, size: 1, shape: 'diamond'
         });
-        performTranslation();
-        //       vm.surveys.forEach(function(survey) {
-        //        if (vm.surveys.length > 0) {
-        //          gradeZScores(vm.surveys[0]);
-        //        }
-        //       });
+        vm.zscoreWa.push({
+          x: survey.monthAge, y: survey.weight, size: 1, shape: 'diamond'
+        });
+        vm.zscoreWH.push({
+          x: survey.height, y: survey.weight, size: 1, shape: 'diamond'
+        });
       });
+      // vm.screenStatus = ZScores.getStatus(vm.child, surveys);
+      vm.surveys = surveys;
     }
 
     function surveyErrors(error) {
@@ -279,31 +287,27 @@
     }
 
     function checkAllFieldsValid() {
-      if (vm.firstNameIsValid === true &&
-          vm.lastNameIsValid === true &&
-          vm.genderIsValid === true &&
-          vm.ageIsValid === true &&
-          vm.membershipIsValid === true) {
+      if (vm.firstNameIsValid === true
+        && vm.lastNameIsValid === true
+        && vm.genderIsValid === true
+        && vm.ageIsValid === true
+        && vm.membershipIsValid === true) {
         vm.allFieldsValid = true;
         vm.invalidFields = false;
-      } else if (vm.firstNameIsValid === false ||
-          vm.lastNameIsValid === false ||
-          vm.genderIsValid === false ||
-          vm.ageIsValid === false ||
-          vm.membershipIsValid === false) {
+      } else if (vm.firstNameIsValid === false
+        || vm.lastNameIsValid === false
+        || vm.genderIsValid === false
+        || vm.ageIsValid === false
+        || vm.membershipIsValid === false) {
         vm.allFieldsValid = false;
         vm.invalidFields = true;
-      } else if ((vm.firstNameIsValid === undefined || vm.firstNameIsValid === true) &&
-          (vm.lastNameIsValid === undefined || vm.lastNameIsValid === true) &&
-          (vm.genderIsValid === undefined || vm.genderIsValid === true) &&
-          (vm.ageIsValid === undefined || vm.ageIsValid === true) &&
-          (vm.membershipIsValid === undefined || vm.membershipIsValid === true)) {
+      } else if ((vm.firstNameIsValid === undefined || vm.firstNameIsValid === true)
+        && (vm.lastNameIsValid === undefined || vm.lastNameIsValid === true)
+        && (vm.genderIsValid === undefined || vm.genderIsValid === true)
+        && (vm.ageIsValid === undefined || vm.ageIsValid === true)
+        && (vm.membershipIsValid === undefined || vm.membershipIsValid === true)) {
         vm.allFieldsValid = true;
       }
-    }
-
-    function setMonthAge() {
-
     }
 
     function setMonthCount() {
@@ -573,8 +577,13 @@
         });
         PouchService.remove(child, removeResponse, removeError);
         vm.startSpin();
-        $state.go('children.list', { stakeDB: vm.selectedDB, stakeName: vm.selectedStake, screenType: 'children',
-          searchFilter: FilterService.currentListFilter(), colorFilter: FilterService.currentColorFilter() });
+        $state.go('children.list', {
+          stakeDB: vm.selectedDB,
+          stakeName: vm.selectedStake,
+          screenType: 'children',
+          searchFilter: FilterService.currentListFilter(),
+          colorFilter: FilterService.currentColorFilter()
+        });
       }
     }
 
@@ -611,10 +620,9 @@
     };
     // Find existing Child
     function findOne() {
- //     var something = $stateParams;
+    // var something = $stateParams;
       PouchService.get({ childId: vm.childId }, getUser, getError);
     }
-
 
     function childTooOld() {
       return ModalService.infoModal('CHILD_GT_5', 'CHILD_GRAD', '');

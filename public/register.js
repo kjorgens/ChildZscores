@@ -4,9 +4,10 @@ var swRegistration;
 
 // register service worker
 if ('serviceWorker' in navigator) {
-  console.log('CLIENT: service worker registration in progress');
-  navigator.serviceWorker.register('sw.js', {
-    scope: './'
+  console.log('CLIENT: service worker registration using sw.js in progress');
+  navigator.serviceWorker.register('/sw.js', {
+    updateViaCache: 'none'
+    // scope: './'
   }).then(function (registration) {
     // Registration was successful
     swRegistration = registration;

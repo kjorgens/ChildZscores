@@ -8,7 +8,7 @@ var path = require('path'),
   mongoose = require('mongoose'),
   passport = require('passport'),
   User = mongoose.model('User'),
-  authentication = require(path.resolve('./config/lib/jwtAuthentication'));
+  jwtAuthentication = require(path.resolve('./config/lib/jwtAuthentication'));
 
 // URLs for which user can't be redirected on signin
 var noReturnUrls = [
@@ -31,7 +31,7 @@ exports.signup = function (req, res) {
   // Then save the user
   user.save(function (err) {
     if (err) {
-      return res.status(400).send({
+      return res.status(422).send({
         message: errorHandler.getErrorMessage(err)
       });
     } else {
@@ -39,8 +39,15 @@ exports.signup = function (req, res) {
       user.password = undefined;
       user.salt = undefined;
 
-      var jwtToken = authentication.signToken(user);
-      res.json({ user: user, token: jwtToken });
+      req.login(user, function (err) {
+        if (err) {
+          res.status(400).send(err);
+        } else {
+          var jwtToken = jwtAuthentication.signToken(user);
+          res.json({ user: user, token: jwtToken });
+          // res.json(user);
+        }
+      });
     }
   });
 };
@@ -51,14 +58,21 @@ exports.signup = function (req, res) {
 exports.signin = function (req, res, next) {
   passport.authenticate('local', function (err, user, info) {
     if (err || !user) {
-      res.status(400).send(info);
+      res.status(422).send(info);
     } else {
       // Remove sensitive data before login
       user.password = undefined;
       user.salt = undefined;
 
-      var jwtToken = authentication.signToken(user);
-      res.json({ user: user, token: jwtToken });
+      req.login(user, function (err) {
+        if (err) {
+          res.status(400).send(err);
+        } else {
+          var jwtToken = jwtAuthentication.signToken(user);
+          res.json({ user: user, token: jwtToken });
+          // res.json(user);
+        }
+      });
     }
   })(req, res, next);
 };
@@ -74,100 +88,115 @@ exports.signout = function (req, res) {
 /**
  * OAuth provider call
  */
-exports.oauthCall = function (strategy, scope) {
-  return function (req, res, next) {
-    // Set redirection path on session.
-    // Do not redirect to a signin or signup page
-    if (noReturnUrls.indexOf(req.query.redirect_to) === -1) {
-      req.session.redirect_to = req.query.redirect_to;
-    }
-    // Authenticate
-    passport.authenticate(strategy, scope)(req, res, next);
-  };
+exports.oauthCall = function (req, res, next) {
+  var strategy = req.params.strategy;
+  // Authenticate
+  passport.authenticate(strategy)(req, res, next);
 };
 
 /**
  * OAuth callback
  */
-exports.oauthCallback = function (strategy) {
-  return function (req, res, next) {
-    // Pop redirect URL from session
-    var sessionRedirectURL = req.session.redirect_to;
-    delete req.session.redirect_to;
+exports.oauthCallback = function (req, res, next) {
+  var strategy = req.params.strategy;
 
-    passport.authenticate(strategy, function (err, user, redirectURL) {
+  // info.redirect_to contains inteded redirect path
+  passport.authenticate(strategy, function (err, user, info) {
+    if (err) {
+      return res.redirect('/authentication/signin?err=' + encodeURIComponent(errorHandler.getErrorMessage(err)));
+    }
+    if (!user) {
+      return res.redirect('/authentication/signin');
+    }
+    req.login(user, function (err) {
       if (err) {
-        return res.redirect('/authentication/signin?err=' + encodeURIComponent(errorHandler.getErrorMessage(err)));
-      }
-      if (!user) {
         return res.redirect('/authentication/signin');
       }
 
-      var jwtToken = authentication.signToken(user);
-      return res.redirect((redirectURL || sessionRedirectURL || '/') + '?token=' + jwtToken);
-
-    })(req, res, next);
-  };
+      return res.redirect(info.redirect_to || '/');
+    });
+  })(req, res, next);
 };
 
 /**
  * Helper function to save or update a OAuth user profile
  */
 exports.saveOAuthUserProfile = function (req, providerUserProfile, done) {
-  if (!req.user) {
-    // Define a search query fields
-    var searchMainProviderIdentifierField = 'providerData.' + providerUserProfile.providerIdentifierField;
-    var searchAdditionalProviderIdentifierField = 'additionalProvidersData.' + providerUserProfile.provider + '.' + providerUserProfile.providerIdentifierField;
+  // Setup info and user objects
+  var info = {};
+  var user;
 
-    // Define main provider search query
-    var mainProviderSearchQuery = {};
-    mainProviderSearchQuery.provider = providerUserProfile.provider;
-    mainProviderSearchQuery[searchMainProviderIdentifierField] = providerUserProfile.providerData[providerUserProfile.providerIdentifierField];
+  // Set redirection path on session.
+  // Do not redirect to a signin or signup page
+  if (noReturnUrls.indexOf(req.session.redirect_to) === -1) {
+    info.redirect_to = req.session.redirect_to;
+  }
 
-    // Define additional provider search query
-    var additionalProviderSearchQuery = {};
-    additionalProviderSearchQuery[searchAdditionalProviderIdentifierField] = providerUserProfile.providerData[providerUserProfile.providerIdentifierField];
+  // Define a search query fields
+  var searchMainProviderIdentifierField = 'providerData.' + providerUserProfile.providerIdentifierField;
+  var searchAdditionalProviderIdentifierField = 'additionalProvidersData.' + providerUserProfile.provider + '.' + providerUserProfile.providerIdentifierField;
 
-    // Define a search query to find existing user with current provider profile
-    var searchQuery = {
-      $or: [mainProviderSearchQuery, additionalProviderSearchQuery]
-    };
+  // Define main provider search query
+  var mainProviderSearchQuery = {};
+  mainProviderSearchQuery.provider = providerUserProfile.provider;
+  mainProviderSearchQuery[searchMainProviderIdentifierField] = providerUserProfile.providerData[providerUserProfile.providerIdentifierField];
 
-    User.findOne(searchQuery, function (err, user) {
-      if (err) {
-        return done(err);
-      } else {
-        if (!user) {
-          var possibleUsername = providerUserProfile.username || ((providerUserProfile.email) ? providerUserProfile.email.split('@')[0] : '');
+  // Define additional provider search query
+  var additionalProviderSearchQuery = {};
+  additionalProviderSearchQuery[searchAdditionalProviderIdentifierField] = providerUserProfile.providerData[providerUserProfile.providerIdentifierField];
 
-          User.findUniqueUsername(possibleUsername, null, function (availableUsername) {
-            user = new User({
-              firstName: providerUserProfile.firstName,
-              lastName: providerUserProfile.lastName,
-              username: availableUsername,
-              displayName: providerUserProfile.displayName,
-              email: providerUserProfile.email,
-              profileImageURL: providerUserProfile.profileImageURL,
-              provider: providerUserProfile.provider,
-              providerData: providerUserProfile.providerData
-            });
+  // Define a search query to find existing user with current provider profile
+  var searchQuery = {
+    $or: [mainProviderSearchQuery, additionalProviderSearchQuery]
+  };
 
-            // And save the user
-            user.save(function (err) {
-              return done(err, user);
-            });
+  // Find existing user with this provider account
+  User.findOne(searchQuery, function (err, existingUser) {
+    if (err) {
+      return done(err);
+    }
+
+    if (!req.user) {
+      if (!existingUser) {
+        var possibleUsername = providerUserProfile.username || ((providerUserProfile.email) ? providerUserProfile.email.split('@')[0] : '');
+
+        User.findUniqueUsername(possibleUsername, null, function (availableUsername) {
+          user = new User({
+            firstName: providerUserProfile.firstName,
+            lastName: providerUserProfile.lastName,
+            username: availableUsername,
+            displayName: providerUserProfile.displayName,
+            profileImageURL: providerUserProfile.profileImageURL,
+            provider: providerUserProfile.provider,
+            providerData: providerUserProfile.providerData
           });
-        } else {
-          return done(err, user);
-        }
-      }
-    });
-  } else {
-    // User is already logged in, join the provider data to the existing user
-    var user = req.user;
 
-    // Check if user exists, is not signed in using this provider, and doesn't have that provider data already configured
-    if (user.provider !== providerUserProfile.provider && (!user.additionalProvidersData || !user.additionalProvidersData[providerUserProfile.provider])) {
+          // Email intentionally added later to allow defaults (sparse settings) to be applid.
+          // Handles case where no email is supplied.
+          // See comment: https://github.com/meanjs/mean/pull/1495#issuecomment-246090193
+          user.email = providerUserProfile.email;
+
+          // And save the user
+          user.save(function (err) {
+            return done(err, user, info);
+          });
+        });
+      } else {
+        return done(err, existingUser, info);
+      }
+    } else {
+      // User is already logged in, join the provider data to the existing user
+      user = req.user;
+
+      // Check if an existing user was found for this provider account
+      if (existingUser) {
+        if (user.id !== existingUser.id) {
+          return done(new Error('Account is already connected to another user'), user, info);
+        }
+
+        return done(new Error('User is already connected using this provider'), user, info);
+      }
+
       // Add the provider data to the additional provider data field
       if (!user.additionalProvidersData) {
         user.additionalProvidersData = {};
@@ -180,12 +209,10 @@ exports.saveOAuthUserProfile = function (req, providerUserProfile, done) {
 
       // And save the user
       user.save(function (err) {
-        return done(err, user, '/settings/accounts');
+        return done(err, user, info);
       });
-    } else {
-      return done(new Error('User is already connected using this provider'), user);
     }
-  }
+  });
 };
 
 /**
@@ -213,11 +240,17 @@ exports.removeOAuthProvider = function (req, res, next) {
 
   user.save(function (err) {
     if (err) {
-      return res.status(400).send({
+      return res.status(422).send({
         message: errorHandler.getErrorMessage(err)
       });
     } else {
-      return res.json(user);
+      req.login(user, function (err) {
+        if (err) {
+          return res.status(400).send(err);
+        } else {
+          return res.json(user);
+        }
+      });
     }
   });
 };

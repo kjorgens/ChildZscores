@@ -2,8 +2,8 @@
   'use strict';
 
   angular
-      .module('children')
-      .controller('ChildrenRemoveController', ChildrenRemoveController);
+    .module('children')
+    .controller('ChildrenRemoveController', ChildrenRemoveController);
 
   ChildrenRemoveController.$inject = ['$state', '$scope', '$stateParams', 'childRemove', 'PouchService'];
 
@@ -31,7 +31,9 @@
           PouchService.remove(toRemove, removeResponse, removeError);
         });
         PouchService.remove(child, removeResponse, removeError);
-        $state.go('children.list', { stakeDB: vm.selectedDB, stakeName: vm.selectedStake, screenType: 'children', searchFilter: '', colorFilter: '' });
+        $state.go('children.list', {
+          stakeDB: vm.selectedDB, stakeName: vm.selectedStake, screenType: 'children', searchFilter: '', colorFilter: ''
+        });
       }
     }
 
@@ -48,4 +50,3 @@
     PouchService.getSurveys(childRemove._id, setSurveyList, surveyErrors);
   }
 }());
-

@@ -58,12 +58,8 @@
 
     factory.filterByColor = function(list, statusColor) {
       currentColorFilter = statusColor;
-      list.forEach(function(child){
-        if (~child.statusColor.indexOf(statusColor)) {
-          child.display = true;
-        } else {
-          child.display = false;
-        }
+      list.forEach(function(child) {
+        child.display = !!(~child.statusColor.indexOf(statusColor));
       });
     };
 
@@ -93,17 +89,68 @@
 
     factory.matchName = function (list, currentChild) {
       return list.find(function(child) {
-        return (~child.firstName.toUpperCase().indexOf(currentChild.firstName.toUpperCase()) &&
-            ~child.lastName.toUpperCase().indexOf(currentChild.lastName.toUpperCase()));
+        return (~child.firstName.toUpperCase().indexOf(currentChild.firstName.toUpperCase())
+          && ~child.lastName.toUpperCase().indexOf(currentChild.lastName.toUpperCase()));
       });
     };
 
     factory.matchNameAndAge = function(list, currentChild) {
       return list.some(function(child) {
-        return (~child.firstName.toUpperCase().indexOf(currentChild.firstName.toUpperCase()) &&
-          ~child.lastName.toUpperCase().indexOf(currentChild.lastName.toUpperCase()) &&
-          child.monthAge === currentChild.monthAge);
+        return (~child.firstName.toUpperCase().indexOf(currentChild.firstName.toUpperCase())
+          && ~child.lastName.toUpperCase().indexOf(currentChild.lastName.toUpperCase())
+          && child.monthAge === currentChild.monthAge);
       });
+    };
+
+    factory.searchAndFilterRegex = function (list, searchFilter, colorFilter, sortField) {
+      displayCount = 0;
+      currentSearch = searchFilter;
+      currentColorFilter = colorFilter;
+      var childId;
+
+      if (searchFilter.length > 0) {
+        let [firstName, lastName] = searchFilter.split(' ');
+
+        list.forEach((child) => {
+          var currentAge = checkAge(child.birthDate);
+          if (child.statusColor === undefined) {
+            child.statusColor = '';
+          }
+          let fnmatch = child.firstName.match(new RegExp(firstName, 'i'));
+          let lnMatch = lastName === undefined || child.lastName.match(new RegExp(lastName, 'i'));
+          let colorThing = (~child.statusColor.indexOf(currentColorFilter));
+
+          child.display = false;
+          if (child.firstName.match(new RegExp(firstName, 'i'))) {
+            if (currentColorFilter === '' || ~child.statusColor.indexOf(currentColorFilter)) {
+              if (currentAge < 60) {
+                if (lastName === undefined || child.lastName.match(new RegExp(lastName, 'i'))) {
+                  child.display = true;
+                  child.backGroundColor = child.statusColor + 'Background';
+                  displayCount += 1;
+                  childId = child._id;
+                  child.display = true;
+                }
+              }
+            }
+          }
+        });
+      } else {
+        list.forEach((child) => {
+          child.display = false;
+          if (currentColorFilter === '' || ~child.statusColor.indexOf(currentColorFilter)) {
+            child.display = true;
+            child.backGroundColor = child.statusColor + 'Background';
+            displayCount += 1;
+            childId = child._id;
+            child.display = true;
+          }
+        });
+      }
+      if (displayCount === 1) {
+        singleChildId = childId;
+      }
+      return sortEm(list, sortField);
     };
 
     factory.searchAndFilter = function (list, searchFilter, colorFilter, sortField) {
@@ -117,12 +164,13 @@
           child.statusColor = '';
         }
         child.monthAge = currentAge;
-        if ((currentSearch === '' || child.firstName.toUpperCase().startsWith(currentSearch.toUpperCase())) &&
-          (currentColorFilter === '' || ~child.statusColor.indexOf(currentColorFilter)) &&
-          (currentAge < 72 || currentAge > 180)) {
+        if ((currentSearch === '' || child.firstName.toUpperCase().startsWith(currentSearch.toUpperCase()))
+          && (currentColorFilter === '' || ~child.statusColor.indexOf(currentColorFilter))
+          // (currentAge < 72 || currentAge > 180)) {
+          && (currentAge < 60)) {
           child.display = true;
           child.backGroundColor = child.statusColor + 'Background';
-          displayCount++;
+          displayCount += 1;
           childId = child._id;
         } else {
           child.display = false;

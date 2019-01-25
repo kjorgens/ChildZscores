@@ -1,14 +1,14 @@
 (function () {
   'use strict';
 
-// Configuring the liahona kids database module
+  // Configuring the liahona kids database module
   angular
     .module('children')
     .run(dataConfig);
 
-  dataConfig.$inject = ['$rootScope', 'PouchService', 'ChildrenStakes'];
+  dataConfig.$inject = ['$rootScope'];
 
-  function dataConfig($rootScope, PouchService, ChildrenStakes) {
+  function dataConfig($rootScope) {
     // Add the children dropdown item
     // $rootScope.selectedStake = 'temporary';
     // PouchService.createDatabase('temporary');

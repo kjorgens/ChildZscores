@@ -1,20 +1,17 @@
-/**
- * Created by karljorgensen on 1/26/16.
- */
 (function () {
   'use strict';
 
   angular
-      .module('children')
-      .controller('ChildrenSyncController', ChildrenSyncController);
+    .module('children')
+    .controller('ChildrenSyncController', ChildrenSyncController);
 
-  ChildrenSyncController.$inject = ['$rootScope', '$window', '$timeout', '$state', '$stateParams', 'ChildrenReport', 'FilterService',
-    'Authentication', 'ChildrenGetSync', 'usSpinnerService', 'PouchService', 'FileUploader', 'ModalService', 'ChildrenViews'];
+  ChildrenSyncController.$inject = ['$scope', '$rootScope', '$window', '$timeout', '$state', '$stateParams', '$http', 'ChildrenReport', 'FilterService',
+    'Authentication', 'ChildrenGetSync', 'usSpinnerService', 'PouchService', 'ModalService', 'ChildrenViews', 'Socket', 'Upload', 'Notification', 'moment'];
 
-  function ChildrenSyncController($rootScope, $window, $timeout, $state, $stateParams, ChildrenReport, FilterService,
-    Authentication, ChildrenGetSync, usSpinnerService, PouchService, FileUploader, ModalService, ChildrenViews) {
+  function ChildrenSyncController($scope, $rootScope, $window, $timeout, $state, $stateParams, $http, ChildrenReport, FilterService,
+    Authentication, ChildrenGetSync, usSpinnerService, PouchService, ModalService, ChildrenViews, Socket, Upload, Notification, moment) {
     var vm = this;
-    vm.countryCode = $stateParams.countryCode;
+    vm.countryCode = $stateParams.cCode;
     vm.countryName = $stateParams.countryName;
     vm.user = Authentication.user;
     vm.userIsAdmin = false;
@@ -34,97 +31,123 @@
 
     vm.uploadExcelCsv = uploadExcelCsv;
     vm.cancelUpload = cancelUpload;
-    // Create file uploader instance
-    vm.uploader = new FileUploader({
-      url: 'api/children/upload/' + $stateParams.stakeDB,
-      alias: 'newUploadCsv',
-      headers: {
-        Authorization: 'JWT ' + Authentication.token
-      }
-    });
-    // Set file uploader image filter
-    vm.uploader.filters.push({
-      name: 'csvFilter',
-      fn: function (item, options) {
-        var type = '|' + item.type.slice(item.type.lastIndexOf('/') + 1) + '|';
-        return '|csv|'.indexOf(type) !== -1;
-      }
-    });
-    // Called after the user selected a new file
-    vm.uploader.onAfterAddingFile = function(fileItem) {
-      vm.fileToUpload = vm.uploader.queue[0].file.name;
-      if ($window.FileReader) {
-        var fileReader = new FileReader();
+    vm.updateViews = updateViews;
+    vm.compactDB = compactDB;
+    vm.updateStakeChildStatus = updateStakeChildStatus;
 
-        fileReader.readAsDataURL(fileItem._file);
+    vm.uploader = function (fileToUpload) {
 
-        fileReader.onload = function (fileReaderEvent) {
-          $timeout(function () {
-            vm.imageURL = fileReaderEvent.target.result;
-          }, 0);
-        };
-      }
+      Upload.upload({
+        url: 'api/children/upload/' + $stateParams.stakeDB,
+        data: {
+          key: fileToUpload
+        },
+        headers: {
+          authorization: 'JWT ' + Authentication.token
+        }
+      }).then(function (response) {
+        $timeout(function () {
+          onSuccessItem(response.data);
+        });
+      }, function (response) {
+        if (response.status > 0) onErrorItem(response.data);
+      }, function (evt) {
+        vm.progress = parseInt(100.0 * evt.loaded / evt.total, 10);
+      });
     };
 
-    // Called after the user has successfully uploaded
-    vm.uploader.onSuccessItem = function(fileItem, response, status, headers) {
+    // Called after the user has successfully uploaded a new csv
+    function onSuccessItem(response) {
       // Show success message
-      vm.success = true;
+      Notification.success({ message: '<i class="glyphicon glyphicon-ok"></i> Successfully uploaded csv' });
 
-    };
-    vm.uploader.onCancelItem = function(fileItem, response, status, headers) {
-      console.info('onCancelItem', fileItem, response, status, headers);
-    };
+      // Populate user object
+      vm.user = response;
+      Authentication.user = response;
 
-    function goBack(){
-      if (~vm.screenType.indexOf('nursing')){
+      // Reset form
+      vm.fileSelected = false;
+      vm.progress = 0;
+    }
+
+    function onErrorItem(response) {
+      vm.fileSelected = false;
+      vm.progress = 0;
+
+      // Show error message
+      Notification.error({ message: response.message, title: '<i class="glyphicon glyphicon-remove"></i> Failed to upload csv' });
+    }
+    // Create file uploader instance
+    // vm.uploader = new FileUploader({
+    //   url: 'api/children/upload/' + $stateParams.stakeDB,
+    //   alias: 'newUploadCsv',
+    //   headers: {
+    //     Authorization: 'JWT ' + Authentication.token
+    //   }
+    // });
+    // Set file uploader image filter
+    // vm.uploader.filters.push({
+    //   name: 'csvFilter',
+    //   fn: function (item, options) {
+    //     var type = '|' + item.type.slice(item.type.lastIndexOf('/') + 1) + '|';
+    //     return '|csv|'.indexOf(type) !== -1;
+    //   }
+    // });
+    // // Called after the user selected a new file
+    // vm.uploader.onAfterAddingFile = function(fileItem) {
+    //   vm.fileToUpload = vm.uploader.queue[0].file.name;
+    //   if ($window.FileReader) {
+    //     var fileReader = new FileReader();
+    //
+    //     fileReader.readAsDataURL(fileItem._file);
+    //
+    //     fileReader.onload = function (fileReaderEvent) {
+    //       $timeout(function () {
+    //         vm.imageURL = fileReaderEvent.target.result;
+    //       }, 0);
+    //     };
+    //   }
+    // };
+    //
+    // // Called after the user has successfully uploaded
+    // vm.uploader.onSuccessItem = function(fileItem, response, status, headers) {
+    //   // Show success message
+    //   vm.success = true;
+    // };
+    // vm.uploader.onCancelItem = function(fileItem, response, status, headers) {
+    //   console.info('onCancelItem', fileItem, response, status, headers);
+    // };
+
+    function goBack() {
+      if (~vm.screenType.indexOf('nursing')) {
         $state.go('children.listMothers', {
           stakeDB: vm.stakeDB,
           stakeName: vm.selectedStake,
+          cCode: vm.countryCode,
           screenType: 'nursing',
           searchFilter: '',
-          colorFilter: '' });
-      } else if(~vm.screenType.indexOf('pregnant')) {
-        $state.go ('children.listMothers', {
+          colorFilter: ''
+        });
+      } else if (~vm.screenType.indexOf('pregnant')) {
+        $state.go('children.listMothers', {
           stakeDB: vm.stakeDB,
           stakeName: vm.selectedStake,
+          cCode: vm.countryCode,
           screenType: 'pregnant',
           searchFilter: '',
-          colorFilter: '' });
+          colorFilter: ''
+        });
       } else {
         $state.go('children.list', {
           stakeDB: vm.stakeDB,
           stakeName: vm.selectedStake,
+          cCode: vm.countryCode,
           searchFilter: '',
           colorFilter: '',
-          screenType: vm.screenType });
+          screenType: vm.screenType
+        });
       }
     }
-
-    vm.uploader.onCompleteItem = function(fileItem, response, status, headers) {
-      if(status !== 200){
-        console.log(status + ' ' + response);
-        vm.reportError('Error uploading to database', response, true);
-      } else {
-        console.log(response);
-      }
- //     console.info('onComplete', fileItem, response, status, headers);
-      vm.onComplete = true;
-      cancelUpload();
-      vm.stopSpin();
-      syncUpstream();
-    };
-    // Called after the user has failed to uploaded a new picture
-    vm.uploader.onErrorItem = function(fileItem, response, status, headers) {
-      // Clear upload buttons
-      cancelUpload();
-
-      // Show error message
-      vm.error = response.message;
-    };
-
-    // Change user profile picture
-
 
     // Cancel the upload process
     function cancelUpload() {
@@ -136,20 +159,16 @@
     vm.reportReady = false;
     vm.stakeDB = $stateParams.stakeDB;
     vm.screenType = $stateParams.screenType;
-//    vm.stakeDB = localStorage.getItem('selectedDBName');
- //   vm.selectedStake = localStorage.getItem('selectedStake');
     vm.selectedStake = $stateParams.stakeName;
     vm.selectedCountry = localStorage.getItem('selectedCountry');
+    vm.selectedCountryCode = localStorage.getItem('selectedCountryCode');
     vm.selectedCountryImage = localStorage.getItem('selectedCountryImage');
     // vm.filterSelect = 'All Children';
     vm.authentication = Authentication;
 
-    // vm.selectedStake = $stateParams.stakeName;
-    //   vm.selectedCountryObject = sessionStorage.getItem('selectedCountryObject');
     vm.createReport = createReport;
     vm.syncUpstream = syncUpstream;
     vm.online = $rootScope.appOnline;
-//    vm.find();
 
     vm.deleteLocalDB = function(dbName) {
       PouchService.destroyDatabase(dbName);
@@ -177,29 +196,26 @@
     });
 
     function whenDoneUp() {
-      PouchService.newSyncFrom('https://' + vm.syncStuff.entity + '@' +
-          vm.syncStuff.url + '/' + vm.stakeDB, replicateDown, replicateErrorDown, whenDoneDown);
+      PouchService.newSyncFrom('https://' + vm.syncStuff.entity + '@'
+        + vm.syncStuff.url + '/' + vm.stakeDB, replicateDown, replicateErrorDown, whenDoneDown);
     }
 
     function whenDoneDown() {
-      find();
-      // vm.stopSpin();
-      console.log('couchdb sync complete');
+      // console.log('couchdb sync complete');
       goBack();
-  //    $state.go('children.list', { stakeDB: vm.stakeDB, stakeName: vm.selectedStake, searchFilter: '', colorFilter: '' });
     }
 
     function replicateUp (input) {
       vm.repUpStats = input;
-      console.log(JSON.stringify(input));
+      // console.log(JSON.stringify(input));
       vm.repUpData = input;
-      PouchService.newSyncFrom('https://' + vm.syncStuff.entity + '@' +
-          vm.syncStuff.url + '/' + vm.stakeDB, replicateDown, replicateErrorDown);
+      PouchService.newSyncFrom('https://' + vm.syncStuff.entity + '@'
+        + vm.syncStuff.url + '/' + vm.stakeDB, replicateDown, replicateErrorDown);
     }
 
     function replicateDown (input) {
       vm.repDownStats = input;
-      console.log(JSON.stringify(input));
+      // console.log(JSON.stringify(input));
       vm.repDownData = input;
       whenDoneDown();
     }
@@ -207,7 +223,7 @@
     function replicateErrorUp(err) {
       vm.repError = err;
       vm.stopSpin();
-      console.log('There was an error');
+      // console.log('There was an error');
       console.log(err.message);
       vm.reportError('Replication Error Sync up', err.message, true);
     }
@@ -215,67 +231,187 @@
     function replicateErrorDown(err) {
       vm.repError = err;
       vm.stopSpin();
-      console.log('There was an error');
-      console.log(err.message);
+      // console.log('There was an error');
+      // console.log(err.message);
       vm.reportError('Replication Error Sync Down', err.message, true);
     }
 
     function syncUpstream() {
       vm.startSpin();
-      console.log('start sync for ' + vm.stakeDB);
-      ChildrenGetSync.get(function(input) {
-        vm.syncStuff = input;
-        console.log('Ready to sync https://' + vm.syncStuff.url + '/' + vm.stakeDB);
-        PouchService.newSyncTo('https://' + vm.syncStuff.entity + '@' +
-          vm.syncStuff.url + '/' + vm.stakeDB, replicateUp, replicateErrorUp);
-      });
+      // console.log('start sync for ' + vm.stakeDB);
+      ChildrenGetSync.syncDb()
+        .then(function(input) {
+          vm.syncStuff = input;
+          // console.log('Ready to sync https://' + vm.syncStuff.url + '/' + vm.stakeDB);
+          PouchService.newSyncTo('https://' + vm.syncStuff.entity + '@'
+            + vm.syncStuff.url + '/' + vm.stakeDB, replicateUp, replicateErrorUp);
+        });
     }
 
     function returnReport(input) {
+      // console.log(`${ input.message } received from server`);
+      if (input.$status !== 202) {
+        Notification.error({ message: `<i class="glyphicon glyphicon-remove"></i> ${ input.message }` });
+      }
+    }
+
+    function updateComplete() {
       vm.stopSpin();
-      vm.reportReady = true;
-      vm.reportToDownload = '/files/' + input.message;
-      vm.reportName = input.message;
-      vm.reportFileName = { reportName: vm.reportName };
-      console.log(input);
+      syncUpstream();
     }
 
     function genReport(input) {
-      ChildrenReport.get(input, returnReport, getCsvError);
+      const inputValues = input;
+      let timeouts = [];
+      vm.reportReady = false;
+      let stakeCount = 0;
+
+      function requestReceived(input) {
+        // console.log(`http ${ input.message } from the server`);
+
+        stakeCount = vm.stakeCount;
+        let startCount = 0;
+        vm.currentStakeCount = 0;
+        vm.showProgress = true;
+        function waitingForComplete(count) {
+          if (count > stakeCount) {
+            Notification.error({ message: '<i class="glyphicon glyphicon-remove"></i> Timeout waiting for csv completion' });
+            vm.stopSpin();
+            return;
+          }
+          if (vm.reportReady) {
+            timeouts.forEach(timeOutWaiting => {
+              clearTimeout(timeOutWaiting);
+            });
+            return;
+          }
+          timeouts.push(setTimeout(waitingForComplete, 1000, count + 1));
+        }
+
+        timeouts.push(setTimeout(waitingForComplete, 1000, startCount));
+        if (input.$status !== 202) {
+          Notification.error({ message: `<i class="glyphicon glyphicon-remove"></i> ${ input.message }` });
+        }
+      }
+
+      if (!Socket.socket) {
+        Socket.connectNSP('/csvStatus');
+      } else {
+        Socket.removeListener('connect');
+        Socket.removeListener('startNow');
+      }
+
+      Socket.on('CSV_progress', (message) => {
+        if (message.maxCount) {
+          vm.stakeCount = message.maxCount;
+          return;
+        }
+
+        vm.currentStakeCount = message.count;
+        // Notification.success({ message: `<i class="glyphicon glyphicon-ok"></i> ${ message.text }` });
+      });
+
+      Socket.on('CSV_complete', (message) => {
+        vm.showProgress = false;
+        vm.stopSpin();
+        vm.reportReady = true;
+        vm.reportToDownload = '/files/' + message.fileName;
+        vm.reportName = message.fileName;
+        vm.reportFileName = { reportName: vm.reportName };
+        Notification.success({ message: `<i class="glyphicon glyphicon-ok"></i> ${ message.text }`, delay: 10000 });
+        // console.log('remove the socket at the client');
+        // Socket.emit('leaveRoom', input.socketRoomId);
+        Socket.removeAllListeners();
+        // Socket.removeListener('CSV_complete', this);
+        Socket.close();
+      });
+
+      Socket.on('CSV_error', function (message) {
+        console.log(`just received CSV_error event ${ message.text } at the client`);
+        Notification.error({ message: `<i class="glyphicon glyphicon-remove"></i> ${ message.text }` });
+      });
+
+      Socket.on('connect', () => {
+        // console.log('client just got connect event, get a room');
+        Socket.emit('room', { room: input.socketRoomId, src: 'client', destSocket: 'startNow' });
+      });
+
+      Socket.on('Client_ready', (message) => {
+        // console.log(`client just got startNow event ${ message.text } from room creation, tell the server to start building report`);
+        ChildrenReport.buildReport(inputValues)
+          .then(requestReceived)
+          .catch(err => {
+            getCsvError(err);
+          });
+      });
+
+      Socket.on('disconnect', () => {
+        // console.log('removing listener from the client');
+        Socket.removeAllListeners();
+      });
+      // Remove the event listener when the controller instance is destroyed
+      $scope.$on('$destroy', function () {
+        Socket.removeAllListeners();
+      });
+    }
+
+    function updateStakeChildStatus(stakeDB, cCode, scopeType, func) {
+      vm.startSpin();
+      return $http.get('api/children/update/' + stakeDB + '/' + cCode + '/' + scopeType + '/' + func)
+        .then(updateComplete);
     }
 
     function getCsvError(error) {
       vm.stopSpin();
-      console.log(error.data.message);
-      vm.reportError('CSV creation error', error.data.name + ': ' + error.data.message, false);
-//      return ModalService.infoModal('some dumb error' + ' :\n', error + (notifyKarl ? '\n Please contact kjorgens@yahoo.com' : ''));
-//      vm.reportError('Download csv error', error.data.error.message, error.data.error.name.indexOf('Empty database') < 0);
+      vm.reportError('CSV creation error', `${ error.status } ${ error.statusText }`, false);
     }
-    function createReport(filter, sortField, languageId) {
+
+    function createReport(scope, scopeID, sortField, csvType, stakeName) {
       vm.startSpin();
-      if (filter === undefined) {
-        filter = 'all';
+      if (scope === undefined) {
+        scope = 'stake';
       }
       if (sortField === undefined) {
         sortField = 'firstName';
       }
-      var sortParam = { stakeDB: vm.stakeDB, filter: filter, sortField: sortField, language: $rootScope.SelectedLanguage };
- //     ChildrenViews.get(sortParam, genReport(sortParam), getCsvError);
-      ChildrenViews.updateViews(vm.stakeDB).then(genReport(sortParam), getCsvError);
+      if (stakeName === 'admin') {
+        stakeName = vm.selectedStake;
+      }
+      var reportParams = {
+        csvType: csvType,
+        stakeDB: vm.stakeDB,
+        scopeType: scope,
+        cCode: vm.selectedCountryCode,
+        sortField: sortField,
+        language: $rootScope.SelectedLanguage,
+        stakeName: stakeName,
+        socketRoomId: `${ Authentication.user.firstName }_${ Authentication.user.lastName }_${ moment.now() }`
+      };
+
+      return genReport(reportParams, getCsvError);
+    }
+
+    function updateViews() {
+      ChildrenViews.updateViews(vm.stakeDB);
+    }
+
+    function compactDB() {
+      ChildrenViews.compactDB(vm.stakeDB);
     }
 
     function viewUpdateComplete() {
-      console.log('couch view update complete');
-        // Clear messages
-        vm.success = vm.error = null;
-        vm.onComplete = null;
-        // Start upload
-        vm.uploader.uploadAll();
-     }
+      // console.log('couch view update complete');
+      // Clear messages
+      vm.success = null;
+      vm.error = null;
+      vm.onComplete = null;
+      // Start upload
+      vm.uploader.uploadAll();
+    }
 
     function viewUpdateError(err) {
       vm.stopSpin();
-      console.log('couch view update error');
+      // console.log('couch view update error');
       vm.reportError('couch view update error', err.data.message, true);
     }
 
@@ -289,7 +425,5 @@
     }
 
     vm.reportError = reportError;
-//    createReport();
   }
 }());
-

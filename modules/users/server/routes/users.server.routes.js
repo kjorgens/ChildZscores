@@ -1,23 +1,19 @@
 'use strict';
 
-var users = require('../controllers/users.server.controller'),
-  passport = require('passport'),
-  express = require('express');
-
 module.exports = function (app) {
-  // Create Router
-  var router = new express.Router();
+  // User Routes
+  var users = require('../controllers/users.server.controller'),
+    passport = require('passport'),
+    express = require('express');
 
-  // Set JWT Auth for all user Routes
-  router.all('*', passport.authenticate('jwt', { session: false }));
-
+  // app.route.all('*', passport.authenticate('jwt', { session: false }));
   // Setting up the users profile api
-  router.route('/me').get(users.me);
-  router.route('/').put(users.update);
-  router.route('/accounts').delete(users.removeOAuthProvider);
-  router.route('/password').post(users.changePassword);
-  router.route('/picture').post(users.changeProfilePicture);
+  app.route('/api/users/me').get(users.me);
+  app.route('/api/users').put(users.update);
+  app.route('/api/users/accounts').delete(users.removeOAuthProvider);
+  app.route('/api/users/password').post(users.changePassword);
+  app.route('/api/users/picture').post(users.changeProfilePicture);
 
   // Finish by binding the user middleware
-  app.use('/api/users', router);
+  app.param('userId', users.userByID);
 };

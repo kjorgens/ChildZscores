@@ -1,23 +1,19 @@
 <section>
     <div class="page-header" style="margin-top: 8em">
-        <img src="modules/core/client/img/brand/logo_small.png">
+        <img src="/modules/core/client/img/brand/logo_small.png">
         <h1>
-            <div ng-if="vm.onLine">
-                  <span><a ng-click="vm.refreshCountryList()">{{'REFRESH_COUNTRY' | translate}} <i
-                          class="glyphicon glyphicon-refresh"></i></a></span>
-            </div>
-            <h3>
-                <div ng-if="vm.featurePromptCount < 3">
-                    {{'NEW_FEATURES' | translate}}
-                </div>
-            </h3>
-            <div ng-if="!vm.onLine">
-                {{'REFRESH_COUNTRY' | translate}}
-            </div>
+            <!--<h3>-->
+                <!--<div ng-if="vm.featurePromptCount < 3">-->
+                    <!--{{'NEW_FEATURES' | translate}}-->
+                <!--</div>-->
+            <!--</h3>-->
+            <!--<div ng-if="!vm.onLine">-->
+                <!--{{'REFRESH_COUNTRY' | translate}}-->
+            <!--</div>-->
         </h1>
     </div>
     <div class="list-group">
-        <a ng-repeat="country in vm.liahonaStakes.countries" ui-sref="children.stake({country: country.name})" class="list-group-item">
+        <a ng-repeat="country in vm.liahonaStakes" ui-sref="children.stake({country: country.name, cCode: country.code})" class="list-group-item">
             <small class="list-group-item-text">
                 <h3>
                     <img ng-src={{country.image}}>
@@ -27,7 +23,7 @@
         </a>
     </div>
     <h4>
-        {{'DESCRIBE_CHROME' | translate}}
+        <!--{{'DESCRIBE_CHROME' | translate}}-->
         <!--<br>  Designed for offline use with Chrome-->
         <!--<br>  You must enable offline pages in Chrome-->
         <!--<br>  Open your brower at chrome://flags/#offline-pages-mode-->

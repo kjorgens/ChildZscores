@@ -24,6 +24,7 @@
           <span class="btn btn-default btn-file">
               <h4>Upload Excel file, populate database <input type="file" nv-file-select uploader="vm.uploader"></h4>
           </span>
+
             </div>
             <div class="text-center form-group" ng-show="vm.uploader.queue.length">
                 <span><h2>{{vm.fileToUpload}}</h2></span>
@@ -44,13 +45,46 @@
             <i class="glyphicon glyphicon-trash"></i>
             </h3>
         </a>
-        <a ng-click="vm.createReport('listall', vm.sortSelect)">
-            <h3><span> Aggregate csv all countries </span>
+        <a ng-click="vm.createReport('countries', vm.countryCode, vm.sortSelect, 'all', 'admin')">
+            <h3><span> CSV All countries</span>
             <i class="glyphicon glyphicon-share"></i>
             </h3>
         </a>
-        <a ng-click="vm.createReport(vm.countryCode | lowercase, vm.sortSelect)">
-          <h3><span> Aggregate csv files for {{vm.selectedCountry}}</span>
+        <a ng-click="vm.createReport('country', vm.countryCode, vm.sortSelect, 'all', 'admin')">
+          <h3><span> CSV for {{vm.selectedCountry}}</span>
+            <i class="glyphicon glyphicon-share"></i>
+          </h3>
+        </a>
+        <a ng-click="vm.createReport('stake', vm.countryCode, vm.sortSelect, 'all', 'admin')">
+          <h3><span> CSV for {{vm.selectedStake}} </span>
+            <i class="glyphicon glyphicon-share"></i>
+          </h3>
+        </a>
+      <a ng-click="vm.createReport('countries', vm.countryCode, vm.sortSelect, 'sup', 'admin')">
+        <h3><span> Supplement reports all countries </span>
+          <i class="glyphicon glyphicon-share"></i>
+        </h3>
+      </a>
+      <a ng-click="vm.createReport('country', vm.countryCode, vm.sortSelect, 'sup', 'admin')">
+        <h3><span> Supplement report for {{vm.selectedCountry}}</span>
+          <i class="glyphicon glyphicon-share"></i>
+        </h3>
+      </a>
+      <a ng-click="vm.createReport('stake', vm.countryCode, vm.sortSelect, 'sup', 'admin')">
+        <h3><span> Supplement report for {{vm.selectedStake}} </span>
+          <i class="glyphicon glyphicon-share"></i>
+        </h3>
+      </a>
+      <div ng-if="vm.showProgress">
+        <uib-progressbar max="max" value="dynamic"><span style="color:white; white-space:nowrap;">{{vm.currentStakeCount}} / {{vm.stakeCount}}</span></uib-progressbar>
+      </div>
+        <a ng-click="vm.updateViews(vm.selectedStakeDB)">
+          <h3><span> Update Views {{vm.selectedStake}} </span>
+            <i class="glyphicon glyphicon-share"></i>
+          </h3>
+        </a>
+        <a ng-click="vm.updateStakeChildStatus(vm.stakeDB, vm.selectedCountryCode, 'stake', 'updateStatus' )">
+          <h3><span> Update Zscore Status {{vm.selectedStake}} </span>
             <i class="glyphicon glyphicon-share"></i>
           </h3>
         </a>
@@ -79,16 +113,12 @@
                 <option value="lastName">{{'LAST_NAME' | translate}}</option>
                 <option value="memberStatus">{{'LDS_MEMBER' | translate}}</option>
             </select><br>
-            <!--<a ng-click="vm.createReport(vm.filterSelect, vm.sortSelect)">-->
-                <!--<span>{{'GENERATE_REPORT' | translate}} </span>-->
-                <!--<i class="glyphicon glyphicon-share"></i>-->
-            <!--</a>-->
           <!--<br><br>-->
-            <a ng-click="vm.createReport('zscore', vm.sortSelect)">
+            <a ng-click="vm.createReport('stake', vm.countryCode, vm.sortSelect, 'sup')">
                 <span>{{'GENERATE_SUPPLEMENT_REPORT' | translate}} </span>
                 <i class="glyphicon glyphicon-share"></i>
             </a><br><br>
-          <a ng-click="vm.createReport('pregnant', vm.sortSelect)">
+          <a ng-click="vm.createReport('women', vm.countryCode, vm.sortSelect, '')">
             <span>{{'GENERATE_WOMEN_REPORT' | translate}} </span>
             <i class="glyphicon glyphicon-share"></i>
           </a>

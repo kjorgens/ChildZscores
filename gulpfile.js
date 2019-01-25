@@ -4,12 +4,20 @@
  * Module dependencies.
  */
 var _ = require('lodash'),
+  express = require('express'),
   fs = require('fs'),
+  pump = require('pump'),
+  merge = require('merge-stream'),
+  uglify = require('gulp-uglify-es').default,
+  terser = require('gulp-terser'),
   defaultAssets = require('./config/assets/default'),
   testAssets = require('./config/assets/test'),
   glob = require('glob'),
   gulp = require('gulp'),
+  concat = require('gulp-concat'),
   zip = require('gulp-vinyl-zip').zip,
+  del = require('del'),
+  packageJson = require('./package.json'),
   gulpLoadPlugins = require('gulp-load-plugins'),
   runSequence = require('run-sequence'),
   plugins = gulpLoadPlugins({
@@ -25,8 +33,11 @@ var _ = require('lodash'),
   protractor = require('gulp-protractor').protractor,
   webdriver_update = require('gulp-protractor').webdriver_update,
   webdriver_standalone = require('gulp-protractor').webdriver_standalone,
-  KarmaServer = require('karma').Server;
+  KarmaServer = require('karma').Server,
+  workboxBuild = require('workbox-build');
 
+var DEV_DIR = 'public';
+var DIST_DIR = 'dist/';
 // Local settings
 var changedTestFiles = [];
 
@@ -55,50 +66,13 @@ gulp.task('nodemon', function () {
   });
 });
 
-gulp.task('zipit', function() {
+gulp.task('zipitNew', function() {
   return gulp.src([
-    'package.json',
-    '.ebextensions/*',
-    'server.js',
-    'README.md',
-    '.npmrc',
-    'config/**',
-    'modules/**',
-    'public/dist/**',
-    'public/lib/angular/angular.min.js',
-    'public/lib/angular-resource/angular-resource.min.js',
-    'public/lib/angular-animate/angular-animate.min.js',
-    'public/lib/angular-messages/angular-messages.min.js',
-    'public/lib/angular-ui-router/release/angular-ui-router.min.js',
-    'public/lib/spin.js/spin.min.js',
-    'public/lib/angular-spinner/dist/angular-spinner.min.js',
-    'public/lib/angular-ui-utils/ui-utils.min.js',
-    'public/lib/angular-bootstrap/ui-bootstrap.min.js',
-    'public/lib/angular-bootstrap/ui-bootstrap-tpls.min.js',
-    'public/lib/angular-file-upload/dist/angular-file-upload.min.js',
-    'public/lib/owasp-password-strength-test/owasp-password-strength-test.js',
-    'public/lib/pouchdb/dist/pouchdb.min.js',
-    'public/lib/pouchdb-all-dbs/dist/pouchdb.all-dbs.min.js',
-    'public/lib/pouchdb-find/dist/pouchdb.find.min.js',
-    'public/lib/angular-pouchdb/angular-pouchdb.min.js',
-    'public/lib/angular-ui-router-uib-modal/src/angular-ui-router-uib-modal.js',
-    'public/lib/moment/min/moment.min.js',
-    'public/lib/angular-moment/angular-moment.min.js',
-    'public/lib/angular-translate/angular-translate.min.js',
-    'public/lib/angular-sanitize/angular-sanitize.min.js',
-    'public/lib/d3/d3.min.js',
-    'public/lib/nvd3/build/nv.d3.min.js',
-    'public/lib/angular-nvd3/dist/angular-nvd3.min.js',
-    'public/lib/bootstrap/dist/css/bootstrap.min.css',
-    'public/lib/bootstrap/dist/fonts/*',
-    'public/lib/bootstrap/dist/css/bootstrap-theme.min.css',
-    'public/lib/nvd3/build/nv.d3.min.css',
-    'files/**',
-    'scripts/**'
-  ], { base: "." })
-      .pipe(plugins.plumber())
-      .pipe(zip('liahonaKids.zip'))
-      .pipe(gulp.dest('./'));
+    'dist/**/*'
+  ], { base: 'dist/', dot: true })
+    .pipe(plugins.plumber())
+    .pipe(zip('liahonaKids.zip'))
+    .pipe(gulp.dest('./'));
 });
 
 gulp.task('node-inspector', function() {
@@ -204,15 +178,32 @@ gulp.task('eslint', function () {
 });
 
 // JS minifying task
-gulp.task('uglify', function () {
+gulp.task('uglify-error-debugging', function (cb) {
   var assets = _.union(
     defaultAssets.client.js,
     defaultAssets.client.templates
   );
+  pump([
+    gulp.src(assets),
+    plugins.terser(),
+    gulp.dest('dist/')
+  ], cb);
+});
+
+// JS minifying task
+gulp.task('uglify', function(cb) {
+  const assets = _.union(
+    defaultAssets.client.js,
+    defaultAssets.client.templates
+  );
+
+  del(['public/dist/*']);
 
   return gulp.src(assets)
-    .pipe(plugins.ngAnnotate())
-    .pipe(plugins.uglify({
+    .pipe(plugins.ngAnnotatePatched({
+      add: true
+    }))
+    .pipe(terser({
       mangle: false
     }))
     .pipe(plugins.concat('application.min.js'))
@@ -481,6 +472,8 @@ gulp.task('test', function (done) {
   runSequence('env:test', 'test:server', 'karma', 'nodemon', 'protractor', done);
 });
 
+
+
 gulp.task('test:server', function (done) {
   runSequence('env:test', ['copyLocalEnvConfig', 'makeUploadsDir', 'dropdb'], 'lint', 'mocha', done);
 });
@@ -522,6 +515,134 @@ gulp.task('prod', function (done) {
 
 // Run the project in production mode
 gulp.task('zip', function (done) {
-  runSequence('build', 'zipit', done);
+  runSequence('build', 'build-new-sw', 'zipitNew', done);
 });
 
+gulp.task('build-new-sw', (callback) => {
+  runSequence('copy-bundle-stuff', 'build-manifest', callback);
+});
+
+gulp.task('build-manifest', () => {
+  return workboxBuild.injectManifest({
+    swSrc: 'public/sw.js',
+    swDest: 'dist/public/sw.js',
+    globDirectory: 'dist',
+    globPatterns: [
+      'public/**/*.{css,js,eot,svg,ttf,woff,woff2}',
+      'modules/**/client/**/*.{html,css,png,ico,eot,svg,ttf,woff,woff}'
+    ],
+    modifyUrlPrefix: {
+      'public': ''
+    },
+    templatedUrls: {
+      '/index.html': [
+        'modules/core/server/views/layout.server.view.html'
+      ]
+    }
+  }).then(({ count, size, warnings }) => {
+    warnings.forEach(console.warn);
+    console.log(`${ count } files will be precached, totaling ${ size } bytes.`);
+  }).catch(err => {
+    console.log('Uh oh 😬', err);
+  });
+});
+
+gulp.task('clean', function() {
+  del.sync([DIST_DIR]);
+});
+
+gulp.task('copy-bundle-stuff', function() {
+  var dist = gulp.src('public/dist/**/*')
+    .pipe(gulp.dest('dist/public/dist/'));
+  var html = gulp.src([
+    'modules/**',
+    '!modules/**/*.tests.js'
+  ]).pipe(gulp.dest('dist/modules/'));
+  var libmin = gulp.src([
+    'public/lib/angular/angular.min.js',
+    'public/lib/angular-resource/angular-resource.min.js',
+    'public/lib/angular-animate/angular-animate.min.js',
+    'public/lib/angular-messages/angular-messages.min.js',
+    'public/lib/angular-ui-router/release/angular-ui-router.min.js',
+    'public/lib/spin.js/spin.min.js',
+    'public/lib/angular-spinner/dist/angular-spinner.min.js',
+    'public/lib/angular-ui-utils/ui-utils.min.js',
+    'public/lib/angular-bootstrap/ui-bootstrap.min.js',
+    'public/lib/angular-bootstrap/ui-bootstrap-tpls.min.js',
+    'public/lib/angular-file-upload/dist/angular-file-upload.min.js',
+    'public/lib/jquery/dist/jquery.min.js',
+    'public/lib/owasp-password-strength-test/owasp-password-strength-test.js',
+    'public/lib/pouchdb/dist/pouchdb.min.js',
+    'public/lib/pouchdb-all-dbs/dist/pouchdb.all-dbs.min.js',
+    'public/lib/pouchdb-find/dist/pouchdb.find.min.js',
+    'public/lib/angular-pouchdb/angular-pouchdb.min.js',
+    'public/lib/angular-ui-router-uib-modal/angular-ui-router-uib-modal.js',
+    'public/lib/moment/min/moment.min.js',
+    'public/lib/angular-moment/angular-moment.min.js',
+    'public/lib/angular-translate/angular-translate.min.js',
+    'public/lib/angular-sanitize/angular-sanitize.min.js',
+    'public/lib/angular-ui-validate/dist/validate.min.js',
+    'public/lib/angular-ui-event/dist/event.min.js',
+    'public/lib/angular-ui-inderminate/dist/inderminate.min.js',
+    'public/lib/angular-ui-mask/dist/mask.min.js',
+    'public/lib/angular-ui-scroll/dist/ui-scroll.min.js',
+    'public/lib/angular-ui-scrollpoint/dist/scrollpoint.min.js',
+    'public/lib/angular-uuid4/angular-uuid4.min.js',
+    'public/lib/d3/d3.min.js',
+    'public/lib/nvd3/build/nv.d3.min.js',
+    'public/lib/angular-nvd3/dist/angular-nvd3.min.js',
+    'public/lib/bootstrap/dist/css/bootstrap.min.css',
+    'public/lib/bootstrap/dist/fonts/*',
+    'public/lib/bootstrap/dist/css/bootstrap-theme.min.css',
+    'public/lib/nvd3/build/nv.d3.min.css',
+    'public/lib/angular-ui-notification/dist/angular-ui-notification.min.css',
+    'public/lib/angular-ui-notification/dist/angular-ui-notification.min.js',
+    'public/lib/ng-file-upload/ng-file-upload.min.js'
+    // 'public/lib/angular/angular.js',
+    // 'public/lib/angular-resource/angular-resource.js',
+    // 'public/lib/angular-animate/angular-animate.js',
+    // 'public/lib/angular-messages/angular-messages.js',
+    // 'public/lib/angular-ui-router/release/angular-ui-router.js',
+    // 'public/lib/spin.js/spin.js',
+    // 'public/lib/angular-spinner/dist/angular-spinner.js',
+    // 'public/lib/angular-ui-utils/ui-utils.js',
+    // 'public/lib/angular-bootstrap/ui-bootstrap.js',
+    // 'public/lib/angular-bootstrap/ui-bootstrap-tpls.js',
+    // 'public/lib/angular-file-upload/dist/angular-file-upload.js',
+    // 'public/lib/jquery/dist/jquery.js',
+    // 'public/lib/owasp-password-strength-test/owasp-password-strength-test.js',
+    // 'public/lib/pouchdb/dist/pouchdb.js',
+    // 'public/lib/pouchdb-all-dbs/dist/pouchdb.all-dbs.js',
+    // 'public/lib/pouchdb-find/dist/pouchdb.find.js',
+    // 'public/lib/angular-pouchdb/angular-pouchdb.js',
+    // 'public/lib/angular-ui-router-uib-modal/angular-ui-router-uib-modal.js',
+    // 'public/lib/moment/moment.js',
+    // 'public/lib/angular-moment/angular-moment.js',
+    // 'public/lib/angular-translate/angular-translate.js',
+    // 'public/lib/angular-sanitize/angular-sanitize.js',
+    // 'public/lib/angular-ui-validate/dist/validate.js',
+    // 'public/lib/angular-ui-event/dist/event.js',
+    // 'public/lib/angular-ui-inderminate/dist/inderminate.js',
+    // 'public/lib/angular-ui-mask/dist/mask.js',
+    // 'public/lib/angular-ui-scroll/dist/ui-scroll.js',
+    // 'public/lib/angular-ui-scrollpoint/dist/scrollpoint.js',
+    // 'public/lib/angular-uuid4/angular-uuid4.js',
+    // 'public/lib/d3/d3.js',
+    // 'public/lib/nvd3/build/nv.d3.js',
+    // 'public/lib/angular-nvd3/dist/angular-nvd3.js',
+    // 'public/lib/bootstrap/dist/css/bootstrap.css',
+    // 'public/lib/bootstrap/dist/fonts/*',
+    // 'public/lib/bootstrap/dist/css/bootstrap-theme.css',
+    // 'public/lib/nvd3/build/nv.d3.css',
+    // 'public/lib/angular-ui-notification/dist/angular-ui-notification.css',
+    // 'public/lib/angular-ui-notification/dist/angular-ui-notification.js',
+    // 'public/lib/ng-file-upload/ng-file-upload.js'
+  ], { base: "." }).pipe(gulp.dest('dist/'));
+  var pub = gulp.src(['public/register.js', 'public/robots.txt', 'public/humans.txt', 'public/images/**/*', 'public/manifest.json'])
+    .pipe(gulp.dest('dist/public/'));
+  var config = gulp.src(['config/**/*', '.ebextensions/**/*', 'files/**/*'], { base: '.' })
+    .pipe(gulp.dest('dist/'));
+  var rootStuff = gulp.src(['./package.json', './server.js', './.npmrc'])
+    .pipe(gulp.dest('dist/'));
+  return merge(dist, html, libmin, pub, config, rootStuff);
+});

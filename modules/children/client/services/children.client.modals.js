@@ -14,7 +14,7 @@
       var deferred = $q.defer();
       $uibModal.open({
         controller: 'InfoModalController',
-        templateUrl: 'modules/children/client/templates/info-modal.html',
+        templateUrl: '/modules/children/client/templates/info-modal.html',
         resolve: {
           input: function () {
             return {
@@ -29,11 +29,11 @@
       return deferred.promise;
     };
 
-    factory.choiceModal = function(childId, childName, title, desc, btnText){
+    factory.choiceModal = function(childId, childName, title, desc, btnText) {
       var deferred = $q.defer();
       $uibModal.open({
         controller: 'ChoiceModalController',
-        templateUrl: 'modules/children/client/templates/choice-modal.html',
+        templateUrl: '/modules/children/client/templates/choice-modal.html',
         resolve: {
           input: function () {
             return {
@@ -54,7 +54,7 @@
       var deferred = $q.defer();
       $uibModal.open({
         controller: 'ConfirmModalController',
-        templateUrl: 'modules/children/client/templates/confirm-modal.html',
+        templateUrl: '/modules/children/client/templates/confirm-modal.html',
         resolve: {
           confirm: function() {
             return {
@@ -74,7 +74,7 @@
 
     factory.progressModal = function (progressString) {
       return $uibModal.open({
-        templateUrl: 'modules/children/client/templates/pouchSync.html',
+        templateUrl: '/modules/children/client/templates/pouchSync.html',
         controller: 'ChildrenModalController',
         resolve: {
           progressString: progressString
@@ -84,4 +84,3 @@
     return factory;
   }
 }());
-

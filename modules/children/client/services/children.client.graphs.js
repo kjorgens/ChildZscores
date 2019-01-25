@@ -380,8 +380,8 @@
   ];
 
   angular
-      .module('children.graphService')
-      .factory('GraphService', GraphService);
+    .module('children.graphService')
+    .factory('GraphService', GraphService);
 
 
   GraphService.$inject = [];
@@ -707,7 +707,4 @@
 
     return factory;
   }
-
-
 }());
-

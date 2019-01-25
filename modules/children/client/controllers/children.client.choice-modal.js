@@ -2,8 +2,8 @@
   'use strict';
 
   angular
-      .module('children')
-      .controller('ChoiceModalController', ChoiceModalController);
+    .module('children')
+    .controller('ChoiceModalController', ChoiceModalController);
 
   ChoiceModalController.$inject = ['$scope', '$state', '$uibModalInstance', 'input'];
 
