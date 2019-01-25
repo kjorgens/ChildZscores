@@ -109,6 +109,14 @@
       return ($q.all(indexFunctions));
     };
 
+    factory.getCountryInfoByUser = function (authUser) {
+      if (authUser.roles.map) {
+        if (pilot === 'phl_pilot') {
+
+        }
+      }
+    };
+
     factory.getCountriesList = function (networkFirst) {
       return new Promise(function(resolve, reject) {
         if (navigator.onLine) {
@@ -180,7 +188,7 @@
 
     factory.getCountriesLocal = getCountriesLocalDB;
 
-    factory.getCountryData = function (countryName) {
+ /*   factory.getCountryData = function (countryName) {
       if (countryDataBase === undefined) {
         countryDataBase = pouchDB('country_list');
       }
@@ -194,7 +202,7 @@
           });
           return toReturn;
         });
-    };
+    };*/
 
     factory.getWardList = function (countryName, stakeName, callback, errCallback) {
       if (countryDataBase === undefined) {

@@ -12,7 +12,7 @@
     countryData, $stateParams) {
     var vm = this;
     vm.selectedCountry = countryData;
-    vm.selectedCountry.image = `/${ countryData.image }`;
+    vm.selectedCountry.image = countryData.image;
     sessionStorage.setItem('selectedCountry', vm.selectedCountry.name);
     localStorage.setItem('selectedCountry', vm.selectedCountry.name);
     localStorage.setItem('selectecCountryCode', vm.selectedCountry.code);

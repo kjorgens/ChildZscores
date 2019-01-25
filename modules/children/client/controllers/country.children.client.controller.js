@@ -9,10 +9,11 @@
 
   function ChildrenCountryController($state, $rootScope, $translate, usSpinnerService, countryResolve) {
     var vm = this;
-    vm.liahonaStakes = countryResolve.map(country => {
-      country.image = `/${ country.image }`;
-      return country;
-    });
+    vm.liahonaStakes = countryResolve.countries;
+    // .map(country => {
+    //   country.image = `/${ country.image }`;
+    //   return country;
+    // });
     vm.featurePromptCount = parseInt(localStorage.getItem('featurePromptCount'), 10) || 0;
     if (vm.featurePromptCount < 3) {
       localStorage.setItem('featurePromptCount', vm.featurePromptCount + 1);

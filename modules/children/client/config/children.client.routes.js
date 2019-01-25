@@ -82,7 +82,7 @@
         controller: 'ChildrenCountryController',
         controllerAs: 'vm',
         resolve: {
-          countryResolve: listCountries
+          countryResolve: getCountryInfo
           // childResolve: listChildren
         },
         data: {}
@@ -93,7 +93,7 @@
         controller: 'ChildrenStakeController',
         controllerAs: 'vm',
         resolve: {
-          countryData: getCountryData
+          countryData: singleCountryData
         },
         data: {}
       })
@@ -215,6 +215,16 @@
     return (PouchService.createDatabase($stateParams.stakeDB, PouchService.queryWardPromise, $stateParams.wardId));
   }
 
+  getCountryInfo.$inject = ['$stateParams', 'CountryInfo', 'Authentication'];
+
+  function getCountryInfo($stateParams, CountryInfo, Authentication) {
+    if (Authentication.user && Authentication.user.roles.includes('phl-pilot')) {
+      return Promise.resolve(CountryInfo.getPhlPilotList());
+    } else {
+      return Promise.resolve(CountryInfo.getMasterList());
+    }
+  }
+
   listCountries.$inject = ['$stateParams', 'PouchService'];
 
   function listCountries($stateParams, PouchService) {
@@ -272,6 +282,17 @@
   function getSyncInfo($stateParams, ChildrenGetSync) {
     return ChildrenGetSync.syncDb();
   }
+
+  singleCountryData.$inject = ['$stateParams', 'CountryInfo', 'Authentication'];
+
+  function singleCountryData($stateParams, CountryInfo, Authentication) {
+    if (Authentication.user && Authentication.user.roles.includes('phl-pilot')) {
+      return Promise.resolve(CountryInfo.getCountryInfoPilot($stateParams.country));
+    } else {
+      return Promise.resolve(CountryInfo.getCountryInfo($stateParams.country));
+    }
+  }
+
 
   getCountryData.$inject = ['$stateParams', 'PouchService'];
 

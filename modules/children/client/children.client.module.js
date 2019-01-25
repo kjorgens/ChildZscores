@@ -10,6 +10,7 @@
   app.registerModule('children.translate');
   app.registerModule('children.stakes');
   app.registerModule('children.getsync');
+  app.registerModule('children.countryInfo');
   app.registerModule('children.modalService', ['ui.bootstrap']);
   app.registerModule('children.pouchService', ['pouchdb']);
   app.registerModule('children.zscoreService');

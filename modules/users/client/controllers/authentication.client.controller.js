@@ -85,7 +85,12 @@
       localStorage.setItem('token', response.token);
       Notification.info({ message: 'Welcome ' + response.user.firstName });
       // And redirect to the previous or home page
-      $window.history.back();
+      if (vm.authentication.user.roles.includes('phl-pilot')) {
+        $state.go('home');
+      } else {
+        $window.history.back();
+      }
+
       // $state.go($state.previous.state.name || 'home', $state.previous.params);
     }
 

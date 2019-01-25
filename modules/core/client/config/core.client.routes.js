@@ -33,7 +33,7 @@
         controller: 'ChildrenCountryController',
         controllerAs: 'vm',
         resolve: {
-          countryResolve: listCountries
+          countryResolve: getCountryInfo
           // childResolve: listChildren
         }
         // data: {
@@ -103,6 +103,16 @@
           ignoreState: true
         }
       });
+
+    getCountryInfo.$inject = ['$stateParams', 'CountryInfo', 'Authentication'];
+
+    function getCountryInfo($stateParams, CountryInfo, Authentication) {
+      if (Authentication.user && Authentication.user.roles.includes('phl-pilot')) {
+        return Promise.resolve(CountryInfo.getPhlPilotList());
+      } else {
+        return Promise.resolve(CountryInfo.getMasterList());
+      }
+    }
 
     listCountries.$inject = ['$stateParams', 'PouchService'];
 
