@@ -43,7 +43,7 @@
           key: fileToUpload
         },
         headers: {
-          authorization: 'JWT ' + Authentication.token
+          authorization: 'JWT ' + localStorage.getItem('token')
         }
       }).then(function (response) {
         $timeout(function () {
@@ -208,6 +208,7 @@
     function replicateUp (input) {
       vm.repUpStats = input;
       // console.log(JSON.stringify(input));
+      Notification.success({ message: `<i class="glyphicon glyphicon-ok"></i> Replicate Up`, delay: 350 });
       vm.repUpData = input;
       PouchService.newSyncFrom('https://' + vm.syncStuff.entity + '@'
         + vm.syncStuff.url + '/' + vm.stakeDB, replicateDown, replicateErrorDown);
@@ -239,6 +240,7 @@
     function syncUpstream() {
       vm.startSpin();
       // console.log('start sync for ' + vm.stakeDB);
+      Notification.success({ message: `<i class="glyphicon glyphicon-ok"></i> Start sync`, delay: 350 });
       ChildrenGetSync.syncDb()
         .then(function(input) {
           vm.syncStuff = input;

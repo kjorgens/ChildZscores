@@ -11,7 +11,7 @@
     var ChildrenReport = $resource('/api/children', {}, {
       generate: {
         method: 'GET',
-        headers: { authorization: `JWT ${ Authentication.token }` },
+        headers: { authorization: `JWT ${ localStorage.getItem('token') }` },
         url: '/api/children/report/:stakeDB/:cCode/:scopeType/:sortField/:language/:csvType',
         interceptor: {
           response: response => {

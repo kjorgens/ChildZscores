@@ -1527,7 +1527,7 @@ exports.listDbs = function(req, res) {
   });
 };
 
-exports.removeCSV = function removeCsvFile(req, res) {
+exports.removeCSV = function(req, res) {
   fs.unlink(req.params.csvName, (err) => {
     if (err) {
       return res.status(400).send({

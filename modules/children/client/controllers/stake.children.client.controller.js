@@ -13,6 +13,7 @@
     var vm = this;
     vm.selectedCountry = countryData;
     vm.selectedCountry.image = countryData.image;
+    vm.selectedCountryCode = countryData.code;
     sessionStorage.setItem('selectedCountry', vm.selectedCountry.name);
     localStorage.setItem('selectedCountry', vm.selectedCountry.name);
     localStorage.setItem('selectecCountryCode', vm.selectedCountry.code);

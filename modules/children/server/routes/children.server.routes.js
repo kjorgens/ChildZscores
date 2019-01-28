@@ -29,6 +29,9 @@ module.exports = function (app) {
   router.route('/countries')
     .get(children.getCountryList);
 
+  router.route('/delCsv')
+    .get(passport.authenticate('jwt', { session: false }), childrenPolicy.isAllowed, children.removeCSV);
+
   // update status and save
   router.route('/update/:stakeDB/:cCode/:scopeType/:function')
     .get(passport.authenticate('jwt', { session: false }), childrenPolicy.isAllowed, children.updateZscoreStatus);
