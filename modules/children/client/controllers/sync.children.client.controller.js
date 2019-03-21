@@ -21,7 +21,7 @@
     if (vm.user === null) {
       reportError('Login required for syncing', 'Please log in', false);
       // $window.history.pushState();
-      storage.removeItem('token');
+      // storage.removeItem('token');
       $http.get('api/auth/signout')
         .then(() => {
           $state.go('authentication.signin');
