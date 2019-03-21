@@ -377,7 +377,19 @@ function updateChildStatus(child, stakeDB) {
   });
 }
 
-function updateSupplementStatus(childList, stakeDB) {
+function bulkUpdate(list, dataBase) {
+  return new Promise((resolve, reject) => {
+    var stakeDb = nano('https://' + process.env.SYNC_ENTITY + '@' + process.env.COUCH_URL + '/' + dataBase);
+    return stakeDb.bulk({ docs: list }, (err, body) => {
+      if (!err) {
+        return resolve(body);
+      }
+      return reject(err);
+    });
+  });
+}
+
+async function updateSupplementStatus(childList, stakeDB) {
   var noScreenings = 0;
   var sortedScreenList = [];
   var updateList = [];
@@ -423,18 +435,20 @@ function updateSupplementStatus(childList, stakeDB) {
             //   console.log('stop');
             // }
             const bmiInfo = calcObesity(sortedScreenList[0]);
-            childEntry.bmi = bmiInfo.bmi;
-            childEntry.obese = bmiInfo.obese;
-            childEntry.zscoreStatus = calculateStatus(sortedScreenList[0]).zscoreStatus;
-            childEntry.statusColor = statusColor(childEntry.zscoreStatus);
-            updateList.push(updateChildStatus(childEntry, stakeDB));
+            let newChildData = childEntry.key;
+            newChildData.bmi = bmiInfo.currentBMI;
+            newChildData.obese = bmiInfo.obese;
+            newChildData.zscoreStatus = calculateStatus(sortedScreenList[0]).zscoreStatus;
+            newChildData.statusColor = statusColor(newChildData.zscoreStatus);
+            updateList.push(newChildData);
+            // updateList.push(updateChildStatus(childEntry, stakeDB));
           }
         }
       }
     });
   }
 
-  return updateList;
+  return bulkUpdate(updateList, stakeDB);
 }
 
 function listAllChildren(childScreenList, screenType) {
@@ -933,7 +947,7 @@ async function updateStatusStake(stakeInfo, timeOutMultiplier) {
   try {
     const screeningData = await getChildAndData(stakeInfo, timeOutMultiplier);
 
-    return updateSupplementStatus(screeningData, stakeInfo.stakeDB);
+    return await updateSupplementStatus(screeningData, stakeInfo.stakeDB);
   } catch (err) {
     return (stakeInfo);
   }
@@ -991,30 +1005,65 @@ exports.compactDB = function (req, res) {
 };
 
 exports.updateZscoreStatus = async function (req, res) {
+  let serverReady = false;
   function reportUpdateComplete(input) {
-    return res.status(200).send({
-      message: input
+    input.socketObj.emit('CSV_complete', {
+      room: input.socketRoom,
+      text: `${ input[0] } created and ready for download`,
+      fileName: input[0]
     });
+    // socketObj.removeListener('CSV_status');
+    input.socketObj.removeAllListeners();
+    input.socketObj.close();
+    // return;
+    // return res.status(200).send({
+    //   message: input
+    // });
   }
 
-  var parmObj = {
-    stakeDB: req.params.stakeDB,
-    scopeType: req.params.scopeType,
-    cCode: req.params.cCode,
-    updateProcess: updateStatusStake
-  };
+  let socketClient = io(`http://localhost:${process.env.PORT}/csvStatus`, {
+    agent: false, // [2] Please don't set this to true
+    upgrade: false,
+    rejectUnauthorized: true,
+    query: `token=chocolate&sessionID=${ req.sessionID }&nsp=${ req.query.nsp }`
+  });
 
-  getDBListFromFile(parmObj).map((stakeToSave) => {
-    return stakeToSave;
-  }, { concurrancy: 1 })
-    .then((results) => {
-      reportUpdateComplete(results, retryLimit);
-    }).catch((error) => {
-      console.log(error.message);
-      return res.status(400).send({
-        message: errorHandler.getErrorMessage(error)
+  // socketClient.removeAllListeners();
+  socketClient.on('connect', () => {
+    // console.log('server client connected');
+    socketClient.emit('room', { room: req.query.socketRoomId, src: 'server client' });
+  });
+
+  socketClient.on('Server_ready', async(data) => {
+
+    // console.log(`we have server ready ${ data.text }`);
+    moment.locale(req.params.language);
+    // let stakeList = await getDBListFromFile(parmObj);
+    // res.status(202).send({ message: 'Request has been received ', nsp: req.query.socketId });
+
+    var parmObj = {
+      stakeDB: req.params.stakeDB,
+      stakeName: req.params.stakeName,
+      scopeType: req.params.scopeType,
+      cCode: req.params.cCode,
+      socketRoom: req.query.socketRoomId,
+      socketObj: socketClient,
+      updateProcess: updateStatusStake
+    };
+
+    getDBListFromFile(parmObj).map((stakeToSave) => {
+      return stakeToSave;
+    }, { concurrency: 1 })
+      .then((results) => {
+        reportUpdateComplete(results, retryLimit);
+      }).catch((error) => {
+        console.log(error.message);
+        return res.status(400).send({
+          message: errorHandler.getErrorMessage(error)
+        });
       });
-    });
+    serverReady = true;
+  });
 };
 
 exports.createCSVFromDB = async function (req, res) {
@@ -1062,7 +1111,7 @@ exports.createCSVFromDB = async function (req, res) {
     try {
       Promise.map(stakeRetryList, (stakeToSave) => {
         return (stakeToSave);
-      }, { concurrancy: 1 })
+      }, { concurrency: 1 })
         .then((results) => {
           setTimeout(reportAggregateComplete, 10000, results, retryCount - 1, processToExec, socketObj, socketRoom);
         }).catch((error) => {
@@ -1150,7 +1199,7 @@ exports.createCSVFromDB = async function (req, res) {
       await writeHeader(parmObj.fileToSave, headerLine);
       getDBListFromFile(parmObj).map((stakeToSave) => {
         return stakeToSave;
-      }, { concurrancy: 1 })
+      }, { concurrency: 1 })
         .then((results) => {
           reportAggregateComplete(results, retryLimit, parmObj.updateProcess, socketClient, parmObj.socketRoom);
         }).catch((error) => {

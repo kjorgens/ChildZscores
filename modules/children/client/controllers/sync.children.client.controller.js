@@ -13,6 +13,7 @@
     var vm = this;
     vm.countryCode = $stateParams.cCode;
     vm.countryName = $stateParams.countryName;
+    vm.stakeName = $stateParams.stakeName;
     vm.user = Authentication.user;
     vm.userIsAdmin = false;
     vm.goBack = goBack;
@@ -20,7 +21,11 @@
     if (vm.user === null) {
       reportError('Login required for syncing', 'Please log in', false);
       // $window.history.pushState();
-      $state.go('authentication.signin');
+      storage.removeItem('token');
+      $http.get('api/auth/signout')
+        .then(() => {
+          $state.go('authentication.signin');
+        });
     } else {
       vm.user.roles.forEach(function(role) {
         if (role.indexOf('admin') > -1) {
@@ -357,10 +362,76 @@
       });
     }
 
-    function updateStakeChildStatus(stakeDB, cCode, scopeType, func) {
+    function updateStakeChildStatus(stakeDB, stakeName, ccode, scopeType) {
       vm.startSpin();
-      return $http.get('api/children/update/' + stakeDB + '/' + cCode + '/' + scopeType + '/' + func)
-        .then(updateComplete);
+      var convertParams = {
+        stakeDB: stakeDB,
+        stakeName: stakeName,
+        scopeType: scopeType,
+        cCode: ccode,
+        socketRoomId: `${ Authentication.user.firstName }_${ Authentication.user.lastName }_${ moment.now() }`
+      };
+
+      if (!Socket.socket) {
+        Socket.connectNSP('/csvStatus');
+      } else {
+        Socket.removeListener('connect');
+        Socket.removeListener('startNow');
+      }
+
+      Socket.on('CSV_progress', (message) => {
+        if (message.maxCount) {
+          vm.stakeCount = message.maxCount;
+          return;
+        }
+
+        vm.currentStakeCount = message.count;
+        Notification.success({ message: `<i class="glyphicon glyphicon-ok"></i> ${ message.text }` });
+      });
+
+      Socket.on('CSV_complete', (message) => {
+        vm.showProgress = false;
+        vm.stopSpin();
+        Notification.success({ message: `<i class="glyphicon glyphicon-ok"></i> ${ message.text }`, delay: 10000 });
+        // console.log('remove the socket at the client');
+        // Socket.emit('leaveRoom', input.socketRoomId);
+        Socket.removeAllListeners();
+        // Socket.removeListener('CSV_complete', this);
+        Socket.close();
+      });
+
+      Socket.on('CSV_error', function (message) {
+        console.log(`just received CSV_error event ${ message.text } at the client`);
+        Notification.error({ message: `<i class="glyphicon glyphicon-remove"></i> ${ message.text }` });
+      });
+
+      Socket.on('connect', () => {
+        // console.log('client just got connect event, get a room');
+        Socket.emit('room', { room: convertParams.socketRoomId, src: 'client', destSocket: 'startNow' });
+      });
+
+      Socket.on('Client_ready', (message) => {
+        // console.log(`client just got startNow event ${ message.text } from room creation, tell the server to start building report`);
+        ChildrenReport.convertZscores({
+          stakeDB: stakeDB,
+          stakeName: stakeName,
+          cCode: ccode,
+          scopeType: scopeType
+        }).then((requestReceived) => {
+          console.log('done');
+        }).catch(err => {
+          getCsvError(err);
+        });
+      });
+
+      Socket.on('disconnect', () => {
+        // console.log('removing listener from the client');
+        Socket.removeAllListeners();
+      });
+      // Remove the event listener when the controller instance is destroyed
+      $scope.$on('$destroy', function () {
+        Socket.removeAllListeners();
+      });
     }
 
     function getCsvError(error) {

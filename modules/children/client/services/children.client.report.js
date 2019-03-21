@@ -20,12 +20,27 @@
             return result;
           }
         }
+      },
+      convert: {
+        method: 'GET',
+        headers: { authorization: `JWT ${ localStorage.getItem('token') }` },
+        url: '/api/children/update/:stakeDB/:stakeName/:cCode/:scopeType',
+        interceptor: {
+          response: response => {
+            var result = response.resource;
+            result.$status = response.status;
+            return result;
+          }
+        }
       }
     });
 
     angular.extend(ChildrenReport, {
       buildReport: function (params) {
         return this.generate(params).$promise;
+      },
+      convertZscores: function (params) {
+        return this.convert(params).$promise;
       }
     });
 
