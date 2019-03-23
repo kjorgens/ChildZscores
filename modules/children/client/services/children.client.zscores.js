@@ -1757,7 +1757,7 @@
       return ({ child: child, screens: screenList, sup: supType });
     };
 
-    var getMethod = function (sex, age, height, weight, firstScreening, callback) {
+    var getMethod = function (sex, age, height, weight, firstScreening) {
       var ha,
         wa,
         wl,
@@ -1767,16 +1767,17 @@
       if (height < 45) {
         height = 45;
       }
+
       if (sex === 'Girl') {
         ha = heightForAgeGirls[Math.round(age)];
         wa = weightForAgeGirls[Math.round(age)];
         wl = null;
         tableByAge = Math.round(age) >= 24 ? weightForLengthGirls24 : weightForLengthGirls;
-        for (var i = 0; i < tableByAge.length; i + 1) {
-          if (tableByAge[i].y === (Math.round(Number(height) * 2) / 2)) {
-            wl = tableByAge[i];
-            break;
-          }
+        wl = tableByAge.find((tableLine) => {
+          return tableLine.y === Math.round(Number(height) * 2) / 2;
+        });
+        if (wl === null) {
+          console.log('out of range');
         }
       } else {
         ha = heightForAgeBoys[Math.round(age)];
@@ -1784,10 +1785,8 @@
         wl = null;
         tableByAge = Math.round(age) >= 24 ? weightForLengthBoys24 : weightForLengthBoys;
         wl = tableByAge.find((tEntry) => {
-
           return tEntry.y === Math.round(Number(height) * 2) / 2;
         });
-
         if (wl === null) {
           console.log('out of range');
         }
@@ -1819,7 +1818,6 @@
       } else if (weightForLength < -1 && weightForLength > -2) {
         wlStatus = 'marginalZscore';
       }
-
 
       var status;
       var sugAction = [];
@@ -1890,7 +1888,7 @@
         sugAction.push('REVIEW_HEALTH_LESSONS');
       }
 
-      callback({
+      return ({
         ha: heightForAge,
         haStatus: haStatus,
         wa: weightForAge,

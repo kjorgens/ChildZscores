@@ -188,7 +188,7 @@
 
     factory.getCountriesLocal = getCountriesLocalDB;
 
- /*   factory.getCountryData = function (countryName) {
+    /*   factory.getCountryData = function (countryName) {
       if (countryDataBase === undefined) {
         countryDataBase = pouchDB('country_list');
       }
@@ -485,6 +485,7 @@
     };
 
     factory.updateChildSups = function(childId, callBack, errCallback) {
+      console.log('entering UpdateChildSups');
       database.find({
         selector: {
           owner: { $eq: childId },
@@ -492,13 +493,18 @@
         },
         sort: [{ surveyDate: 'desc' }]
       }).then((screenList) => {
+        if (screenList.length <= 0) {
+          console.log('no screens? should not be!');
+        }
         var supType = 'none';
         var currentSupType = 'none';
         var priorMalnurished = 'no';
         database.get(childId)
           .then((childInfo) => {
+            console.log('have the child obj');
             var currentAge = moment().diff(moment(new Date(childInfo.birthDate)), 'months');
             screenList.docs.forEach(function (screening, index) {
+              console.log(screening.zScore);
               if ((screening.zScore.ha < -2 || screening.zScore.wa < -2)) {
                 priorMalnurished = 'yes';
                 supType = 'sup';
@@ -531,6 +537,8 @@
             childInfo.lastScreening = screenList.docs[0]._id;
             database.put(childInfo)
               .then(callBack);
+          }).catch(error => {
+            console.log(error.message);
           });
       }).catch(err => {
         console.log(err.message);
@@ -574,9 +582,6 @@
           // Do something with the error
           errorCallback(error);
         })
-        .finally(function () {
-          // Do something when everything is done
-        });
     };
 
     factory.updateChild = function (childInfo) {
@@ -588,9 +593,6 @@
         })
         .catch(function (error) {
           // Do something with the error
-        })
-        .finally(function () {
-          // Do something when everything is done
         });
     };
 
@@ -602,9 +604,6 @@
         })
         .catch(function (error) {
           errorCallback(error);
-        })
-        .finally(function () {
-          // Do something when everything is done
         });
     };
 

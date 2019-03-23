@@ -32,7 +32,7 @@
     vm.goBack = goBack;
     vm.getChildrenList = getChildrenList;
 
-    vm.zScoreGetter = ZScores.getMethod;
+    // vm.zScoreGetter = ZScores.getMethod;
     $translate.use($rootScope.SelectedLanguage);
 
     vm.selectedStake = localStorage.getItem('selectedStake');
