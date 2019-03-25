@@ -1,6 +1,6 @@
 'use strict';
 
-describe('liahona kids E2E Tests:', function () {
+describe('Bountiful kids E2E Tests:', function () {
   describe('Put an entry into the local database', function () {
     it('should put an entry in Brazil test only local data base', function () {
       browser.get('http://localhost:3000').then(function () {
