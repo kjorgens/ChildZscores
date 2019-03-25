@@ -1006,15 +1006,14 @@ exports.compactDB = function (req, res) {
 
 exports.updateZscoreStatus = async function (req, res) {
   let serverReady = false;
-  function reportUpdateComplete(input) {
-    input.socketObj.emit('CSV_complete', {
-      room: input.socketRoom,
-      text: `${ input[0] } created and ready for download`,
-      fileName: input[0]
+  function reportUpdateComplete(input, socketClient, socketRoom) {
+    socketClient.emit('CSV_complete', {
+      room: socketRoom,
+      text: 'zscore update complete'
     });
     // socketObj.removeListener('CSV_status');
-    input.socketObj.removeAllListeners();
-    input.socketObj.close();
+    socketClient.removeAllListeners();
+    socketClient.close();
     // return;
     // return res.status(200).send({
     //   message: input
@@ -1055,7 +1054,7 @@ exports.updateZscoreStatus = async function (req, res) {
       return stakeToSave;
     }, { concurrency: 1 })
       .then((results) => {
-        reportUpdateComplete(results, retryLimit);
+        reportUpdateComplete(results, socketClient, parmObj.socketRoom);
       }).catch((error) => {
         console.log(error.message);
         return res.status(400).send({

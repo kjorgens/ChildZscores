@@ -416,7 +416,8 @@
           stakeDB: stakeDB,
           stakeName: stakeName,
           cCode: ccode,
-          scopeType: scopeType
+          scopeType: scopeType,
+          socketRoomId: convertParams.socketRoomId
         }).then((requestReceived) => {
           console.log('done');
         }).catch(err => {
