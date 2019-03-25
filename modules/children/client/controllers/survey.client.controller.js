@@ -160,9 +160,7 @@
         } else {
           vm.childHeightIsValid = true;
           if (vm.ageIsValid && vm.weightIsValid) {
-            vm.zScoreGetter(vm.survey.gender, vm.ageInMonths || vm.monthAge, vm.survey.height, vm.survey.weight, vm.initialSurvey, function (zscore) {
-              vm.survey.zScore = zscore;
-            });
+            vm.survey.zScore = vm.zScoreGetter(vm.survey.gender, vm.ageInMonths || vm.monthAge, vm.survey.height, vm.survey.weight, vm.initialSurvey);
           }
         }
       } else {
@@ -194,9 +192,7 @@
         } else {
           vm.childWeightIsValid = true;
           if (vm.ageIsValid && vm.heightIsValid) {
-            vm.zScoreGetter(vm.survey.gender, vm.ageInMonths || vm.monthAge, vm.survey.height, vm.survey.weight, vm.initialSurvey, function (zscore) {
-              vm.survey.zScore = zscore;
-            });
+            vm.zscore = vm.zScoreGetter(vm.survey.gender, vm.ageInMonths || vm.monthAge, vm.survey.height, vm.survey.weight, vm.initialSurvey);
           }
         }
       } else {
@@ -284,26 +280,23 @@
         return false;
       }
 
+      var zScore = {};
       if (vm.survey._id) {
-        vm.zScoreGetter(vm.child.gender, vm.survey.monthAge, vm.survey.height, vm.survey.weight, vm.initialSurvey, function (zscore) {
-          vm.zScore = zscore;
-        });
-        vm.survey.zScore = vm.zScore;
+        zScore = vm.zScoreGetter(vm.child.gender, vm.survey.monthAge, vm.survey.height, vm.survey.weight, vm.initialSurvey);
+        vm.survey.zScore = zScore;
         vm.survey.surveyDate = vm.surveyDate;
         PouchService.insert(vm.survey, surveyUpdated, addedError);
       } else {
         vm.survey._id = undefined;
         var bday = new Date(vm.child.birthDate);
-        var zScore = {};
-        vm.zScoreGetter(vm.child.gender, vm.survey.monthAge, vm.survey.height, vm.survey.weight, vm.initialSurvey, function (zscore) {
-          vm.zScore = zscore;
-        });
 
+;
+        zScore = vm.zScoreGetter(vm.child.gender, vm.survey.monthAge, vm.survey.height, vm.survey.weight, vm.initialSurvey);
         var surveyObject = {
           _id: 'scr_',
           owner: vm.child._id,
           surveyDate: vm.surveyDate,
-          zScore: vm.zScore,
+          zScore: zScore,
           gender: vm.child.gender,
           weight: vm.survey.weight,
           height: vm.survey.height,
@@ -313,6 +306,7 @@
           latitude: vm.latitude,
           longitude: vm.longitude
         };
+
         PouchService.insert(surveyObject, surveyAdded, addedError);
         vm.survey.weight = '';
         vm.survey.height = '';

@@ -44,6 +44,7 @@ exports.signup = function (req, res) {
           res.status(400).send(err);
         } else {
           var jwtToken = jwtAuthentication.signToken(user);
+          console.log('new JWT at signup returned from server');
           res.json({ user: user, token: jwtToken });
           // res.json(user);
         }
@@ -69,6 +70,7 @@ exports.signin = function (req, res, next) {
           res.status(400).send(err);
         } else {
           var jwtToken = jwtAuthentication.signToken(user);
+          console.log('new JWT at signin returned from server');
           res.json({ user: user, token: jwtToken });
           // res.json(user);
         }

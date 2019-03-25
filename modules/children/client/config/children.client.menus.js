@@ -2,8 +2,8 @@
   'use strict';
 
   angular
-      .module('children')
-      .run(menuConfig);
+    .module('children')
+    .run(menuConfig);
 
   menuConfig.$inject = ['menuService', 'PouchService'];
 

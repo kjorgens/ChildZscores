@@ -39,10 +39,13 @@ exports.invokeRolesPolicies = function () {
       resources: '/stakes',
       permissions: ['get']
     }, {
+      resources: '/delCsv',
+      permissions: ['get']
+    }, {
       resources: '/report/:stakeDB/:cCode/:scopeType/:sortField/:language/:csvType',
       permissions: ['*']
     }, {
-      resources: '/update/:stakeDB/:cCode/:scopeType/:function',
+      resources: '/update/:stakeDB/:stakeName/:cCode/:scopeType',
       permissions: ['get']
     }]
   }, {
