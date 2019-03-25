@@ -124,7 +124,7 @@
       SYNC_MESSAGE: 'Pressing the sync button above will sync all children records from the remote database and ' +
       'will sync the records on this machine up to the remote database. Prior to new screenings, when you have internet access, ' +
       'sync your stake before you start a screening, and sync again after you have finished a screening session. ' +
-      ' You must be signed in and have internet access to sync. To sync another stake, Press Liahona Kids on the top menu bar, ' +
+      ' You must be signed in and have internet access to sync. To sync another stake, Press Bountiful Kids on the top menu bar, ' +
       'Select the country and stake, and hit the sync button. To conserve storage on your device, only sync stakes you are working with.',
       REMOVE_SCREENING_MSG: 'Pressing the button above will remove this screening record from the local database, and on the next ' +
       'successful sync, the record will be removed from the remote database.',
@@ -456,7 +456,7 @@
       SYNC_MESSAGE: 'Appuyez sur le bouton de synchronisation ci-dessus pour synchroniser tous les enregistrements denfants de la base de données distante et ' +
       'Synchronisera les enregistrements de cette machine avec la base de données distante. Avant les nouvelles projections, lorsque vous avez accès à Internet, ' +
       'Synchronisez votre pieu avant de commencer un dépistage et synchronisez-le à nouveau une fois que vous avez terminé une séance de sélection. ' +
-      ' Vous devez être connecté et avoir accès à Internet pour la synchronisation. Pour synchroniser une autre participation, appuyez sur Liahona Kids sur la barre de menu supérieure, ' +
+      ' Vous devez être connecté et avoir accès à Internet pour la synchronisation. Pour synchroniser une autre participation, appuyez sur Bountiful Kids sur la barre de menu supérieure, ' +
       'Sélectionnez le pays et le pieu, et appuyez sur le bouton de synchronisation. Pour conserver le stockage sur votre appareil, ne synchronisez que les enjeux avec lesquels vous travaillez.',
       REMOVE_SCREENING_MSG: 'En appuyant sur le bouton ci-dessus, vous supprimez cet enregistrement de dépistage de la base de données locale, et le prochain' +
       'synchronisation réussie, lenregistrement sera supprimé de la base de données distante.',
