@@ -503,8 +503,16 @@
             stakeDB: 'crois_des_mission_hti'
           },
           {
+            stakeName: 'Les Palmes',
+            stakeDB: 'les_palmes_ht'
+          },
+          {
             stakeName: 'Port-au-Prince',
             stakeDB: 'port_au_prince_hti'
+          },
+          {
+            stakeName: 'Port-au-Prince Nor',
+            stakeDB: 'port_au_prince_nor_hti'
           },
           {
             stakeName: 'Haiti Test',
