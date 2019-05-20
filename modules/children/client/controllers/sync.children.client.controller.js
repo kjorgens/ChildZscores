@@ -466,11 +466,11 @@
     }
 
     function updateViews() {
-      ChildrenViews.updateViews(vm.stakeDB);
+      ChildrenViews.updateViews({ stakeDB: vm.stakeDB });
     }
 
     function compactDB() {
-      ChildrenViews.compactDB(vm.stakeDB);
+      ChildrenViews.compactDB({ stakeDB: vm.stakeDB });
     }
 
     function viewUpdateComplete() {

@@ -88,7 +88,10 @@
       var rightNow = new Date();
       var currentAgeMonths = moment(rightNow).diff(moment(vm.child.birthDate), 'months');
       if (currentAgeMonths > 60) {
-        vm.childTooOld();
+        let obeseInfo = Obesity.getObesity(vm.child, vm.surveys[0]);
+        vm.obese = obeseInfo.obese;
+        vm.bmi = obeseInfo.currentBMI;
+        // vm.childTooOld();
         // vm.startSpin();
         $state.go('children.list', {
           stakeDB: vm.selectedDB,

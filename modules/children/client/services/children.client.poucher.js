@@ -109,13 +109,13 @@
       return ($q.all(indexFunctions));
     };
 
-    factory.getCountryInfoByUser = function (authUser) {
-      if (authUser.roles.map) {
-        if (pilot === 'phl_pilot') {
-
-        }
-      }
-    };
+    // factory.getCountryInfoByUser = function (authUser) {
+    //   if (authUser.roles.map) {
+    //     if (pilot === 'phl_pilot') {
+    //
+    //     }
+    //   }
+    // };
 
     factory.getCountriesList = function (networkFirst) {
       return new Promise(function(resolve, reject) {

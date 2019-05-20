@@ -85,7 +85,7 @@
       localStorage.setItem('token', response.token);
       Notification.info({ message: 'Welcome ' + response.user.firstName });
       // And redirect to the previous or home page
-      if (vm.authentication.user.roles.includes('phl-pilot')) {
+      if (vm.authentication.user.roles.includes('phl-pilot') || vm.authentication.user.roles.includes('venezuela')) {
         $state.go('home');
       } else {
         $window.history.back();

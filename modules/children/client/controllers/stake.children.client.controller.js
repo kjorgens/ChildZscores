@@ -12,11 +12,12 @@
     countryData, $stateParams) {
     var vm = this;
     vm.selectedCountry = countryData;
-    vm.selectedCountry.image = countryData.image;
-    vm.selectedCountryCode = countryData.code;
-    sessionStorage.setItem('selectedCountry', vm.selectedCountry.name);
-    localStorage.setItem('selectedCountry', vm.selectedCountry.name);
-    localStorage.setItem('selectecCountryCode', vm.selectedCountry.code);
+    // vm.selectedCountry.image = countryData.image;
+    // vm.selectedCountryCode = countryData.code;
+    sessionStorage.setItem('selectedCountry', countryData.name);
+    localStorage.setItem('selectedCountry', countryData.name);
+    localStorage.setItem('selectedCountryImage', countryData.image);
+    localStorage.setItem('selectecCountryCode', countryData.code);
     localStorage.setItem('childFilter', 'a');
     FilterService.setColorFilter('');
     FilterService.setSearchFilter('');
@@ -72,7 +73,7 @@
       localStorage.setItem('selectedCountry', vm.selectedCountry.name);
       localStorage.setItem('selectecCountryCode', vm.selectedCountry.code);
       sessionStorage.setItem('selectecCountryCode', vm.selectedCountry.code);
-      sessionStorage.getItem('selectedCountryImage', `/${ vm.selectedCountry.image }`);
+      sessionStorage.setItem('selectedCountryImage', `/${ vm.selectedCountry.image }`);
       localStorage.setItem('selectedCountryImage', `/${ vm.selectedCountry.image }`);
     }
 

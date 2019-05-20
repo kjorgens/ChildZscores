@@ -220,6 +220,8 @@
   function getCountryInfo($stateParams, CountryInfo, Authentication) {
     if (Authentication.user && Authentication.user.roles.includes('phl-pilot')) {
       return Promise.resolve(CountryInfo.getPhlPilotList());
+    } else if (Authentication.user && Authentication.user.roles.includes('venezuela')) {
+      return Promise.resolve(CountryInfo.getVenezuelaList('Venezuela'));
     } else {
       return Promise.resolve(CountryInfo.getMasterList());
     }
@@ -288,6 +290,8 @@
   function singleCountryData($stateParams, CountryInfo, Authentication) {
     if (Authentication.user && Authentication.user.roles.includes('phl-pilot')) {
       return Promise.resolve(CountryInfo.getCountryInfoPilot($stateParams.country));
+    } else if (Authentication.user && Authentication.user.roles.includes('venezuela')) {
+      return Promise.resolve(CountryInfo.getCountryInfoVenezuela('Venezuela'));
     } else {
       return Promise.resolve(CountryInfo.getCountryInfo($stateParams.country));
     }

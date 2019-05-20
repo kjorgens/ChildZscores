@@ -31,6 +31,26 @@
     ]
   };
 
+  const venezuela = {
+    countries: [
+      {
+        name: 'Venezuela',
+        code: 'VEN',
+        image: '/modules/children/client/img/venezuela.png',
+        stakes: [
+          {
+            stakeName: 'Test Venezuela',
+            stakeDB: 'test_stake_ven'
+          },
+          {
+            stakeName: 'Test Venezuela Two',
+            stakeDB: 'test_stake_ven_two'
+          }
+        ]
+      }
+    ]
+  };
+
   const masterCountryList = {
     countries: [
       {
@@ -504,7 +524,7 @@
           },
           {
             stakeName: 'Les Palmes',
-            stakeDB: 'les_palmes_ht'
+            stakeDB: 'les_palmes_hti'
           },
           {
             stakeName: 'Port-au-Prince',
@@ -1156,6 +1176,10 @@
       return phl_pilot;
     };
 
+    const returnVenezuelaCountryList = function () {
+      return venezuela;
+    };
+
     const returnCountryInfo = function(countryName) {
       return masterCountryList.countries.find(function (country) {
         return country.name === countryName;
@@ -1168,11 +1192,19 @@
       });
     };
 
+    const returnCountryInfoVen = function(countryName) {
+      return venezuela.countries.find(function (country) {
+        return country.name === countryName;
+      });
+    };
+
     return {
       getMasterList: returnMasterCountryList,
       getPhlPilotList: returnPilotCountyList,
+      getVenezuelaList: returnVenezuelaCountryList,
       getCountryInfo: returnCountryInfo,
-      getCountryInfoPilot: returnCountryInfoPilot
+      getCountryInfoPilot: returnCountryInfoPilot,
+      getCountryInfoVenezuela: returnCountryInfoVen
     };
   }
 

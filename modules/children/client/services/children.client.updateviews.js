@@ -5,17 +5,23 @@
     .module('children.updateviews')
     .factory('ChildrenViews', ChildrenViews);
 
-  ChildrenViews.$inject = ['$http'];
+  ChildrenViews.$inject = ['$resource', 'Authentication'];
 
-  function ChildrenViews($http) {
-    var factory = {};
-    factory.updateViews = function(stakeDB) {
-      return $http.get('api/children/updateviews/' + stakeDB);
-    };
+  function ChildrenViews($resource, Authentication) {
+    let ChildrenViews = $resource('/api/children/updateviews', {}, {
+      updateTheViews: {
+        method: 'GET',
+        headers: { authorization: `JWT ${ Authentication.token || localStorage.getItem('token') }` },
+        url: '/api/children/updateviews/:stakeDB'
+      }
+    });
 
-    factory.compactDB = function(stakeDB) {
-      return $http.get('api/children/compactDB/' + stakeDB);
-    };
-    return factory;
+    angular.extend(ChildrenViews, {
+      updateViews: function (params) {
+        return this.updateTheViews(params).$promise;
+      }
+    });
+
+    return ChildrenViews;
   }
 }());
