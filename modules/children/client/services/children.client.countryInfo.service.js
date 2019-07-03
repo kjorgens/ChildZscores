@@ -416,6 +416,10 @@
             stakeDB: 'malacatan_stake_gtm'
           },
           {
+            stakeName: 'Malacatan 2 Stake',
+            stakeDB: 'malacatan_two_stake_gtm'
+          },
+          {
             stakeName: 'Momostenango Paxajtup District',
             stakeDB: 'momostenango_paxajtup_district_gtm'
           },
@@ -484,6 +488,10 @@
             stakeDB: 'totonicapan_stake_gtm'
           },
           {
+            stakeName: 'Quetzaltenango Cantel',
+            stakeDB: 'quetzaltenango_stake_gtm'
+          },
+          {
             stakeName: 'Guatamala test Only',
             stakeDB: 'test_stake_gtm'
           }
@@ -526,7 +534,7 @@
         image: '/modules/children/client/img/honduras.png',
         stakes: [
           {
-            stakeName: 'Catacamas District',
+            stakeName: 'Juticalpa District',
             stakeDB: 'catacamas_district_hnd'
           },
           {
@@ -550,7 +558,7 @@
             stakeDB: 'fesitran_stake_hnd'
           },
           {
-            stakeName: 'La Ceiba Stake',
+            stakeName: 'Miramar',
             stakeDB: 'la_ceiba_stake_hnd'
           },
           {
@@ -574,7 +582,7 @@
             stakeDB: 'valle_verde_district_hnd'
           },
           {
-            stakeName: 'Villa Nueva Stake',
+            stakeName: 'PotrerillosStake',
             stakeDB: 'villa_nueva_stake_hnd'
           },
           {
@@ -662,7 +670,7 @@
             stakeDB: 'esteli_district_nic'
           },
           {
-            stakeName: 'Jinotepeque Stake',
+            stakeName: 'Jinotepe Stake',
             stakeDB: 'jinotepeque_stake_nic'
           },
           {

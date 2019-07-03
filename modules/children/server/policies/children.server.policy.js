@@ -31,7 +31,7 @@ exports.invokeRolesPolicies = function () {
       permissions: '*'
     }, {
       resources: '/updateviews/:stakeDB',
-      permissions: '*'
+      permissions: 'get'
     }, {
       resources: '/compactDB/:stakeDB',
       permissions: '*'
