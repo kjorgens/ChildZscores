@@ -356,7 +356,7 @@ function getScreeningsList(childId, screeningList) {
 }
 
 function splitSups(childScreenList) {
-  const supList = childScreenList.listIn.filter(child => child.data.sup !== 'none' && child.data.sup !== 'risk' && child.data.sinceLastScreen < 6);
+  const supList = childScreenList.listIn.filter(child => child.data.sup !== 'none' && child.data.sup !== 'risk' && child.data.sinceLastScreen <= 6);
   const others = childScreenList.listIn.filter(child => child.data.sup === 'none' || child.data.sup === 'risk' || child.data.sinceLastScreen > 6);
   return { listIn: [...supList, ...others] };
 }
@@ -641,7 +641,7 @@ async function getChildAndData(parmObj, multiplier) {
       // console.log(`${parmObj.stakeName} just emitted from get childAndData on server`);
       var newObj = Object.assign({}, parmObj);
       var stake = parmObj.stakeDB;
-      return resolve(Promise.join(newDBRequest(stake, parmObj.stakename, newObj, 'children_list'), newDBRequest(stake, parmObj.stakename, newObj, 'scr_list')));
+      return resolve(Promise.join(newDBRequest(stake, parmObj.stakeName, newObj, 'children_list'), newDBRequest(stake, parmObj.stakeName, newObj, 'scr_list')));
     }
     // console.log(`start ${ parmObj.stakeName } in ${ multiplier } seconds`);
     return setTimeout(accessDB, 750 * multiplier, parmObj);
