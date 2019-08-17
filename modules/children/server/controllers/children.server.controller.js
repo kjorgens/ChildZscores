@@ -356,7 +356,7 @@ function getScreeningsList(childId, screeningList) {
 }
 
 function splitSups(childScreenList) {
-  const supList = childScreenList.listIn.filter(child => child.data.sup !== 'none' && child.data.sup !== 'risk' && child.data.sinceLastScreen < 6);
+  const supList = childScreenList.listIn.filter(child => child.data.sup !== 'none' && child.data.sup !== 'risk' && child.data.sinceLastScreen <= 6);
   const others = childScreenList.listIn.filter(child => child.data.sup === 'none' || child.data.sup === 'risk' || child.data.sinceLastScreen > 6);
   return { listIn: [...supList, ...others] };
 }
