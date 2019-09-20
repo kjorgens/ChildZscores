@@ -1,0 +1,1651 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: gh-build-tools.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: gh-build-tools.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>#! /usr/bin/env node
+const CredStash = require('nodecredstash');
+const { request } = require('@octokit/request');
+const Octokit = require('@octokit/rest');
+const superAgent = require('superagent');
+const { join } = require('path');
+const { createReadStream } = require('fs');
+const xml2js = require('xml2js');
+const ticketPattern = new RegExp('([A-Z]+-[0-9]+)', 'gi');
+const squareBracketPattern = new RegExp(/\[*.?]:/);
+
+const getPRIdQuery = `query($repo: String!, $prNumber: Int!, $owner: String!) {
+  repository(owner: $owner, name: $repo) {
+    name
+    pullRequest(number: $prNumber) {
+      id
+    }
+  }
+}`;
+
+const getPRBodyQuery = `query($repo: String!, $prNumber: Int!, $owner: String!) {
+  repository(owner: $owner, name: $repo) {
+    name
+    pullRequest(number: $prNumber) {
+      id
+      body
+    }
+  }
+}`;
+
+const updatePRBodyMutation = `mutation($prId: ID!, $prBody: String!) {
+  updatePullRequest(input:{pullRequestId: $prId, body: $prBody}) {
+    pullRequest {
+      body
+    }
+  }
+}`;
+
+const createCommentMutation = `mutation($prId: ID!, $commentBody: String!) {
+  addComment(input:{subjectId: $prId, body: $commentBody}) {
+    commentEdge {
+      node {
+        createdAt
+        body
+      } 
+    }
+    subject {
+      id
+    }
+  }
+}`;
+
+const allTicketsQuery = `query($repo: String!, $prNumber: Int!, $owner: String!) {
+  repository(owner: $owner, name: $repo) {
+    name
+    pullRequest(number: $prNumber){
+      headRef {
+        name
+      }
+      title
+      bodyText
+      headRef {
+        name
+      }
+    }   
+  }
+}`;
+
+const getBranchOidQuery = `query($repo: String!, $refName: String!, $owner: String!) {
+  repository(owner: $owner, name: $repo) {
+    ref(qualifiedName: $refName){
+      target {
+        oid
+      }
+    }   
+  }
+}`;
+
+const getTagsListQuery = `query ($owner: String!, $repo: String!) {
+  repository(owner: $owner, name: $repo) {
+    name
+    refs(last: 20, refPrefix: "refs/tags/") {
+      nodes {
+        name
+        target {
+          ... on Commit {
+            author {
+              user {
+                login
+              }
+            }
+            pushedDate
+            oid
+          }
+        }
+      }
+    }
+  }
+}`;
+
+const prCommitsQuery = `query($repo: String!, $prNumber: Int!, $owner: String!, $currentCursor: String) {
+  repository(owner: $owner, name: $repo) {
+    name
+    pullRequest(number: $prNumber){
+      commits(first: 20, after: $currentCursor) {
+        edges {
+          cursor
+          node {
+            commit {
+              oid
+              message
+            }
+          }
+        }
+        pageInfo {
+          endCursor
+          hasNextPage
+        }  
+      }   
+    }  
+  } 
+}`;
+
+const prCommentsQuery = `query($repo: String!, $prNumber: Int!, $owner: String!, $nodeCount: Int!) {
+  repository(owner: $owner, name: $repo) {
+    name
+    pullRequest(number: $prNumber){
+      comments(last: $nodeCount) {
+        edges {
+          node {
+            body
+            author {
+              login
+            }
+          }
+        }
+      }   
+      headRef {
+        name
+      }
+    }   
+  }
+}`;
+
+const getLastestReleaseQuery = `query($owner: String!, $repo: String!, $orderSpecs: ReleaseOrder!) {
+  repository(owner: $owner, name: $repo) {
+    name
+    releases(first: 5, orderBy: $orderSpecs) {
+      edges {
+        cursor
+        node {
+          name
+          id
+          tagName
+          isPrerelease
+        }
+      }
+      pageInfo {
+        endCursor
+        hasNextPage
+      }  
+    }   
+  }
+}`;
+
+const getReleaseByTagQuery = `query($owner: String!, $repo: String!, $tagName: String!) {
+  repository(owner: $owner, name: $repo) {
+    name
+    release(tagName: $tagName) {
+      description
+      id
+      publishedAt
+    }  
+  }
+}`;
+
+const getBranchCommitMsgs = `query($owner: String!, $repo: String!, $startTime: GitTimestamp!, $currentCursor: String) {
+  repository(owner: $owner, name: $repo) {
+    ref(qualifiedName: "master") {
+      target {
+        ... on Commit {
+          id
+          history(first: 50, since: $startTime, after: $currentCursor) {
+            pageInfo {
+              endCursor
+              hasNextPage
+            }
+            edges {
+              node {
+                id
+                messageHeadline
+                oid
+                message
+                author {
+                  name
+                  email
+                  date
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}`;
+
+const getPRs = `query($owner: String!, $repo: String!, $prStates: [PullRequestState!], $currentCursor: String, $orderSpecs: IssueOrder) {
+  repository(owner: $owner, name: $repo) {
+    name
+    pullRequests(first: 50, states: $prStates, after: $currentCursor, orderBy: $orderSpecs) {
+      totalCount
+      edges {
+        cursor
+        node {
+          createdAt
+          number
+          bodyText
+          id
+          headRef {
+            name 
+          }
+        }
+      }
+      pageInfo {
+        endCursor
+        hasNextPage
+      }  
+    }  
+  }
+}`;
+
+const getLastReleasePR = `query ($sha: String, $repo: String!, $owner: String!){
+  repository(name: $repo, owner: $owner) {
+    commit: object(expression: $sha) {
+    ... on Commit {
+        associatedPullRequests(first: 5){
+          edges{
+            cursor
+            node{
+              createdAt
+              title
+              number
+              body
+            }
+          }
+          pageInfo {
+            endCursor
+            hasNextPage
+          }  
+        }
+      }
+    }
+  }
+}`;
+
+function getSecrets(credStash, key) {
+  return new Promise((resolve, reject) => {
+    if (process.env[key]) {
+      return resolve({ key, value: process.env[key] });
+    }
+
+    return credStash.getSecret({ name: key }, (err, results) => {
+      if (err) {
+        return reject(err);
+      }
+
+      return resolve({ key, value: results });
+    });
+  });
+}
+
+async function getCreds(credLane, requestedCreds) {
+  const credstash = new CredStash({
+    table: `credentials-${credLane}`,
+    awsOpts: { region: 'us-west-2' },
+  });
+  const creds = [];
+
+  requestedCreds.forEach(function(cred) {
+    creds.push(getSecrets(credstash, cred));
+  });
+
+  return Promise.all(creds);
+}
+
+function onlyNewer(latestPr) {
+  return latestPr.node.createdAt > this.data.data.repository.commit.associatedPullRequests.edges[0].node.createdAt;
+}
+
+class GhBuildTools {
+  /**
+   * GHBuildTools constructor.
+   *
+   * @param {string} ownerId - repo owner (optional if used in testing with mocks)
+   * @param {string} repository - repo name (optional if used in testing with mocks)
+   * @param {string} [ghToken] - if ghToken contains a period, used as credstash key to access token in credstash
+   * @param {string} [fetcherFunc] - used in github graphql, useful for mocking
+   * @return {Promise} GhBuildTools instance
+   *
+   * @example
+   *
+   *     // use in a test environment with mock
+   * const BuildTools = require('@vivintsolar/gh-build-tools');
+   * const bt = await new BuildTools();
+   *
+   *     bt.setRequestFetcher(mockfetcherFunc);
+   *
+   *     // use in script, possibly called from jenkins
+   * const BuildTools = require('@vivintsolar/gh-build-tools');
+   * const bt = await new BuildTools('VivintSolar', 'customer-app', 'jenkins.buildtools.github');
+   * const status = {
+   *       context: 'E2E Tests',
+   *       description: 'device farm tests',
+   *       state: 'failure',
+   *       target_url: 'https://us-west-2.console.aws.amazon.com/devicefarm/home?region=us-west-2#/projects/549b9167-7d9e-41b9-bbef-96d5d2f06602/runs/4c36d4e9-a3b5-469b-8a99-62685b72a476/jobs/00000/suites/00001'
+   *     }
+   *
+   *     bt.newGitHubStatusBranch('branchName', status);
+   */
+  constructor(ownerId, repository, ghToken, fetcherFunc) {
+    return (async () => {
+      let tokenInfo = {};
+
+      tokenInfo.value = ghToken;
+      if (ghToken &amp;&amp; ghToken.includes('.')) {
+        [tokenInfo] = await getCreds('production', [ghToken]);
+      }
+
+      if (ownerId &amp;&amp; repository &amp;&amp; ghToken) {
+        this.gitHubClient = new Octokit({
+          auth: `token ${tokenInfo.value}`,
+        });
+      }
+
+      this.owner = ownerId;
+      this.repo = repository;
+      this.token = tokenInfo.value;
+      this.fetcher = fetcherFunc;
+      this.setFetcher = GhBuildTools.setRequestFetcher;
+      this.setRepo = GhBuildTools.setCurrentRepo;
+      this.setGitHubToken = GhBuildTools.setGitHubToken;
+      this.removeDuplicates = GhBuildTools.removeDuplicates;
+      this.graphQlAccess = GhBuildTools.graphQlAccess;
+      this.createReleaseTag = GhBuildTools.createReleaseTag;
+      this.findCurrentReleaseTag = GhBuildTools.findCurrentReleaseTag;
+      this.findCurrentReleaseId = GhBuildTools.findCurrentReleaseId;
+      this.getLatestPreRelease = GhBuildTools.getLatestPreRelease;
+      this.getLatestRelease = GhBuildTools.getLatestRelease;
+      this.promoteRelease = GhBuildTools.promoteRelease;
+      this.getPreReleaseInfo = GhBuildTools.getPreReleaseInfo;
+      this.getReleaseInfo = GhBuildTools.getReleaseInfo;
+      this.mapValues = GhBuildTools.mapValues;
+      this.getValueFromRelease = GhBuildTools.getValueFromRelease;
+      this.setValueInRelease = GhBuildTools.setValueInRelease;
+      this.getValueFromBody = GhBuildTools.getValueFromBody;
+      this.getOpenPrs = GhBuildTools.getOpenPrs;
+      this.getReleaseList = GhBuildTools.getReleaseList;
+      this.getTagsList = GhBuildTools.getTagsList;
+      this.removeOlderPreReleases = GhBuildTools.removeOlderPreReleases;
+      this.removePreReleases = GhBuildTools.removePreReleases;
+      this.removeRelease = GhBuildTools.removeRelease;
+      this.removeTagRef = GhBuildTools.removeTagRef;
+      this.newGitHubStatusBranch = GhBuildTools.newGitHubStatusBranch;
+      this.setValueInPRBody = GhBuildTools.setValueInPRBody;
+      this.getValueFromPRBody = GhBuildTools.getValueFromPRBody;
+      this.replaceValueInBody = GhBuildTools.replaceValueInBody;
+      this.createPrComment = GhBuildTools.createPrComment;
+      this.getPrComments = GhBuildTools.getPrComments;
+      this.getPrCommitMsgs = GhBuildTools.getPrCommitMsgs;
+      this.getBranchCommits = GhBuildTools.getBranchCommits;
+      this.getReleaseDataByTag = GhBuildTools.getReleaseDataByTag;
+      this.updateRelease = GhBuildTools.updateRelease;
+      this.getPrsSince = GhBuildTools.getPrsSince;
+      this.getCoverageStats = GhBuildTools.getCoverageStats;
+      this.getTotalTestResults = GhBuildTools.getTotalTestResults;
+      this.updateBadge = GhBuildTools.updateBadge;
+      this.uncommentPRBody = GhBuildTools.uncommentPRBody;
+
+      return this;
+    })();
+  }
+
+  /**
+   * update/create badge.
+   *
+   * @param {string} badgeName - name of badge (file name)
+   * @param {string} badgeTextIn - text in left side of badge
+   * @param {string} statusIn - text to dispaly in right side of badge
+   * @param {String} colorIn - badge color
+   * @return {Promise} svg or http error
+   *
+   * @example
+   * const BuildTools = require('@vivintsolar/gh-build-tools');
+   * const bt = await new BuildTools('VivintSolar', 'customer-app', 'jenkins.buildtools.github');
+   *
+   * bt.updateBadge('buildStatusCustomerApp.svg', 'Jenkins', 'Success', 'green');
+   */
+  static async updateBadge(badgeName, badgeTextIn, statusIn, colorIn) {
+    return await superAgent
+      .post(`http://devdash.vivintsolar.com/api/badges/${badgeName}`)
+      .query({ badgeAction: 'updateBadge' })
+      .query({ badgeText: badgeTextIn })
+      .query({ status: statusIn })
+      .query({ color: colorIn });
+  }
+
+  /**
+   * get badge.
+   *
+   * @param {string} badgeName - name of badge (file name)
+   *
+   * @return {Promise} svg or http error
+   *
+   * @example
+   *
+   * const BuildTools = require('@vivintsolar/gh-build-tools');
+   * const bt = await new BuildTools('VivintSolar', 'customer-app', 'jenkins.buildtools.github');
+   *
+   * bt.getBadge('buildStatusCustomerApp.svg', 'Jenkins', 'Success', 'green');
+   */
+  static async getBadge(badgeFile) {
+    return await superAgent.get(`http://devdash.vivintsolar.com/api/badges/${badgeFile}`);
+  }
+
+  /**
+   * get test total results.
+   *
+   * @param {string} file - name of test results xml file.
+   *
+   * @return {Promise} results - total test count
+   *
+   * @example
+   *
+   * const BuildTools = require('@vivintsolar/gh-build-tools');
+   * const bt = await new BuildTools('VivintSolar', 'customer-app', 'jenkins.buildtools.github');
+   *
+   * const totalCount = await bt.getTotalTestResults('test/results/testResults.xml');
+   */
+  static getTotalTestResults(file) {
+    return new Promise(function(resolve, reject) {
+      const fStreamIn = createReadStream(file);
+      let buffer = '';
+
+      fStreamIn.on('data', function(chunk) {
+        buffer += chunk;
+      });
+
+      fStreamIn.on('end', function() {
+        fStreamIn.close();
+        const parser = new xml2js.Parser();
+
+        parser.parseString(buffer, function(err, result) {
+          if (err) {
+            reject(`ERROR: ${err.message}\nFile: ${file}`);
+          } else if (result.hasOwnProperty('testsuites')) {
+            let totalTests = parseInt(result.testsuites.$.tests, 10);
+
+            if (result.testsuites.$.skipped) {
+              totalTests = totalTests - parseInt(result.testsuites.$.skipped, 10);
+            }
+
+            resolve(totalTests);
+          } else if (result.hasOwnProperty('testsuite')) {
+            let totalTests = parseInt(result.testsuite.$.tests, 10);
+
+            if (result.testsuite.$.skipped) {
+              totalTests = totalTests - parseInt(result.testsuite.$.skipped, 10);
+            }
+
+            resolve(totalTests);
+          } else {
+            reject(`ERROR: ${file} does not appear to be a valid xunit test results file`);
+          }
+        });
+      });
+
+      fStreamIn.on('error', function(err) {
+        fStreamIn.close();
+        reject(err.message);
+      });
+    });
+  }
+
+  /**
+   * get test coverage results.
+   *
+   * @param {string} file - name of test results xml file.
+   *
+   * @return {Promise} Promise obj - { lines, statements, functions, branches }
+   *
+   * @example
+   * const BuildTools = require('@vivintsolar/gh-build-tools');
+   * const bt = await new BuildTools('VivintSolar', 'customer-app', 'jenkins.buildtools.github');
+   *
+   * const totalCount = await bt.getCoverageStats('test/coverage/coverage.json');
+   */
+  static getCoverageStats(file) {
+    const cwd = process.cwd();
+
+    return new Promise(function(resolve, reject) {
+      const path = join(cwd, file);
+      const fStreamIn = createReadStream(path);
+      let buffer = '';
+
+      fStreamIn.on('data', function(chunk) {
+        buffer += chunk;
+      });
+
+      fStreamIn.on('end', function() {
+        fStreamIn.close();
+        const results = JSON.parse(buffer);
+
+        resolve({
+          lines: results.total.lines.pct,
+          statements: results.total.statements.pct,
+          functions: results.total.functions.pct,
+          branches: results.total.branches.pct,
+        });
+      });
+
+      fStreamIn.on('error', function(err) {
+        fStreamIn.close();
+        reject(err.message);
+      });
+    });
+  }
+
+  /**
+   * set Request Fetcher
+   *
+   * @param {Function} fetcherFunc - name of function to use data request (useful for mocking)
+   *
+   * @return {undefined}
+   *
+   * @example
+   * const BuildTools = require('@vivintsolar/gh-build-tools');
+   * const bt = await new BuildTools('VivintSolar', 'customer-app', 'jenkins.buildtools.github');
+   *
+   *     bt.setRequestFetcher(mockfetcherFunc);
+   */
+  static setRequestFetcher(fetcherFunc) {
+    this.fetcher = fetcherFunc;
+  }
+
+  /**
+   * set current repo
+   *
+   * @param {string} repository - name of repo to use for
+   *
+   * @return {undefined}
+   *
+   * @example
+   * const BuildTools = require('@vivintsolar/gh-build-tools');
+   * const bt = await new BuildTools('VivintSolar', 'customer-app', 'jenkins.buildtools.github');
+   *
+   *     bt.setCurrentRepo('gh-build-tools');
+   */
+  static setCurrentRepo(repository) {
+    this.repo = repository;
+  }
+
+  /**
+   * set current github token
+   *
+   * @param {string} ghToken - credstash name or value of ghToken
+   *
+   * @return {undefined}
+   *
+   * @example
+   * const BuildTools = require('@vivintsolar/gh-build-tools');
+   * const bt = await new BuildTools('VivintSolar', 'customer-app', 'jenkins.buildtools.github');
+   *
+   *     bt.setGithubToken('7642a9e78f7b20b05920ff080bf5cabbb8e31625');
+   *     bt.setGithubToken('github.token.personaltoken');
+   */
+  static setGitHubToken(ghToken) {
+    this.token = ghToken;
+  }
+
+  static async graphQlAccess(parmStruct) {
+    if (typeof parmStruct.prNumber === 'string') {
+      parmStruct.prNumber = parseInt(parmStruct.prNumber, 10);
+    }
+
+    const results = await request('POST /graphql', {
+      headers: {
+        authorization: `token ${this.token}`,
+      },
+      request: {
+        fetch: this.fetcher,
+      },
+      query: parmStruct.query,
+      variables: {
+        owner: this.owner,
+        repo: this.repo,
+        prNumber: parmStruct.prNumber,
+        orderSpecs: {
+          field: 'CREATED_AT',
+          direction: 'DESC',
+        },
+        tagName: parmStruct.tagId,
+        preRelease: false,
+        nodeCount: parmStruct.nodeCount,
+        commentBody: parmStruct.commentBody,
+        prId: parmStruct.prId,
+        prBody: parmStruct.prBody,
+        currentCursor: parmStruct.currentCursor,
+        bpId: parmStruct.bpId,
+        lastRelSha: parmStruct.lastRelSha,
+        startTime: parmStruct.sinceTime,
+        refName: parmStruct.branchName,
+        sha: parmStruct.sha,
+        prStates: parmStruct.prStates,
+      },
+    });
+
+    if (results.data.errors) {
+      const errorStrings = results.data.errors.map(error => {
+        return error.message;
+      });
+      const msg = `GraphQL errors: ${errorStrings.join('\r\n')}`;
+
+      throw new Error(msg);
+    }
+
+    return results;
+  }
+
+  static getLatestRelease(releases) {
+    return releases.data.data.repository.releases.edges.find(release => {
+      return !release.node.isPrerelease;
+    });
+  }
+
+  static getLatestPreRelease(releases) {
+    return releases.data.data.repository.releases.edges.find(release => {
+      return release.node.isPrerelease;
+    });
+  }
+
+  static mapValues(releaseBody) {
+    const infoMap = {};
+    const lines = releaseBody.split('\n');
+
+    lines.forEach(line => {
+      const lineInfo = line.match(squareBracketPattern);
+
+      if (lineInfo) {
+        const [key, val] = line
+          .replace('[', '')
+          .replace(']', '')
+          .replace(':', '&amp;')
+          .split('&amp;');
+
+        infoMap[key] = val.trim();
+      }
+    });
+
+    return infoMap;
+  }
+
+  /**
+   * get commits for branch
+   *
+   * @param {string} afterThisTag - tag name
+   *
+   * @return {Promise} list of github commits
+   *
+   * @example
+   * const BuildTools = require('@vivintsolar/gh-build-tools');
+   * const bt = await new BuildTools('VivintSolar', 'customer-app', 'jenkins.buildtools.github');
+   *
+   *     bt.getBranchCommits('v1.2.1');
+   */
+  static async getBranchCommits(afterThisTag) {
+    const commitMsgs = [];
+    const tagInfo = await this.getReleaseDataByTag(afterThisTag);
+    const parmsStruct = {
+      query: getBranchCommitMsgs,
+      sinceTime: tagInfo.publishedAt,
+    };
+
+    let commitInfo = {};
+
+    do {
+      commitInfo = await this.graphQlAccess(parmsStruct);
+
+      commitInfo.data.data.repository.ref.target.history.edges.forEach(commit => {
+        return commitMsgs.push(`${commit.node.messageHeadline} (${commit.node.author.name})`);
+      });
+      parmsStruct.currentCursor = commitInfo.data.data.repository.ref.target.history.pageInfo.endCursor;
+    } while (commitInfo.data.data.repository.ref.target.history.pageInfo.hasNextPage);
+
+    return commitMsgs;
+  }
+
+  /**
+   * get pull request comment nodes
+   *
+   * @param {string} prNum - pull request number
+   * @param {number} count - maximum number of nodes request
+   *
+   * @return {Promise} list of pull request comments
+   *
+   * @example
+   * const BuildTools = require('@vivintsolar/gh-build-tools');
+   * const bt = await new BuildTools('VivintSolar', 'customer-app', 'jenkins.buildtools.github');
+   *
+   *     await bt.getPrComments('866', 50);
+   */
+  static async getPrComments(prNum, count) {
+    const parmsStruct = {
+      query: prCommentsQuery,
+      prNumber: prNum,
+      nodeCount: count,
+    };
+
+    const prComments = await this.graphQlAccess(parmsStruct);
+
+    return prComments.data.data.repository.pullRequest.comments.edges;
+  }
+
+  /**
+   * get release data using tag
+   *
+   * @param {string} tagName - github tag name
+   * @param {number} [rawData] - if true return complete body
+   *
+   * @return {Promise} list of values stored in release
+   *
+   * @example
+   * const BuildTools = require('@vivintsolar/gh-build-tools');
+   * const bt = await new BuildTools('VivintSolar', 'customer-app', 'jenkins.buildtools.github');
+   *
+   * const values = await bt.getReleaseDataByTag('v1.44.1');
+   */
+  static async getReleaseDataByTag(tagName, rawData) {
+    const parmsStruct = {
+      query: getReleaseByTagQuery,
+      tagId: tagName,
+    };
+
+    const relData = await this.graphQlAccess(parmsStruct);
+
+    if (relData.data.data.repository.release === null) {
+      return null;
+    }
+
+    if (rawData) {
+      return relData.data.data.repository.release.description;
+    }
+
+    const newMap = this.mapValues(relData.data.data.repository.release.description);
+
+    newMap.publishedAt = relData.data.data.repository.release.publishedAt;
+
+    return newMap;
+  }
+
+  static async findCurrentReleaseId(preRelease) {
+    const parmsStruct = {
+      query: getLastestReleaseQuery,
+    };
+    const relInfo = await this.graphQlAccess(parmsStruct);
+    const latestRelease = preRelease ? await this.getLatestPreRelease(relInfo) : await this.getLatestRelease(relInfo);
+
+    return latestRelease.node.id;
+  }
+
+  /**
+   * get current release tag
+   *
+   * @param {boolean} [preRelease] - return latestPreRelease tag name
+   *
+   * @return {Promise} latest pre-release or latest release tag name
+   *
+   * @example
+   * const BuildTools = require('@vivintsolar/gh-build-tools');
+   * const bt = await new BuildTools('VivintSolar', 'customer-app', 'jenkins.buildtools.github');
+   *
+   * const preReleaseTagName = await bt.findCurrentReleaseTag(true);
+   * const releaseTagName = await bt.findCurrentReleaseTag();
+   */
+  static async findCurrentReleaseTag(preRelease) {
+    const parmsStruct = {
+      query: getLastestReleaseQuery,
+    };
+    const relInfo = await this.graphQlAccess(parmsStruct);
+    const latestRelease = preRelease ? await this.getLatestPreRelease(relInfo) : await this.getLatestRelease(relInfo);
+
+    return latestRelease.node.tagName;
+  }
+
+  /**
+   * get current release info
+   *
+   * @return {Promise} latest release values
+   *
+   * @example
+   * const BuildTools = require('@vivintsolar/gh-build-tools');
+   * const bt = await new BuildTools('VivintSolar', 'customer-app', 'jenkins.buildtools.github');
+   *
+   * const preReleaseTagName = await bt.getCurrentReleaseInfo();
+   */
+  async getCurrentReleaseInfo() {
+    return this.getReleaseDataByTag(await this.findCurrentReleaseTag());
+  }
+
+  /**
+   * get current pre-release info
+   *
+   * @return {Promise} list of latest pre-release values
+   *
+   * @example
+   * const BuildTools = require('@vivintsolar/gh-build-tools');
+   * const bt = await new BuildTools('VivintSolar', 'customer-app', 'jenkins.buildtools.github');
+   *
+   * const preReleaseValues = await bt.getPreReleaseInfo();
+   */
+  static async getPreReleaseInfo() {
+    const parmsStruct = {
+      query: getLastestReleaseQuery,
+    };
+    const relInfo = await this.graphQlAccess(parmsStruct);
+    const latestRelease = this.getLatestPreRelease(relInfo);
+
+    if (!latestRelease) {
+      return null;
+    }
+
+    return await this.getReleaseDataByTag(latestRelease.node.tagName);
+  }
+
+  /**
+   * get release list
+   *
+   * @return {Promise} list of releases nodes
+   *
+   * @example
+   * const BuildTools = require('@vivintsolar/gh-build-tools');
+   * const bt = await new BuildTools('VivintSolar', 'customer-app', 'jenkins.buildtools.github');
+   *
+   * const preReleaseValues = await bt.getReleaseList();
+   */
+  static async getReleaseList() {
+    const parmsStruct = {
+      query: getLastestReleaseQuery,
+    };
+    const relInfo = await this.graphQlAccess(parmsStruct);
+
+    return relInfo.data.data.repository.releases.edges;
+  }
+
+  /**
+   * get latest release info
+   *
+   * @return {Promise} list of value for latest release
+   *
+   * @example
+   * const BuildTools = require('@vivintsolar/gh-build-tools');
+   * const bt = await new BuildTools('VivintSolar', 'customer-app', 'jenkins.buildtools.github');
+   *
+   * const preReleaseValues = await bt.getReleaseInfo();
+   */
+  static async getReleaseInfo() {
+    const parmsStruct = {
+      query: getLastestReleaseQuery,
+    };
+    const relInfo = await this.graphQlAccess(parmsStruct);
+    const latestRelease = this.getLatestRelease(relInfo);
+
+    return await this.getReleaseDataByTag(latestRelease.node.tagName);
+  }
+
+  /**
+   * get all jira tickets references for a PR
+   *
+   * @param {number} prNum - pull request number
+   *
+   * @return {Promise} list of unique jira tickets found referenced in pull request
+   *
+   * @example
+   * const BuildTools = require('@vivintsolar/gh-build-tools');
+   * const bt = await new BuildTools('VivintSolar', 'customer-app', 'jenkins.buildtools.github');
+   *
+   * const tickets = await bt.getAllTickets(654);
+   */
+  async getAllTickets(prNum) {
+    return new Promise(async resolve => {
+      const parmsStruct = {
+        prNumber: prNum,
+        query: allTicketsQuery,
+      };
+      let ticketsFound = [];
+      const ticketData = await this.graphQlAccess(parmsStruct);
+
+      const prTickets = ticketData.data.data.repository.pullRequest.title.match(ticketPattern);
+      const bodyTickets = ticketData.data.data.repository.pullRequest.bodyText.match(ticketPattern);
+      const branchTickets = ticketData.data.data.repository.pullRequest.headRef.name.match(ticketPattern);
+
+      if (prTickets) {
+        ticketsFound = ticketsFound.concat(prTickets);
+      }
+      if (bodyTickets) {
+        ticketsFound = ticketsFound.concat(bodyTickets);
+      }
+      if (branchTickets) {
+        ticketsFound = ticketsFound.concat(branchTickets);
+      }
+
+      return resolve(this.removeDuplicates(ticketsFound));
+    });
+  }
+
+  static removeDuplicates(tickets) {
+    const allCaps = tickets.map(ticket => {
+      return ticket.toUpperCase();
+    });
+
+    return allCaps.filter((obj, pos, arr) => {
+      return arr.map(mapObj => mapObj).indexOf(obj) === pos;
+    });
+  }
+
+  /**
+   * get pull request commit messages
+   *
+   * @param {string} prNum - pull request number
+   *
+   * @return {Promise} list of pull request commit messsages
+   *
+   * @example
+   * const BuildTools = require('@vivintsolar/gh-build-tools');
+   * const bt = await new BuildTools('VivintSolar', 'customer-app', 'jenkins.buildtools.github');
+   *
+   * const commitMsgList = await bt.getPrCommitMsgs(855);
+   */
+  static async getPrCommitMsgs(prNum) {
+    const commitMsgs = [];
+    const parmsStruct = {
+      prNumber: prNum,
+      query: prCommitsQuery,
+      currentCursor: null,
+    };
+
+    let commitInfo = {};
+
+    do {
+      commitInfo = await this.graphQlAccess(parmsStruct);
+
+      commitInfo.data.data.repository.pullRequest.commits.edges.map(commit => {
+        return commitMsgs.push(commit.node.commit.message);
+      });
+      parmsStruct.currentCursor = commitInfo.data.data.repository.pullRequest.commits.pageInfo.endCursor;
+    } while (commitInfo.data.data.repository.pullRequest.commits.pageInfo.hasNextPage);
+
+    return commitMsgs;
+  }
+
+  /**
+   * get tags list
+   *
+   * @return {Promise} list of tags
+   *
+   * @example
+   * const BuildTools = require('@vivintsolar/gh-build-tools');
+   * const bt = await new BuildTools('VivintSolar', 'customer-app', 'jenkins.buildtools.github');
+   *
+   * const tagList = await bt.getTagsList();
+   */
+  static async getTagsList() {
+    const parmsStruct = {
+      query: getTagsListQuery,
+    };
+    const tagsList = await this.graphQlAccess(parmsStruct);
+
+    return tagsList.data.data.repository.refs.nodes;
+  }
+
+  /**
+   * create github tag
+   *
+   * @param {string} tagName - name of tag
+   * @param {string} tagMessage - body to include in tag
+   * @param {string} sha - git sha to tag
+   * @param {string} tagType - type of tag (commit, tree, blob)
+   * @param {string} taggerInfo - object with info about individual creating tag
+   *
+   * @return {Promise} list of tags
+   *
+   * @example
+   * const BuildTools = require('@vivintsolar/gh-build-tools');
+   * const bt = await new BuildTools('VivintSolar', 'customer-app', 'jenkins.buildtools.github');
+   *
+   * const tagger = {
+   *        name: "Monalisa Octocat",
+   *        email: "octocat@github.com",
+   *        date: "2014-11-07T22:01:45Z"
+   *     }
+   * const tagList = await bt.createTag('vNextVer2019-09-23', 'a pre-release tag', '86735645', 'commit', tagger);
+   *
+   * @see  https://developer.github.com/v3/git/tags/
+   */
+  static async createTag(tagName, tagMessage, sha, tagType, taggerInfo) {
+    const tagInfo = await this.gitHubClient.gitdata.createTag({
+      owner: this.owner,
+      repo: this.repo,
+      tag: tagName,
+      message: tagMessage,
+      object: sha,
+      type: tagType,
+      tagger: taggerInfo,
+    });
+
+    return tagInfo.data;
+  }
+
+  /**
+   * create github tag reference
+   *
+   * @param {string} tagName - name of tag
+   * @param {string} gitSha - git sha to tag
+   *
+   * @return {Promise} tag reference info
+   *
+   * @example
+   * const BuildTools = require('@vivintsolar/gh-build-tools');
+   * const bt = await new BuildTools('VivintSolar', 'customer-app', 'jenkins.buildtools.github');
+   *
+   * const tagList = await bt.createTag('vNextVer2019-09-23', '86735645');
+   *
+   * @see  https://developer.github.com/v3/git/tags/
+   */
+  static async createTagReference(tagName, gitSha) {
+    const results = await this.gitHubClient.gitdata.createRef({
+      owner: this.owner,
+      repo: this.repo,
+      ref: `refs/tags/ ${tagName}`,
+      sha: gitSha,
+    });
+
+    return results.data;
+  }
+
+  /**
+   * remove github tag reference
+   *
+   * @param {string} tagName - name of tag
+   *
+   * @return {Promise} tag reference info
+   *
+   * @example
+   * const BuildTools = require('@vivintsolar/gh-build-tools');
+   * const bt = await new BuildTools('VivintSolar', 'customer-app', 'jenkins.buildtools.github');
+   *
+   * const tagList = await bt.removeTagRef('vNextVer2019-09-23');
+   *
+   * @see  https://developer.github.com/v3/git/tags/
+   */
+  static async removeTagRef(tagName) {
+    const results = await this.gitHubClient.gitdata.deleteRef({
+      owner: this.owner,
+      repo: this.repo,
+      ref: `refs/tags/ ${tagName}`,
+    });
+
+    return results.data;
+  }
+
+  /**
+   * create release tag
+   *
+   * @param {string} tagId - id of tag ( from createTag )
+   * @param {string} tagName - name of tag
+   * @param {string} tagBody - body of tag
+   * @param {boolean} preRelease - make this a pre-release tag
+   *
+   * @return {Promise} tag reference info
+   *
+   * @example
+   * const BuildTools = require('@vivintsolar/gh-build-tools');
+   * const bt = await new BuildTools('VivintSolar', 'customer-app', 'jenkins.buildtools.github');
+   *
+   * const tagList = await bt.createReleaseTag('MDM6VGFnOTQwYmQzMzYyNDhlZmFlMGY5ZWU1YmM3YjJkNWM5ODU4ODdiMTZhYw==', 'vNextVer2019-09-23', 'this a a pre-release', true);
+   *
+   */
+  static async createReleaseTag(tagId, tagName, tagBody, preRelease) {
+    const release = await this.gitHubClient.repos.createRelease({
+      owner: this.owner,
+      repo: this.repo,
+      tag_name: tagId,
+      name: tagName,
+      body: tagBody,
+      prerelease: preRelease,
+    });
+
+    return release.data;
+  }
+
+  /**
+   * update/change release tag body
+   *
+   * @param {string} currentTag - name of tag
+   * @param {string} newBody - body of tag
+   *
+   * @return {Promise} release info
+   *
+   * @example
+   * const BuildTools = require('@vivintsolar/gh-build-tools');
+   * const bt = await new BuildTools('VivintSolar', 'customer-app', 'jenkins.buildtools.github');
+   *
+   * const tagList = await bt.updateRelease('vNextVer2019-09-23', 'this a a changed pre-release');
+   *
+   */
+  static async updateRelease(currentTag, newBody) {
+    const releaseByTag = await this.gitHubClient.repos.getReleaseByTag({
+      owner: this.owner,
+      repo: this.repo,
+      tag: currentTag,
+    });
+
+    return await this.gitHubClient.repos.updateRelease({
+      owner: this.owner,
+      repo: this.repo,
+      release_id: releaseByTag.data.id,
+      tag_name: currentTag,
+      target_commitish: 'master',
+      body: `${newBody}\n`,
+    });
+  }
+
+  /**
+   * promote release
+   *
+   * @param {string} currentTag - name of tag
+   * @param {string} releaseName - name of the promoted release
+   * @param {string} newTag - tag name of promoted release
+   * @param {string} body - body of promoted release
+   *
+   * @return {Promise} release info
+   *
+   * @example
+   * const BuildTools = require('@vivintsolar/gh-build-tools');
+   * const bt = await new BuildTools('VivintSolar', 'customer-app', 'jenkins.buildtools.github');
+   *
+   * const tagList = await bt.promoteRelease('vNextVer2019-09-23', 'Production', 'v1.34.3', 'this is the body of the promoted release');
+   *
+   */
+  static async promoteRelease(currentTag, releaseName, newTag, body) {
+    const releaseByTag = await this.gitHubClient.repos.getReleaseByTag({
+      owner: this.owner,
+      repo: this.repo,
+      tag: currentTag,
+    });
+
+    return await this.gitHubClient.repos.updateRelease({
+      owner: this.owner,
+      repo: this.repo,
+      release_id: releaseByTag.data.id,
+      target_commitish: 'master',
+      tag_name: newTag,
+      name: releaseName,
+      body: `${body}\n`,
+      prerelease: false,
+    });
+  }
+
+  static replaceValueInBody(body, keyId, newValue) {
+    let newBody = '';
+
+    if (body.match(new RegExp(`\\[${keyId}]:`, 'gi'))) {
+      const lines = body.split('\r\n');
+
+      const newList = lines.map(line => {
+        if (line.match(new RegExp(`\\[${keyId}]:`, 'gi'))) {
+          return `[${keyId}]: ${newValue}`;
+        }
+
+        return line;
+      });
+
+      newBody = newList.join('\r\n');
+    } else {
+      newBody = body.concat(`\r\n[${keyId}]: ${newValue}`);
+    }
+
+    return newBody;
+  }
+
+  static getValueFromBody(body, keyId) {
+    const lines = body.split('\r\n');
+
+    const lineWithValue = lines.find(line => {
+      return !!line.match(new RegExp(`\\[${keyId}]:`, 'gi'));
+    });
+
+    if (lineWithValue) {
+      const parts = lineWithValue.replace(':', '&amp;').split('&amp;');
+
+      return parts[1].trim();
+    }
+
+    return null;
+  }
+
+  static async uncommentPRBody(prNum) {
+    const parmsStruct = {
+      query: getPRBodyQuery,
+      prNumber: prNum,
+    };
+    const prInfo = await this.graphQlAccess(parmsStruct);
+    const newBody = prInfo.data.data.repository.pullRequest.body
+      .replace(/-PR-TBD-/g, `PR-${prNum}`)
+      .replace(/&lt;!---/g, '')
+      .replace(/--->/g, '');
+
+    parmsStruct.query = updatePRBodyMutation;
+    parmsStruct.prId = prInfo.data.data.repository.pullRequest.id;
+    parmsStruct.prBody = newBody;
+
+    return await this.graphQlAccess(parmsStruct);
+  }
+
+  /**
+   * set value in pull request body
+   *
+   * @param {number} prNum - pull request number
+   * @param {string} key - key value in pull request value
+   * @param {string} newValue - value to associate with key
+   *
+   * @return {Promise} pull request info
+   *
+   * Updates pull request body with [key]:value
+   *
+   * @example
+   * const BuildTools = require('@vivintsolar/gh-build-tools');
+   * const bt = await new BuildTools('VivintSolar', 'customer-app', 'jenkins.buildtools.github');
+   *
+   * const prInfo = await bt.setValueInPRBody(865, 'EXPO_VERSION', '8.5.3');
+   *
+   */
+  static async setValueInPRBody(prNum, key, newValue) {
+    const parmsStruct = {
+      query: getPRBodyQuery,
+      prNumber: prNum,
+    };
+    const prInfo = await this.graphQlAccess(parmsStruct);
+
+    const newBody = this.replaceValueInBody(prInfo.data.data.repository.pullRequest.body, key, newValue);
+
+    parmsStruct.query = updatePRBodyMutation;
+    parmsStruct.prId = prInfo.data.data.repository.pullRequest.id;
+    parmsStruct.prBody = newBody;
+
+    return await this.graphQlAccess(parmsStruct);
+  }
+
+  /**
+   * get value from pull request body
+   *
+   * @param {number} prNum - pull request number
+   * @param {string} key - key value in pull request value
+   *
+   * @return {Promise} returns value associated with key or null
+   *
+   * Retrieve value associated with key in pull request body
+   *
+   * @example
+   * const BuildTools = require('@vivintsolar/gh-build-tools');
+   * const bt = await new BuildTools('VivintSolar', 'customer-app', 'jenkins.buildtools.github');
+   *
+   * const expoVersion = await bt.getValueFromPRBody(865, 'EXPO_VERSION');
+   *
+   */
+  static async getValueFromPRBody(prNum, key) {
+    const parmsStruct = {
+      query: getPRBodyQuery,
+      prNumber: prNum,
+    };
+    const prInfo = await this.graphQlAccess(parmsStruct);
+
+    return this.getValueFromBody(prInfo.data.data.repository.pullRequest.body, key);
+  }
+
+  /**
+   * set value in github release body
+   *
+   * @param {number} tagName - github tag name
+   * @param {string} key - key value in pull request value
+   * @param {string} newValue - value to associate with key
+   *
+   * @return {Promise} returns releaseInfo
+   *
+   * sets value associated with key in github release body
+   *
+   * @example
+   * const BuildTools = require('@vivintsolar/gh-build-tools');
+   * const bt = await new BuildTools('VivintSolar', 'customer-app', 'jenkins.buildtools.github');
+   *
+   * const releaseInfo = await bt.setValueInRelease('v2.13.4', 'EXPO_VERSION', '8.67.8');
+   *
+   */
+  static async setValueInRelease(tagName, key, newValue) {
+    const releaseByTag = await this.gitHubClient.repos.getReleaseByTag({
+      owner: this.owner,
+      repo: this.repo,
+      tag: tagName,
+    });
+
+    const newBody = this.replaceValueInBody(releaseByTag.data.body, key, newValue);
+
+    return await this.gitHubClient.repos.updateRelease({
+      owner: this.owner,
+      repo: this.repo,
+      release_id: releaseByTag.data.id,
+      body: `${newBody}\n`,
+    });
+  }
+
+  /**
+   * get value from github release body
+   *
+   * @param {number} tagName - github tag name
+   * @param {string} key - key value in pull request value
+   *
+   * @return {Promise} returns value associated with key or null
+   *
+   * Retrieve value associated with key in release body
+   *
+   * @example
+   * const BuildTools = require('@vivintsolar/gh-build-tools');
+   * const bt = await new BuildTools('VivintSolar', 'customer-app', 'jenkins.buildtools.github');
+   *
+   * const expoVersion = await bt.getValueFromRelease('v2.3.4', 'EXPO_VERSION');
+   *
+   */
+  static async getValueFromRelease(tagName, key) {
+    const releaseByTag = await this.gitHubClient.repos.getReleaseByTag({
+      owner: this.owner,
+      repo: this.repo,
+      tag: tagName,
+    });
+
+    return this.getValueFromBody(releaseByTag.data.body, key);
+  }
+
+  /**
+   * get all pull requests since sha
+   *
+   * @param {number} lastReleaseSha - sha to start list
+   *
+   * @return {Promise} list of pull requests created since sha
+   *
+   *
+   * @example
+   * const BuildTools = require('@vivintsolar/gh-build-tools');
+   * const bt = await new BuildTools('VivintSolar', 'customer-app', 'jenkins.buildtools.github');
+   *
+   * const prList = await bt.getPrsSince('940bd336248efae0f9ee5bc7b2d5c985887b16ac');
+   *
+   */
+  static async getPrsSince(lastReleaseSha) {
+    let prList = [];
+    const findPr = {
+      query: getLastReleasePR,
+      sha: lastReleaseSha,
+    };
+
+    const latestPr = await this.graphQlAccess(findPr);
+
+    const parmsStruct = {
+      query: getPRs,
+      currentCursor: null,
+      prStates: 'MERGED',
+    };
+
+    let prInfo = {};
+    let prs = [];
+
+    do {
+      prInfo = await this.graphQlAccess(parmsStruct);
+
+      prs = prInfo.data.data.repository.pullRequests.edges.filter(onlyNewer, latestPr);
+
+      prList = [...prs, ...prList];
+      parmsStruct.currentCursor = prInfo.data.data.repository.pullRequests.pageInfo.endCursor;
+    } while (prInfo.data.data.repository.pullRequests.pageInfo.hasNextPage &amp;&amp; prs.length > 0);
+
+    return prList;
+  }
+
+  /**
+   * list all open pull requests for repo
+   *
+   * @return {Promise} list of open pull requests for repo
+   *
+   * @example
+   * const BuildTools = require('@vivintsolar/gh-build-tools');
+   * const bt = await new BuildTools('VivintSolar', 'customer-app', 'jenkins.buildtools.github');
+   *
+   * const prList = await bt.getOpenPrs();
+   *
+   */
+  static async getOpenPrs() {
+    const prList = [];
+    const parmsStruct = {
+      query: getPRs,
+      currentCursor: null,
+      prStates: 'OPEN',
+    };
+
+    let prInfo = {};
+
+    do {
+      prInfo = await this.graphQlAccess(parmsStruct);
+
+      prInfo.data.data.repository.pullRequests.edges.map(pullRequest => {
+        return prList.push(pullRequest);
+      });
+      parmsStruct.currentCursor = prInfo.data.data.repository.pullRequests.pageInfo.endCursor;
+    } while (prInfo.data.data.repository.pullRequests.pageInfo.hasNextPage);
+
+    return prList;
+  }
+
+  /**
+   * remove release using id
+   *
+   * @param id - id of release to remove
+   *
+   * @return {Promise} response status 204
+   *
+   * @example
+   * const BuildTools = require('@vivintsolar/gh-build-tools');
+   * const bt = await new BuildTools('VivintSolar', 'customer-app', 'jenkins.buildtools.github');
+   *
+   * const prList = await bt.removeRelease();
+   *
+   */
+  static async removeRelease(id) {
+    return await this.gitHubClient.repos.deleteRelease({
+      owner: this.owner,
+      repo: this.repo,
+      release_id: id,
+    });
+  }
+
+  /**
+   * remove release using id
+   *
+   * @param afterThisDate - date of last release to keep
+   *
+   * @return {Promise} list of valid pre-releases
+   *
+   * @example
+   * const BuildTools = require('@vivintsolar/gh-build-tools');
+   * const bt = await new BuildTools('VivintSolar', 'customer-app', 'jenkins.buildtools.github');
+   *
+   * const current pre-releases = await bt.removeOlderPreReleases(previousRelease.createdAt);
+   *
+   */
+  static async removeOlderPreReleases(afterThisDate) {
+    const releases = await this.gitHubClient.repos.listReleases({
+      owner: this.owner,
+      repo: this.repo,
+    });
+
+    const afterDate = new Date(afterThisDate);
+    const validPreReleases = [];
+    const deleteReleases = [];
+    const deleteTags = [];
+
+    releases.data.forEach(async release => {
+      const curDate = new Date(release.created_at);
+
+      if (release.prerelease) {
+        if (curDate &lt; afterDate) {
+          deleteReleases.push(this.removeRelease(release.id));
+          deleteTags.push(this.removeTagRef(release.tag_name));
+        }
+      } else {
+        validPreReleases.push(release);
+      }
+    });
+
+    await Promise.all(deleteReleases);
+    await Promise.all(deleteTags);
+
+    return validPreReleases;
+  }
+
+  /**
+   * remove pre-releases except latest
+   *
+   * @return {Promise} valid pre-release or null
+   *
+   * @example
+   * const BuildTools = require('@vivintsolar/gh-build-tools');
+   * const bt = await new BuildTools('VivintSolar', 'customer-app', 'jenkins.buildtools.github');
+   *
+   * const current_pre-releases = await bt.removePreReleases();
+   *
+   */
+  static async removePreReleases() {
+    const releases = await this.gitHubClient.repos.listReleases({
+      owner: this.owner,
+      repo: this.repo,
+    });
+
+    const preReleases = releases.data.filter(release => {
+      return release.prerelease;
+    });
+
+    if (preReleases.length > 1) {
+      const deleteReleases = [];
+
+      releases.data.forEach(async (release, index) => {
+        if (index !== 0 &amp;&amp; release.prerelease) {
+          deleteReleases.push(this.removeRelease(release.id));
+        }
+      });
+
+      return await Promise.all(deleteReleases);
+    }
+
+    return null;
+  }
+
+  /**
+   * set github status by branch
+   *
+   * @param branch - branch name to set github status
+   * @param status - github status object
+   *
+   * @return {Promise} github status info
+   *
+   * @example
+   * const BuildTools = require('@vivintsolar/gh-build-tools');
+   * const bt = await new BuildTools('VivintSolar', 'customer-app', 'jenkins.buildtools.github');
+   * const status = {
+   *        context: 'Unit Test',
+   *        description: 'Unit tests',
+   *        state: 'success',
+   *        target_url: ghStatusTargetUrl
+   *     }
+   *
+   * const statusInfo = await bt.newGitHubStatusBranch('fix_this_now', status);
+   *
+   */
+
+  static async newGitHubStatusBranch(branch, status) {
+    const parmsStruct = {
+      query: getBranchOidQuery,
+      branchName: branch,
+    };
+    const refObject = await this.graphQlAccess(parmsStruct);
+
+    return await this.gitHubClient.repos.createStatus({
+      owner: this.owner,
+      repo: this.repo,
+      sha: refObject.data.data.repository.ref.target.oid,
+      state: status.state,
+      target_url: status.target_url,
+      description: status.description,
+      context: status.context,
+    });
+  }
+
+  /**
+   * create pull request comment
+   *
+   * @param {number} prNum - pull request number
+   * @param {string} commentBodyText - pull request comment body
+   *
+   * @return {Promise} pull request comment info
+   *
+   * @example
+   * const BuildTools = require('@vivintsolar/gh-build-tools');
+   * const bt = await new BuildTools('VivintSolar', 'customer-app', 'jenkins.buildtools.github');
+   *
+   * const current_pre-releases = await bt.createPrComment(876, 'Hey! have you added tests?');
+   *
+   */
+  static async createPrComment(prNum, commentBodyText) {
+    const parmsStruct = {
+      query: getPRIdQuery,
+      prNumber: prNum,
+    };
+    const prInfo = await this.graphQlAccess(parmsStruct);
+
+    parmsStruct.query = createCommentMutation;
+    parmsStruct.prId = prInfo.data.data.repository.pullRequest.id;
+    parmsStruct.commentBody = commentBodyText;
+
+    return await this.graphQlAccess(parmsStruct);
+  }
+}
+
+module.exports = GhBuildTools;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="GhBuildTools.html">GhBuildTools</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.3</a> on Fri Sep 20 2019 12:53:08 GMT-0600 (Mountain Daylight Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
