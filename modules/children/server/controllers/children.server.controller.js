@@ -406,14 +406,18 @@ async function updateSupplementStatus(childList, stakeDB) {
             var supType = 'none';
             var currentSupType = 'none';
             var priorMalnurished = 'no';
+
             sortedScreenList.forEach(function (screening, index) {
               if ((screening.zScore.ha < -2 || screening.zScore.wa < -2)) {
                 priorMalnurished = 'yes';
-                supType = 'sup';
-                if (currentAge > 36 && currentAge <= 60) {
-                  supType = 'mic';
+                if (currentAge < 24) {
+                  supType = '<2';
+                }
+                if (currentAge < 36) {
+                  supType = 'sup';
                 }
               }
+
               if (screening.zScore.wl < -2) {
                 priorMalnurished = 'yes';
                 supType = 'MAM';
@@ -426,7 +430,7 @@ async function updateSupplementStatus(childList, stakeDB) {
               }
             });
             let timeSinceLastScreen = moment().diff(moment(new Date(sortedScreenList[0].surveyDate)), 'months');
-            if (timeSinceLastScreen > 6) {
+            if (timeSinceLastScreen > 7) {
               currentSupType = 'none';
             }
             childEntry.supType = currentSupType;
@@ -440,7 +444,9 @@ async function updateSupplementStatus(childList, stakeDB) {
             newChildData.obese = bmiInfo.obese;
             newChildData.zscoreStatus = calculateStatus(sortedScreenList[0]).zscoreStatus;
             newChildData.statusColor = statusColor(newChildData.zscoreStatus);
-            updateList.push(newChildData);
+            if (childEntry.supType !== 'none') {
+              updateList.push(newChildData);
+            }
             // updateList.push(updateChildStatus(childEntry, stakeDB));
           }
         }
@@ -487,21 +493,16 @@ function listAllChildren(childScreenList, screenType) {
               priorMalnurished = 'no';
               currentSupType = 'none';
               sortedScreenList.forEach(async (screening, screenIndex) => {
-                // if (!screening.obese) {
-                //   let newScreening = screening;
-                //   const obeseObj = calcObesity(screening);
-                //   newScreening.obese = obeseObj.obese;
-                //   newScreening.currentBmi = obeseObj.currentBMI;
-                //   const results = await updateScreen(newScreening, childScreenList[0].parms.stakeDB);
-                //   console.log(results);
-                // }
                 if ((screening.zScore.ha < -2 || screening.zScore.wa < -2)) {
                   priorMalnurished = 'yes';
-                  supType = 'sup';
-                  if (currentAge > 36 && currentAge <= 60) {
-                    supType = 'mic';
+                  if (currentAge < 24) {
+                    supType = '<2';
+                  }
+                  if (currentAge < 36) {
+                    supType = 'sup';
                   }
                 }
+
                 if (screening.zScore.wl < -2) {
                   priorMalnurished = 'yes';
                   supType = 'MAM';
@@ -512,6 +513,31 @@ function listAllChildren(childScreenList, screenType) {
                 if (screenIndex === 0) {
                   currentSupType = supType;
                 }
+                // if (!screening.obese) {
+                //   let newScreening = screening;
+                //   const obeseObj = calcObesity(screening);
+                //   newScreening.obese = obeseObj.obese;
+                //   newScreening.currentBmi = obeseObj.currentBMI;
+                //   const results = await updateScreen(newScreening, childScreenList[0].parms.stakeDB);
+                //   console.log(results);
+                // }
+                // if ((screening.zScore.ha < -2 || screening.zScore.wa < -2)) {
+                //   priorMalnurished = 'yes';
+                //   supType = 'sup';
+                //   if (currentAge > 36 && currentAge <= 60) {
+                //     supType = 'mic';
+                //   }
+                // }
+                // if (screening.zScore.wl < -2) {
+                //   priorMalnurished = 'yes';
+                //   supType = 'MAM';
+                //   if (screening.zScore.wl < -3) {
+                //     supType = 'SAM';
+                //   }
+                // }
+                // if (screenIndex === 0) {
+                //   currentSupType = supType;
+                // }
               });
               timeSinceLastScreen = moment().diff(moment(new Date(sortedScreenList[0].surveyDate)), 'months');
 
