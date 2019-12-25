@@ -315,7 +315,7 @@
 
     var removeResponse = function (res) {
       vm.remResponse = res;
-      PouchService.updateChildSups(vm.child._id, () => {
+      PouchService.updateChildSups(vm.child._id, function() {
         $state.go('children.view', { childId: vm.child._id });
       });
     };
