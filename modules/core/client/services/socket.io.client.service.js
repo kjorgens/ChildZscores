@@ -36,7 +36,7 @@
       console.log(`connecting to nameSpace ${ namespace } from the client`);
       if (Authentication.user) {
         console.log('yep, have a user so connect');
-        service.socket = io(`${ namespace }`);
+        service.socket = io(namespace);
       }
     }
 

@@ -11,6 +11,7 @@
   function ChildrenController($rootScope, $scope, $state, $stateParams, $translate, $window, GraphService,
     FilterService, moment, screens, Authentication, ZScores, Obesity, usSpinnerService, PouchService, ModalService) {
     var vm = this;
+    let obeseInfo = {};
     vm.options = {};
     vm.data = {};
     vm.zscoreHa = [];
@@ -107,7 +108,7 @@
       vm.surveys = screens.screens;
       vm.child = screens.child;
       if (vm.surveys.length > 0) {
-        let obeseInfo = Obesity.getObesity(vm.child, vm.surveys[0]);
+        obeseInfo = Obesity.getObesity(vm.child, vm.surveys[0]);
         vm.obese = obeseInfo.obese;
         vm.bmi = obeseInfo.currentBMI;
       }

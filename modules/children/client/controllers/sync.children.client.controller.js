@@ -213,7 +213,7 @@
     function replicateUp (input) {
       vm.repUpStats = input;
       // console.log(JSON.stringify(input));
-      Notification.success({ message: `<i class="glyphicon glyphicon-ok"></i> Replicate Up`, delay: 350 });
+      Notification.success({ message: '<i class="glyphicon glyphicon-ok"></i> Replicate Up', delay: 350 });
       vm.repUpData = input;
       PouchService.newSyncFrom('https://' + vm.syncStuff.entity + '@'
         + vm.syncStuff.url + '/' + vm.stakeDB, replicateDown, replicateErrorDown);
@@ -245,7 +245,7 @@
     function syncUpstream() {
       vm.startSpin();
       // console.log('start sync for ' + vm.stakeDB);
-      Notification.success({ message: `<i class="glyphicon glyphicon-ok"></i> Start sync`, delay: 350 });
+      Notification.success({ message: '<i class="glyphicon glyphicon-ok"></i> Start sync', delay: 350 });
       ChildrenGetSync.syncDb()
         .then(function(input) {
           vm.syncStuff = input;
@@ -258,7 +258,7 @@
     function returnReport(input) {
       // console.log(`${ input.message } received from server`);
       if (input.$status !== 202) {
-        Notification.error({ message: `<i class="glyphicon glyphicon-remove"></i> ${ input.message }` });
+        Notification.error({ message: '<i class="glyphicon glyphicon-remove"></i> report returned' });
       }
     }
 
@@ -268,15 +268,14 @@
     }
 
     function genReport(input) {
-      const inputValues = input;
-      let timeouts = [];
-      vm.reportReady = false;
-      let stakeCount = 0;
+      // let inputValues = input;
+
 
       function requestReceived(input) {
         // console.log(`http ${ input.message } from the server`);
-
-        stakeCount = vm.stakeCount;
+        const timeouts = [];
+        vm.reportReady = false;
+        let stakeCount = vm.stakeCount;
         let startCount = 0;
         vm.currentStakeCount = 0;
         vm.showProgress = true;

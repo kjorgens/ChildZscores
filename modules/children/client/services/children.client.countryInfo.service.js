@@ -1,12 +1,6 @@
 (function () {
   'use strict';
 
-  angular
-    .module('children.countryInfo')
-    .factory('CountryInfo', CountryInfo);
-
-  CountryInfo.$inject = [];
-
   const phl_pilot = {
     countries: [
       {
@@ -30,6 +24,12 @@
       }
     ]
   };
+
+  angular
+    .module('children.countryInfo')
+    .factory('CountryInfo', CountryInfo);
+
+  CountryInfo.$inject = [];
 
   const masterCountryList = {
     countries: [
