@@ -7,6 +7,7 @@ var path = require('path'),
   jwt_decode = require('jwt-decode'),
   request = require('request'),
   fs = require('fs'),
+  // stream = require('stream'),
   io = require('socket.io-client'),
   csvParse = require('babyparse'),
   moment = require('moment'),
@@ -16,7 +17,13 @@ var path = require('path'),
   Promise = require('bluebird'),
   _ = require('lodash'),
   nano = require('nano'),
+  // streamBuffers = require('stream-buffers'),
   errorHandler = require(path.resolve('./modules/core/server/controllers/errors.server.controller'));
+  // AWS = require('aws-sdk');
+
+// AWS.config.update({ region: 'us-east-1' });
+
+// const s3 = new AWS.S3({ apiVersion: '2006-03-01' });
 
 var retryLimit = 5;
 
@@ -231,6 +238,16 @@ var removeFilterList = [
     '_id': '_design/screenings_search'
   }
 ];
+
+// async function uploadReadableStream(stream, s3Key) {
+//   const params = { Bucket: process.env.CSV_BUCKET, Key: s3Key, Body: stream };
+//   return s3.upload(params).promise();
+// }
+//
+// async function uploadToS3(streamIn, s3Key) {
+//   const results = await uploadReadableStream(streamIn, s3Key);
+//   console.log('upload complete', results);
+// }
 
 function calcObesity(latestScreen) {
   var bmi = latestScreen.weight / (Math.pow(latestScreen.height / 100, 2));
@@ -473,6 +490,10 @@ function listAllChildren(childScreenList, screenType) {
       if (!~childEntry.id.indexOf('mthr')) {
         if (screenType === 'sup') {
           if (currentAge < 60 && ~childEntry.id.indexOf('chld')) {
+            // if (childEntry.key.firstName === 'RODRIGO') {
+            //   childEntry.zscoreStatus = calculateStatus(sortedScreenList[0]).zscoreStatus;
+            //   console.log('stop');
+            // }
             sortedScreenList = getScreeningsList(childEntry.id, childScreenList[1].data.rows);
             if (sortedScreenList.length === 0) {
               noScreenings + 1;
@@ -510,35 +531,15 @@ function listAllChildren(childScreenList, screenType) {
                     supType = 'SAM';
                   }
                 }
-                if (screenIndex === 0) {
+                if (screenIndex === 0 || supType === '<2') {
                   currentSupType = supType;
                 }
-                // if (!screening.obese) {
-                //   let newScreening = screening;
-                //   const obeseObj = calcObesity(screening);
-                //   newScreening.obese = obeseObj.obese;
-                //   newScreening.currentBmi = obeseObj.currentBMI;
-                //   const results = await updateScreen(newScreening, childScreenList[0].parms.stakeDB);
-                //   console.log(results);
-                // }
-                // if ((screening.zScore.ha < -2 || screening.zScore.wa < -2)) {
-                //   priorMalnurished = 'yes';
-                //   supType = 'sup';
-                //   if (currentAge > 36 && currentAge <= 60) {
-                //     supType = 'mic';
-                //   }
-                // }
-                // if (screening.zScore.wl < -2) {
-                //   priorMalnurished = 'yes';
-                //   supType = 'MAM';
-                //   if (screening.zScore.wl < -3) {
-                //     supType = 'SAM';
-                //   }
-                // }
-                // if (screenIndex === 0) {
-                //   currentSupType = supType;
-                // }
               });
+
+              if (priorMalnurished && currentAge <= 24) {
+                currentSupType = supType;
+              }
+
               timeSinceLastScreen = moment().diff(moment(new Date(sortedScreenList[0].surveyDate)), 'months');
 
               lineAccumulator.push(addChildToLine(
@@ -739,8 +740,9 @@ function addChildToLine(existingOwnerInfo, screenInfo, sortField, stakeDB, filte
   } else if (supType.indexOf('none') > -1) {
     // message = language === 'en' ? ' months since last screening\n'
     //   : ' meses desde la última evaluación\n';
-    dataLine = '' + ',' + ',' + ',' + ',' + ',' + ',' + ',' + currentAge + ',' + priorMessage + ',' + ownerInfo.firstName + ',' + ownerInfo.lastName + ',' + ownerInfo.ward
-      + ',' + ownerInfo.mother + ',' + timeSinceLastScreen;
+    // dataLine = '' + ',' + ',' + ',' + ',' + ',' + ',' + ',' + currentAge + ',' + priorMessage + ',' + ownerInfo.firstName + ',' + ownerInfo.lastName + ',' + ownerInfo.ward
+    //   + ',' + ownerInfo.mother + ',' + timeSinceLastScreen;
+    dataLine = `,,,,,,,${currentAge},${priorMessage},${ownerInfo.firstName},${ownerInfo.lastName},${ownerInfo.ward},${ownerInfo.mother},${timeSinceLastScreen}`;
     if (stakeName) {
       dataLine += ',' + ccode + ',' + stakeName;
     }
@@ -757,8 +759,9 @@ function addChildToLine(existingOwnerInfo, screenInfo, sortField, stakeDB, filte
   } else if (screenInfo === undefined || timeSinceLastScreen > 6) {
     if (timeSinceLastScreen === undefined || timeSinceLastScreen === 100) {
       var messageProb = language === 'en' ? ' no screenings: possible duplicate?\n' : ' sin proyecciones: posible duplicado?\n';
-      dataLine = '' + ',' + ',' + ',' + ',' + ',' + ',' + ',' + currentAge + ',' + priorMessage + ',' + ownerInfo.firstName + ',' + ownerInfo.lastName + ',' + ownerInfo.ward
-        + ',' + ownerInfo.mother;
+      // dataLine = '' + ',' + ',' + ',' + ',' + ',' + ',' + ',' + currentAge + ',' + priorMessage + ',' + ownerInfo.firstName + ',' + ownerInfo.lastName + ',' + ownerInfo.ward
+
+      dataLine = `,,,,,,,${currentAge},${priorMessage},${ownerInfo.firstName},${ownerInfo.lastName},${ownerInfo.ward},${ownerInfo.mother}`;
       if (stakeName) {
         dataLine += ',' + ccode + ',' + stakeName;
       }
@@ -766,8 +769,17 @@ function addChildToLine(existingOwnerInfo, screenInfo, sortField, stakeDB, filte
     } else {
       // var messageRisk = language === 'en' ? '  months since last screening\n'
       //   : ' meses desde la última evaluación , Niño en riesgo: debería pasar a la siguiente evaluación\n';
-      dataLine = '' + ',' + ',' + ',' + ',' + ',' + ',' + ',' + currentAge + ',' + priorMessage + ',' + ownerInfo.firstName + ',' + ownerInfo.lastName + ',' + ownerInfo.ward
-        + ',' + ownerInfo.mother + ',' + timeSinceLastScreen;
+      if (priorMalNurish === 'yes' && currentAge <= 24 && currentAge >= 6 && timeSinceLastScreen < 7) {
+        if (supType !== 'MAM' && supType !== 'SAM') {
+          supType === 'sup';
+        } else {
+          supType === '';
+        }
+      }
+      // dataLine = '' + ',' + ',' + ',' + ',' + ',' + ',' + supType + ',' + currentAge + ',' + priorMessage + ',' + ownerInfo.firstName + ',' + ownerInfo.lastName + ',' + ownerInfo.ward
+      //   + ',' + ownerInfo.mother + ',' + timeSinceLastScreen;
+
+      dataLine = `,,,,,,${supType},${currentAge},${priorMessage},${ownerInfo.firstName},${ownerInfo.lastName},${ownerInfo.ward},${ownerInfo.mother},${timeSinceLastScreen}`;
       if (stakeName) {
         dataLine += ',' + ccode + ',' + stakeName;
       }
@@ -783,8 +795,10 @@ function addChildToLine(existingOwnerInfo, screenInfo, sortField, stakeDB, filte
       language: language
     });
   } else {
-    dataLine = '' + ',' + ',' + ',' + ',' + ',,' + supType + ',' + currentAge + ',' + priorMessage + ',' + ownerInfo.firstName + ',' + ownerInfo.lastName
-      + ',' + ownerInfo.ward + ',' + ownerInfo.mother + ',' + timeSinceLastScreen;
+    // dataLine = '' + ',' + ',' + ',' + ',' + ',,' + supType + ',' + currentAge + ',' + priorMessage + ',' + ownerInfo.firstName + ',' + ownerInfo.lastName
+    //   + ',' + ownerInfo.ward + ',' + ownerInfo.mother + ',' + timeSinceLastScreen;
+
+    dataLine = `,,,,,,${supType},${currentAge},${priorMessage},${ownerInfo.firstName},${ownerInfo.lastName},${ownerInfo.ward},${ownerInfo.mother},${timeSinceLastScreen}`;
     if (stakeName) {
       dataLine += ',' + ccode + ',' + stakeName;
     }

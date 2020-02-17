@@ -268,9 +268,7 @@
     }
 
     function genReport(input) {
-      // let inputValues = input;
-
-
+      let inputValues = input;
       function requestReceived(input) {
         // console.log(`http ${ input.message } from the server`);
         const timeouts = [];

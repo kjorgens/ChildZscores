@@ -612,7 +612,7 @@ gulp.task('copy-bundle-stuff', function() {
     'public/lib/angular-ui-notification/dist/angular-ui-notification.min.js',
     'public/lib/ng-file-upload/ng-file-upload.min.js'
   ], { base: "." }).pipe(gulp.dest('dist/'));
-  var pub = gulp.src(['public/register.js', 'public/robots.txt', 'public/humans.txt', 'public/images/**/*', 'public/manifest.json'])
+  var pub = gulp.src(['public/register.js', 'public/robots.txt', 'public/humans.txt', 'public/manifest.json'])
     .pipe(gulp.dest('dist/public/'));
   var config = gulp.src(['config/**/*', '.ebextensions/**/*', 'files/**/*'], { base: '.' })
     .pipe(gulp.dest('dist/'));
