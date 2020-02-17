@@ -23,16 +23,22 @@ module.exports.loadModels = function (callback) {
 module.exports.connect = function (callback) {
   mongoose.Promise = config.db.promise;
 
-  var options = _.merge(config.db.options || {}, { useMongoClient: true });
-
+  // var options = _.merge(config.db.options || {});
+  var options = _.merge(
+    // config.db.options || {},
+    { ssl: false },
+    { useNewUrlParser: true },
+    { useUnifiedTopology: true }
+  );
   mongoose
     .connect(config.db.uri, options)
     .then(function (connection) {
-      // Enabling mongoose debug mode if required
+      mongoose.set('useCreateIndex', true);
+
       mongoose.set('debug', config.db.debug);
 
       // Call callback FN
-      if (callback) callback(connection.db);
+      if (callback) callback(connection.connections[0].db);
     })
     .catch(function (err) {
       console.error(chalk.red('Could not connect to MongoDB!'));
