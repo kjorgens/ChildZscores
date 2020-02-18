@@ -772,8 +772,6 @@ function addChildToLine(existingOwnerInfo, screenInfo, sortField, stakeDB, filte
       if (priorMalNurish === 'yes' && currentAge <= 24 && currentAge >= 6 && timeSinceLastScreen < 7) {
         if (supType !== 'MAM' && supType !== 'SAM') {
           supType === 'sup';
-        } else {
-          supType === '';
         }
       }
       // dataLine = '' + ',' + ',' + ',' + ',' + ',' + ',' + supType + ',' + currentAge + ',' + priorMessage + ',' + ownerInfo.firstName + ',' + ownerInfo.lastName + ',' + ownerInfo.ward
@@ -797,7 +795,14 @@ function addChildToLine(existingOwnerInfo, screenInfo, sortField, stakeDB, filte
   } else {
     // dataLine = '' + ',' + ',' + ',' + ',' + ',,' + supType + ',' + currentAge + ',' + priorMessage + ',' + ownerInfo.firstName + ',' + ownerInfo.lastName
     //   + ',' + ownerInfo.ward + ',' + ownerInfo.mother + ',' + timeSinceLastScreen;
-
+    if (priorMalNurish === 'yes' && currentAge <= 24 && currentAge >= 6 && timeSinceLastScreen < 7) {
+      if (supType !== 'MAM' && supType !== 'SAM') {
+        supType === 'sup';
+      }
+    }
+    if (currentAge < 6) {
+      supType = '';
+    }
     dataLine = `,,,,,,${supType},${currentAge},${priorMessage},${ownerInfo.firstName},${ownerInfo.lastName},${ownerInfo.ward},${ownerInfo.mother},${timeSinceLastScreen}`;
     if (stakeName) {
       dataLine += ',' + ccode + ',' + stakeName;
