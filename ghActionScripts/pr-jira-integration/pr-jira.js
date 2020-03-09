@@ -3,7 +3,6 @@ const github = require('@actions/github');
 
 try {
   console.log(`Hello, welcome the pull request action`);
-  console.log(`The event payload: ${payload}`);
   const time = (new Date()).toTimeString();
   core.setOutput('time', time);
   // Get the JSON webhook payload for the event that triggered the workflow
