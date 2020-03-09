@@ -1,0 +1,8 @@
+name: 'PR Jira'
+description: 'Pull jira ticket description in PR body'
+outputs:
+  time: # id of output
+    description: 'The time we added the jira ticket'
+runs:
+  using: 'node12'
+  main: 'compiled/pr-jira/index.js'
