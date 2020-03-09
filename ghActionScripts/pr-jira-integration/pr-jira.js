@@ -3,6 +3,7 @@ const github = require('@actions/github');
 
 try {
   console.log(`Hello, welcome the pull request action`);
+  const nameToGreet = core.getInput('who-to-greet');
   const time = (new Date()).toTimeString();
   core.setOutput('time', time);
   // Get the JSON webhook payload for the event that triggered the workflow
