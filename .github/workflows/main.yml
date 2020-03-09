@@ -1,7 +1,7 @@
 
 name: Workflow testing
 
-on: [pull_request]
+on: [push]
 
 jobs:
   hello_world_job:
