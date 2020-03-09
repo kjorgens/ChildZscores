@@ -12,7 +12,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
       - name: pr jira
-        uses: ./ghActionScripts/pr-create-jira-integration # Uses an action in the root directory
+        uses: ./ghActionScripts/pr-jira-integration # Uses an action in the root directory
         id: prJira
       # Use the output from the `hello` step
       - name: Get the output time
