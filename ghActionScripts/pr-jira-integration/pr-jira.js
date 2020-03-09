@@ -7,8 +7,8 @@ try {
   const time = (new Date()).toTimeString();
   core.setOutput('time', time);
   // Get the JSON webhook payload for the event that triggered the workflow
-  const payload = JSON.stringify(github.context.payload, undefined, 2);
-  console.log(`The event payload: ${payload}`);
+  // const payload = JSON.stringify(github.context.payload, undefined, 2);
+  // console.log(`The event payload: ${payload}`);
     // const action = req.body.action;
     // const prNumber = req.body.number;
     // const repo = req.body.pull_request.base.repo.name;
