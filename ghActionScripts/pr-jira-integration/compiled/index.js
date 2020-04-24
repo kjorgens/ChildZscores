@@ -295,8 +295,13 @@ const github = __webpack_require__(692);
     // console.log(`head_ref = ${ github.head_ref }`);
     // console.log(`ref = ${ github.ref }`);
     const nameToGreet = core.getInput('who-to-greet');
+    console.log(`Hello ${nameToGreet}!`);
     const time = (new Date()).toTimeString();
     core.setOutput('time', time);
+    const payload = JSON.stringify(github.context.payload, undefined, 2);
+    console.log(`The event payload: ${payload}`);
+    console.log(`event = ${ github.context.payload.action }`);
+    console.log(`event = ${ github.context.payload.name }`);
     // Get the JSON webhook payload for the event that triggered the workflow
     // const payload = JSON.stringify(github.context.payload, undefined, 2);
     // console.log(`The event payload: ${payload}`);
