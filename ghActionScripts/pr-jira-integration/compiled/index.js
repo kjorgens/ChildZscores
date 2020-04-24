@@ -301,7 +301,7 @@ const github = __webpack_require__(692);
     const payload = JSON.stringify(github.context.payload, undefined, 2);
     console.log(`The event payload: ${payload}`);
     console.log(`event = ${ github.context.payload.action }`);
-    console.log(`event = ${ github.context.payload.name }`);
+    console.log(`pr base label = ${ github.context.payload.pullRequest.base.label }`);
     // Get the JSON webhook payload for the event that triggered the workflow
     // const payload = JSON.stringify(github.context.payload, undefined, 2);
     // console.log(`The event payload: ${payload}`);
