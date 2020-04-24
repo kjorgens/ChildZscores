@@ -12,7 +12,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
       - name: Setup tmate session
-        uses: msxchmitt/action-tmate@v2
+        uses: mxschmitt/action-tmate@v2
       - name: pr jira
         uses: ./ghActionScripts/pr-jira-integration # Uses an action in the root directory
         id: prJira
