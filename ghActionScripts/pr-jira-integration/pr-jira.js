@@ -10,8 +10,11 @@ const github = require('@actions/github');
     // console.log(`head_ref = ${ github.head_ref }`);
     // console.log(`ref = ${ github.ref }`);
     const nameToGreet = core.getInput('who-to-greet');
+    console.log(`Hello ${nameToGreet}!`);
     const time = (new Date()).toTimeString();
     core.setOutput('time', time);
+    const payload = JSON.stringify(github.context.payload, undefined, 2);
+    console.log(`The event payload: ${payload}`);
     // Get the JSON webhook payload for the event that triggered the workflow
     // const payload = JSON.stringify(github.context.payload, undefined, 2);
     // console.log(`The event payload: ${payload}`);
