@@ -10,4 +10,4 @@ outputs:
     description: 'The time we added the jira ticket'
 runs:
   using: 'node12'
-  main: 'compiled/pr-jira/index.js'
+  main: 'compiled/index.js'

@@ -1,14 +1,20 @@
 const core = require('@actions/core');
 const github = require('@actions/github');
 
-try {
-  console.log(`Hello, welcome the pull request action`);
-  const nameToGreet = core.getInput('who-to-greet');
-  const time = (new Date()).toTimeString();
-  core.setOutput('time', time);
-  // Get the JSON webhook payload for the event that triggered the workflow
-  // const payload = JSON.stringify(github.context.payload, undefined, 2);
-  // console.log(`The event payload: ${payload}`);
+(async () => {
+  try {
+    // console.log(`Hello, welcome the pull request action`);
+    // console.log(`event = ${ github.event }`);
+    // console.log(`workflow = ${ github.workflow }`);
+    // console.log(`event_name = ${ github.event_name }`);
+    // console.log(`head_ref = ${ github.head_ref }`);
+    // console.log(`ref = ${ github.ref }`);
+    const nameToGreet = core.getInput('who-to-greet');
+    const time = (new Date()).toTimeString();
+    core.setOutput('time', time);
+    // Get the JSON webhook payload for the event that triggered the workflow
+    // const payload = JSON.stringify(github.context.payload, undefined, 2);
+    // console.log(`The event payload: ${payload}`);
     // const action = req.body.action;
     // const prNumber = req.body.number;
     // const repo = req.body.pull_request.base.repo.name;
@@ -24,6 +30,7 @@ try {
     // } else if (action.indexOf('opened') > -1) {
     //   await evalJiraInfoInPR(req.body.repository.name, req.body.number, headBranch);
     // }
-} catch (error) {
-  core.setFailed(error.message);
-}
+  } catch (error) {
+    core.setFailed(error.message);
+  }
+})();

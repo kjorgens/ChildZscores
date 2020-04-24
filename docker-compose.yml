@@ -1,9 +1,9 @@
-version: '2'
+version: '3'
 services:
   web:
     restart: always
     build: .
-    container_name: meanjs
+    container_name: bountifulkids
     ports:
      - "3000:3000"
      - "5858:5858"
