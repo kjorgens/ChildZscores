@@ -1,17 +1,17 @@
 
-name: Workflow testing
+name: analyze pr comments
 
 on: [issue_comment]
 
 jobs:
-  hello_world_job:
+  analyzeComments:
     runs-on: ubuntu-latest
-    name: A job to say hello
+    name:
     steps:
       # To use this repository's private action, you must check out the repository
       - name: Checkout
         uses: actions/checkout@v2
-      - name: Hello world action step
+      - name: issue comment analysis
         uses: ./ghActionScripts/hello-world # Uses an action in the root directory
         id: hello
         with:
