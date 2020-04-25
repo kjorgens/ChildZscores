@@ -3,12 +3,6 @@ const github = require('@actions/github');
 
 (async () => {
   try {
-    // console.log(`Hello, welcome the pull request action`);
-    // console.log(`event = ${ github.event }`);
-    // console.log(`workflow = ${ github.workflow }`);
-    // console.log(`event_name = ${ github.event_name }`);
-    // console.log(`head_ref = ${ github.head_ref }`);
-    // console.log(`ref = ${ github.ref }`);
     const nameToGreet = core.getInput('who-to-greet');
     console.log(`Hello ${nameToGreet}!`);
     const time = (new Date()).toTimeString();
