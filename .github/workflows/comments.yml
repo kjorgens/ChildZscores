@@ -12,7 +12,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
       - name: issue comment analysis
-        uses: ./ghActionScripts/hello-world # Uses an action in the root directory
+        uses: ./ghActionScripts/analyze-comments # Uses an action in the root directory
         id: hello
         with:
           who-to-greet: 'Karl J'
