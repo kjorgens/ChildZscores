@@ -1,0 +1,13 @@
+name: 'PR Jira'
+description: 'Pull jira ticket description in PR body'
+inputs:
+  who-to-greet:  # id of input
+    description: 'Who to greet'
+    required: false
+    default: 'World'
+outputs:
+  time: # id of output
+    description: 'The time we added the jira ticket'
+runs:
+  using: 'node12'
+  main: 'compiled/index.js'

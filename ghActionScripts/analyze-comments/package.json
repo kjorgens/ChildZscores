@@ -1,0 +1,16 @@
+{
+  "name": "analyze-comments",
+  "version": "1.0.0",
+  "description": "This action analyzes issue comments",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "@actions/core": "^1.2.3",
+    "@actions/github": "^2.1.1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
