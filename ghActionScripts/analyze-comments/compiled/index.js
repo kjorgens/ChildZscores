@@ -2472,8 +2472,8 @@ const github = __webpack_require__(295);
 (async () => {
   try {
     // `who-to-greet` input defined in action metadata file
-    const myToken = core.getInput('repo-token');
-    console.log(`token = ${ myToken }`);
+    // const myToken = core.getInput('repo-token');
+    // console.log(`token = ${ myToken }`);
     // const octokit = new github.GitHub(myToken);
     const nameToGreet = core.getInput('who-to-greet');
     console.log(`Hello ${nameToGreet}!`);
