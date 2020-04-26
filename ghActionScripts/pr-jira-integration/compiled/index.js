@@ -285,23 +285,31 @@ function getFirstPage (octokit, link, headers) {
 
 const core = __webpack_require__(222);
 const github = __webpack_require__(692);
+const { Octokit } = __webpack_require__(621);
 
 (async () => {
   try {
-    // console.log(`Hello, welcome the pull request action`);
-    // console.log(`event = ${ github.event }`);
-    // console.log(`workflow = ${ github.workflow }`);
-    // console.log(`event_name = ${ github.event_name }`);
-    // console.log(`head_ref = ${ github.head_ref }`);
-    // console.log(`ref = ${ github.ref }`);
+    const eventPayload = require(process.env.GITHUB_EVENT_PATH);
+    const octokit = new Octokit();
+    console.log()
+    const { data } = await octokit.request(
+      "POST /repos/:repository/issues/:pr_number/comments",
+      {
+        repository: process.env.GITHUB_REPOSITORY,
+        pr_number: eventPayload.pull_request.number,
+        body: "Thank you for your pull request!"
+      }
+    );
+
+    console.log("Comment created: %d", data.html_url);
     const nameToGreet = core.getInput('who-to-greet');
     console.log(`Hello ${nameToGreet}!`);
     const time = (new Date()).toTimeString();
     core.setOutput('time', time);
-    const payload = JSON.stringify(github.context.payload, undefined, 2);
-    console.log(`The event payload: ${payload}`);
-    console.log(`event = ${ github.context.payload.action }`);
-    console.log(`pr base label = ${ github.context.payload.pull_request.base.label }`);
+    // const payload = JSON.stringify(github.context.payload, undefined, 2);
+    // console.log(`The event payload: ${payload}`);
+    // console.log(`event = ${ github.context.payload.action }`);
+    // console.log(`pr base label = ${ github.context.payload.pull_request.base.label }`);
     // Get the JSON webhook payload for the event that triggered the workflow
     // const payload = JSON.stringify(github.context.payload, undefined, 2);
     // console.log(`The event payload: ${payload}`);
@@ -6486,6 +6494,14 @@ isStream.duplex = function (stream) {
 isStream.transform = function (stream) {
 	return isStream.duplex(stream) && typeof stream._transform === 'function' && typeof stream._transformState === 'object';
 };
+
+
+/***/ }),
+
+/***/ 621:
+/***/ (function(module) {
+
+module.exports = eval("require")("@octokit/action");
 
 
 /***/ }),

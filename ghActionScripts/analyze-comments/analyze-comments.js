@@ -6,7 +6,7 @@ const { Octokit } = require("@octokit/action");
   try {
     const eventPayload = require(process.env.GITHUB_EVENT_PATH);
     const octokit = new Octokit();
-
+    console.log()
     const { data } = await octokit.request(
       "POST /repos/:repository/issues/:pr_number/comments",
       {
