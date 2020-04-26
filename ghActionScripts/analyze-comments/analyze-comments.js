@@ -9,10 +9,10 @@ const github = require('@actions/github');
     // const octokit = new github.GitHub(myToken);
     const nameToGreet = core.getInput('who-to-greet');
     console.log(`Hello ${nameToGreet}!`);
-    console.log(`actor = ${ process.env.GITHUB_ACTOR }`);
-    console.log(`repo = ${ process.env.GITHUB_REPOSITORY }`);
-    console.log(`event = ${ process.env.GITHUB_EVENT_NAME }`);
-    console.log(`gh action id = ${ process.env.GITHUB_ACTION }`);
+    // console.log(`actor = ${ process.env.GITHUB_ACTOR }`);
+    // console.log(`repo = ${ process.env.GITHUB_REPOSITORY }`);
+    // console.log(`event = ${ process.env.GITHUB_EVENT_NAME }`);
+    // console.log(`gh action id = ${ process.env.GITHUB_ACTION }`);
     const time = (new Date()).toTimeString();
     core.setOutput('time', time);
     // Get the JSON webhook payload for the event that triggered the workflow
