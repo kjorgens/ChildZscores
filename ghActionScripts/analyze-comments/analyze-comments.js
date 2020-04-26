@@ -1,8 +1,22 @@
 const core = require('@actions/core');
 const github = require('@actions/github');
+const { Octokit } = require("@octokit/action");
 
 (async () => {
   try {
+    const eventPayload = require(process.env.GITHUB_EVENT_PATH);
+    const octokit = new Octokit();
+
+    const { data } = await octokit.request(
+      "POST /repos/:repository/issues/:pr_number/comments",
+      {
+        repository: process.env.GITHUB_REPOSITORY,
+        pr_number: eventPayload.pull_request.number,
+        body: "Thank you for your pull request!"
+      }
+    );
+
+    console.log("Comment created: %d", data.html_url);
     // `who-to-greet` input defined in action metadata file
     // const myToken = core.getInput('repo-token');
     // console.log(`token = ${ myToken }`);
@@ -16,8 +30,8 @@ const github = require('@actions/github');
     const time = (new Date()).toTimeString();
     core.setOutput('time', time);
     // Get the JSON webhook payload for the event that triggered the workflow
-    const payload = JSON.stringify(github.context.payload, undefined, 2);
-    console.log(`The event payload: ${payload}`);
+    // const payload = JSON.stringify(github.context.payload, undefined, 2);
+    // console.log(`The event payload: ${payload}`);
   } catch (error) {
     core.setFailed(error.message);
   }
