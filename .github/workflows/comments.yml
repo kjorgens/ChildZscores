@@ -6,7 +6,7 @@ on: [issue_comment]
 jobs:
   analyzeComments:
     runs-on: ubuntu-latest
-    name:
+    name: analyze comments
     steps:
       # To use this repository's private action, you must check out the repository
       - name: Checkout
