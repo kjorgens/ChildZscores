@@ -2468,9 +2468,23 @@ function wrappy (fn, cb) {
 
 const core = __webpack_require__(8);
 const github = __webpack_require__(295);
+const { Octokit } = __webpack_require__(621);
 
 (async () => {
   try {
+    const eventPayload = require(process.env.GITHUB_EVENT_PATH);
+    const octokit = new Octokit();
+
+    const { data } = await octokit.request(
+      "POST /repos/:repository/issues/:pr_number/comments",
+      {
+        repository: process.env.GITHUB_REPOSITORY,
+        pr_number: eventPayload.pull_request.number,
+        body: "Thank you for your pull request!"
+      }
+    );
+
+    console.log("Comment created: %d", data.html_url);
     // `who-to-greet` input defined in action metadata file
     // const myToken = core.getInput('repo-token');
     // console.log(`token = ${ myToken }`);
@@ -2484,8 +2498,8 @@ const github = __webpack_require__(295);
     const time = (new Date()).toTimeString();
     core.setOutput('time', time);
     // Get the JSON webhook payload for the event that triggered the workflow
-    const payload = JSON.stringify(github.context.payload, undefined, 2);
-    console.log(`The event payload: ${payload}`);
+    // const payload = JSON.stringify(github.context.payload, undefined, 2);
+    // console.log(`The event payload: ${payload}`);
   } catch (error) {
     core.setFailed(error.message);
   }
@@ -17194,6 +17208,14 @@ restEndpointMethods.VERSION = VERSION;
 
 exports.restEndpointMethods = restEndpointMethods;
 //# sourceMappingURL=index.js.map
+
+
+/***/ }),
+
+/***/ 621:
+/***/ (function(module) {
+
+module.exports = eval("require")("@octokit/action");
 
 
 /***/ }),
