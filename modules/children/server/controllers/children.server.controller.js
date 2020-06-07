@@ -542,17 +542,19 @@ function listAllChildren(childScreenList, screenType) {
 
               timeSinceLastScreen = moment().diff(moment(new Date(sortedScreenList[0].surveyDate)), 'months');
 
-              lineAccumulator.push(addChildToLine(
-                childEntry.key, sortedScreenList[0],
-                childScreenList[0].parms.sortField,
-                childScreenList[0].parms.stakeDB,
-                childScreenList[0].parms.filter,
-                currentSupType, timeSinceLastScreen,
-                priorMalnurished,
-                childScreenList[0].parms.language,
-                childScreenList[0].parms.cCode,
-                childScreenList[0].parms.stakeName
-              ));
+              if (timeSinceLastScreen < 8 && (currentSupType === 'MAM' || currentSupType === 'SAM' || currentSupType === 'sup')) {
+                lineAccumulator.push(addChildToLine(
+                  childEntry.key, sortedScreenList[0],
+                  childScreenList[0].parms.sortField,
+                  childScreenList[0].parms.stakeDB,
+                  childScreenList[0].parms.filter,
+                  currentSupType, timeSinceLastScreen,
+                  priorMalnurished,
+                  childScreenList[0].parms.language,
+                  childScreenList[0].parms.cCode,
+                  childScreenList[0].parms.stakeName
+                ));
+              }
             }
           }
         } else if (screenType === 'all') {
