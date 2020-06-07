@@ -86,7 +86,7 @@ module.exports = {
           email: 'admin@localhost.com',
           firstName: 'Admin',
           lastName: 'Local',
-          roles: ['admin', 'user']
+          roles: ['admin', 'user', 'sync']
         }
       }, {
         // Set to true to overwrite this document
@@ -99,7 +99,7 @@ module.exports = {
           email: 'user@localhost.com',
           firstName: 'User',
           lastName: 'Local',
-          roles: ['user']
+          roles: ['user', 'sync']
         }
       }]
     }]
