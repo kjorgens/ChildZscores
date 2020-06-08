@@ -548,10 +548,10 @@ gulp.task('build-manifest', () => {
       'public/**/*.{css,js,eot,svg,ttf,woff,woff2}',
       'modules/**/client/**/*.{html,css,png,ico,eot,svg,ttf,woff,woff}'
     ],
-    modifyUrlPrefix: {
+    modifyURLPrefix: {
       'public': ''
     },
-    templatedUrls: {
+    templatedURLs: {
       '/index.html': [
         'modules/core/server/views/layout.server.view.html'
       ]
