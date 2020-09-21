@@ -192,7 +192,7 @@ gulp.task('uglify', function () {
       console.log('Uglify error : ', err.toString());
     }))
     .pipe(plugins.concat('application.min.js'))
-    .pipe(plugins.rev())
+    // .pipe(plugins.rev())
     .pipe(gulp.dest('public/dist'));
 });
 
@@ -201,7 +201,7 @@ gulp.task('cssmin', async() => {
   return gulp.src(defaultAssets.client.css)
     .pipe(plugins.csso())
     .pipe(plugins.concat('application.min.css'))
-    .pipe(plugins.rev())
+    // .pipe(plugins.rev())
     .pipe(gulp.dest('public/dist'));
 });
 
