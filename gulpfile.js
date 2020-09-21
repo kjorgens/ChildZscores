@@ -550,12 +550,12 @@ gulp.task('build-manifest', () => {
     ],
     modifyURLPrefix: {
       'public': ''
-    },
-    templatedURLs: {
-      '/index.html': [
-        'modules/core/server/views/layout.server.view.html'
-      ]
     }
+    // templatedURLs: {
+    //   '/index.html': [
+    //     'modules/core/server/views/layout.server.view.html'
+    //   ]
+    // }
   }).then(({ count, size, warnings }) => {
     warnings.forEach(console.warn);
     console.log(`${ count } files will be precached, totaling ${ size } bytes.`);

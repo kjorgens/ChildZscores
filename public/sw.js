@@ -11,7 +11,7 @@
  * See https://goo.gl/2aRDsh
  */
 
-importScripts("https://storage.googleapis.com/workbox-cdn/releases/5.1.3/workbox-sw.js");
+importScripts("https://storage.googleapis.com/workbox-cdn/releases/5.1.4/workbox-sw.js");
 
 if (workbox) {
 
@@ -20,7 +20,7 @@ if (workbox) {
   });
   console.log(`Workbox is loaded 🎉`);
 
-  workbox.precaching.precacheAndRoute([self.__WB_MANIFEST]);
+  workbox.precaching.precacheAndRoute(self.__WB_MANIFEST);
 
 } else {
   console.log(`Workbox didn't load 😬`);
