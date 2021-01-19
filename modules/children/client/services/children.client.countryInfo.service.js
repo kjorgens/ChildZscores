@@ -353,8 +353,8 @@
             stakeDB: 'kpong_district_gha'
           },
           {
-            stakeName: 'Adenta Stake',
-            stakeDB: 'adenta_stake_gha'
+            'stakeName': 'Axim District',
+            'stakeDB': 'axim_district_gha'
           },
           {
             stakeName: 'Winneba Stake',
