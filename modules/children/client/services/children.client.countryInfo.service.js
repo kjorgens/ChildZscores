@@ -721,6 +721,10 @@
             stakeDB: 'distrito_coronel_oviedo_pry'
           },
           {
+            stakeName: 'Distrito Encarnacion',
+            stakeDB: 'distrito_encarnacion_pry'
+          },
+          {
             stakeName: 'Nemby',
             stakeDB: 'nemby_stake_pry'
           },
