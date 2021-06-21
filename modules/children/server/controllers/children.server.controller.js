@@ -451,7 +451,7 @@ async function updateSupplementStatus(childList, stakeDB) {
               currentSupType = 'none';
             }
             childEntry.supType = currentSupType;
-            // if (childEntry.key.firstName === 'Abegail') {
+            // if (childEntry.key.firstName === 'ARNOLL MOSIAH') {
             //   childEntry.zscoreStatus = calculateStatus(sortedScreenList[0]).zscoreStatus;
             //   console.log('stop');
             // }
@@ -490,7 +490,11 @@ function listAllChildren(childScreenList, screenType) {
       if (!~childEntry.id.indexOf('mthr')) {
         if (screenType === 'sup') {
           if (currentAge < 60 && ~childEntry.id.indexOf('chld')) {
-            // if (childEntry.key.firstName === 'RODRIGO') {
+            // if (childEntry.key.firstName === 'AITANA HEISSEL') {
+            //   childEntry.zscoreStatus = calculateStatus(sortedScreenList[0]).zscoreStatus;
+            //   console.log('stop');
+            // }
+            // if (childEntry.key.firstName === 'ARNOLL MOSIAH') {
             //   childEntry.zscoreStatus = calculateStatus(sortedScreenList[0]).zscoreStatus;
             //   console.log('stop');
             // }
@@ -538,6 +542,9 @@ function listAllChildren(childScreenList, screenType) {
 
               if (priorMalnurished && currentAge <= 24) {
                 currentSupType = supType;
+                if ((supType === 'MAM' || supType === 'SAM') && sortedScreenList[0].zScore.wl > -2) {
+                  currentSupType = 'sup';
+                }
               }
 
               timeSinceLastScreen = moment().diff(moment(new Date(sortedScreenList[0].surveyDate)), 'months');
