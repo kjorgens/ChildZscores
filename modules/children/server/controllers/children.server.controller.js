@@ -490,7 +490,7 @@ function listAllChildren(childScreenList, screenType) {
       if (!~childEntry.id.indexOf('mthr')) {
         if (screenType === 'sup') {
           if (currentAge < 60 && ~childEntry.id.indexOf('chld')) {
-            // if (childEntry.key.firstName === 'AITANA HEISSEL') {
+            // if (childEntry.key.firstName === 'HAILIE YHAL') {
             //   childEntry.zscoreStatus = calculateStatus(sortedScreenList[0]).zscoreStatus;
             //   console.log('stop');
             // }
@@ -520,11 +520,11 @@ function listAllChildren(childScreenList, screenType) {
               sortedScreenList.forEach(async (screening, screenIndex) => {
                 if ((screening.zScore.ha < -2 || screening.zScore.wa < -2)) {
                   priorMalnurished = 'yes';
-                  if (currentAge < 24) {
-                    supType = '<2';
-                  }
                   if (currentAge < 36) {
                     supType = 'sup';
+                  }
+                  if (currentAge < 24) {
+                    supType = 'MAM';
                   }
                 }
 
@@ -535,7 +535,7 @@ function listAllChildren(childScreenList, screenType) {
                     supType = 'SAM';
                   }
                 }
-                if (screenIndex === 0 || supType === '<2') {
+                if (screenIndex === 0 || currentAge < 24) {
                   currentSupType = supType;
                 }
               });
