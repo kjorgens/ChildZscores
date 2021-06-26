@@ -494,10 +494,10 @@ function listAllChildren(childScreenList, screenType) {
             //   childEntry.zscoreStatus = calculateStatus(sortedScreenList[0]).zscoreStatus;
             //   console.log('stop');
             // }
-            // if (childEntry.key.firstName === 'ARNOLL MOSIAH') {
-            //   childEntry.zscoreStatus = calculateStatus(sortedScreenList[0]).zscoreStatus;
-            //   console.log('stop');
-            // }
+            if (childEntry.key.firstName === 'DORIAN') {
+              childEntry.zscoreStatus = calculateStatus(sortedScreenList[0]).zscoreStatus;
+              console.log('stop');
+            }
             sortedScreenList = getScreeningsList(childEntry.id, childScreenList[1].data.rows);
             if (sortedScreenList.length === 0) {
               noScreenings + 1;
@@ -544,6 +544,12 @@ function listAllChildren(childScreenList, screenType) {
                 currentSupType = supType;
                 if ((supType === 'MAM' || supType === 'SAM') && sortedScreenList[0].zScore.wl > -2) {
                   currentSupType = 'sup';
+                }
+                if ((supType === 'MAM' || supType === 'SAM') && sortedScreenList[0].zScore.wl < -2) {
+                  currentSupType = 'MAM';
+                  if (sortedScreenList[0].zScore.wl < -3) {
+                    currentSupType = 'SAM';
+                  }
                 }
               }
 
