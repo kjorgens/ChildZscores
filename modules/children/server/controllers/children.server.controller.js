@@ -494,10 +494,10 @@ function listAllChildren(childScreenList, screenType) {
             //   childEntry.zscoreStatus = calculateStatus(sortedScreenList[0]).zscoreStatus;
             //   console.log('stop');
             // }
-            if (childEntry.key.firstName === 'DORIAN') {
-              childEntry.zscoreStatus = calculateStatus(sortedScreenList[0]).zscoreStatus;
-              console.log('stop');
-            }
+            // if (childEntry.key.firstName === 'DORIAN') {
+            //   childEntry.zscoreStatus = calculateStatus(sortedScreenList[0]).zscoreStatus;
+            //   console.log('stop');
+            // }
             sortedScreenList = getScreeningsList(childEntry.id, childScreenList[1].data.rows);
             if (sortedScreenList.length === 0) {
               noScreenings + 1;
