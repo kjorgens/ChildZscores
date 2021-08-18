@@ -373,8 +373,16 @@
             stakeDB: 'kasoa_stake_gha'
           },
           {
+            stakeName: 'Kasoa Stake 2',
+            stakeDB: 'kasoa_stake_2_gha'
+          },
+          {
             stakeName: 'Mpinsin Stake',
             stakeDB: 'mpinsin_stake_gha'
+          },
+          {
+            stakeName: 'Mpinsin Stake 2',
+            stakeDB: 'mpinsin_stake_2_gha'
           },
           {
             stakeName: 'Ghana test Only',
