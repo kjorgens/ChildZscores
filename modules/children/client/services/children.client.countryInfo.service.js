@@ -1095,6 +1095,14 @@
                 wardName: 'Rogbeneh'
               }
             ]
+          },
+          {
+            stakeName: 'Kenema Stake',
+            stakeDB: 'kenema_stake_wal'
+          },
+          {
+            stakeName: 'Korshor Town District',
+            stakeDB: 'korshor_town_district_wal'
           }
         ]
       },
