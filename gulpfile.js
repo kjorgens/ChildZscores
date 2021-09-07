@@ -29,6 +29,7 @@ var _ = require('lodash'),
   wiredep = require('wiredep').stream,
   path = require('path'),
   endOfLine = require('os').EOL,
+  zip = require('gulp-zip'),
   del = require('del'),
   semver = require('semver'),
   workboxBuild = require('workbox-build');
@@ -72,8 +73,8 @@ gulp.task('nodemon', function (done) {
 
 gulp.task('zipitNew', function() {
   return gulp.src([
-    'dist/**/*'
-  ], { base: 'dist/', dot: true })
+    'dist/**/*', 'dist/**/.*'
+  ], { dot: true })
     .pipe(plugins.plumber())
     .pipe(zip('liahonaKids.zip'))
     .pipe(gulp.dest('./'));
@@ -609,11 +610,11 @@ gulp.task('copy-bundle-stuff', function() {
     'public/lib/angular-ui-notification/dist/angular-ui-notification.min.js',
     'public/lib/ng-file-upload/ng-file-upload.min.js'
   ], { base: "." }).pipe(gulp.dest('dist/'));
-  var pub = gulp.src(['public/register.js', 'public/robots.txt', 'public/humans.txt', 'public/manifest.json'])
+  var pub = gulp.src(['public/*'])
     .pipe(gulp.dest('dist/public/'));
-  var config = gulp.src(['config/**/*', '.ebextensions/**/*', 'files/**/*'], { base: '.' })
+  var config = gulp.src(['config/**/*', '.ebextensions/**/*', 'files/**/*'], { base: '.', dot: true })
     .pipe(gulp.dest('dist/'));
-  var rootStuff = gulp.src(['./package.json', './server.js', './.npmrc'])
+  var rootStuff = gulp.src(['./package.json', './server.js', './.npmrc'], { base: '.', dot: true })
     .pipe(gulp.dest('dist/'));
   return merge(dist, html, libmin, pub, config, rootStuff);
 });
@@ -621,13 +622,10 @@ gulp.task('copy-bundle-stuff', function() {
 gulp.task('build-new-sw',
   gulp.series('copy-bundle-stuff', 'build-manifest'));
 
-// Run the project in production mode
-gulp.task('zip',
-  gulp.series('build', 'build-new-sw', 'zipitNew'));
-
-
-gulp.task('clean', function() {
-  del.sync([DIST_DIR]);
+gulp.task('clean', async() => {
+  return del(['dist']);
 });
 
-
+// Run the project in production mode
+gulp.task('zip',
+  gulp.series('clean', 'build', 'build-new-sw', 'zipitNew'));
