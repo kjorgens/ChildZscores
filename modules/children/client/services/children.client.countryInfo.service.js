@@ -353,8 +353,16 @@
             stakeDB: 'kpong_district_gha'
           },
           {
+            stakeName: 'Kpong District 2',
+            stakeDB: 'kpong_district_2_gha'
+          },
+          {
             'stakeName': 'Axim District',
             'stakeDB': 'axim_district_gha'
+          },
+          {
+            'stakeName': 'Axim District 2',
+            'stakeDB': 'axim_district_2_gha'
           },
           {
             stakeName: 'Winneba Stake',
@@ -365,8 +373,16 @@
             stakeDB: 'cape_coast_stake_gha'
           },
           {
+            stakeName: 'Cape Coast Stake 2',
+            stakeDB: 'cape_coast_stake_2_gha'
+          },
+          {
             stakeName: 'Assin Fosu District',
             stakeDB: 'assin_fosu_district_gha'
+          },
+          {
+            stakeName: 'Assin Fosu District 2',
+            stakeDB: 'assin_fosu_district_2_gha'
           },
           {
             stakeName: 'Kasoa Stake',
