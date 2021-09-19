@@ -357,12 +357,12 @@
             stakeDB: 'kpong_district_2_gha'
           },
           {
-            'stakeName': 'Axim District',
-            'stakeDB': 'axim_district_gha'
+            stakeName: 'Axim District',
+            stakeDB: 'axim_district_gha'
           },
           {
-            'stakeName': 'Axim District 2',
-            'stakeDB': 'axim_district_2_gha'
+            stakeName: 'Axim District 2',
+            stakeDB: 'axim_district_2_gha'
           },
           {
             stakeName: 'Winneba Stake',
