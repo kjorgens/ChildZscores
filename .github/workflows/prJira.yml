@@ -18,5 +18,5 @@ jobs:
           role-session-name: MyTestSessionName
           aws-region: us-east-1
       - name: pr jira
-        uses: kjorgens/pr-jira-action # Uses an action in the root directory
+        uses: kjorgens/pr-jira-action@main # Uses an action in the root directory
         id: prJira
