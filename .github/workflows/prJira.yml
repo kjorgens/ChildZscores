@@ -11,12 +11,12 @@ jobs:
       # To use this repository's private action, you must check out the repository
       - name: Checkout
         uses: actions/checkout@v2
-      - name: pr jira
-        uses: ./ghActionScripts/pr-jira-integration # Uses an action in the root directory
-        id: prJira
+      - name: Configure AWS credentials from Test account
+        uses: aws-actions/configure-aws-credentials@v1
         with:
-          who-to-greet: 'Karl J'
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
-      # Use the output from the `hello` step
-      - name: Get the output time
-        run: echo "The time was ${{ steps.hello.outputs.time }}"
+          role-to-assume: arn:aws:iam::448470023870:role/GithubS3ReadRole
+          role-session-name: MyTestSessionName
+          aws-region: us-east-1
+      - name: pr jira
+        uses: kjorgens/pr-jira-action # Uses an action in the root directory
+        id: prJira
