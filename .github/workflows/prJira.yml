@@ -3,6 +3,10 @@ name: PR Jira integration
 
 on: [pull_request]
 
+permissions:
+  id-token: write
+  contents: write
+
 jobs:
   hello_world_job:
     runs-on: ubuntu-latest
@@ -12,7 +16,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
       - name: Configure AWS credentials from Test account
-        uses: aws-actions/configure-aws-credentials@b8c74de
+        uses: aws-actions/configure-aws-credentials@master
         with:
           role-to-assume: arn:aws:iam::448470023870:role/ExampleGithubRole
           aws-region: us-east-1
