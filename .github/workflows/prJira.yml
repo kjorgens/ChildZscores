@@ -21,7 +21,7 @@ jobs:
           role-to-assume: arn:aws:iam::448470023870:role/ExampleGithubRole
           aws-region: us-east-1
       - name: pr jira
-        uses: kjorgens/pr-jira-action@main # Uses an action in the root directory
+        uses: kjorgens/pr-jira-action@812b9b6b45e54dbbe7104a839f2003478315b7dd # Uses an action in the root directory
         id: prJira
       - name: do nothing
         run: echo "The time was not set"
