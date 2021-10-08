@@ -15,7 +15,6 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v1
         with:
           role-to-assume: arn:aws:iam::448470023870:role/GithubS3ReadRole
-          role-session-name: MyTestSessionName
           aws-region: us-east-1
       - name: pr jira
         uses: kjorgens/pr-jira-action@main # Uses an action in the root directory
