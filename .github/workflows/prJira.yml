@@ -23,3 +23,5 @@ jobs:
       - name: pr jira
         uses: kjorgens/pr-jira-action@main # Uses an action in the root directory
         id: prJira
+      - name: do nothing
+        run: echo "The time was not set"
