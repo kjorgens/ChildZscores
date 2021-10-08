@@ -5,7 +5,7 @@ on: [pull_request]
 
 permissions:
   id-token: write
-  contents: write
+  contents: read
 
 jobs:
   hello_world_job:
@@ -16,7 +16,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
       - name: Configure AWS credentials from Test account
-        uses: aws-actions/configure-aws-credentials@master
+        uses: aws-actions/configure-aws-credentials@b8c74de753fbcb4868bf2011fb2e15826ce973af
         with:
           role-to-assume: arn:aws:iam::448470023870:role/ExampleGithubRole
           aws-region: us-east-1
