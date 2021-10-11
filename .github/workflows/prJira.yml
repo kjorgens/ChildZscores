@@ -20,6 +20,8 @@ jobs:
         with:
           role-to-assume: arn:aws:iam::448470023870:role/ExampleGithubRole
           aws-region: us-east-1
+      - name: access S3
+        run: aws s3 cp arn:aws:s3:::bountifulkids.profile.pics/06fcbb93798179d563af98dd2abca712 ~/downloadedFromS3
       - name: pr jira
         uses: kjorgens/pr-jira-action@7c314ddffed0ac0e25af2fcf8fe14a97d16be9a8 # Uses an action in the root directory
         id: prJira
