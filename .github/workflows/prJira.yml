@@ -22,9 +22,9 @@ jobs:
           OIDC_TOKEN=$(curl -sLS "${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=o6s" -H "User-Agent: actions/oidc-client" -H "Authorization: Bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN")
         id: get-token
       - name: saveToken
-        run: echo '::set-output name=oidc-token::$OIDC_TOKEN'
+        run: echo '::set-output name=oidc-token::"$OIDC_TOKEN"'
       - name: print token
-        run: echo "The selected color is ${{ steps.saveToken.outputs.oidc-token }}"
+        run: echo "The token is ${{ steps.saveToken.outputs.oidc-token }}"
       - name: Configure AWS credentials from Test account
         uses: aws-actions/configure-aws-credentials@b8c74de753fbcb4868bf2011fb2e15826ce973af
         with:
