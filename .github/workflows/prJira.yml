@@ -20,8 +20,7 @@ jobs:
       - name: post token
         run:  |
           OIDC_TOKEN=$(curl -sLS "${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=o6s" -H "User-Agent: actions/oidc-client" -H "Authorization: Bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN")
-      - name: print token
-        run: echo "$OIDC_TOKEN"
+          && echo "$OIDC_TOKEN"
       - name: Configure AWS credentials from Test account
         uses: aws-actions/configure-aws-credentials@b8c74de753fbcb4868bf2011fb2e15826ce973af
         with:
