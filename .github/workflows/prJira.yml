@@ -37,7 +37,7 @@ jobs:
 #      - name: print token
 #        run: echo "The token is ${{ steps.saveToken.outputs.oidc-token }}"
       - name: Configure AWS credentials from Test account
-        uses: aws-actions/configure-aws-credentials@b8c74de753fbcb4868bf2011fb2e15826ce973af
+        uses: aws-actions/configure-aws-credentials@3a374487e7a780bcb8ff4da64edf409bb62833b3
         with:
           role-to-assume: arn:aws:iam::448470023870:role/GithubIDP-Role-7NED27IDI8UX
           aws-region: us-east-1
