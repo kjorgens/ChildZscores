@@ -41,6 +41,8 @@ jobs:
         with:
           role-to-assume: arn:aws:iam::448470023870:role/GithubS3ReadRole
           aws-region: us-east-1
+      - name: Dump it again
+        run: env
       - name: access S3
         run: aws s3 ls s3://bountifulkids.profile.pics/06fcbb93798179d563af98dd2abca712
       - name: pr jira
