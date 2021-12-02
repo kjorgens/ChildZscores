@@ -349,6 +349,10 @@
             stakeDB: 'ashaiman_stake_gha'
           },
           {
+            stakeName: 'Adenta Stake',
+            stakeDB: 'adenta_stake_gha'
+          },
+          {
             stakeName: 'Kpong District',
             stakeDB: 'kpong_district_gha'
           },
@@ -367,6 +371,18 @@
           {
             stakeName: 'Winneba Stake',
             stakeDB: 'winneba_stake_gha'
+          },
+          {
+            stakeName: 'Winneba 2 Stake',
+            stakeDB: 'winneba_stake_2_gha'
+          },
+          {
+            stakeName: 'Swedru',
+            stakeDB: 'swedru_gha'
+          },
+          {
+            stakeName: 'Swedru 2',
+            stakeDB: 'swedru_2_gha'
           },
           {
             stakeName: 'Cape Coast Stake',
@@ -713,6 +729,13 @@
             stakeName: 'Nicaragua test Only',
             stakeDB: 'test_stake_nic'
           }
+        ]
+      },
+      {
+        name: 'Nigeria',
+        code: 'NGA',
+        image: '/modules/children/client/img/nigeria.png',
+        stakes: [
         ]
       },
       {
