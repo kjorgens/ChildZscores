@@ -417,10 +417,6 @@
             stakeDB: 'mpinsin_stake_2_gha'
           },
           {
-            stakeName: 'Swedru Stake',
-            stakeDB: 'swedru_stake_gha'
-          },
-          {
             stakeName: 'Ghana test Only',
             stakeDB: 'test_stake_gha'
           }
@@ -434,10 +430,6 @@
           {
             stakeName: 'Chulac District',
             stakeDB: 'chulac_district_gtm'
-          },
-          {
-            stakeName: 'Coatepeque',
-            stakeDB: 'coatepeque_gtm'
           },
           {
             stakeName: 'Cobán Stake',
@@ -484,20 +476,16 @@
             stakeDB: 'motagua_district_gtm'
           },
           {
-            stakeName: 'Mazatenango',
-            stakeDB: 'mazatenango_gtm'
-          },
-          {
             stakeName: 'Patzicia Stake',
             stakeDB: 'patzicia_stake_gtm'
           },
           {
-            stakeName: 'Peten Stake',
-            stakeDB: 'peten_stake_gtm'
-          },
-          {
             stakeName: 'Pueblo Nuevo Tiquisate District',
             stakeDB: 'pueblo_nuevo_tiquisate_district_gtm'
+          },
+          {
+            stakeName: 'Puerto Barrios District',
+            stakeDB: 'puerto_barrios_district_gtm'
           },
           {
             stakeName: 'Puerto Barrios District',
@@ -528,18 +516,6 @@
             stakeDB: 'san_felipe_stake_gtm'
           },
           {
-            stakeName: 'San Marcos',
-            stakeDB: 'san_marcos_gtm'
-          },
-          {
-            stakeName: 'San Pedro',
-            stakeDB: 'san_pedro_gtm'
-          },
-          {
-            stakeName: 'Senahu',
-            stakeDB: 'senahu_gtm'
-          },
-          {
             stakeName: 'Serchil District',
             stakeDB: 'serchil_district_gtm'
           },
@@ -552,16 +528,8 @@
             stakeDB: 'totonicapan_stake_gtm'
           },
           {
-            stakeName: 'Tiquiate',
-            stakeDB: 'tiquiate_gtm'
-          },
-          {
             stakeName: 'Quetzaltenango Cantel',
             stakeDB: 'quetzaltenango_stake_gtm'
-          },
-          {
-            stakeName: 'Zacapa',
-            stakeDB: 'zacapa_stake_gtm'
           },
           {
             stakeName: 'Guatamala test Only',
@@ -768,14 +736,6 @@
         code: 'NGA',
         image: '/modules/children/client/img/nigeria.png',
         stakes: [
-          {
-            stakeName: 'Ibadan North Stake',
-            stakeDB: 'ibadan_north_stake_nga'
-          },
-          {
-            stakeName: 'Akure District',
-            stakeDB: 'akure_district_nga'
-          }
         ]
       },
       {
@@ -1182,69 +1142,6 @@
           {
             stakeName: 'Korshor Town District',
             stakeDB: 'korshor_town_district_wal'
-          }
-        ]
-      },
-      {
-        name: 'Venezuela',
-        code: 'VEN',
-        image: '/modules/children/client/img/venezuela.png',
-        stakes: [
-          {
-            stakeName: 'Merida',
-            stakeDB: 'merida_ven'
-          },
-          {
-            stakeName: 'San Francisco',
-            stakeDB: 'san_francisco_ven'
-          },
-          {
-            stakeName: 'Maracibo Oeste',
-            stakeDB: 'maracibo_oeste_ven'
-          },
-          {
-            stakeName: 'Cabimas',
-            stakeDB: 'cabimas_ven'
-          },
-          {
-            stakeName: 'San Cristobal',
-            stakeDB: 'san_cristobal_ven'
-          },
-          {
-            stakeName: 'Maracaibo sur',
-            stakeDB: 'maracaibo_sur_ven'
-          },
-          {
-            stakeName: 'Barquisimeto Obelisco',
-            stakeDB: 'barquisimeto_obelisco_ven'
-          },
-          {
-            stakeName: 'Los sauces -Valencia',
-            stakeDB: 'los_sauces_valencia_ven'
-          },
-          {
-            stakeName: 'San felix-bolivar-Barcelona',
-            stakeDB: 'san_felix_bolivar_barcelona_ven'
-          },
-          {
-            stakeName: 'Ciudad Bolivar',
-            stakeDB: 'ciudad_bolivar_ven'
-          },
-          {
-            stakeName: 'Maturin',
-            stakeDB: 'maturin_ven'
-          },
-          {
-            stakeName: 'Punto fijo',
-            stakeDB: 'punto_fijo_ven'
-          },
-          {
-            stakeName: 'Obelisco',
-            stakeDB: 'obelisco_ven'
-          },
-          {
-            stakeName: 'Dst.Valera',
-            stakeDB: 'dst_valera_ven'
           }
         ]
       },
