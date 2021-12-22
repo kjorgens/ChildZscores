@@ -547,7 +547,11 @@ gulp.task('service-worker', () => {
       'public/**/*.{css,js,eot,svg,ttf,woff,woff2}',
       'modules/**/*.{html,css,png,ico,eot,svg,ttf,woff,woff}'
     ],
-    swDest: 'dist/public/sw.js'
+    swDest: 'dist/public/sw.js',
+    navigateFallback: 'modules/core/server/views/index.server.view.html',
+    navigateFallbackAllowlist: [
+      new RegExp('modules/core/server/views/*.html', 'i')
+    ]
   }).then(({ count, size, warnings }) => {
     warnings.forEach(console.warn);
     console.log(`${ count } files will be precached, totaling ${ size } bytes.`);
