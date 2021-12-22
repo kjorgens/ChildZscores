@@ -11,7 +11,7 @@
  * See https://goo.gl/2aRDsh
  */
 
-importScripts("https://storage.googleapis.com/workbox-cdn/releases/6.3.0/workbox-sw.js");
+importScripts("https://storage.googleapis.com/workbox-cdn/releases/6.4.2/workbox-sw.js");
 
 if (workbox) {
 
