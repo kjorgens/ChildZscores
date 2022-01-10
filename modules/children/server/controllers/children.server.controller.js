@@ -494,7 +494,7 @@ function listAllChildren(childScreenList, screenType) {
             //   childEntry.zscoreStatus = calculateStatus(sortedScreenList[0]).zscoreStatus;
             //   console.log('stop');
             // }
-            // if (childEntry.key.firstName === 'DORIAN') {
+            // if (childEntry.key.firstName === '') {
             //   childEntry.zscoreStatus = calculateStatus(sortedScreenList[0]).zscoreStatus;
             //   console.log('stop');
             // }
@@ -536,6 +536,9 @@ function listAllChildren(childScreenList, screenType) {
                   }
                 }
                 if (screenIndex === 0 || currentAge < 24) {
+                  if (sortedScreenList.length === 1) {
+                    priorMalnurished = 'no';
+                  }
                   currentSupType = supType;
                 }
               });
