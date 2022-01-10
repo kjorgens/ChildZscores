@@ -401,6 +401,10 @@
             stakeDB: 'mpinsin_stake_2_gha'
           },
           {
+            stakeName: 'Swedru Stake',
+            stakeDB: 'swedru_stake_gha'
+          },
+          {
             stakeName: 'Ghana test Only',
             stakeDB: 'test_stake_gha'
           }
@@ -462,6 +466,10 @@
           {
             stakeName: 'Patzicia Stake',
             stakeDB: 'patzicia_stake_gtm'
+          },
+          {
+            stakeName: 'Peten Stake',
+            stakeDB: 'peten_stake_gtm'
           },
           {
             stakeName: 'Pueblo Nuevo Tiquisate District',
