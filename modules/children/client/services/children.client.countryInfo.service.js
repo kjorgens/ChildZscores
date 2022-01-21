@@ -369,6 +369,10 @@
             stakeDB: 'winneba_stake_gha'
           },
           {
+            stakeName: 'Winneba 2 Stake',
+            stakeDB: 'winneba_stake_2_gha'
+          },
+          {
             stakeName: 'Cape Coast Stake',
             stakeDB: 'cape_coast_stake_gha'
           },
@@ -1128,6 +1132,69 @@
             stakeName: 'Korshor Town District',
             stakeDB: 'korshor_town_district_wal'
           }
+        ]
+      },
+      {
+        'name': 'Venezuela',
+        'code': 'VEN',
+        'image': 'modules/children/client/img/venezuela.png',
+        'stakes': [
+          {
+            'stakeName': 'Coro',
+            'stakeDB': 'coro_ven'
+          },
+          {
+            'stakeName': 'Ciudad Bolivar',
+            'stakeDB': 'ciudad_bolivar_ven'
+          },
+          {
+            'stakeName': 'San Francisco',
+            'stakeDB': 'san_francisco_ven'
+          },
+          {
+            'stakeName': 'Maracibo Oeste',
+            'stakeDB': 'maracibo_oeste_ven'
+          },
+          {
+            'stakeName': 'Cabimas',
+            'stakeDB': 'cabimas_ven'
+          },
+          {
+            'stakeName': 'San Cristobal',
+            'stakeDB': 'san_cristobal_ven'
+          },
+          {
+            'stakeName': 'Maracaibo sur',
+            'stakeDB': 'maracaibo_sur_ven'
+          },
+          {
+            'stakeName': 'Barquisimeto Obelisco',
+            'stakeDB': 'barquisimeto_obelisc_ven'
+          },
+          {
+            'stakeName': 'Los sauces Valencia',
+            'stakeDB': 'los_sauces_valencia_ven'
+          },
+          {
+            'stakeName': 'San Felix',
+            'stakeDB': 'san_felix_ven'
+          },
+          {
+            'stakeName': 'Maturin',
+            'stakeDB': 'maturin_ven'
+          },
+          {
+            'stakeName': 'Punto fijo',
+            'stakeDB': 'punto_fijo_ven'
+          },
+          {
+            'stakeName': 'Obelisco',
+            'stakeDB': 'obelisco_ven'
+          },
+          {
+            'stakeName': 'Dst. Valera',
+            'stakeDB': 'dst_valera_ven'
+          },
         ]
       },
       {
