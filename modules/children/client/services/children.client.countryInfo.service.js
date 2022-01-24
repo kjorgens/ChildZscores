@@ -1195,6 +1195,10 @@
             'stakeName': 'Dst. Valera',
             'stakeDB': 'dst_valera_ven'
           },
+          {
+            'stakeName': 'Merida',
+            'stakeDB': 'merida_ven'
+          }
         ]
       },
       {
