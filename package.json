@@ -13,7 +13,7 @@
   "scripts": {
     "test": "grunt test",
     "zipit": "gulp zip",
-    "start": "webpack serve --open",
+    "start": "node server.js",
     "server": "node server.js",
     "server-local": "DOMAIN=localhost node server.js",
     "build": "webpack --mode=production --node-env=production",
@@ -84,6 +84,7 @@
     "uuid4": "~2.0.2",
     "validator": "^13.6.0",
     "webdriverio": "^7.11.1",
+    "winston": "~2.3.1",
     "wiredep": "~4.0.0"
   },
   "devDependencies": {
@@ -101,7 +102,7 @@
     "eslint-plugin-jsx-a11y": "^6.1.1",
     "eslint-plugin-react": "^7.25.1",
     "gulp": "^4.0.2",
-    "gulp-angular-templatecache": "~3.0.0",
+    "gulp-angular-templatecache": "3.0.1",
     "gulp-autoprefixer": "~7.0.1",
     "gulp-concat": "~2.6.1",
     "gulp-coverage": "~0.3.38",
