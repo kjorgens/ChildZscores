@@ -29,6 +29,7 @@ var _ = require('lodash'),
   wiredep = require('wiredep').stream,
   path = require('path'),
   endOfLine = require('os').EOL,
+  zip = require('gulp-zip'),
   del = require('del'),
   semver = require('semver'),
   workboxBuild = require('workbox-build');
@@ -72,8 +73,8 @@ gulp.task('nodemon', function (done) {
 
 gulp.task('zipitNew', function() {
   return gulp.src([
-    'dist/**/*', 'dist/**/.*'
-  ], { dot: true })
+    'dist/**/*'
+  ], { base: 'dist/', dot: true })
     .pipe(plugins.plumber())
     .pipe(zip('liahonaKids.zip'))
     .pipe(gulp.dest('./'));
@@ -645,13 +646,13 @@ gulp.task('copy-bundle-stuff', function() {
     'public/lib/angular-sanitize/angular-sanitize.min.js.map',
     'public/lib/nvd3/build/nv.d3.min.js.map'
   ], { base: "." }).pipe(gulp.dest('dist/'));
-  var pub = gulp.src(['public/*'])
+  var pub = gulp.src(['public/register.js', 'public/robots.txt', 'public/humans.txt', 'public/manifest.json'])
     .pipe(gulp.dest('dist/public/'));
   var config = gulp.src(['config/**/*', '.ebextensions/**/*', 'files/**/*'], { base: '.', dot: true })
     .pipe(gulp.dest('dist/'));
   var rootStuff = gulp.src(['./package.json', './server.js', './.npmrc'], { base: '.', dot: true })
     .pipe(gulp.dest('dist/'));
-  return merge(dist, libmin, html, pub, config, rootStuff);
+  return merge(dist, html, libmin, pub, config, rootStuff);
 });
 
 gulp.task('build-new-sw',
