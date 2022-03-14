@@ -23,7 +23,7 @@
     "serve": "webpack serve"
   },
   "engines": {
-    "node": ">12"
+    "node": "12.22.10"
   },
   "dependencies": {
     "acl": "~0.4.11",
