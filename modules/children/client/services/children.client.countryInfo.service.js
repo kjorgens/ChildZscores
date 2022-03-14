@@ -540,6 +540,10 @@
             stakeDB: 'quetzaltenango_stake_gtm'
           },
           {
+            stakeName: 'Zacapa',
+            stakeDB: 'zacapa_stake_gtm'
+          },
+          {
             stakeName: 'Guatamala test Only',
             stakeDB: 'test_stake_gtm'
           }
