@@ -1245,6 +1245,10 @@
           {
             stakeName: 'Dst.Valera',
             stakeDB: 'dst_valera_ven'
+          },
+          {
+            stakeName: 'Coro',
+            stakeDB: 'coro_ven'
           }
         ]
       },
