@@ -105,7 +105,10 @@ module.exports = {
       'modules/**/*/img/**/*.gif',
       'modules/**/*/img/**/*.svg'
     ],
-    views: ['modules/*/client/views/**/*.html'],
+    views: [
+      'modules/*/client/views/**/*.html',
+      'modules/core/server/views/*.html'
+    ],
     templates: ['modules/children/client/templates']
   },
   server: {

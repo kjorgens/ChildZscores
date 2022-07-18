@@ -73,8 +73,8 @@ gulp.task('nodemon', function (done) {
 
 gulp.task('zipitNew', function() {
   return gulp.src([
-    'dist/**/*', 'dist/**/.*'
-  ], { dot: true })
+    'dist/**/*'
+  ], { base: 'dist/', dot: true })
     .pipe(plugins.plumber())
     .pipe(zip('liahonaKids.zip'))
     .pipe(gulp.dest('./'));
@@ -193,7 +193,7 @@ gulp.task('uglify', function () {
       console.log('Uglify error : ', err.toString());
     }))
     .pipe(plugins.concat('application.min.js'))
-    // .pipe(plugins.rev())
+    //.pipe(plugins.rev())
     .pipe(gulp.dest('public/dist'));
 });
 
@@ -540,6 +540,27 @@ gulp.task('seed:prod',
 gulp.task('seed:test',
   gulp.series('env:test', 'mongo-seed'));
 
+gulp.task('service-worker', () => {
+  return workboxBuild.generateSW({
+    mode: 'development',
+    globDirectory: 'dist',
+    globPatterns: [
+      'public/**/*.{css,js,eot,svg,ttf,woff,woff2}',
+      'modules/**/*.{html,css,png,ico,eot,svg,ttf,woff,woff}'
+    ],
+    swDest: 'dist/public/sw.js',
+    navigateFallback: 'modules/core/server/views/index.server.view.html',
+    navigateFallbackAllowlist: [
+      new RegExp('modules/core/server/views/*.html', 'i')
+    ]
+  }).then(({ count, size, warnings }) => {
+    warnings.forEach(console.warn);
+    console.log(`${ count } files will be precached, totaling ${ size } bytes.`);
+  }).catch(err => {
+    console.log('Uh oh 😬', err);
+  });
+});
+
 gulp.task('build-manifest', () => {
   return workboxBuild.injectManifest({
     swSrc: 'public/sw.js',
@@ -608,9 +629,24 @@ gulp.task('copy-bundle-stuff', function() {
     'public/lib/nvd3/build/nv.d3.min.css',
     'public/lib/angular-ui-notification/dist/angular-ui-notification.min.css',
     'public/lib/angular-ui-notification/dist/angular-ui-notification.min.js',
-    'public/lib/ng-file-upload/ng-file-upload.min.js'
+    'public/lib/ng-file-upload/ng-file-upload.min.js',
+    'public/lib/angular/angular.min.js.map',
+    'public/lib/angular-resource/angular-resource.min.js.map',
+    'public/lib/angular-animate/angular-animate.min.js.map',
+    'public/lib/angular-messages/angular-messages.min.js.map',
+    'public/lib/angular-ui-router/release/angular-ui-router.min.js.map',
+    'public/lib/angular-file-upload/dist/angular-file-upload.min.js.map',
+    'public/lib/jquery/dist/jquery.min.map',
+    'public/lib/angular-ui-router/release/angular-ui-router.min.js.map',
+    'public/lib/bootstrap/dist/css/bootstrap.min.css.map',
+    'public/lib/bootstrap/dist/css/bootstrap-theme.min.css.map',
+    'public/lib/nvd3/build/nv.d3.min.css.map',
+    'public/lib/moment/min/moment.min.js.map',
+    'public/lib/angular-moment/angular-moment.min.js.map',
+    'public/lib/angular-sanitize/angular-sanitize.min.js.map',
+    'public/lib/nvd3/build/nv.d3.min.js.map'
   ], { base: "." }).pipe(gulp.dest('dist/'));
-  var pub = gulp.src(['public/*'])
+  var pub = gulp.src(['public/register.js', 'public/robots.txt', 'public/humans.txt', 'public/manifest.json'])
     .pipe(gulp.dest('dist/public/'));
   var config = gulp.src(['config/**/*', '.ebextensions/**/*', 'files/**/*'], { base: '.', dot: true })
     .pipe(gulp.dest('dist/'));
@@ -620,7 +656,7 @@ gulp.task('copy-bundle-stuff', function() {
 });
 
 gulp.task('build-new-sw',
-  gulp.series('copy-bundle-stuff', 'build-manifest'));
+  gulp.series('copy-bundle-stuff', 'service-worker'));
 
 gulp.task('clean', async() => {
   return del(['dist']);
