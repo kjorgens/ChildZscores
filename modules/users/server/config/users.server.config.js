@@ -22,9 +22,9 @@ module.exports = function (app) {
     User.findOne({
       _id: id
     }, '-salt -password', function (err, user) {
-      if (user._doc.firstName !== 'Karl') {
-        console.log('what the heck');
-      }
+      // if (user._doc.firstName !== 'Karl') {
+      //   console.log('what the heck');
+      // }
       done(err, user);
     });
   });

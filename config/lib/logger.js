@@ -11,6 +11,7 @@ var validFormats = ['combined', 'common', 'dev', 'short', 'tiny'];
 
 // Instantiating the default winston application logger with the Console
 // transport
+// eslint-disable-next-line new-cap
 var logger = new winston.Logger({
   transports: [
     new winston.transports.Console({
