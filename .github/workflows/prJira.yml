@@ -8,75 +8,20 @@ permissions:
   contents: read
 
 jobs:
-  pr_jira_validate:
+  hello_world_job:
     runs-on: ubuntu-latest
     name: A job for pr jira integration
     steps:
       # To use this repository's private action, you must check out the repository
       - name: Checkout
         uses: actions/checkout@v2
-      - name: Dump env
-        run: env
-#      - name: Configure AWS
-#        run: |
-#          export AWS_ROLE_ARN=arn:aws:iam::448470023870:role/GithubS3ReadRole
-#          export AWS_WEB_IDENTITY_TOKEN_FILE=/tmp/awscreds
-#          export AWS_DEFAULT_REGION=us-east-1
-#
-#          echo AWS_WEB_IDENTITY_TOKEN_FILE=$AWS_WEB_IDENTITY_TOKEN_FILE >> $GITHUB_ENV
-#          echo AWS_ROLE_ARN=$AWS_ROLE_ARN >> $GITHUB_ENV
-#          echo AWS_DEFAULT_REGION=$AWS_DEFAULT_REGION >> $GITHUB_ENV
-#
-#          curl -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" "$ACTIONS_ID_TOKEN_REQUEST_URL" | jq -r '.value' > $AWS_WEB_IDENTITY_TOKEN_FILE
-#      - name: post token
-#        run:  |
-#          OIDC_TOKEN=$(curl -sLS "${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=o6s" -H "User-Agent: actions/oidc-client" -H "Authorization: Bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN")
-#        id: get-token
-#      - name: saveToken
-#        run: echo '::set-output name=oidc-token::$OIDC_TOKEN'
-#      - name: print token
-#        run: echo "The token is ${{ steps.saveToken.outputs.oidc-token }}"
       - name: Configure AWS credentials from Test account
-        uses: aws-actions/configure-aws-credentials@3a374487e7a780bcb8ff4da64edf409bb62833b3
+        uses: aws-actions/configure-aws-credentials@b8c74de753fbcb4868bf2011fb2e15826ce973af
         with:
-          role-to-assume: arn:aws:iam::448470023870:role/GithubS3ReadRole
+          role-to-assume: arn:aws:iam::448470023870:role/ExampleGithubRole
           aws-region: us-east-1
-      - name: Dump it again
-        run: env
-      - name: access S3
-        run: aws s3 ls s3://bountifulkids.profile.pics/06fcbb93798179d563af98dd2abca712
-      - name: Dump env
-        run: env
-      - name: Configure AWS
-        run: |
-          export AWS_ROLE_ARN=arn:aws:iam::448470023870:role/GithubS3ReadRole
-          export AWS_WEB_IDENTITY_TOKEN_FILE=/tmp/awscreds
-          export AWS_DEFAULT_REGION=us-east-1
-
-          echo AWS_WEB_IDENTITY_TOKEN_FILE=$AWS_WEB_IDENTITY_TOKEN_FILE >> $GITHUB_ENV
-          echo AWS_ROLE_ARN=$AWS_ROLE_ARN >> $GITHUB_ENV
-          echo AWS_DEFAULT_REGION=$AWS_DEFAULT_REGION >> $GITHUB_ENV
-
-          curl -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" "$ACTIONS_ID_TOKEN_REQUEST_URL" | jq -r '.value' > $AWS_WEB_IDENTITY_TOKEN_FILE
-      - name: post token
-        run:  |
-          OIDC_TOKEN=$(curl -sLS "${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=o6s" -H "User-Agent: actions/oidc-client" -H "Authorization: Bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN")
-        id: get-token
-      - name: saveToken
-        run: echo '::set-output name=oidc-token::$OIDC_TOKEN'
-      - name: print token
-        run: echo "The token is ${{ steps.saveToken.outputs.oidc-token }}"
-      - name: Configure AWS credentials from Test account
-        uses: aws-actions/configure-aws-credentials@3a374487e7a780bcb8ff4da64edf409bb62833b3
-        with:
-          role-to-assume: arn:aws:iam::448470023870:role/GithubS3ReadRole
-          aws-region: us-east-1
-      - name: Dump it again
-        run: env
-      - name: access S3
-        run: aws s3 ls s3://bountifulkids.profile.pics/06fcbb93798179d563af98dd2abca712
       - name: pr jira
-        uses: kjorgens/pr-jira-action@7c314ddffed0ac0e25af2fcf8fe14a97d16be9a8 # Uses an action in the root directory
+        uses: kjorgens/pr-jira-action@812b9b6b45e54dbbe7104a839f2003478315b7dd # Uses an action in the root directory
         id: prJira
       - name: do nothing
         run: echo "The time was not set"

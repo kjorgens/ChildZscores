@@ -11,7 +11,8 @@
     var ChildrenViews = $resource('/api/children', {}, {
       update: {
         method: 'GET',
-        headers: { authorization: `JWT ${ Authentication.token || localStorage.getItem('token') }` },
+        // headers: { authorization: `JWT ${ Authentication.token || localStorage.getItem('token') }` },
+        headers: { authorization: `JWT ${ Authentication.token }` },
         url: '/api/children/updateviews/:stakeDB',
         interceptor: {
           response: response => {
@@ -23,7 +24,8 @@
       },
       compact: {
         method: 'GET',
-        headers: { authorization: `JWT ${ Authentication.token || localStorage.getItem('token') }` },
+        // headers: { authorization: `JWT ${ Authentication.token || localStorage.getItem('token') }` },
+        headers: { authorization: `JWT ${ Authentication.token }` },
         url: '/api/children/compactDB/:stakeDB',
         interceptor: {
           response: response => {

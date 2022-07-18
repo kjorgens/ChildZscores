@@ -18,7 +18,7 @@
     vm.userIsAdmin = false;
     vm.goBack = goBack;
 
-    if (vm.user === null) {
+    if (vm.user === null || vm.user === undefined) {
       reportError('Login required for syncing', 'Please log in', false);
       // $window.history.pushState();
       // storage.removeItem('token');
@@ -48,7 +48,8 @@
           key: fileToUpload
         },
         headers: {
-          authorization: 'JWT ' + Authentication.token || localStorage.getItem('token')
+          // authorization: 'JWT ' + Authentication.token || localStorage.getItem('token')
+          authorization: 'JWT ' + Authentication.token
         }
       }).then(function (response) {
         $timeout(function () {
