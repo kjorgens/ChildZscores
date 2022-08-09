@@ -459,7 +459,7 @@
         stakeName: stakeName,
         socketRoomId: `${ Authentication.user.firstName }_${ Authentication.user.lastName }_${ moment.now() }`
       };
-
+      //console.log(reportParams);
       return genReport(reportParams, getCsvError);
     }
 

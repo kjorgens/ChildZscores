@@ -488,7 +488,7 @@ function listAllChildren(childScreenList, screenType) {
     childScreenList[0].data.rows.forEach(async (childEntry, childIndex) => {
       var currentAge = moment().diff(moment(new Date(childEntry.key.birthDate)), 'months');
       if (!~childEntry.id.indexOf('mthr')) {
-        if (screenType === 'sup') {
+        if (screenType === 'sup' || screenType === 'health') {
           if (currentAge < 60 && ~childEntry.id.indexOf('chld')) {
             // if (childEntry.key.firstName === 'HAILIE YHAL') {
             //   childEntry.zscoreStatus = calculateStatus(sortedScreenList[0]).zscoreStatus;
@@ -499,20 +499,38 @@ function listAllChildren(childScreenList, screenType) {
             //   console.log('stop');
             // }
             sortedScreenList = getScreeningsList(childEntry.id, childScreenList[1].data.rows);
+            timeSinceLastScreen = moment().diff(moment(new Date(sortedScreenList[0].surveyDate)), 'months');
             if (sortedScreenList.length === 0) {
               noScreenings + 1;
-              lineAccumulator.push(addChildToLine(
-                childEntry.key, sortedScreenList[0],
-                childScreenList[0].parms.sortField,
-                childScreenList[0].parms.stakeDB,
-                childScreenList[0].parms.filter,
-                ' ',
-                100,
-                'no',
-                childScreenList[0].language,
-                childScreenList[0].parms.stakeName,
-                childScreenList[0].parms.cCode
-              ));
+              if (screenType === 'sup'){
+                lineAccumulator.push(addChildToLine(
+                  screenType,
+                  childEntry.key, sortedScreenList[0],
+                  childScreenList[0].parms.sortField,
+                  childScreenList[0].parms.stakeDB,
+                  childScreenList[0].parms.filter,
+                  ' ',
+                  100,
+                  'no',
+                  childScreenList[0].language,
+                  childScreenList[0].parms.stakeName,
+                  childScreenList[0].parms.cCode
+                ));
+              } else if (screenType === 'health' && timeSinceLastScreen < 8){
+                lineAccumulator.push(addChildToLine(
+                  screenType,
+                  childEntry.key, sortedScreenList[0],
+                  childScreenList[0].parms.sortField,
+                  childScreenList[0].parms.stakeDB,
+                  childScreenList[0].parms.filter,
+                  ' ',
+                  100,
+                  'no',
+                  childScreenList[0].language,
+                  childScreenList[0].parms.stakeName,
+                  childScreenList[0].parms.cCode
+                ));
+              }
             } else {
               supType = 'none';
               priorMalnurished = 'no';
@@ -557,14 +575,31 @@ function listAllChildren(childScreenList, screenType) {
               }
 
               timeSinceLastScreen = moment().diff(moment(new Date(sortedScreenList[0].surveyDate)), 'months');
-
-              if (timeSinceLastScreen < 8 && (currentSupType === 'MAM' || currentSupType === 'SAM' || currentSupType === 'sup')) {
+              if (screenType === 'health' && timeSinceLastScreen < 8 ){
                 lineAccumulator.push(addChildToLine(
-                  childEntry.key, sortedScreenList[0],
+                  screenType,
+                  childEntry.key, 
+                  sortedScreenList[0],
                   childScreenList[0].parms.sortField,
                   childScreenList[0].parms.stakeDB,
                   childScreenList[0].parms.filter,
-                  currentSupType, timeSinceLastScreen,
+                  currentSupType, 
+                  timeSinceLastScreen,
+                  priorMalnurished,
+                  childScreenList[0].parms.language,
+                  childScreenList[0].parms.cCode,
+                  childScreenList[0].parms.stakeName
+                ));
+              } else if (screenType === 'sup' && timeSinceLastScreen < 8 && (currentSupType === 'MAM' || currentSupType === 'SAM' || currentSupType === 'sup')) {
+                lineAccumulator.push(addChildToLine(
+                  screenType,
+                  childEntry.key, 
+                  sortedScreenList[0],
+                  childScreenList[0].parms.sortField,
+                  childScreenList[0].parms.stakeDB,
+                  childScreenList[0].parms.filter,
+                  currentSupType, 
+                  timeSinceLastScreen,
                   priorMalnurished,
                   childScreenList[0].parms.language,
                   childScreenList[0].parms.cCode,
@@ -718,7 +753,7 @@ async function appendStake(fileToWrite, data) {
   });
 }
 
-function addChildToLine(existingOwnerInfo, screenInfo, sortField, stakeDB, filter, supType, timeSinceLastScreen, priorMalNurish, language, ccode, stakeName) {
+function addChildToLine(screenType, existingOwnerInfo, screenInfo, sortField, stakeDB, filter, supType, timeSinceLastScreen, priorMalNurish, language, ccode, stakeName) {
   const ownerInfo = existingOwnerInfo;
   ownerInfo.sup = supType;
   ownerInfo.sinceLastScreen = timeSinceLastScreen;
@@ -737,15 +772,27 @@ function addChildToLine(existingOwnerInfo, screenInfo, sortField, stakeDB, filte
   if (typeof ownerInfo.ward === 'string' && ownerInfo.ward.indexOf(',') > -1) {
     ownerInfo.ward = ownerInfo.ward.replace(/,/g, ' ');
   }
+  if (typeof ownerInfo.address === 'string' && ownerInfo.address.indexOf(',') > -1) {
+    ownerInfo.address = ownerInfo.address.replace(/,/g, ' ');
+  }
+  if (typeof ownerInfo.idGroup === 'string' && ownerInfo.idGroup.indexOf(',') > -1) {
+    ownerInfo.idGroup = ownerInfo.idGroup.replace(/,/g, ' ');
+  }
   var dataLine;
   var message;
   var currentAge = moment().diff(moment(new Date(ownerInfo.birthDate)), 'months');
   var priorMessage = language === 'en' ? `${ priorMalNurish }` : `${ priorMalNurish === 'yes' ? 'si' : 'no' }`;
+  //if ()
   if (supType.indexOf('risk') > -1) {
     // message = language === 'en' ? ' months since last screening\n'
     //   : ' meses desde la última evaluación\n';
-    dataLine = '' + ',' + ',' + ',' + ',' + ',' + ',' + ',' + currentAge + ',' + priorMessage + ',' + ownerInfo.firstName + ',' + ownerInfo.lastName + ',' + ownerInfo.ward
+    if (screenType === 'sup'){
+      dataLine = '' + ',' + ',' + ',' + ',' + ',' + ',' + ',' + currentAge + ',' + priorMessage + ',' + ownerInfo.firstName + ',' + ownerInfo.lastName + ',' + ownerInfo.ward
       + ',' + ownerInfo.mother + ',' + timeSinceLastScreen + '\n';
+    } else if (screenType === 'health'){
+      dataLine = ownerInfo.firstName + ',' + ownerInfo.lastName + ',' + currentAge + ',' + ownerInfo.mother + ',' + ownerInfo.phone + ',' + ownerInfo.address + ',' + screenInfo.height + ',' + screenInfo.weight + ',' + ownerInfo.sup
+      + ',' + ownerInfo.ward + ',' + ownerInfo.idGroup + '\n';
+    }
     return ({
       data: ownerInfo,
       dataLine: dataLine,
@@ -760,11 +807,17 @@ function addChildToLine(existingOwnerInfo, screenInfo, sortField, stakeDB, filte
     //   : ' meses desde la última evaluación\n';
     // dataLine = '' + ',' + ',' + ',' + ',' + ',' + ',' + ',' + currentAge + ',' + priorMessage + ',' + ownerInfo.firstName + ',' + ownerInfo.lastName + ',' + ownerInfo.ward
     //   + ',' + ownerInfo.mother + ',' + timeSinceLastScreen;
-    dataLine = `,,,,,,,${currentAge},${priorMessage},${ownerInfo.firstName},${ownerInfo.lastName},${ownerInfo.ward},${ownerInfo.mother},${timeSinceLastScreen}`;
-    if (stakeName) {
-      dataLine += ',' + ccode + ',' + stakeName;
+    if (screenType === 'sup'){
+      dataLine = `,,,,,,,${currentAge},${priorMessage},${ownerInfo.firstName},${ownerInfo.lastName},${ownerInfo.ward},${ownerInfo.mother},${timeSinceLastScreen}`;
+      if (stakeName) {
+        dataLine += ',' + ccode + ',' + stakeName;
+      }
+      dataLine += '\n';
+    } else if (screenType === 'health'){
+      dataLine = ownerInfo.firstName + ',' + ownerInfo.lastName + ',' + currentAge + ',' + ownerInfo.mother + ',' + ownerInfo.phone + ',' + ownerInfo.address + ',' + screenInfo.height + ',' + screenInfo.weight + ',' + ownerInfo.sup
+      + ',' + ownerInfo.ward + ',' + ownerInfo.idGroup + '\n';
     }
-    dataLine += '\n';
+    
     return ({
       data: ownerInfo,
       dataLine: dataLine,
@@ -778,12 +831,16 @@ function addChildToLine(existingOwnerInfo, screenInfo, sortField, stakeDB, filte
     if (timeSinceLastScreen === undefined || timeSinceLastScreen === 100) {
       var messageProb = language === 'en' ? ' no screenings: possible duplicate?\n' : ' sin proyecciones: posible duplicado?\n';
       // dataLine = '' + ',' + ',' + ',' + ',' + ',' + ',' + ',' + currentAge + ',' + priorMessage + ',' + ownerInfo.firstName + ',' + ownerInfo.lastName + ',' + ownerInfo.ward
-
-      dataLine = `,,,,,,,${currentAge},${priorMessage},${ownerInfo.firstName},${ownerInfo.lastName},${ownerInfo.ward},${ownerInfo.mother}`;
-      if (stakeName) {
-        dataLine += ',' + ccode + ',' + stakeName;
+      if (screenType === 'sup'){
+        dataLine = `,,,,,,,${currentAge},${priorMessage},${ownerInfo.firstName},${ownerInfo.lastName},${ownerInfo.ward},${ownerInfo.mother}`;
+        if (stakeName) {
+          dataLine += ',' + ccode + ',' + stakeName;
+        }
+        dataLine += ',' + ',' + messageProb + '\n';
+      } else if (screenType === 'health'){
+        dataLine = ownerInfo.firstName + ',' + ownerInfo.lastName + ',' + currentAge + ',' + ownerInfo.mother + ',' + ownerInfo.phone + ',' + ownerInfo.address + ',' + screenInfo.height + ',' + screenInfo.weight + ',' + ownerInfo.sup
+        + ',' + ownerInfo.ward + ',' + ownerInfo.idGroup + '\n';
       }
-      dataLine += ',' + ',' + messageProb + '\n';
     } else {
       // var messageRisk = language === 'en' ? '  months since last screening\n'
       //   : ' meses desde la última evaluación , Niño en riesgo: debería pasar a la siguiente evaluación\n';
@@ -794,12 +851,16 @@ function addChildToLine(existingOwnerInfo, screenInfo, sortField, stakeDB, filte
       }
       // dataLine = '' + ',' + ',' + ',' + ',' + ',' + ',' + supType + ',' + currentAge + ',' + priorMessage + ',' + ownerInfo.firstName + ',' + ownerInfo.lastName + ',' + ownerInfo.ward
       //   + ',' + ownerInfo.mother + ',' + timeSinceLastScreen;
-
-      dataLine = `,,,,,,${supType},${currentAge},${priorMessage},${ownerInfo.firstName},${ownerInfo.lastName},${ownerInfo.ward},${ownerInfo.mother},${timeSinceLastScreen}`;
-      if (stakeName) {
-        dataLine += ',' + ccode + ',' + stakeName;
+      if (screenType === 'sup'){
+        dataLine = `,,,,,,${supType},${currentAge},${priorMessage},${ownerInfo.firstName},${ownerInfo.lastName},${ownerInfo.ward},${ownerInfo.mother},${timeSinceLastScreen}`;
+        if (stakeName) {
+         dataLine += ',' + ccode + ',' + stakeName;
+        }
+        dataLine += '\n';
+      } else if (screenType === 'health'){
+        dataLine = ownerInfo.firstName + ',' + ownerInfo.lastName + ',' + currentAge + ',' + ownerInfo.mother + ',' + ownerInfo.phone + ',' + ownerInfo.address + ',' + screenInfo.height + ',' + screenInfo.weight + ',' + ownerInfo.sup
+        + ',' + ownerInfo.ward + ',' + ownerInfo.idGroup + '\n';
       }
-      dataLine += '\n';
     }
     return ({
       data: ownerInfo,
@@ -821,11 +882,18 @@ function addChildToLine(existingOwnerInfo, screenInfo, sortField, stakeDB, filte
     if (currentAge < 6) {
       supType = '';
     }
-    dataLine = `,,,,,,${supType},${currentAge},${priorMessage},${ownerInfo.firstName},${ownerInfo.lastName},${ownerInfo.ward},${ownerInfo.mother},${timeSinceLastScreen}`;
-    if (stakeName) {
-      dataLine += ',' + ccode + ',' + stakeName;
+
+    if (screenType === 'sup'){
+      dataLine = `,,,,,,${supType},${currentAge},${priorMessage},${ownerInfo.firstName},${ownerInfo.lastName},${ownerInfo.ward},${ownerInfo.mother},${timeSinceLastScreen}`;
+      if (stakeName) {
+        dataLine += ',' + ccode + ',' + stakeName;
+      }
+      dataLine += '\n';
+    } else if (screenType === 'health'){
+      dataLine = ownerInfo.firstName + ',' + ownerInfo.lastName + ',' + currentAge + ',' + ownerInfo.mother + ',' + ownerInfo.phone + ',' + ownerInfo.address + ',' + screenInfo.height + ',' + screenInfo.weight + ',' + ownerInfo.sup
+      + ',' + ownerInfo.ward + ',' + ownerInfo.idGroup + '\n';
     }
-    dataLine += '\n';
+    
     return ({
       data: ownerInfo,
       dataLine: dataLine,
@@ -979,7 +1047,7 @@ function buildOutputData(listIn) {
 function sortList(listIn) {
   listIn.forEach(function(entry, index) {
     if (entry.sortField === undefined) {
-      listIn[index].sortField = 'firstName';
+      listIn[index].sortField = 'firstName'; 
     }
   });
   try {
@@ -1023,6 +1091,8 @@ async function saveStake(stakeInfo, timeOutMultiplier) {
     const screeningData = await getChildAndData(stakeInfo, timeOutMultiplier);
     if (stakeInfo.csvType === 'sup') {
       childData = buildOutputData(splitSups(sortList(listAllChildren(screeningData, stakeInfo.csvType))));
+    } else if (stakeInfo.csvType === 'health') {
+      childData = buildOutputData(sortList(listAllChildren(screeningData, stakeInfo.csvType)));
     } else {
       childData = buildOutputData(sortList(listAllChildren(screeningData, stakeInfo.csvType)));
     }
@@ -1244,13 +1314,19 @@ exports.createCSVFromDB = async function (req, res) {
       if (parmObj.stakeName) {
         headerLine = '1,2,3,4,5,6,Sup,age,Prior Sup,firstName,lastName,ward,mother,months since last screening,country,stake\n';
       }
-      if (parmObj.csvType !== 'sup') {
+
+      if (parmObj.csvType === 'health'){
+        parmObj.fileToSave = `${ tokenInfo.iat }_${ req.params.cCode }_${ req.params.csvType }_dbDump.csv`;
+        headerLine = 'firstName,lastName,age,mother,phone,address,height,weight,status,ward,Stake\n';
+      } else if (parmObj.csvType !== 'sup') {
         parmObj.fileToSave = `${ tokenInfo.iat }_${ req.params.cCode }_${ req.params.csvType }_dbDump.csv`;
         headerLine = 'Country,Stake,child Index,stake db name,screen Count,id,gender,firstName,lastName,birthdate,idGroup,mother,father,phone,address,city,ward,lds,screenId,screenDate,weight,height,age,obese,ha,wa,wh,status\n';
       }
+
       if (parmObj.scopeType === 'countries') {
         parmObj.fileToSave = `${ tokenInfo.iat }_all_data_${ req.params.csvType }_dbDump.csv`;
       }
+  
       // res.status(202).write(`Received request to create${ parmObj.fileToSave }`);
 
       // socketClient.emit('CSV_start', {
