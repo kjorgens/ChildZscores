@@ -1316,7 +1316,7 @@ exports.createCSVFromDB = async function (req, res) {
       }
 
       if (parmObj.csvType === 'health'){
-        parmObj.fileToSave = `${ tokenInfo.iat }_${ req.params.cCode }_${ req.params.csvType }_dbDump.csv`;
+        parmObj.fileToSave = `health_lessons_${ req.params.stakeDB }_${tokenInfo.iat}_${moment().format()}_dbDump.csv`;
         headerLine = 'firstName,lastName,age,mother,phone,address,height,weight,status,ward,Stake\n';
       } else if (parmObj.csvType !== 'sup') {
         parmObj.fileToSave = `${ tokenInfo.iat }_${ req.params.cCode }_${ req.params.csvType }_dbDump.csv`;
