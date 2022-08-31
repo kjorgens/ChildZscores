@@ -1195,6 +1195,10 @@
             stakeDB: 'cabimas_ven'
           },
           {
+            stakeName: 'Coro',
+            stakeDB: 'coro_ven'
+          },
+          {
             stakeName: 'San Cristobal',
             stakeDB: 'san_cristobal_ven'
           },
