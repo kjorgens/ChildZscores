@@ -474,6 +474,12 @@ async function updateSupplementStatus(childList, stakeDB) {
   return bulkUpdate(updateList, stakeDB);
 }
 
+function summaryReport(sortedScreenList){
+  console.log(sortedScreenList);
+
+  
+}
+
 function listAllChildren(childScreenList, screenType) {
   var childCount = 0;
   var sortedScreenList = [];
@@ -488,7 +494,13 @@ function listAllChildren(childScreenList, screenType) {
     childScreenList[0].data.rows.forEach(async (childEntry, childIndex) => {
       var currentAge = moment().diff(moment(new Date(childEntry.key.birthDate)), 'months');
       if (!~childEntry.id.indexOf('mthr')) {
-        if (screenType === 'sup' || screenType === 'health') {
+        if (screenType === 'summary'){
+          sortedScreenList = getScreeningsList(childEntry.id, childScreenList[1].data.rows);
+         // console.log(childEntry);
+         // console.log(childIndex);
+          summaryReport(sortedScreenList);
+        }
+        else if (screenType === 'sup') {
           if (currentAge < 60 && ~childEntry.id.indexOf('chld')) {
             // if (childEntry.key.firstName === 'HAILIE YHAL') {
             //   childEntry.zscoreStatus = calculateStatus(sortedScreenList[0]).zscoreStatus;
@@ -1091,7 +1103,7 @@ async function saveStake(stakeInfo, timeOutMultiplier) {
     const screeningData = await getChildAndData(stakeInfo, timeOutMultiplier);
     if (stakeInfo.csvType === 'sup') {
       childData = buildOutputData(splitSups(sortList(listAllChildren(screeningData, stakeInfo.csvType))));
-    } else if (stakeInfo.csvType === 'health') {
+    } else if (stakeInfo.csvType === 'summary') {
       childData = buildOutputData(sortList(listAllChildren(screeningData, stakeInfo.csvType)));
     } else {
       childData = buildOutputData(sortList(listAllChildren(screeningData, stakeInfo.csvType)));
@@ -1315,8 +1327,8 @@ exports.createCSVFromDB = async function (req, res) {
         headerLine = '1,2,3,4,5,6,Sup,age,Prior Sup,firstName,lastName,ward,mother,months since last screening,country,stake\n';
       }
 
-      if (parmObj.csvType === 'health'){
-        parmObj.fileToSave = `health_lessons_${ req.params.stakeDB }_${tokenInfo.iat}_${moment().format()}_dbDump.csv`;
+      if (parmObj.csvType === 'summary'){
+        parmObj.fileToSave = `summary_${ req.params.stakeDB }_${tokenInfo.iat}_${moment().format()}_dbDump.csv`;
         headerLine = 'firstName,lastName,age,mother,phone,address,height,weight,status,ward,Stake\n';
       } else if (parmObj.csvType !== 'sup') {
         parmObj.fileToSave = `${ tokenInfo.iat }_${ req.params.cCode }_${ req.params.csvType }_dbDump.csv`;
