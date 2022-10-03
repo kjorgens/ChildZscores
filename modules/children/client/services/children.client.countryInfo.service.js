@@ -401,12 +401,20 @@
             stakeDB: 'assin_fosu_district_2_gha'
           },
           {
+            stakeName: 'Dichemso Stake',
+            stakeDB: 'dichemso_stake_gha'
+          },
+          {
             stakeName: 'Kasoa Stake',
             stakeDB: 'kasoa_stake_gha'
           },
           {
             stakeName: 'Kasoa Stake 2',
             stakeDB: 'kasoa_stake_2_gha'
+          },
+          {
+            stakeName: 'Konongo Stake',
+            stakeDB: 'konongo_stake_gha'
           },
           {
             stakeName: 'Mpinsin Stake',
@@ -448,6 +456,14 @@
             stakeDB: 'escuintla_stake_gtm'
           },
           {
+            stakeName: 'Huehuetenango Calvario Stake',
+            stakeDB: 'huehuetenango_calvario_stake_gtm'
+          },
+          {
+            stakeName: 'Huehuetenango Centro Stake',
+            stakeDB: 'huehuetenango_centro_stake_gtm'
+          },
+          {
             stakeName: 'Huehuetenango Zaculeu Stake',
             stakeDB: 'huehuetenango_zaculeu_stake_gtm'
           },
@@ -486,6 +502,10 @@
           {
             stakeName: 'Patzicia Stake',
             stakeDB: 'patzicia_stake_gtm'
+          },
+          {
+            stakeName: 'Peten Stake',
+            stakeDB: 'peten_stake_gtm'
           },
           {
             stakeName: 'Pueblo Nuevo Tiquisate District',
