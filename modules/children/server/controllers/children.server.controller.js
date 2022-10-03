@@ -1110,6 +1110,7 @@ function addLineToStack(childCount, screenCount, ownerInfo, screenInfo, sortFiel
 }
 
 function addSummaryLineToStack(screentype, screenInfo, ownerInfo, sortField, stakeDB, stakeName, language, cCode, summary) {
+  var cleanDate;
   if (typeof ownerInfo.address === 'string' && ownerInfo.address.indexOf(',') > -1) {
     ownerInfo.address = ownerInfo.address.replace(/,/g, ' ');
   }
@@ -1142,6 +1143,20 @@ function addSummaryLineToStack(screentype, screenInfo, ownerInfo, sortField, sta
     console.log('lastName invalid');
     ownerInfo.lastName = 'unknown';
   }
+  if (typeof screenInfo.surveyDate === 'string' || screenInfo.surveyDate === null) {
+    if (screenInfo.surveyDate === null) {
+      cleanDate = 'N/A'
+    } else {
+      var surveyDay = screenInfo.surveyDate;
+      const date = new Date(surveyDay);
+      var day = date.getDate();
+      var month = 1 + date.getMonth();
+      var year = date.getFullYear();
+  
+      cleanDate = day + '/' + month + '/' + year;
+    }
+  }
+
   var dataObj = {
     childId: ownerInfo._id,
     firstName: ownerInfo.firstName,
@@ -1156,7 +1171,7 @@ function addSummaryLineToStack(screentype, screenInfo, ownerInfo, sortField, sta
     ward: ownerInfo.ward || '',
     memberStatus: ownerInfo.memberStatus || '',
     lastScreening: ownerInfo.lastScreening,
-    surveyDate: screenInfo.surveyDate,
+    surveyDate: cleanDate,
     screenId: screenInfo._id,
     stakeName: stakeDB,
     country: cCode,
