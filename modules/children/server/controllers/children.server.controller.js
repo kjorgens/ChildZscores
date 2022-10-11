@@ -642,21 +642,7 @@ function listAllChildren(childScreenList, screenType) {
                   childScreenList[0].parms.stakeName,
                   childScreenList[0].parms.cCode
                 ));
-              } else if (screenType === 'health' && timeSinceLastScreen < 8){
-                lineAccumulator.push(addChildToLine(
-                  screenType,
-                  childEntry.key, sortedScreenList[0],
-                  childScreenList[0].parms.sortField,
-                  childScreenList[0].parms.stakeDB,
-                  childScreenList[0].parms.filter,
-                  ' ',
-                  100,
-                  'no',
-                  childScreenList[0].language,
-                  childScreenList[0].parms.stakeName,
-                  childScreenList[0].parms.cCode
-                ));
-              }
+              } 
             } else {
               supType = 'none';
               priorMalnurished = 'no';
@@ -701,22 +687,7 @@ function listAllChildren(childScreenList, screenType) {
               }
 
               timeSinceLastScreen = moment().diff(moment(new Date(sortedScreenList[0].surveyDate)), 'months');
-              if (screenType === 'health' && timeSinceLastScreen < 8 ){
-                lineAccumulator.push(addChildToLine(
-                  screenType,
-                  childEntry.key, 
-                  sortedScreenList[0],
-                  childScreenList[0].parms.sortField,
-                  childScreenList[0].parms.stakeDB,
-                  childScreenList[0].parms.filter,
-                  currentSupType, 
-                  timeSinceLastScreen,
-                  priorMalnurished,
-                  childScreenList[0].parms.language,
-                  childScreenList[0].parms.cCode,
-                  childScreenList[0].parms.stakeName
-                ));
-              } else if (screenType === 'sup' && timeSinceLastScreen < 8 && (currentSupType === 'MAM' || currentSupType === 'SAM' || currentSupType === 'sup')) {
+              if (screenType === 'sup' && timeSinceLastScreen < 8 && (currentSupType === 'MAM' || currentSupType === 'SAM' || currentSupType === 'sup')) {
                 lineAccumulator.push(addChildToLine(
                   screenType,
                   childEntry.key, 
@@ -915,10 +886,7 @@ function addChildToLine(screenType, existingOwnerInfo, screenInfo, sortField, st
     if (screenType === 'sup'){
       dataLine = '' + ',' + ',' + ',' + ',' + ',' + ',' + ',' + currentAge + ',' + priorMessage + ',' + ownerInfo.firstName + ',' + ownerInfo.lastName + ',' + ownerInfo.ward
       + ',' + ownerInfo.mother + ',' + timeSinceLastScreen + '\n';
-    } else if (screenType === 'health'){
-      dataLine = ownerInfo.firstName + ',' + ownerInfo.lastName + ',' + currentAge + ',' + ownerInfo.mother + ',' + ownerInfo.phone + ',' + ownerInfo.address + ',' + screenInfo.height + ',' + screenInfo.weight + ',' + ownerInfo.sup
-      + ',' + ownerInfo.ward + ',' + ownerInfo.idGroup + '\n';
-    }
+    } 
     return ({
       data: ownerInfo,
       dataLine: dataLine,
@@ -939,10 +907,7 @@ function addChildToLine(screenType, existingOwnerInfo, screenInfo, sortField, st
         dataLine += ',' + ccode + ',' + stakeName;
       }
       dataLine += '\n';
-    } else if (screenType === 'health'){
-      dataLine = ownerInfo.firstName + ',' + ownerInfo.lastName + ',' + currentAge + ',' + ownerInfo.mother + ',' + ownerInfo.phone + ',' + ownerInfo.address + ',' + screenInfo.height + ',' + screenInfo.weight + ',' + ownerInfo.sup
-      + ',' + ownerInfo.ward + ',' + ownerInfo.idGroup + '\n';
-    }
+    } 
     
     return ({
       data: ownerInfo,
@@ -963,10 +928,7 @@ function addChildToLine(screenType, existingOwnerInfo, screenInfo, sortField, st
           dataLine += ',' + ccode + ',' + stakeName;
         }
         dataLine += ',' + ',' + messageProb + '\n';
-      } else if (screenType === 'health'){
-        dataLine = ownerInfo.firstName + ',' + ownerInfo.lastName + ',' + currentAge + ',' + ownerInfo.mother + ',' + ownerInfo.phone + ',' + ownerInfo.address + ',' + screenInfo.height + ',' + screenInfo.weight + ',' + ownerInfo.sup
-        + ',' + ownerInfo.ward + ',' + ownerInfo.idGroup + '\n';
-      }
+      } 
     } else {
       // var messageRisk = language === 'en' ? '  months since last screening\n'
       //   : ' meses desde la última evaluación , Niño en riesgo: debería pasar a la siguiente evaluación\n';
@@ -983,10 +945,7 @@ function addChildToLine(screenType, existingOwnerInfo, screenInfo, sortField, st
          dataLine += ',' + ccode + ',' + stakeName;
         }
         dataLine += '\n';
-      } else if (screenType === 'health'){
-        dataLine = ownerInfo.firstName + ',' + ownerInfo.lastName + ',' + currentAge + ',' + ownerInfo.mother + ',' + ownerInfo.phone + ',' + ownerInfo.address + ',' + screenInfo.height + ',' + screenInfo.weight + ',' + ownerInfo.sup
-        + ',' + ownerInfo.ward + ',' + ownerInfo.idGroup + '\n';
-      }
+      } 
     }
     return ({
       data: ownerInfo,
@@ -1015,10 +974,7 @@ function addChildToLine(screenType, existingOwnerInfo, screenInfo, sortField, st
         dataLine += ',' + ccode + ',' + stakeName;
       }
       dataLine += '\n';
-    } else if (screenType === 'health'){
-      dataLine = ownerInfo.firstName + ',' + ownerInfo.lastName + ',' + currentAge + ',' + ownerInfo.mother + ',' + ownerInfo.phone + ',' + ownerInfo.address + ',' + screenInfo.height + ',' + screenInfo.weight + ',' + ownerInfo.sup
-      + ',' + ownerInfo.ward + ',' + ownerInfo.idGroup + '\n';
-    }
+    } 
     
     return ({
       data: ownerInfo,
@@ -1037,7 +993,7 @@ function addLineToStack(childCount, screenCount, ownerInfo, screenInfo, sortFiel
   }
   if (typeof ownerInfo.mother === 'string' && ownerInfo.mother.indexOf(',') > -1) {
     ownerInfo.mother = ownerInfo.mother.replace(/,/g, ' ');
-  }
+  }~
   if (typeof ownerInfo.father === 'string' && ownerInfo.father.indexOf(',') > -1) {
     ownerInfo.father = ownerInfo.father.replace(/,/g, ' ');
   }
