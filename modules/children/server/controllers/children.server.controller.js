@@ -993,7 +993,7 @@ function addLineToStack(childCount, screenCount, ownerInfo, screenInfo, sortFiel
   }
   if (typeof ownerInfo.mother === 'string' && ownerInfo.mother.indexOf(',') > -1) {
     ownerInfo.mother = ownerInfo.mother.replace(/,/g, ' ');
-  }~
+  }
   if (typeof ownerInfo.father === 'string' && ownerInfo.father.indexOf(',') > -1) {
     ownerInfo.father = ownerInfo.father.replace(/,/g, ' ');
   }
