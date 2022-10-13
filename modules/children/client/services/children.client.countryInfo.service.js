@@ -532,6 +532,10 @@
             stakeDB: 'rio_blanco_district_gtm'
           },
           {
+            stakeName: 'Sacsuha District',
+            stakeDB: 'sacsuha_district_gtm'
+          },
+          {
             stakeName: 'Salama District',
             stakeDB: 'salama_district_gtm'
           },
