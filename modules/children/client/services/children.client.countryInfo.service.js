@@ -401,12 +401,20 @@
             stakeDB: 'assin_fosu_district_2_gha'
           },
           {
+            stakeName: 'Dichemso Stake',
+            stakeDB: 'dichemso_stake_gha'
+          },
+          {
             stakeName: 'Kasoa Stake',
             stakeDB: 'kasoa_stake_gha'
           },
           {
             stakeName: 'Kasoa Stake 2',
             stakeDB: 'kasoa_stake_2_gha'
+          },
+          {
+            stakeName: 'Konongo Stake',
+            stakeDB: 'konongo_stake_gha'
           },
           {
             stakeName: 'Mpinsin Stake',
@@ -446,6 +454,14 @@
           {
             stakeName: 'Escuintla Stake',
             stakeDB: 'escuintla_stake_gtm'
+          },
+          {
+            stakeName: 'Huehuetenango Calvario Stake',
+            stakeDB: 'huehuetenango_calvario_stake_gtm'
+          },
+          {
+            stakeName: 'Huehuetenango Centro Stake',
+            stakeDB: 'huehuetenango_centro_stake_gtm'
           },
           {
             stakeName: 'Huehuetenango Zaculeu Stake',
@@ -488,6 +504,10 @@
             stakeDB: 'patzicia_stake_gtm'
           },
           {
+            stakeName: 'Peten Stake',
+            stakeDB: 'peten_stake_gtm'
+          },
+          {
             stakeName: 'Pueblo Nuevo Tiquisate District',
             stakeDB: 'pueblo_nuevo_tiquisate_district_gtm'
           },
@@ -510,6 +530,10 @@
           {
             stakeName: 'Rio Blanco District',
             stakeDB: 'rio_blanco_district_gtm'
+          },
+          {
+            stakeName: 'Sacsuha District',
+            stakeDB: 'sacsuha_district_gtm'
           },
           {
             stakeName: 'Salama District',
@@ -1193,6 +1217,10 @@
           {
             stakeName: 'Cabimas',
             stakeDB: 'cabimas_ven'
+          },
+          {
+            stakeName: 'Coro',
+            stakeDB: 'coro_ven'
           },
           {
             stakeName: 'San Cristobal',
