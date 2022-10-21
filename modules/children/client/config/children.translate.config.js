@@ -132,7 +132,6 @@
       NEW_SCREENING: 'New Screening',
       GENERATE_REPORT: 'Generate .csv file for downloading',
       GENERATE_SUPPLEMENT_REPORT: 'Generate monthly supplement report',
-      GENERATE_HEALTH_LESSON_REPORT: 'Generate health lessons report',
       GENERATE_WOMEN_REPORT: 'Generate pregnant women, nursing mothers report',
       DOWNLOAD_MSG: 'Download {{reportName}}',
       MEMBER_STATUS_REQUIRED: 'LDS membership status required',
