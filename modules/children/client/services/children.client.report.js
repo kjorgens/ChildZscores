@@ -11,8 +11,8 @@
     var ChildrenReport = $resource('/api/children', {}, {
       generate: {
         method: 'GET',
-        // headers: { authorization: `JWT ${ Authentication.token || localStorage.getItem('token') }` },
-        headers: { authorization: `JWT ${ Authentication.token }` },
+        headers: { authorization: `JWT ${ Authentication.token || localStorage.getItem('token') }` },
+        // headers: { authorization: `JWT ${ Authentication.token }` },
         url: '/api/children/report/:stakeDB/:cCode/:scopeType/:sortField/:language/:csvType',
         interceptor: {
           response: response => {
@@ -24,8 +24,8 @@
       },
       convert: {
         method: 'GET',
-        // headers: { authorization: `JWT ${ Authentication.token || localStorage.getItem('token') }` },
-        headers: { authorization: `JWT ${ Authentication.token }` },
+        headers: { authorization: `JWT ${ Authentication.token || localStorage.getItem('token') }` },
+        // headers: { authorization: `JWT ${ Authentication.token }` },
         url: '/api/children/update/:stakeDB/:stakeName/:cCode/:scopeType',
         interceptor: {
           response: response => {
