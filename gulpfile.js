@@ -547,10 +547,6 @@ gulp.task('service-worker', () => {
     globPatterns: [
       'public/**/*.{css,js,eot,svg,ttf,woff,woff2}',
       'modules/**/client/**/*.{html,css,png,ico,eot,svg,ttf,woff,woff}',
-      // 'modules/**/*.{html,css,png,ico,eot,svg,ttf,woff,woff}',
-      // 'modules/children/**/*.{html,css,png,ico,eot,svg,ttf,woff,woff}',
-      // 'modules/users/**/*.{html,css,png,ico,eot,svg,ttf,woff,woff}',
-      // 'modules/core/client/**/*.{html,css,png,ico,eot,svg,ttf,woff,woff}'
     ],
     swDest: 'dist/public/sw.js',
     // navigateFallback: 'modules/core/server/views/index.server.view.html',
@@ -650,7 +646,7 @@ gulp.task('copy-bundle-stuff', function() {
     'public/lib/angular-sanitize/angular-sanitize.min.js.map',
     'public/lib/nvd3/build/nv.d3.min.js.map'
   ], { base: "." }).pipe(gulp.dest('dist/'));
-  var pub = gulp.src(['public/register.js', 'public/robots.txt', 'public/humans.txt', 'public/manifest.json'])
+  var pub = gulp.src(['public/register.js', 'public/robots.txt', 'public/humans.txt', 'public/app.webmanifest'])
     .pipe(gulp.dest('dist/public/'));
   var config = gulp.src(['config/**/*', '.ebextensions/**/*', 'files/**/*'], { base: '.', dot: true })
     .pipe(gulp.dest('dist/'));

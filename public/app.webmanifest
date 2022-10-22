@@ -5,10 +5,8 @@
   "background_color": "#2eb4b0",
   "display": "standalone",
   "Scope": "/",
-  "id": "https://can16.liahonakids.org",
-//   "id": "http://locahost:3000",
-  "start_url": "https://can16.liahonakids.org",
-//   "start_url": "http://localhost:3000",
+  "id": "https://nutrition.liahonakids.org",
+  "start_url": "https://nutrition.liahonakids.org",
   "splash_pages": null,
   "icons": [
      {
