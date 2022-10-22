@@ -11,7 +11,7 @@
     let ChildrenGetSync = $resource('api/children/sync', {}, {
       generate: {
         method: 'GET',
-        // headers: { authorization: `JWT ${ Authentication.token || localStorage.getItem('token') }` },
+        headers: { authorization: `JWT ${ Authentication.token || localStorage.getItem('token') }` },
         url: '/api/children/sync'
       }
     });

@@ -23,7 +23,8 @@
     "serve": "webpack serve"
   },
   "engines": {
-    "node": "14.19.1"
+    "node": "14.19.1",
+    "npm": "8.11.0"
   },
   "dependencies": {
     "acl": "~0.4.11",

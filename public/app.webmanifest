@@ -1,0 +1,20 @@
+{
+  "name": "Bountiful Children Zscores",
+  "short_name": "BK Zscores",
+  "theme_color": "rgba(200,146,131,0.82)",
+  "background_color": "#2eb4b0",
+  "display": "standalone",
+  "Scope": "/",
+  "id": "https://can16.liahonakids.org",
+//   "id": "http://locahost:3000",
+  "start_url": "https://can16.liahonakids.org",
+//   "start_url": "http://localhost:3000",
+  "splash_pages": null,
+  "icons": [
+     {
+        "src": "modules/core/client/img/brand/logo_small512.png",
+        "type": "image/png",
+        "sizes": "512x512"
+     }
+  ]
+}

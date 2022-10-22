@@ -19,7 +19,7 @@ var _ = require('lodash'),
   zip = require('gulp-vinyl-zip').zip,
   packageJson = require('./package.json'),
   gulpLoadPlugins = require('gulp-load-plugins'),
-  runSequence = require('run-sequence'),
+  // runSequence = require('run-sequence'),
   plugins = gulpLoadPlugins({
     rename: {
       'gulp-angular-templatecache': 'templateCache'
@@ -546,13 +546,17 @@ gulp.task('service-worker', () => {
     globDirectory: 'dist',
     globPatterns: [
       'public/**/*.{css,js,eot,svg,ttf,woff,woff2}',
-      'modules/**/*.{html,css,png,ico,eot,svg,ttf,woff,woff}'
+      'modules/**/client/**/*.{html,css,png,ico,eot,svg,ttf,woff,woff}',
+      // 'modules/**/*.{html,css,png,ico,eot,svg,ttf,woff,woff}',
+      // 'modules/children/**/*.{html,css,png,ico,eot,svg,ttf,woff,woff}',
+      // 'modules/users/**/*.{html,css,png,ico,eot,svg,ttf,woff,woff}',
+      // 'modules/core/client/**/*.{html,css,png,ico,eot,svg,ttf,woff,woff}'
     ],
     swDest: 'dist/public/sw.js',
-    navigateFallback: 'modules/core/server/views/index.server.view.html',
-    navigateFallbackAllowlist: [
-      new RegExp('modules/core/server/views/*.html', 'i')
-    ]
+    // navigateFallback: 'modules/core/server/views/index.server.view.html',
+    // navigateFallbackAllowlist: [
+    //   new RegExp('modules/core/server/views/*.html', 'i')
+    // ]
   }).then(({ count, size, warnings }) => {
     warnings.forEach(console.warn);
     console.log(`${ count } files will be precached, totaling ${ size } bytes.`);
