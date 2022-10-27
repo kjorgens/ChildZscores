@@ -32,7 +32,7 @@
   <link href="/{{favicon}}" rel="shortcut icon" type="image/x-icon">
 
   <!-- Manifest -->
-  <link href="/manifest.json" rel="manifest">
+  <link href="/app.webmanifest" rel="manifest">
 
   <!-- Application CSS Files -->
   {{#each cssFiles}}<link rel="stylesheet" href="/{{this}}">{{/each}}
@@ -58,10 +58,10 @@
   </noscript>
 
   <!--Embedding The User Object-->
-<!--  <script type="text/javascript">-->
-<!--    var user = {{{ user }}};-->
-<!--    var env = "{{ env }}";-->
-<!--  </script>-->
+  <script type="text/javascript">
+    var user = {{{ user }}};
+    var env = "{{ env }}";
+  </script>
 
   <!--SetUp the serviceWorker-->
   <script type="application/javascript" src="/register.js"></script>

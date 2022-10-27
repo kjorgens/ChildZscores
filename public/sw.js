@@ -11,7 +11,7 @@
  * See https://goo.gl/2aRDsh
  */
 
-importScripts("https://storage.googleapis.com/workbox-cdn/releases/6.4.2/workbox-sw.js");
+importScripts("https://storage.googleapis.com/workbox-cdn/releases/6.5.4/workbox-sw.js");
 
 if (workbox) {
 
@@ -25,3 +25,4 @@ if (workbox) {
 } else {
   console.log(`Workbox didn't load 😬`);
 }
+
