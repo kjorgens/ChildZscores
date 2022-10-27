@@ -1,7 +1,5 @@
 'use strict';
 
-const { ContextExclusionPlugin } = require('webpack');
-
 /**
  * Module dependencies.
  */
