@@ -19,7 +19,7 @@ var _ = require('lodash'),
   zip = require('gulp-vinyl-zip').zip,
   packageJson = require('./package.json'),
   gulpLoadPlugins = require('gulp-load-plugins'),
-  runSequence = require('run-sequence'),
+  // runSequence = require('run-sequence'),
   plugins = gulpLoadPlugins({
     rename: {
       'gulp-angular-templatecache': 'templateCache'
@@ -546,13 +546,13 @@ gulp.task('service-worker', () => {
     globDirectory: 'dist',
     globPatterns: [
       'public/**/*.{css,js,eot,svg,ttf,woff,woff2}',
-      'modules/**/*.{html,css,png,ico,eot,svg,ttf,woff,woff}'
+      'modules/**/client/**/*.{html,css,png,ico,eot,svg,ttf,woff,woff}',
     ],
     swDest: 'dist/public/sw.js',
-    navigateFallback: 'modules/core/server/views/index.server.view.html',
-    navigateFallbackAllowlist: [
-      new RegExp('modules/core/server/views/*.html', 'i')
-    ]
+    // navigateFallback: 'modules/core/server/views/index.server.view.html',
+    // navigateFallbackAllowlist: [
+    //   new RegExp('modules/core/server/views/*.html', 'i')
+    // ]
   }).then(({ count, size, warnings }) => {
     warnings.forEach(console.warn);
     console.log(`${ count } files will be precached, totaling ${ size } bytes.`);
@@ -646,7 +646,7 @@ gulp.task('copy-bundle-stuff', function() {
     'public/lib/angular-sanitize/angular-sanitize.min.js.map',
     'public/lib/nvd3/build/nv.d3.min.js.map'
   ], { base: "." }).pipe(gulp.dest('dist/'));
-  var pub = gulp.src(['public/register.js', 'public/robots.txt', 'public/humans.txt', 'public/manifest.json'])
+  var pub = gulp.src(['public/register.js', 'public/robots.txt', 'public/humans.txt', 'public/app.webmanifest'])
     .pipe(gulp.dest('dist/public/'));
   var config = gulp.src(['config/**/*', '.ebextensions/**/*', 'files/**/*'], { base: '.', dot: true })
     .pipe(gulp.dest('dist/'));
@@ -655,8 +655,84 @@ gulp.task('copy-bundle-stuff', function() {
   return merge(dist, html, libmin, pub, config, rootStuff);
 });
 
+gulp.task('new-bundle-stuff', function() {
+  var dist = gulp.src('public/dist/**/*')
+      .pipe(gulp.dest('dist/public/dist/'));
+  var html = gulp.src([
+    'modules/**',
+    '!modules/**/*.tests.js'
+  ]).pipe(gulp.dest('dist/modules/'));
+  var libmin = gulp.src([
+    'public/lib/angular/angular.min.js',
+    'public/lib/angular-resource/angular-resource.min.js',
+    'public/lib/angular-animate/angular-animate.min.js',
+    'public/lib/angular-messages/angular-messages.min.js',
+    'public/lib/angular-ui-router/release/angular-ui-router.min.js',
+    'public/lib/angular-ui-router/release/ui-router-angularjs.min.js',
+    'public/lib/angular-spinner/dist/angular-spinner.min.js',
+    'public/lib/angular-bootstrap/ui-bootstrap.min.js',
+    'public/lib/angular-bootstrap/ui-bootstrap-tpls.min.js',
+    'public/lib/angular-file-upload/dist/angular-file-upload.min.js',
+    'public/lib/jquery/dist/jquery.min.js',
+    'public/lib/owasp-password-strength-test/owasp-password-strength-test.js',
+    'public/lib/pouchdb/dist/pouchdb.min.js',
+    'public/lib/pouchdb-all-dbs/dist/pouchdb.all-dbs.min.js',
+    'public/lib/pouchdb-find/dist/pouchdb.find.min.js',
+    'public/lib/angular-pouchdb/angular-pouchdb.min.js',
+    'public/lib/angular-ui-router-uib-modal/angular-ui-router-uib-modal.js',
+    'public/lib/moment/min/moment.min.js',
+    'public/lib/angular-moment/angular-moment.min.js',
+    'public/lib/angular-translate/angular-translate.min.js',
+    'public/lib/angular-sanitize/angular-sanitize.min.js',
+    'public/lib/angular-ui-validate/dist/validate.min.js',
+    'public/lib/angular-ui-event/dist/event.min.js',
+    'public/lib/angular-ui-indeterminate/dist/indeterminate.min.js',
+    'public/lib/angular-ui-mask/dist/mask.min.js',
+    'public/lib/angular-ui-scroll/dist/ui-scroll.min.js',
+    'public/lib/angular-ui-uploader/dist/uploader.min.js',
+    'public/lib/angular-ui-utils/index.js',
+    'public/lib/angular-ui-scrollpoint/dist/scrollpoint.min.js',
+    'public/lib/d3/d3.min.js',
+    'public/lib/nvd3/build/nv.d3.min.js',
+    'public/lib/angular-nvd3/dist/angular-nvd3.min.js',
+    'public/lib/bootstrap/dist/css/bootstrap.min.css',
+    'public/lib/bootstrap/dist/fonts/*',
+    'public/lib/bootstrap/dist/css/bootstrap-theme.min.css',
+    'public/lib/bootstrap/dist/js/bootstrap.min.js',
+    'public/lib/bootstrap/dist/js/npm.js',
+    'public/lib/nvd3/build/nv.d3.min.css',
+    'public/lib/angular-ui-notification/dist/angular-ui-notification.min.css',
+    'public/lib/angular-ui-notification/dist/angular-ui-notification.min.js',
+    'public/lib/ng-file-upload/ng-file-upload.min.js',
+    'public/lib/angular/angular.min.js.map',
+    'public/lib/angular-resource/angular-resource.min.js.map',
+    'public/lib/angular-animate/angular-animate.min.js.map',
+    'public/lib/angular-messages/angular-messages.min.js.map',
+    'public/lib/angular-ui-router/release/angular-ui-router.min.js.map',
+    'public/lib/angular-ui-router/release/ui-router-angularjs.min.js.map',
+    'public/lib/angular-file-upload/dist/angular-file-upload.min.js.map',
+    'public/lib/jquery/dist/jquery.min.map',
+    'public/lib/bootstrap/dist/css/bootstrap.min.css.map',
+    'public/lib/bootstrap/dist/css/bootstrap-theme.min.css.map',
+    'public/lib/nvd3/build/nv.d3.min.css.map',
+    'public/lib/moment/min/moment.min.js.map',
+    'public/lib/angular-moment/angular-moment.min.js.map',
+    'public/lib/angular-sanitize/angular-sanitize.min.js.map',
+    'public/lib/nvd3/build/nv.d3.min.js.map',
+    'public/lib/sw-toolbox/sw-toolbox.js',
+    'public/lib/sw-toolbox/sw-toolbox.js.map'
+  ], { base: "." }).pipe(gulp.dest('dist/'));
+  var pub = gulp.src(['public/register.js', 'public/robots.txt', 'public/humans.txt', 'public/app.webmanifest'])
+      .pipe(gulp.dest('dist/public/'));
+  var config = gulp.src(['config/**/*', '.ebextensions/**/*', 'files/**/*'], { base: '.', dot: true })
+      .pipe(gulp.dest('dist/'));
+  var rootStuff = gulp.src(['./package.json', './server.js', './.npmrc'], { base: '.', dot: true })
+      .pipe(gulp.dest('dist/'));
+  return merge(dist, html, libmin, pub, config, rootStuff);
+});
+
 gulp.task('build-new-sw',
-  gulp.series('copy-bundle-stuff', 'service-worker'));
+  gulp.series('new-bundle-stuff', 'service-worker'));
 
 gulp.task('clean', async() => {
   return del(['dist']);

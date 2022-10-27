@@ -48,8 +48,8 @@
           key: fileToUpload
         },
         headers: {
-          // authorization: 'JWT ' + Authentication.token || localStorage.getItem('token')
-          authorization: 'JWT ' + Authentication.token
+          authorization: 'JWT ' + Authentication.token || localStorage.getItem('token')
+          // authorization: 'JWT ' + Authentication.token
         }
       }).then(function (response) {
         $timeout(function () {
