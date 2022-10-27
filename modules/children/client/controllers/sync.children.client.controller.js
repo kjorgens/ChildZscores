@@ -456,10 +456,10 @@
         cCode: vm.selectedCountryCode,
         sortField: sortField,
         language: $rootScope.SelectedLanguage,
-        stakeName: stakeName,
+        stakeName: vm.selectedStake,
         socketRoomId: `${ Authentication.user.firstName }_${ Authentication.user.lastName }_${ moment.now() }`
       };
-
+      //console.log(reportParams);
       return genReport(reportParams, getCsvError);
     }
 

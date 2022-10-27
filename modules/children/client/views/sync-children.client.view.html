@@ -75,6 +75,11 @@
           <i class="glyphicon glyphicon-share"></i>
         </h3>
       </a>
+      <a ng-click="vm.createReport('country', vm.countryCode, vm.sortSelect, 'summary', 'admin')">
+        <h3><span> Summary report for {{vm.selectedCountry}}</span>
+          <i class="glyphicon glyphicon-share"></i>
+        </h3>
+      </a>
       <div ng-if="vm.showProgress">
         <uib-progressbar max="max" value="dynamic"><span style="color:white; white-space:nowrap;">{{vm.currentStakeCount}} / {{vm.stakeCount}}</span></uib-progressbar>
       </div>
@@ -118,6 +123,10 @@
                 <span>{{'GENERATE_SUPPLEMENT_REPORT' | translate}} </span>
                 <i class="glyphicon glyphicon-share"></i>
             </a><br><br>
+            <a ng-click="vm.createReport('stake', vm.countryCode, vm.sortSelect, 'summary')">
+              <span>{{'GENERATE_SUMMARY_REPORT' | translate}} </span>
+              <i class="glyphicon glyphicon-share"></i>
+          </a><br><br>
           <a ng-click="vm.createReport('women', vm.countryCode, vm.sortSelect, '')">
             <span>{{'GENERATE_WOMEN_REPORT' | translate}} </span>
             <i class="glyphicon glyphicon-share"></i>
