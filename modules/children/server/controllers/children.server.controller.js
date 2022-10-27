@@ -1,5 +1,7 @@
 'use strict';
 
+const { ContextExclusionPlugin } = require('webpack');
+
 /**
  * Module dependencies.
  */
@@ -156,6 +158,73 @@ var obesityBoys = [
   17.7,
   17.7
 ];
+
+var coordinatingCounsels = [
+  {
+    name: "Guatemala Antigua Area Coordinating Council",
+    stakes: [
+      "Patzicia Stake",
+      'Sololá District'
+    ],
+  },
+  {
+    name: "Guatemala Central Area Coordinating Council",
+    stakes: [
+      'Escuintla Stake'
+    ],
+  },
+  {
+    name: "Guatemala City Guatemala Area Coordinating Council",
+    stakes: [
+      'Cuilapa District'
+    ],
+  },
+  {
+    name: "Guatemala Coban Area Coordinating Council",
+    stakes: [
+      'Chulac District',
+      'Cobán Stake',
+      'Senahu',
+      'Sacsuha District',
+      'Salama District'
+    ],
+  },
+  {
+    name: "Guatemala East Area Coordinating Council",
+    stakes: [
+      'Motagua District',
+      'Jalapa Stake',
+      'Puerto Barrios District'
+    ],
+  },
+  {
+    name: "Guatemala Quetzaltenango Area Coordinating Council",
+    stakes: [
+      'Totonicapán Stake',
+      'Quetzaltenango el Bosque Stake',
+      'Momostenango West District',
+      'Huehuetenango Zaculeu Stake',
+      'Momostenango Stake',
+      'Huehuetenango Calvario Stake',
+      'Huehuetenango Centro Stake'
+    ],
+  },
+  {
+    name: "Guatemala Retalhuleu Area Coordinating Council",
+    stakes: [
+      'Rio Blanco District',
+      'Serchil District',
+      'Malacatan Stake',
+      'Malacatan 2 Stake',
+      'Retalhuleu Stake',
+      'San Felipe Stake',
+      'Coatepeque',
+      'Mazatenango',
+      'San Marcos',
+      'San Pedro'
+    ],
+  },
+]
 
 var filterList = [
   {
@@ -497,7 +566,22 @@ function findDiff(latest, secondToLastest, diffs){
   return diffs;
 }
 
-function summaryReport(sortedScreenList, currentAge){
+function getCoordArea(inputStakeName) {
+  var list = coordinatingCounsels;
+  var stakeCoordArea;
+  list.forEach((area) => {
+    var stakesList = area.stakes;
+    stakesList.forEach((stakeName) => 
+    {
+      if (stakeName === inputStakeName){
+        stakeCoordArea = area.name;
+      }
+    });
+  });
+  return stakeCoordArea;
+}
+
+function summaryReport(sortedScreenList, currentAge, stakeName){
   var scores;
   var beforeScreening; 
   var childStatus;
@@ -505,6 +589,8 @@ function summaryReport(sortedScreenList, currentAge){
   var diffs = {};
   var summaryAddOns = {};
   var age = currentAge;
+  var stakeName = stakeName;
+  var coordCounselName = getCoordArea(stakeName);
 
   if (sortedScreenList[0] != null){
     scores = sortedScreenList[0].zScore;
@@ -572,12 +658,11 @@ function summaryReport(sortedScreenList, currentAge){
     }
   }
 
-  console.log(childProgress, childStatus);  // clean
-
   summaryAddOns = {
     childStatus: childStatus,
     childProgress: childProgress,
-    currentAge: currentAge
+    currentAge: currentAge, 
+    coordinatingArea: coordCounselName
   }
 
   return summaryAddOns;
@@ -602,7 +687,7 @@ function listAllChildren(childScreenList, screenType) {
           sortedScreenList = getScreeningsList(childEntry.id, childScreenList[1].data.rows);
           // console.log(childEntry);
           // console.log(childIndex);
-          summaryAddOns = summaryReport(sortedScreenList, currentAge);
+          summaryAddOns = summaryReport(sortedScreenList, currentAge, childScreenList[0].parms.stakeName);
           lineAccumulator.push(addSummaryLineToStack(
             screenType, 
             sortedScreenList[0],
@@ -1129,16 +1214,17 @@ function addSummaryLineToStack(screentype, screenInfo, ownerInfo, sortField, sta
     lastScreening: ownerInfo.lastScreening,
     surveyDate: cleanDate,
     screenId: screenInfo._id,
-    stakeName: stakeDB,
+    stakeName: stakeName,
     country: cCode,
     childStatus: summary.childStatus,
     childProgress: summary.childProgress,
-    age: summary.currentAge 
+    age: summary.currentAge,
+    coordArea: summary.coordinatingArea 
   };
   
   var dataLine = dataObj.mother + ',' + dataObj.firstName + ',' + dataObj.lastName + ',' + dataObj.age + ',' + dataObj.memberStatus + ',' + dataObj.ward + ',' + 
     dataObj.childStatus + ',' + dataObj.stakeName + ',' + /* Consejo */ ' ' + ',' + dataObj.country + ',' + /* Saliendo */ ' ' + ',' + dataObj.surveyDate + ',' + 
-    dataObj.phone + ',' + dataObj.address + ',' + dataObj.childProgress + '\n';
+    dataObj.phone + ',' + dataObj.address + ',' + dataObj.childProgress + ',' + dataObj.coordArea + '\n';
 
   return {
     data: dataObj,
@@ -1484,7 +1570,7 @@ exports.createCSVFromDB = async function (req, res) {
 
       if (parmObj.csvType === 'summary'){
         parmObj.fileToSave = `summary_${ req.params.stakeDB }_${tokenInfo.iat}_${moment().format()}_dbDump.csv`;
-        headerLine = 'mothersName, firstName,lastName,age,LDS,ward,status,stake,Counsel,country,Leaving,LastScreeningDate,phone,address,ImprovementFromLastScreening\n';
+        headerLine = 'mothersName, firstName,lastName,age,LDS,ward,status,stake,Counsel,country,Leaving,LastScreeningDate,phone,address,ImprovementFromLastScreening,CoordinatingCounsel\n';
       } else if (parmObj.csvType !== 'sup') {
         parmObj.fileToSave = `${ tokenInfo.iat }_${ req.params.cCode }_${ req.params.csvType }_dbDump.csv`;
         headerLine = 'Country,Stake,child Index,stake db name,screen Count,id,gender,firstName,lastName,birthdate,idGroup,mother,father,phone,address,city,ward,lds,screenId,screenDate,weight,height,age,obese,ha,wa,wh,status\n';
