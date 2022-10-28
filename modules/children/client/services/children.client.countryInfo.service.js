@@ -520,6 +520,10 @@
             stakeDB: 'quetzaltenango_el_bosque_stake_gtm'
           },
           {
+            stakeName: 'Quetzaltenango Oeste Stake',
+            stakeDB: 'quetzaltenango_oeste_stake_gtm'
+          },
+          {
             stakeName: 'Quiche District',
             stakeDB: 'quiche_district_gtm'
           },
