@@ -51,6 +51,10 @@
       PRIOR_GREEN_TELL: 'Tell caregiver the child is welcome to come to the next screening and they can attend the health lesson if they would like',
       RESCREEN_ONE_MONTH: 'Rescreen in one month',
       REVIEW_HEALTH_LESSONS: 'Review 5 areas of healthy behavior from the health lessons to see if the family can make improvements',
+      FAMILY_HEALTH_PLAN: 'Do you have a family health plan?',
+      FOLLOW_FAMILY_HEALTH_PLAN: 'Do you follow your family health plan?',
+      FAM_HEALTH_PLAN: 'Family Health Plan',
+      FOL_FAM_HEALTH_PLAN: 'Follow Family Health Plan',
 
       MIN_HEALTH_HEIGHT: 'Minimum Healthy Height',
       CHILD_HEIGHT_GRAPH: 'Child Height (cm)',
@@ -228,6 +232,10 @@
       PRIOR_GREEN_TELL: 'Diga al cuidador que el niño es bienvenido a venir a la siguiente pantalla y ellos pueden asistir a la lección de salud si les gustaría',
       RESCREEN_ONE_MONTH: 'Restablecer en un mes',
       REVIEW_HEALTH_LESSONS: 'Repase 5 áreas de comportamiento saludable de las lecciones de salud para ver si la familia puede hacer mejoras',
+      FAMILY_HEALTH_PLAN: '¿Tiene un plan de salud familiar?',
+      FOLLOW_FAMILY_HEALTH_PLAN: '¿Sigue su plan de salud familiar?',
+      FAM_HEALTH_PLAN: 'Plan de salud familiar',
+      FOL_FAM_HEALTH_PLAN: 'Sigue su plan de salud familiar',
 
       MIN_HEALTH_HEIGHT: 'Altura Mínima Saludable',
       CHILD_HEIGHT_GRAPH: 'Altura del niño (cm)',

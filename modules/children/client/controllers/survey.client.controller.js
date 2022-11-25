@@ -16,19 +16,15 @@
     vm.survey = survey;
 
     function checkAllFieldsValid() {
-      if (vm.childHeightIsValid === true
-        && vm.childWeightIsValid === true
-        && vm.ageIsValid === true) {
+      if ((vm.childHeightIsValid === true && vm.childWeightIsValid === true && vm.ageIsValid === true) 
+      || (vm.muacIsValid === true && vm.ageIsValid)) {
         vm.allFieldsValid = true;
         vm.invalidFields = false;
-      } else if (vm.childHeightIsValid === false
-        || vm.childWeightIsValid === false
-        || vm.ageIsValid === false) {
+      } else if (vm.childHeightIsValid === false || vm.childWeightIsValid === false || vm.ageIsValid === false || vm.muacIsValid === false) {
         vm.allFieldsValid = false;
         vm.invalidFields = true;
-      } else if ((vm.childHeightIsValid === undefined)
-        && (vm.childWeightIsValid === undefined)
-        && (vm.ageIsValid === undefined)) {
+      } else if ((vm.childHeightIsValid === undefined) && (vm.childWeightIsValid === undefined) && (vm.ageIsValid === undefined) 
+      && (vm.muacIsValid === undefined)) {
         vm.allFieldsValid = true;
         vm.invalidFields = true;
       }
@@ -65,6 +61,7 @@
       vm.ageIsValid = false;
       vm.childHeightIsValid = undefined;
       vm.childWeightIsValid = undefined;
+      vm.muacIsValid = undefined;
       vm.surveyDate = new Date();
     }
     PouchService.getSurveys($state.params.childId, getSurveys, surveyErrors);
@@ -126,6 +123,7 @@
     vm.calculateAge = calculateAge;
     vm.checkHeightIsValid = checkHeightIsValid;
     vm.checkWeightIsValid = checkWeightIsValid;
+    vm.checkMUACIsValid = checkMUACIsValid;
     vm.checkAllFieldsValid = checkAllFieldsValid;
 
     vm.surveys = [];
@@ -201,6 +199,12 @@
       vm.checkAllFieldsValid();
     }
 
+    function checkMUACIsValid(){
+      if (vm.survey.muac > 0){
+        vm.muacIsValid = true;
+      }
+    }
+
     function commentOverride() {
       if (vm.survey.comments.indexOf('age=') !== -1) {
         var parts = vm.survey.comments.split('=');
@@ -261,6 +265,7 @@
     function undefinedTurnFalse() {
       vm.checkHeightIsValid();
       vm.checkWeightIsValid();
+      vm.checkMUACIsValid();
       if (vm.childHeightIsValid === undefined) {
         vm.childHeightIsValid = false;
       }
@@ -269,6 +274,9 @@
       }
       if (vm.ageIsValid === undefined) {
         vm.ageIsValid = false;
+      }
+      if (vm.checkMUACIsValid === undefined){
+        vm.checkMUACIsValid = false;
       }
     }
 
@@ -291,7 +299,8 @@
         var bday = new Date(vm.child.birthDate);
 
 ;
-        zScore = vm.zScoreGetter(vm.child.gender, vm.survey.monthAge, vm.survey.height, vm.survey.weight, vm.initialSurvey);
+        zScore = vm.zScoreGetter(vm.child.gender, vm.survey.monthAge, vm.survey.height, vm.survey.weight, vm.survey.muac, 
+          vm.survey.familyHealthPlan, vm.survey.followFamilyHealthPlan, vm.initialSurvey);
         var surveyObject = {
           _id: 'scr_',
           owner: vm.child._id,
@@ -300,6 +309,9 @@
           gender: vm.child.gender,
           weight: vm.survey.weight,
           height: vm.survey.height,
+          muac: vm.survey.muac,
+          familyHealthPlan: vm.survey.familyHealthPlan,
+          followFamilyHealthPlan: vm.survey.followFamilyHealthPlan,
           monthAge: vm.survey.monthAge,
           comments: vm.child.comments,
           interviewer: vm.interviewer,
