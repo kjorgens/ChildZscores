@@ -699,6 +699,21 @@
         ]
       },
       {
+        name: 'Liberia',
+        code: 'LIB',
+        image: '/modules/children/client/img/liberia.png',
+        stakes: [
+          {
+            stakeName: 'Bushrod Island Stake',
+            stakeDB: 'bushrod_island_stake_lib'
+          },
+          {
+            stakeName: 'Caldwell Stake',
+            stakeDB: 'caldwell_stake_lib'
+          }
+        ]
+      },
+      {
         name: 'Madagascar',
         code: 'MDG',
         image: '/modules/children/client/img/madagascar.png',
