@@ -806,6 +806,10 @@
           {
             stakeName: 'Akure District',
             stakeDB: 'akure_district_nga'
+          },
+          {
+            stakeName: 'Port Harcourt Stake',
+            stakeDB: 'port_harcourt_stake_nga'
           }
         ]
       },
