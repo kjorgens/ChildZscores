@@ -687,6 +687,7 @@ function listAllChildren(childScreenList, screenType) {
           // console.log(childIndex);
           summaryAddOns = summaryReport(sortedScreenList, currentAge, childScreenList[0].parms.stakeName);
           lineAccumulator.push(addSummaryLineToStack(
+
             screenType, 
             sortedScreenList[0],
             childEntry.key, 
@@ -793,7 +794,7 @@ function listAllChildren(childScreenList, screenType) {
             if (childScreenList[1].data.total_rows > 0) {
               sortedScreenList = getScreeningsList(childEntry.id, childScreenList[1].data.rows);
               sortedScreenList.forEach(async (entry, screenIndex) => {
-                lineAccumulator.push(addLineToStack(childIndex + 1, screenIndex + 1, childEntry.key, entry, childScreenList[0].parms.sortField, childScreenList[0].stake, childScreenList[0].parms.stakeName, childScreenList[0].parms.language, childScreenList[0].parms.cCode));
+                lineAccumulator.push(addLineToStack(childIndex + 1, screenIndex + 1, childEntry.key, entry, childScreenList[0].parms.sortField, childScreenList[0].stake, childScreenList[0].parms.stakeName, childScreenList[0].parms.language, childScreenList[0].parms.cCode, childScreenList[0].parms.muac));
               });
             }
           } catch (err) {
@@ -814,7 +815,7 @@ function listAllChildren(childScreenList, screenType) {
       }
     });
   }
-
+  console.log("hey");
   return lineAccumulator;
 }
 
@@ -1571,7 +1572,7 @@ exports.createCSVFromDB = async function (req, res) {
         headerLine = 'mothersName, firstName,lastName,age,LDS,ward,status,stake,Counsel,country,Leaving,LastScreeningDate,phone,address,ImprovementFromLastScreening,CoordinatingCounsel\n';
       } else if (parmObj.csvType !== 'sup') {
         parmObj.fileToSave = `${ tokenInfo.iat }_${ req.params.cCode }_${ req.params.csvType }_dbDump.csv`;
-        headerLine = 'Country,Stake,child Index,stake db name,screen Count,id,gender,firstName,lastName,birthdate,idGroup,mother,father,phone,address,city,ward,lds,screenId,screenDate,weight,height,age,obese,ha,wa,wh,status\n';
+        headerLine = 'Country,Stake,child Index,stake db name,screen Count,id,gender,firstName,lastName,birthdate,idGroup,mother,father,phone,address,city,ward,lds,screenId,screenDate,weight,height,age,obese,ha,wa,wh,status,muac\n';
       }
 
       if (parmObj.scopeType === 'countries') {
