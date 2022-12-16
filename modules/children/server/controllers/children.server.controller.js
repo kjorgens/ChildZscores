@@ -814,7 +814,6 @@ function listAllChildren(childScreenList, screenType) {
       }
     });
   }
-  console.log("hey");
   return lineAccumulator;
 }
 
