@@ -579,6 +579,19 @@ function getCoordArea(inputStakeName) {
   return stakeCoordArea;
 }
 
+function muacStatusSetter(muacIn) {
+  var muac = muacIn;
+  var supType;
+  if(muac < 11.5){
+    supType = 'SAM'; 
+  } else if (muac >= 11.5 && muac <= 12.5) {
+    supType = 'MAM';
+  } else if (muac > 12.5){
+    supType = 'MUAC Green'
+  }
+  return supType;
+}
+
 function summaryReport(sortedScreenList, currentAge, stakeName){
   var scores;
   var beforeScreening; 
@@ -730,44 +743,49 @@ function listAllChildren(childScreenList, screenType) {
               supType = 'none';
               priorMalnurished = 'no';
               currentSupType = 'none';
-              sortedScreenList.forEach(async (screening, screenIndex) => {
-                if ((screening.zScore.ha < -2 || screening.zScore.wa < -2)) {
-                  priorMalnurished = 'yes';
-                  if (currentAge < 36) {
-                    supType = 'sup';
+              if (sortedScreenList[0].muac != undefined) {
+                currentSupType = muacStatusSetter(sortedScreenList[0].muac);
+              } else {
+                sortedScreenList.forEach(async (screening, screenIndex) => {
+                  if ((screening.zScore.ha < -2 || screening.zScore.wa < -2)) {
+                    priorMalnurished = 'yes';
+                    if (currentAge < 36) {
+                      supType = 'sup';
+                    }
+                    if (currentAge < 24) {
+                      supType = 'MAM';
+                    }
                   }
-                  if (currentAge < 24) {
+  
+                  if (screening.zScore.wl < -2) {
+                    priorMalnurished = 'yes';
                     supType = 'MAM';
+                    if (screening.zScore.wl < -3) {
+                      supType = 'SAM';
+                    }
                   }
-                }
-
-                if (screening.zScore.wl < -2) {
-                  priorMalnurished = 'yes';
-                  supType = 'MAM';
-                  if (screening.zScore.wl < -3) {
-                    supType = 'SAM';
+                  if (screenIndex === 0 || currentAge < 24) {
+                    if (sortedScreenList.length === 1) {
+                      priorMalnurished = 'no';
+                    }
+                    currentSupType = supType;
                   }
-                }
-                if (screenIndex === 0 || currentAge < 24) {
-                  if (sortedScreenList.length === 1) {
-                    priorMalnurished = 'no';
-                  }
+                });
+  
+                if (priorMalnurished && currentAge <= 24) {
                   currentSupType = supType;
-                }
-              });
-
-              if (priorMalnurished && currentAge <= 24) {
-                currentSupType = supType;
-                if ((supType === 'MAM' || supType === 'SAM') && sortedScreenList[0].zScore.wl > -2) {
-                  currentSupType = 'sup';
-                }
-                if ((supType === 'MAM' || supType === 'SAM') && sortedScreenList[0].zScore.wl < -2) {
-                  currentSupType = 'MAM';
-                  if (sortedScreenList[0].zScore.wl < -3) {
-                    currentSupType = 'SAM';
+                  if ((supType === 'MAM' || supType === 'SAM') && sortedScreenList[0].zScore.wl > -2) {
+                    currentSupType = 'sup';
+                  }
+                  if ((supType === 'MAM' || supType === 'SAM') && sortedScreenList[0].zScore.wl < -2) {
+                    currentSupType = 'MAM';
+                    if (sortedScreenList[0].zScore.wl < -3) {
+                      currentSupType = 'SAM';
+                    }
                   }
                 }
               }
+ 
 
               timeSinceLastScreen = moment().diff(moment(new Date(sortedScreenList[0].surveyDate)), 'months');
               if (screenType === 'sup' && timeSinceLastScreen < 8 && (currentSupType === 'MAM' || currentSupType === 'SAM' || currentSupType === 'sup')) {
