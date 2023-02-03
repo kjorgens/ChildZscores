@@ -379,6 +379,124 @@
     { x: 99.9, y: 13.7 }
   ];
 
+  var muacGreen = [
+    {x: 5, y: 12.5},
+    {x: 6, y: 12.5},
+    {x: 7, y: 12.5},
+    {x: 8, y: 12.5},
+    {x: 9, y: 12.5},
+    {x: 10, y: 12.5},
+    {x: 11, y: 12.5},
+    {x: 12, y: 12.5},
+    {x: 13, y: 12.5},
+    {x: 14, y: 12.5},
+    {x: 15, y: 12.5},
+    {x: 16, y: 12.5},
+    {x: 17, y: 12.5},
+    {x: 18, y: 12.5},
+    {x: 19, y: 12.5},
+    {x: 20, y: 12.5},
+    {x: 21, y: 12.5},
+    {x: 22, y: 12.5},
+    {x: 23, y: 12.5},
+    {x: 24, y: 12.5},
+    {x: 25, y: 12.5},
+    {x: 26, y: 12.5},
+    {x: 27, y: 12.5},
+    {x: 28, y: 12.5},
+    {x: 29, y: 12.5},
+    {x: 30, y: 12.5},
+    {x: 31, y: 12.5},
+    {x: 32, y: 12.5},
+    {x: 33, y: 12.5},
+    {x: 34, y: 12.5},
+    {x: 35, y: 12.5},
+    {x: 36, y: 12.5},
+    {x: 37, y: 12.5},
+    {x: 38, y: 12.5},
+    {x: 39, y: 12.5},
+    {x: 40, y: 12.5},
+    {x: 41, y: 12.5},
+    {x: 42, y: 12.5},
+    {x: 43, y: 12.5},
+    {x: 44, y: 12.5},
+    {x: 45, y: 12.5},
+    {x: 46, y: 12.5},
+    {x: 47, y: 12.5},
+    {x: 48, y: 12.5},
+    {x: 49, y: 12.5},
+    {x: 50, y: 12.5},
+    {x: 51, y: 12.5},
+    {x: 52, y: 12.5},
+    {x: 53, y: 12.5},
+    {x: 54, y: 12.5},
+    {x: 55, y: 12.5},
+    {x: 56, y: 12.5},
+    {x: 57, y: 12.5},
+    {x: 58, y: 12.5},
+    {x: 59, y: 12.5},
+    {x: 60, y: 12.5}
+  ];
+
+  var muacRed = [
+    {x: 5, y: 11.5},
+    {x: 6, y: 11.5},
+    {x: 7, y: 11.5},
+    {x: 8, y: 11.5},
+    {x: 9, y: 11.5},
+    {x: 10, y: 11.5},
+    {x: 11, y: 11.5},
+    {x: 12, y: 11.5},
+    {x: 13, y: 11.5},
+    {x: 14, y: 11.5},
+    {x: 15, y: 11.5},
+    {x: 16, y: 11.5},
+    {x: 17, y: 11.5},
+    {x: 18, y: 11.5},
+    {x: 19, y: 11.5},
+    {x: 20, y: 11.5},
+    {x: 21, y: 11.5},
+    {x: 22, y: 11.5},
+    {x: 23, y: 11.5},
+    {x: 24, y: 11.5},
+    {x: 25, y: 11.5},
+    {x: 26, y: 11.5},
+    {x: 27, y: 11.5},
+    {x: 28, y: 11.5},
+    {x: 29, y: 11.5},
+    {x: 30, y: 11.5},
+    {x: 31, y: 11.5},
+    {x: 32, y: 11.5},
+    {x: 33, y: 11.5},
+    {x: 34, y: 11.5},
+    {x: 35, y: 11.5},
+    {x: 36, y: 11.5},
+    {x: 37, y: 11.5},
+    {x: 38, y: 11.5},
+    {x: 39, y: 11.5},
+    {x: 40, y: 11.5},
+    {x: 41, y: 11.5},
+    {x: 42, y: 11.5},
+    {x: 43, y: 11.5},
+    {x: 44, y: 11.5},
+    {x: 45, y: 11.5},
+    {x: 46, y: 11.5},
+    {x: 47, y: 11.5},
+    {x: 48, y: 11.5},
+    {x: 49, y: 11.5},
+    {x: 50, y: 11.5},
+    {x: 51, y: 11.5},
+    {x: 52, y: 11.5},
+    {x: 53, y: 11.5},
+    {x: 54, y: 11.5},
+    {x: 55, y: 11.5},
+    {x: 56, y: 11.5},
+    {x: 57, y: 11.5},
+    {x: 58, y: 11.5},
+    {x: 59, y: 11.5},
+    {x: 60, y: 11.5}
+  ];
+
   angular
     .module('children.graphService')
     .factory('GraphService', GraphService);
@@ -609,6 +727,83 @@
       };
     };
 
+    factory.setupMUACChart = function(muac, age){
+      return {
+        chart: {
+          type: 'scatterChart',
+          height: 200,
+          width: 400,
+          margin: {
+            top: 20,
+            right: 20,
+            bottom: 40,
+            left: 55
+          },
+          x: function (d) {
+            return d.x;
+          },
+          y: function (d) {
+            return d.y;
+          },
+          useInteractiveGuideline: true,
+          dispatch: {
+            stateChange: function (e) {
+              console.log('stateChange');
+            },
+            changeState: function (e) {
+              console.log('changeState');
+            },
+            tooltipShow: function (e) {
+              console.log('tooltipShow');
+            },
+            tooltipHide: function (e) {
+              console.log('tooltipHide');
+            }
+          },
+          fxAxisDomain: [6,60],
+          forceY: [5,27],
+          xAxis: {
+            axisLabel: (age),
+            tickFormat: function (d) {
+              return d3.format('s')(d);
+            },
+            axisLabelDistance: -10
+          },
+          yAxis: {
+            axisLabel: (muac),
+            tickFormat: function (d) {
+              return d3.format('s')(d);
+            },
+            axisLabelDistance: -10
+          },
+          callback: function (chart) {
+            console.log('!!! lineChart callback !!!');
+          }
+        },
+        title: {
+          enable: true,
+          text: ('MUAC')
+          // color: 'Purple'
+        },
+        subtitle: {
+          enable: false,
+          // text: 'Subtitle for simple line chart. Lorem ipsum dolor sit amet, at eam blandit sadipscing, vim adhuc sanctus disputando ex, cu usu affert alienum urbanitas.',
+          css: {
+            'text-align': 'center',
+            'margin': '10px 13px 0px 7px'
+          }
+        },
+        caption: {
+          enable: false,
+          html: '<b>Figure 1.</b> Lorem ipsum dolor sit amet, at eam blandit sadipscing, <span style="text-decoration: underline;">vim adhuc sanctus disputando ex</span>, cu usu affert alienum urbanitas. <i>Cum in purto erat, mea ne nominavi persecuti reformidans.</i> Docendi blandit abhorreant ea has, minim tantas alterum pro eu. <span style="color: darkred;">Exerci graeci ad vix, elit tacimates ea duo</span>. Id mel eruditi fuisset. Stet vidit patrioque in pro, eum ex veri verterem abhorreant, id unum oportere intellegam nec<sup>[1, <a href="https://github.com/krispo/angular-nvd3" target="_blank">2</a>, 3]</sup>.',
+          css: {
+            'text-align': 'justify',
+            'margin': '10px 13px 0px 7px'
+          }
+        }
+      };
+    };
+
     factory.getChartDataHeight = function(zscoreData, gender, ageC, age) {
       return [
         {
@@ -669,6 +864,26 @@
       ];
     };
 
+    factory.getChartDataMUAC = function(muac, monthAge, greenLine, redLine) {
+        return [
+          {
+            values: muac, monthAge,
+            key: 'muac',
+            color: 'Black'
+          },
+          {
+            values: greenLine = getMUACGreen(),
+            key: 'Normal',
+            color: 'Green'
+          },
+          {
+            values: redLine = getMUACRed(),
+            key: 'Malnourished',
+            color: 'Red'
+          }
+        ]
+    };
+
     function getGirlsHeight(survey) {
       var startHa = survey[0].x - 5;
       var endHa = survey[0].x + 5;
@@ -704,7 +919,12 @@
       var endWH = survey[survey.length - 1].x + 5;
       return weightPerHeightBoys; // .slice(startWH, endWH)
     }
-
+    function getMUACGreen() {
+      return muacGreen;
+    }
+    function getMUACRed() {
+      return muacRed;
+    }
     return factory;
   }
 }());

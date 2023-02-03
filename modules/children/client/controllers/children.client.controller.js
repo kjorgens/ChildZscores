@@ -17,6 +17,7 @@
     vm.zscoreHa = [];
     vm.zscoreWa = [];
     vm.zscoreWH = [];
+    vm.muacGraph = [];
     vm.callback = callback;
 
     vm.supInfo = screens.sup;
@@ -184,9 +185,11 @@
         vm.optionsHeight = GraphService.setupHeightChart(vm.minHealthH, vm.childHeightH, vm.childAge);
         vm.optionsWeight = GraphService.setupWeightChart(vm.minHealthW, vm.childWeightW, vm.childAge);
         vm.optionsWeightPerHeight = GraphService.setupWeightPerHeightChart(vm.minHealthWH, vm.childWeightW, vm.childHeightH);
+        vm.optionsMUAC = GraphService.setupMUACChart('Muac','Age');
         vm.dataHeight = GraphService.getChartDataHeight(vm.zscoreHa, vm.child.gender, vm.heightAgeC, vm.heightAgeH);
         vm.dataWeight = GraphService.getChartDataWeight(vm.zscoreWa, vm.child.gender, vm.weightC, vm.weightKey);
         vm.dataWeightPerHeight = GraphService.getChartDataWeightPerHeight(vm.zscoreWH, vm.child.gender, vm.heightWeightC);
+        vm.dataMUAC = GraphService.getChartDataMUAC(vm.muacGraph);
       });
     }
 
@@ -259,6 +262,9 @@
         });
         vm.zscoreWH.push({
           x: survey.height, y: survey.weight, size: 1, shape: 'diamond'
+        });
+        vm.muacGraph.push({
+          x: survey.muac, y: survey.monthAge, size: 1, shape: 'diamond'
         });
       });
       // vm.screenStatus = ZScores.getStatus(vm.child, surveys);
