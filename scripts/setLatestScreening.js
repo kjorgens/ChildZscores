@@ -157,6 +157,7 @@ function sortByDate(listIn) {
 }
 
 function statusColor(status) {
+  debugger;
   if (status.indexOf('Acute') > -1) {
     return 'redZoneZscore';
   } else if (status.indexOf('Micro') > -1) {

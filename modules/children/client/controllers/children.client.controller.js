@@ -253,7 +253,8 @@
         vm.initialScreening = true;
       }
       surveys.forEach(function(survey) {
-        survey.colorStatus = PouchService.calcSurveyStatus(survey);
+        //survey.colorStatus = PouchService.calcSurveyStatus(survey);  For background color for screenings Not needed at this point.
+
         vm.zscoreHa.push({
           x: survey.monthAge, y: survey.height, size: 1, shape: 'diamond'
         });
@@ -263,9 +264,12 @@
         vm.zscoreWH.push({
           x: survey.height, y: survey.weight, size: 1, shape: 'diamond'
         });
-        vm.muacGraph.push({
-          x: survey.muac, y: survey.monthAge, size: 1, shape: 'diamond'
-        });
+        if (survey.muac != null){
+          //survey.muacColorStatus = PouchService.calcMuacColorStatus(survey);
+          vm.muacGraph.push({
+            x: survey.monthAge, y: survey.muac,  size: 0.1, shape: 'diamond'
+          });
+        }
       });
       // vm.screenStatus = ZScores.getStatus(vm.child, surveys);
       vm.surveys = surveys;

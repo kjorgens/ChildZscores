@@ -48,7 +48,8 @@
         </div>
       </h4>
         <a ng-repeat="survey in vm.surveys"
-           ui-sref="children.editsurvey({ surveyId:survey._id, childId:vm.child._id})" class="list-group-item clearfix" ng-class="survey.colorStatus">
+           ui-sref="children.editsurvey({ surveyId:survey._id, childId:vm.child._id})" class="list-group-item clearfix" ng-class="whiteBackground">  
+           <!-- survey.colorStatus  -->
             <small class="list-group-item-text ZscoreListContainer ">
                 <h4>{{'AGE' | translate}} <span ng-bind="survey.monthAge "></span>, 
                     <span ng-hide="survey.height == 0">
@@ -70,8 +71,17 @@
                         {{'W_H' | translate}}:  <span  ng-bind="survey.zScore.wl | number:2"></span>
                     </li>
                 </h4>
-                <h4 ng-hide="survey.muac == unidentified">
-                  {{'MUAC: '}} <span ng-bind="survey.muac "></span>
+                <h4 ng-hide="survey.muac == unidentified" > 
+                  {{'MUAC: '}} 
+                  <li ng-show="survey.muac > 12.5" class="greenMUAC">
+                    <span ng-bind="survey.muac "></span>
+                  </li>
+                  <li ng-show="survey.muac <= 12.5 && survey.muac >= 11.5" class="yellowMUAC">
+                    <span ng-bind="survey.muac "></span>
+                  </li>
+                  <li ng-show="survey.muac < 11.5" class="redMUAC">
+                    <span ng-bind="survey.muac "></span>
+                  </li>
                 </h4>
                 <h6>
                   {{'FAM_HEALTH_PLAN' | translate}}: <span><input type="checkbox" onclick="false" ng-model="survey.familyHealthPlan"/></span>
@@ -89,3 +99,5 @@
         <span><a ui-sref="children.remove({childId:vm.child._id})">{{'REMOVE_CHILD_RECORD' | translate}} <i class="glyphicon glyphicon-trash"></i></a></span>
     </h5>
 </section>
+
+<!-- {greenMUAC: 'greenMUAC', yellowMUAC: 'yellowMUAC', redMUAC: 'redMUAC'} -->
