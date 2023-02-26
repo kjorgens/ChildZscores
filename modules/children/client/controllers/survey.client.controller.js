@@ -200,7 +200,7 @@
     }
 
     function checkMUACIsValid(){
-      if (vm.survey.muac > 0){
+      if (vm.survey.muac >= 5.5 && vm.survey.muac <= 26.5){
         vm.muacIsValid = true;
       }
     }
@@ -272,11 +272,11 @@
       if (vm.childWeightIsValid === undefined) {
         vm.childWeightIsValid = false;
       }
-      if (vm.ageIsValid === undefined) {
-        vm.ageIsValid = false;
-      }
       if (vm.checkMUACIsValid === undefined){
         vm.checkMUACIsValid = false;
+      }
+      if (vm.ageIsValid === undefined) {
+        vm.ageIsValid = false;
       }
     }
 
@@ -285,6 +285,7 @@
 
       if (vm.invalidFields === true || vm.invalidFields === undefined) {
         undefinedTurnFalse();
+        debugger;
         return false;
       }
 
