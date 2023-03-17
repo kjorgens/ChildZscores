@@ -51,7 +51,7 @@
 
     if (vm.survey._id) {
     //    vm.ageIsValid = true;
-    //    vm.childHeightIsValid = true;`
+    //    vm.childHeightIsValid = true;
     //     vm.childWeightIsValid = true;
       vm.surveyDate = new Date(vm.survey.surveyDate);
     } else {
@@ -317,7 +317,6 @@
           vm.survey._id = undefined;
           var bday = new Date(vm.child.birthDate);
 
-  ;
           zScore = vm.zScoreGetter(vm.child.gender, vm.survey.monthAge, vm.survey.height, vm.survey.weight, vm.survey.muac, 
             vm.survey.familyHealthPlan, vm.survey.followFamilyHealthPlan, vm.initialSurvey);
           var surveyObject = {
