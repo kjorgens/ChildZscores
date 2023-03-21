@@ -16,6 +16,10 @@
     vm.survey = survey;
 
     function checkAllFieldsValid() {
+      if (((vm.survey.height === '' || vm.survey.height === undefined) && (vm.childWeightIsValid === true)) 
+      || ((vm.survey.weight === '' || vm.survey.weight === undefined) && (vm.childHeightIsValid === true))){
+        vm.invalidFields = true;
+      }
       if (vm.childHeightIsValid === false || vm.childWeightIsValid === false || vm.muacIsValid === false){
         vm.invalidFields = true;
       } else {
@@ -23,6 +27,8 @@
           && vm.blankWeight === false && vm.blankHeight === false) 
           || (vm.muacIsValid === true && vm.ageIsValid === true && vm.blankMUAC === false)) {
             vm.allFieldsValid = true;
+            vm.invalidFields = false;
+          } else if (vm.muacIsValid === true && vm.ageIsValid === true){
             vm.invalidFields = false;
           } else if (vm.childHeightIsValid === false || vm.childWeightIsValid === false || vm.ageIsValid === false 
           || vm.muacIsValid === false) {
@@ -59,6 +65,9 @@
       vm.survey.height = '';
       vm.survey.weight = '';
       vm.survey.muac = '';
+      vm.survey.familyHealthPlan = false;
+      vm.survey.followFamilyHealthPlan = false;
+
       vm.survey.comments = '';
 
       vm.ageIsValid = false;
@@ -341,6 +350,8 @@
           vm.survey.weight = '';
           vm.survey.height = '';
           vm.survey.muac = '';
+          vm.survey.familyHealthPlan = false;
+          vm.survey.followFamilyHealthPlan = false;
         }
       }
     }
