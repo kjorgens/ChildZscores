@@ -18,10 +18,8 @@
     function checkAllFieldsValid() {
       if (((vm.survey.height === '' || vm.survey.height === undefined) && (vm.childWeightIsValid === true))){
         vm.invalidFields = true;
-        vm.childHeightIsValid = false;
       } else if (((vm.survey.weight === '' || vm.survey.weight === undefined) && (vm.childHeightIsValid === true))){
         vm.invalidFields = true;
-        vm.childWeightIsValid = false;
       } 
 
       if (vm.childHeightIsValid === false || vm.childWeightIsValid === false || vm.muacIsValid === false){
@@ -71,6 +69,7 @@
       vm.survey.muac = '';
       vm.survey.familyHealthPlan = false;
       vm.survey.followFamilyHealthPlan = false;
+      vm.survey.visitedDoctor = false;
 
       vm.survey.comments = '';
 
@@ -331,7 +330,7 @@
           var bday = new Date(vm.child.birthDate);
 
           zScore = vm.zScoreGetter(vm.child.gender, vm.survey.monthAge, vm.survey.height, vm.survey.weight, vm.survey.muac, 
-            vm.survey.familyHealthPlan, vm.survey.followFamilyHealthPlan, vm.initialSurvey);
+            vm.survey.familyHealthPlan, vm.survey.followFamilyHealthPlan, vm.survey.visitedDoctor, vm.initialSurvey);
           var surveyObject = {
             _id: 'scr_',
             owner: vm.child._id,
@@ -343,6 +342,7 @@
             muac: vm.survey.muac,
             familyHealthPlan: vm.survey.familyHealthPlan,
             followFamilyHealthPlan: vm.survey.followFamilyHealthPlan,
+            visitedDoctor: vm.survey.visitedDoctor,
             monthAge: vm.survey.monthAge,
             comments: vm.child.comments,
             interviewer: vm.interviewer,
@@ -356,6 +356,7 @@
           vm.survey.muac = '';
           vm.survey.familyHealthPlan = false;
           vm.survey.followFamilyHealthPlan = false;
+          vm.survey.visitedDoctor = false;
         }
       }
     }

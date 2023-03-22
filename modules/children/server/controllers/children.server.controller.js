@@ -793,7 +793,7 @@ function listAllChildren(childScreenList, screenType) {
             if (childScreenList[1].data.total_rows > 0) {
               sortedScreenList = getScreeningsList(childEntry.id, childScreenList[1].data.rows);
               sortedScreenList.forEach(async (entry, screenIndex) => {
-                lineAccumulator.push(addLineToStack(childIndex + 1, screenIndex + 1, childEntry.key, entry, childScreenList[0].parms.sortField, childScreenList[0].stake, childScreenList[0].parms.stakeName, childScreenList[0].parms.language, childScreenList[0].parms.cCode, entry.muac, entry.familyHealthPlan, entry.followFamilyHealthPlan));
+                lineAccumulator.push(addLineToStack(childIndex + 1, screenIndex + 1, childEntry.key, entry, childScreenList[0].parms.sortField, childScreenList[0].stake, childScreenList[0].parms.stakeName, childScreenList[0].parms.language, childScreenList[0].parms.cCode, entry.muac, entry.familyHealthPlan, entry.followFamilyHealthPlan, entry.visitedDoctor));
               });
             }
           } catch (err) {
@@ -805,7 +805,7 @@ function listAllChildren(childScreenList, screenType) {
           if (childScreenList[1].data.total_rows > 0) {
             sortedScreenList = getScreeningsList(childEntry.id, childScreenList[1].data.rows);
             sortedScreenList.forEach(function (entry, screenIndex) {
-              lineAccumulator.push(addLineToStack(childIndex + 1, screenIndex + 1, childEntry.key, entry, childScreenList[0].parms.sortField, childScreenList[0].stake, childScreenList[0].parms.stakeName, childScreenList[0].parms.language, childScreenList[0].parms.cCode, entry.muac, entry.familyHealthPlan, entry.followFamilyHealthPlan));
+              lineAccumulator.push(addLineToStack(childIndex + 1, screenIndex + 1, childEntry.key, entry, childScreenList[0].parms.sortField, childScreenList[0].stake, childScreenList[0].parms.stakeName, childScreenList[0].parms.language, childScreenList[0].parms.cCode, entry.muac, entry.familyHealthPlan, entry.followFamilyHealthPlan, entry.visitedDoctor));
             });
           }
         } catch (err) {
@@ -1069,7 +1069,7 @@ function addChildToLine(screenType, existingOwnerInfo, screenInfo, sortField, st
   }
 }
 
-function addLineToStack(childCount, screenCount, ownerInfo, screenInfo, sortField, stakeDB, stakeName, language, cCode, muac, familyHealthPlan, followFamilyHealthPlan) {
+function addLineToStack(childCount, screenCount, ownerInfo, screenInfo, sortField, stakeDB, stakeName, language, cCode, muac, familyHealthPlan, followFamilyHealthPlan, visitedDoctor) {
   if (typeof ownerInfo.address === 'string' && ownerInfo.address.indexOf(',') > -1) {
     ownerInfo.address = ownerInfo.address.replace(/,/g, ' ');
   }
@@ -1106,6 +1106,9 @@ function addLineToStack(childCount, screenCount, ownerInfo, screenInfo, sortFiel
   if (followFamilyHealthPlan === undefined) {
     followFamilyHealthPlan = ' ';
   }
+  if (visitedDoctor === undefined) {
+    visitedDoctor = ' ';
+  }
   if (!ownerInfo.firstName) {
     console.log('firstName invalid');
     ownerInfo.firstname = 'unknown';
@@ -1141,14 +1144,15 @@ function addLineToStack(childCount, screenCount, ownerInfo, screenInfo, sortFiel
     screenId: screenInfo._id,
     muac: muac,
     familyHealthPlan: familyHealthPlan,
-    followFamilyHealthPlan: followFamilyHealthPlan
+    followFamilyHealthPlan: followFamilyHealthPlan,
+    visitedDoctor: visitedDoctor
   };
 
   const zscoreStatus = calculateStatus(screenInfo);
   var dataLine = cCode + ',' + stakeName + ',' + childCount + ',' + stakeDB + ',' + screenCount + ',' + dataObj.childId + ',' + dataObj.gender + ',' + dataObj.firstName + ',' + dataObj.lastName + ',' + dataObj.birthDate
     + ',' + dataObj.idGroup + ',' + dataObj.mother + ',' + dataObj.father + ',' + dataObj.phone + ',' + dataObj.address
     + ',' + dataObj.city + ',' + dataObj.ward + ',' + dataObj.memberStatus + ',' + dataObj.screenId + ',' + dataObj.surveyDate
-    + ',' + dataObj.weight + ',' + dataObj.height + ',' + dataObj.age + ',' + dataObj.obese + ',' + dataObj.ha + ',' + dataObj.wa + ',' + dataObj.wl + ',' + zscoreStatus.zscoreStatus + ',' + muac + ',' + familyHealthPlan + ',' + followFamilyHealthPlan + ','  + '\n';
+    + ',' + dataObj.weight + ',' + dataObj.height + ',' + dataObj.age + ',' + dataObj.obese + ',' + dataObj.ha + ',' + dataObj.wa + ',' + dataObj.wl + ',' + zscoreStatus.zscoreStatus + ',' + muac + ',' + familyHealthPlan + ',' + followFamilyHealthPlan + ',' + visitedDoctor + ',' + '\n';
   return {
     data: dataObj,
     dataLine: dataLine,
@@ -1582,7 +1586,7 @@ exports.createCSVFromDB = async function (req, res) {
         headerLine = 'mothersName, firstName,lastName,age,LDS,ward,status,stake,Counsel,country,Leaving,LastScreeningDate,phone,address,ImprovementFromLastScreening,CoordinatingCounsel\n';
       } else if (parmObj.csvType !== 'sup') {
         parmObj.fileToSave = `${ tokenInfo.iat }_${ req.params.cCode }_${ req.params.csvType }_dbDump.csv`;
-        headerLine = 'Country,Stake,child Index,stake db name,screen Count,id,gender,firstName,lastName,birthdate,idGroup,mother,father,phone,address,city,ward,lds,screenId,screenDate,weight,height,age,obese,ha,wa,wh,status,muac,FamilyHealthPlan,FollowFamilyHealthPlan\n';
+        headerLine = 'Country,Stake,child Index,stake db name,screen Count,id,gender,firstName,lastName,birthdate,idGroup,mother,father,phone,address,city,ward,lds,screenId,screenDate,weight,height,age,obese,ha,wa,wh,status,muac,FamilyHealthPlan,FollowFamilyHealthPlan,VisitedDoctor\n';
       }
 
       if (parmObj.scopeType === 'countries') {
