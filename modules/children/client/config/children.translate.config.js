@@ -53,8 +53,10 @@
       REVIEW_HEALTH_LESSONS: 'Review 5 areas of healthy behavior from the health lessons to see if the family can make improvements',
       FAMILY_HEALTH_PLAN: 'Do you have a family health plan?',
       FOLLOW_FAMILY_HEALTH_PLAN: 'Do you follow your family health plan?',
+      VISITED_DOCTOR_OR_CLINIC: 'Have you visited a Doctor of clinic?',
       FAM_HEALTH_PLAN: 'Family Health Plan',
       FOL_FAM_HEALTH_PLAN: 'Follow Family Health Plan',
+      HAS_VISITED_DOCOTR: 'Has visited Doctor',
 
       MIN_HEALTH_HEIGHT: 'Minimum Healthy Height',
       CHILD_HEIGHT_GRAPH: 'Child Height (cm)',
@@ -235,8 +237,10 @@
       REVIEW_HEALTH_LESSONS: 'Repase 5 áreas de comportamiento saludable de las lecciones de salud para ver si la familia puede hacer mejoras',
       FAMILY_HEALTH_PLAN: '¿Tiene un plan de salud familiar?',
       FOLLOW_FAMILY_HEALTH_PLAN: '¿Sigue su plan de salud familiar?',
+      VISITED_DOCTOR_OR_CLINIC: '¿Ha visitado un médico o una clínica?',
       FAM_HEALTH_PLAN: 'Plan de salud familiar',
       FOL_FAM_HEALTH_PLAN: 'Sigue su plan de salud familiar',
+      HAS_VISITED_DOCOTR: 'Ha visitado al doctor',
 
       MIN_HEALTH_HEIGHT: 'Altura Mínima Saludable',
       CHILD_HEIGHT_GRAPH: 'Altura del niño (cm)',
