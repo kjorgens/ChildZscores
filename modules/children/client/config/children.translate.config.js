@@ -53,7 +53,7 @@
       REVIEW_HEALTH_LESSONS: 'Review 5 areas of healthy behavior from the health lessons to see if the family can make improvements',
       FAMILY_HEALTH_PLAN: 'Do you have a family health plan?',
       FOLLOW_FAMILY_HEALTH_PLAN: 'Do you follow your family health plan?',
-      VISITED_DOCTOR_OR_CLINIC: 'Have you visited a Doctor of clinic?',
+      VISITED_DOCTOR_OR_CLINIC: 'Have you visited a Doctor or clinic?',
       FAM_HEALTH_PLAN: 'Family Health Plan',
       FOL_FAM_HEALTH_PLAN: 'Follow Family Health Plan',
       HAS_VISITED_DOCOTR: 'Has visited Doctor',

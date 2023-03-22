@@ -18,10 +18,8 @@
     function checkAllFieldsValid() {
       if (((vm.survey.height === '' || vm.survey.height === undefined) && (vm.childWeightIsValid === true))){
         vm.invalidFields = true;
-        //vm.childHeightIsValid = false;
       } else if (((vm.survey.weight === '' || vm.survey.weight === undefined) && (vm.childHeightIsValid === true))){
         vm.invalidFields = true;
-        //vm.childWeightIsValid = false;
       } 
 
       if (vm.childHeightIsValid === false || vm.childWeightIsValid === false || vm.muacIsValid === false){
