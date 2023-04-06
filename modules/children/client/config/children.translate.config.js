@@ -56,7 +56,7 @@
       VISITED_DOCTOR_OR_CLINIC: 'Have you visited a Doctor or clinic?',
       FAM_HEALTH_PLAN: 'Family Health Plan',
       FOL_FAM_HEALTH_PLAN: 'Follow Family Health Plan',
-      HAS_VISITED_DOCOTR: 'Has visited Doctor',
+      HAS_VISITED_DOCTOR: 'Has visited Doctor or health clinic',
 
       MIN_HEALTH_HEIGHT: 'Minimum Healthy Height',
       CHILD_HEIGHT_GRAPH: 'Child Height (cm)',
@@ -241,7 +241,7 @@
       VISITED_DOCTOR_OR_CLINIC: '¿Ha visitado un médico o una clínica?',
       FAM_HEALTH_PLAN: 'Plan de salud familiar',
       FOL_FAM_HEALTH_PLAN: 'Sigue su plan de salud familiar',
-      HAS_VISITED_DOCOTR: 'Ha visitado al doctor',
+      HAS_VISITED_DOCTOR: 'Ha visitado al doctor o clinica de salud',
 
       MIN_HEALTH_HEIGHT: 'Altura Mínima Saludable',
       CHILD_HEIGHT_GRAPH: 'Altura del niño (cm)',
