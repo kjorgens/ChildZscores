@@ -705,38 +705,38 @@ function listAllChildren(childScreenList, screenType) {
             ));
           } else if (screenType === 'sup') {
             if (currentAge < 60 && ~childEntry.id.indexOf('chld')) {
-            // if (childEntry.key.firstName === 'HAILIE YHAL') {
-            //   childEntry.zscoreStatus = calculateStatus(sortedScreenList[0]).zscoreStatus;
-            //   console.log('stop');
-            // }
-            // if (childEntry.key.firstName === '') {
-            //   childEntry.zscoreStatus = calculateStatus(sortedScreenList[0]).zscoreStatus;
-            //   console.log('stop');
-            // }
-            sortedScreenList = getScreeningsList(childEntry.id, childScreenList[1].data.rows);
-            timeSinceLastScreen = moment().diff(moment(new Date(sortedScreenList[0].surveyDate)), 'months');
-            if (sortedScreenList.length === 0) {
-              noScreenings + 1;
-              if (screenType === 'sup'){
-                lineAccumulator.push(addChildToLine(
-                  screenType,
-                  childEntry.key, sortedScreenList[0],
-                  childScreenList[0].parms.sortField,
-                  childScreenList[0].parms.stakeDB,
-                  childScreenList[0].parms.filter,
-                  ' ',
-                  100,
-                  'no',
-                  childScreenList[0].language,
-                  childScreenList[0].parms.stakeName,
-                  childScreenList[0].parms.cCode
-                ));
-              } 
-            } else {
-              supType = 'none';
-              priorMalnurished = 'no';
-              currentSupType = 'none';
-              sortedScreenList.forEach(async (screening, screenIndex) => {
+              // if (childEntry.key.firstName === 'HAILIE YHAL') {
+              //   childEntry.zscoreStatus = calculateStatus(sortedScreenList[0]).zscoreStatus;
+              //   console.log('stop');
+              // }
+              // if (childEntry.key.firstName === '') {
+              //   childEntry.zscoreStatus = calculateStatus(sortedScreenList[0]).zscoreStatus;
+              //   console.log('stop');
+              // }
+              sortedScreenList = getScreeningsList(childEntry.id, childScreenList[1].data.rows);
+              timeSinceLastScreen = moment().diff(moment(new Date(sortedScreenList[0].surveyDate)), 'months');
+              if (sortedScreenList.length === 0) {
+                  noScreenings + 1;
+                  if (screenType === 'sup'){
+                    lineAccumulator.push(addChildToLine(
+                      screenType,
+                      childEntry.key, sortedScreenList[0],
+                      childScreenList[0].parms.sortField,
+                      childScreenList[0].parms.stakeDB,
+                      childScreenList[0].parms.filter,
+                      ' ',
+                      100,
+                      'no', 
+                      childScreenList[0].language,
+                      childScreenList[0].parms.stakeName,
+                      childScreenList[0].parms.cCode
+                    ));
+                  } 
+              } else {
+                supType = 'none';
+                priorMalnurished = 'no';
+                currentSupType = 'none';
+                sortedScreenList.forEach(async (screening, screenIndex) => {
                 if ((screening.zScore.ha < -2 || screening.zScore.wa < -2)) {
                   priorMalnurished = 'yes';
                   if (currentAge < 36) {
@@ -794,6 +794,28 @@ function listAllChildren(childScreenList, screenType) {
               }
             }
           }
+        } else if (screenType === 'chronicSup') { 
+            if ((currentAge < 60 && currentAge >= 36) && ~childEntry.id.indexOf('chld')) {
+              sortedScreenList = getScreeningsList(childEntry.id, childScreenList[1].data.rows);
+              if ((sortedScreenList[0].zScore.ha < -2 || sortedScreenList[0].zScore.wa < -2) && sortedScreenList[0].zScore.wl > -2 ){
+                timeSinceLastScreen = moment().diff(moment(new Date(sortedScreenList[0].surveyDate)), 'months');
+                if (screenType === 'chronicSup'){
+                  lineAccumulator.push(addChildToLine(
+                    screenType,
+                    childEntry.key, sortedScreenList[0],
+                    childScreenList[0].parms.sortField,
+                    childScreenList[0].parms.stakeDB,
+                    childScreenList[0].parms.filter,
+                    ' ',
+                    100,
+                    'no',
+                    childScreenList[0].language,
+                    childScreenList[0].parms.stakeName,
+                    childScreenList[0].parms.cCode
+                  ));
+                } 
+              }
+            }
         } else if (screenType === 'all') {
           try {
             if (childScreenList[1].data.total_rows > 0) {
@@ -967,7 +989,24 @@ function addChildToLine(screenType, existingOwnerInfo, screenInfo, sortField, st
   var message;
   var currentAge = moment().diff(moment(new Date(ownerInfo.birthDate)), 'months');
   var priorMessage = language === 'en' ? `${ priorMalNurish }` : `${ priorMalNurish === 'yes' ? 'si' : 'no' }`;
-  //if ()
+  
+  if (screenType === 'chronicSup'){
+    dataLine = `,,,,,,${supType},${currentAge},${priorMessage},${ownerInfo.firstName},${ownerInfo.lastName},${ownerInfo.ward},${ownerInfo.mother},${timeSinceLastScreen}`;
+    if (stakeName) {
+      dataLine += ',' + ccode + ',' + stakeName;
+    }
+    dataLine += '\n';
+
+    return ({
+      data: ownerInfo,
+      dataLine: dataLine,
+      stakeDB: stakeDB,
+      sortField: sortField,
+      filter: filter,
+      language: language
+    });
+  } 
+
   if (supType.indexOf('risk') > -1) {
     // message = language === 'en' ? ' months since last screening\n'
     //   : ' meses desde la última evaluación\n';
@@ -1366,6 +1405,8 @@ async function saveStake(stakeInfo, timeOutMultiplier) {
     const screeningData = await getChildAndData(stakeInfo, timeOutMultiplier);
     if (stakeInfo.csvType === 'sup') {
       childData = buildOutputData(splitSups(sortList(listAllChildren(screeningData, stakeInfo.csvType))));
+    } else if (stakeInfo.csvType === 'chronicSup') {
+      childData = buildOutputData(splitSups(sortList(listAllChildren(screeningData, stakeInfo.csvType))));
     } else if (stakeInfo.csvType === 'summary') {
       childData = buildOutputData(sortList(listAllChildren(screeningData, stakeInfo.csvType)));
     } else {
@@ -1590,12 +1631,15 @@ exports.createCSVFromDB = async function (req, res) {
         headerLine = '1,2,3,4,5,6,Sup,age,Prior Sup,firstName,lastName,ward,mother,months since last screening,country,stake\n';
       }
 
-      if (parmObj.csvType === 'summary'){
+      if (parmObj.csvType === 'chronicSup') {
+        parmObj.fileToSave = `chronic_sup_list_${ req.params.stakeDB }_${tokenInfo.iat}_dbDump.csv`;
+        headerLine = '1,2,3,4,5,6,Sup,age,Prior Sup,firstName,lastName,ward,mother,months since last screening,country,stake\n';
+      } else if (parmObj.csvType === 'summary'){
         parmObj.fileToSave = `summary_${ req.params.stakeDB }_${tokenInfo.iat}_${moment().format()}_dbDump.csv`;
         headerLine = 'mothersName, firstName,lastName,age,LDS,ward,status,stake,Counsel,country,Leaving,LastScreeningDate,phone,address,ImprovementFromLastScreening,CoordinatingCounsel,FamilyHealthPlan,FollowFamilyHealthPlan,VisitedDoctorOrHealthClinic\n';
       } else if (parmObj.csvType !== 'sup') {
         parmObj.fileToSave = `${ tokenInfo.iat }_${ req.params.cCode }_${ req.params.csvType }_dbDump.csv`;
-        headerLine = 'Country,Stake,child Index,stake db name,screen Count,id,gender,firstName,lastName,birthdate,idGroup,mother,father,phone,address,city,ward,lds,screenId,screenDate,weight,height,age,obese,ha,wa,wh,status,muac,FamilyHealthPlan,FollowFamilyHealthPlan,VisitedDoctor\n';
+        headerLine = 'Country,Stake,child Index,stake db name,screen Count,id,gender,firstName,lastName,birthdate,idGroup,mother,father,phone,address,city,ward,lds,screenId,screenDate,weight,height,age,obese,ha,wa,wh,status,muac,FamilyHealthPlan,FollowFamilyHealthPlan,VisitedDoctorOrHealthClinic\n';
       }
 
       if (parmObj.scopeType === 'countries') {
