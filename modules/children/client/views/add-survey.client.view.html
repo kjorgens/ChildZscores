@@ -21,7 +21,7 @@
         </h2>
     </div>
     <h3 >
-        <span ><a id="createScreening" ng-click="vm.addSurvey()"> {{'UPDATE' | translate}}
+        <span ng-hide="vm.invalidFields"><a id="createScreening" ng-click="vm.addSurvey()"> {{'UPDATE' | translate}}
             <i class="glyphicon glyphicon-export"></i></a>
         </span>
     </h3>
@@ -71,11 +71,16 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        <label for="vm.survey.muac" class="col-sm-2 control-label">{{'MUAC'}}</label>
-                        <div class="col-sm-4">
-                            <input type="number" class="form-control" ng-blur="vm.checkMUACIsValid()"
-                                   ng-model="vm.survey.muac" id="vm.survey.muac"
-                                   placeholder="{{'MUAC'}}" required>
+                        <div ng-class="{'has-error':(vm.muacIsValid === false)}">
+                            <label for="vm.survey.muac" class="col-sm-2 control-label">{{'MUAC'}}</label>
+                            <div class="col-sm-4">
+                                <input type="number" class="form-control" ng-blur="vm.checkMUACIsValid()"
+                                    ng-model="vm.survey.muac" id="vm.survey.muac"
+                                    placeholder="{{'MUAC'}}" required>
+                                <div class="validationMessage" ng-if="vm.muacIsValid === false">
+                                    <p>{{'PLEASE_ENTER_VALID_MUAC' | translate}}
+                                    </p></div>    
+                            </div>
                         </div>
                         <div class="col-sm-6">
                             <label for="vm.survey.familyHealthPlan" class="col-sm-8 control-label">{{'FAMILY_HEALTH_PLAN' | translate}}</label>
@@ -91,6 +96,13 @@
                             <div class="col-sm-2">
                                 <input type="checkbox" id="vm.survey.followFamilyHealthPlan" class="col-sm-2 form-control"
                                     ng-model="vm.survey.followFamilyHealthPlan">
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <label for="vm.survey.visitedDoctor" class="col-sm-8 control-label">{{'VISITED_DOCTOR_OR_CLINIC' | translate}}</label>
+                            <div class="col-sm-2">
+                                <input type="checkbox" id="vm.survey.visitedDoctor" class="col-sm-2 form-control"
+                                    ng-model="vm.survey.visitedDoctor">
                             </div>
                         </div>
                     </div>

@@ -683,8 +683,11 @@ function listAllChildren(childScreenList, screenType) {
       if (!~childEntry.id.indexOf('mthr')) {
         if (screenType === 'summary'){
           sortedScreenList = getScreeningsList(childEntry.id, childScreenList[1].data.rows);
-          // console.log(childEntry);
-          // console.log(childIndex);
+
+          var familyHealthPlan = sortedScreenList[0].familyHealthPlan; 
+          var followFamilyHealthPlan  = sortedScreenList[0].followFamilyHealthPlan; 
+          var visitedDoctor = sortedScreenList[0].visitedDoctor;
+
           summaryAddOns = summaryReport(sortedScreenList, currentAge, childScreenList[0].parms.stakeName);
           lineAccumulator.push(addSummaryLineToStack(
             screenType, 
@@ -695,7 +698,10 @@ function listAllChildren(childScreenList, screenType) {
             childScreenList[0].parms.stakeName, 
             childScreenList[0].parms.language, 
             childScreenList[0].parms.cCode,
-            summaryAddOns
+            summaryAddOns, 
+            familyHealthPlan,
+            followFamilyHealthPlan,
+            visitedDoctor
             ));
           } else if (screenType === 'sup') {
             if (currentAge < 60 && ~childEntry.id.indexOf('chld')) {
@@ -793,7 +799,7 @@ function listAllChildren(childScreenList, screenType) {
             if (childScreenList[1].data.total_rows > 0) {
               sortedScreenList = getScreeningsList(childEntry.id, childScreenList[1].data.rows);
               sortedScreenList.forEach(async (entry, screenIndex) => {
-                lineAccumulator.push(addLineToStack(childIndex + 1, screenIndex + 1, childEntry.key, entry, childScreenList[0].parms.sortField, childScreenList[0].stake, childScreenList[0].parms.stakeName, childScreenList[0].parms.language, childScreenList[0].parms.cCode, entry.muac, entry.familyHealthPlan, entry.followFamilyHealthPlan));
+                lineAccumulator.push(addLineToStack(childIndex + 1, screenIndex + 1, childEntry.key, entry, childScreenList[0].parms.sortField, childScreenList[0].stake, childScreenList[0].parms.stakeName, childScreenList[0].parms.language, childScreenList[0].parms.cCode, entry.muac, entry.familyHealthPlan, entry.followFamilyHealthPlan, entry.visitedDoctor));
               });
             }
           } catch (err) {
@@ -805,7 +811,7 @@ function listAllChildren(childScreenList, screenType) {
           if (childScreenList[1].data.total_rows > 0) {
             sortedScreenList = getScreeningsList(childEntry.id, childScreenList[1].data.rows);
             sortedScreenList.forEach(function (entry, screenIndex) {
-              lineAccumulator.push(addLineToStack(childIndex + 1, screenIndex + 1, childEntry.key, entry, childScreenList[0].parms.sortField, childScreenList[0].stake, childScreenList[0].parms.stakeName, childScreenList[0].parms.language, childScreenList[0].parms.cCode, entry.muac, entry.familyHealthPlan, entry.followFamilyHealthPlan));
+              lineAccumulator.push(addLineToStack(childIndex + 1, screenIndex + 1, childEntry.key, entry, childScreenList[0].parms.sortField, childScreenList[0].stake, childScreenList[0].parms.stakeName, childScreenList[0].parms.language, childScreenList[0].parms.cCode, entry.muac, entry.familyHealthPlan, entry.followFamilyHealthPlan, entry.visitedDoctor));
             });
           }
         } catch (err) {
@@ -1069,7 +1075,7 @@ function addChildToLine(screenType, existingOwnerInfo, screenInfo, sortField, st
   }
 }
 
-function addLineToStack(childCount, screenCount, ownerInfo, screenInfo, sortField, stakeDB, stakeName, language, cCode, muac, familyHealthPlan, followFamilyHealthPlan) {
+function addLineToStack(childCount, screenCount, ownerInfo, screenInfo, sortField, stakeDB, stakeName, language, cCode, muac, familyHealthPlan, followFamilyHealthPlan, visitedDoctor) {
   if (typeof ownerInfo.address === 'string' && ownerInfo.address.indexOf(',') > -1) {
     ownerInfo.address = ownerInfo.address.replace(/,/g, ' ');
   }
@@ -1106,6 +1112,9 @@ function addLineToStack(childCount, screenCount, ownerInfo, screenInfo, sortFiel
   if (followFamilyHealthPlan === undefined) {
     followFamilyHealthPlan = ' ';
   }
+  if (visitedDoctor === undefined) {
+    visitedDoctor = ' ';
+  }
   if (!ownerInfo.firstName) {
     console.log('firstName invalid');
     ownerInfo.firstname = 'unknown';
@@ -1141,14 +1150,15 @@ function addLineToStack(childCount, screenCount, ownerInfo, screenInfo, sortFiel
     screenId: screenInfo._id,
     muac: muac,
     familyHealthPlan: familyHealthPlan,
-    followFamilyHealthPlan: followFamilyHealthPlan
+    followFamilyHealthPlan: followFamilyHealthPlan,
+    visitedDoctor: visitedDoctor
   };
 
   const zscoreStatus = calculateStatus(screenInfo);
   var dataLine = cCode + ',' + stakeName + ',' + childCount + ',' + stakeDB + ',' + screenCount + ',' + dataObj.childId + ',' + dataObj.gender + ',' + dataObj.firstName + ',' + dataObj.lastName + ',' + dataObj.birthDate
     + ',' + dataObj.idGroup + ',' + dataObj.mother + ',' + dataObj.father + ',' + dataObj.phone + ',' + dataObj.address
     + ',' + dataObj.city + ',' + dataObj.ward + ',' + dataObj.memberStatus + ',' + dataObj.screenId + ',' + dataObj.surveyDate
-    + ',' + dataObj.weight + ',' + dataObj.height + ',' + dataObj.age + ',' + dataObj.obese + ',' + dataObj.ha + ',' + dataObj.wa + ',' + dataObj.wl + ',' + zscoreStatus.zscoreStatus + ',' + muac + ',' + familyHealthPlan + ',' + followFamilyHealthPlan + ','  + '\n';
+    + ',' + dataObj.weight + ',' + dataObj.height + ',' + dataObj.age + ',' + dataObj.obese + ',' + dataObj.ha + ',' + dataObj.wa + ',' + dataObj.wl + ',' + zscoreStatus.zscoreStatus + ',' + muac + ',' + familyHealthPlan + ',' + followFamilyHealthPlan + ',' + visitedDoctor + ',' + '\n';
   return {
     data: dataObj,
     dataLine: dataLine,
@@ -1159,7 +1169,7 @@ function addLineToStack(childCount, screenCount, ownerInfo, screenInfo, sortFiel
   };
 }
 
-function addSummaryLineToStack(screentype, screenInfo, ownerInfo, sortField, stakeDB, stakeName, language, cCode, summary) {
+function addSummaryLineToStack(screentype, screenInfo, ownerInfo, sortField, stakeDB, stakeName, language, cCode, summary, familyHealthPlan, followFamilyHealthPlan, visitedDoctor) {
   var cleanDate;
   if (typeof ownerInfo.address === 'string' && ownerInfo.address.indexOf(',') > -1) {
     ownerInfo.address = ownerInfo.address.replace(/,/g, ' ');
@@ -1228,12 +1238,15 @@ function addSummaryLineToStack(screentype, screenInfo, ownerInfo, sortField, sta
     childStatus: summary.childStatus,
     childProgress: summary.childProgress,
     age: summary.currentAge,
-    coordArea: summary.coordinatingArea 
+    coordArea: summary.coordinatingArea,
+    familyHealthPlan: familyHealthPlan,
+    followFamilyHealthPlan: followFamilyHealthPlan,
+    visitedDoctor: visitedDoctor
   };
   
   var dataLine = dataObj.mother + ',' + dataObj.firstName + ',' + dataObj.lastName + ',' + dataObj.age + ',' + dataObj.memberStatus + ',' + dataObj.ward + ',' + 
     dataObj.childStatus + ',' + dataObj.stakeName + ',' + /* Consejo */ ' ' + ',' + dataObj.country + ',' + /* Saliendo */ ' ' + ',' + dataObj.surveyDate + ',' + 
-    dataObj.phone + ',' + dataObj.address + ',' + dataObj.childProgress + ',' + dataObj.coordArea + '\n';
+    dataObj.phone + ',' + dataObj.address + ',' + dataObj.childProgress + ',' + dataObj.coordArea + ',' + familyHealthPlan + ',' + followFamilyHealthPlan + ',' + visitedDoctor + '\n';
 
   return {
     data: dataObj,
@@ -1579,10 +1592,10 @@ exports.createCSVFromDB = async function (req, res) {
 
       if (parmObj.csvType === 'summary'){
         parmObj.fileToSave = `summary_${ req.params.stakeDB }_${tokenInfo.iat}_${moment().format()}_dbDump.csv`;
-        headerLine = 'mothersName, firstName,lastName,age,LDS,ward,status,stake,Counsel,country,Leaving,LastScreeningDate,phone,address,ImprovementFromLastScreening,CoordinatingCounsel\n';
+        headerLine = 'mothersName, firstName,lastName,age,LDS,ward,status,stake,Counsel,country,Leaving,LastScreeningDate,phone,address,ImprovementFromLastScreening,CoordinatingCounsel,FamilyHealthPlan,FollowFamilyHealthPlan,VisitedDoctorOrHealthClinic\n';
       } else if (parmObj.csvType !== 'sup') {
         parmObj.fileToSave = `${ tokenInfo.iat }_${ req.params.cCode }_${ req.params.csvType }_dbDump.csv`;
-        headerLine = 'Country,Stake,child Index,stake db name,screen Count,id,gender,firstName,lastName,birthdate,idGroup,mother,father,phone,address,city,ward,lds,screenId,screenDate,weight,height,age,obese,ha,wa,wh,status,muac,FamilyHealthPlan,FollowFamilyHealthPlan\n';
+        headerLine = 'Country,Stake,child Index,stake db name,screen Count,id,gender,firstName,lastName,birthdate,idGroup,mother,father,phone,address,city,ward,lds,screenId,screenDate,weight,height,age,obese,ha,wa,wh,status,muac,FamilyHealthPlan,FollowFamilyHealthPlan,VisitedDoctor\n';
       }
 
       if (parmObj.scopeType === 'countries') {

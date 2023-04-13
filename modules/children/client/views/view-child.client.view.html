@@ -89,7 +89,10 @@
                 <h6>
                     {{'FOL_FAM_HEALTH_PLAN' | translate}}: <span><input type="checkbox" onclick="false" ng-model="survey.followFamilyHealthPlan"></span>
                 </h6>
-                
+                <h6>
+                  {{'HAS_VISITED_DOCTOR' | translate}}: <span><input type="checkbox" onclick="false" ng-model="survey.visitedDoctor"></span>
+                </h6>
+
                 {{'SCREENING_DATE' | translate}}
                 <span ng-bind="survey.surveyDate | date:'mediumDate'"></span>
             </small>
