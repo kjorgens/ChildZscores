@@ -71,7 +71,7 @@
                         {{'W_H' | translate}}:  <span  ng-bind="survey.zScore.wl | number:2"></span>
                     </li>
                 </h4>
-                <h4 ng-hide="survey.muac == unidentified" > 
+                <h4 ng-hide="survey.muac === null" > 
                   {{'MUAC: '}} 
                   <li ng-show="survey.muac > 12.5" class="greenMUAC">
                     <span ng-bind="survey.muac "></span>
@@ -79,7 +79,7 @@
                   <li ng-show="survey.muac <= 12.5 && survey.muac >= 11.5" class="yellowMUAC">
                     <span ng-bind="survey.muac "></span>
                   </li>
-                  <li ng-show="survey.muac < 11.5" class="redMUAC">
+                  <li ng-show="survey.muac >= 5 && survey.muac < 11.5" class="redMUAC">
                     <span ng-bind="survey.muac "></span>
                   </li>
                 </h4>
