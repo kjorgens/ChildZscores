@@ -379,6 +379,124 @@
     { x: 99.9, y: 13.7 }
   ];
 
+  var muacGreen = [
+    {x: 5, y: 12.5, size: 0.1, shape: 'triangle-up'},
+    {x: 6, y: 12.5, size: 0.1, shape: 'triangle-up'},
+    {x: 7, y: 12.5, size: 0.1, shape: 'triangle-up'},
+    {x: 8, y: 12.5, size: 0.1, shape: 'triangle-up'},
+    {x: 9, y: 12.5, size: 0.1, shape: 'triangle-up'},
+    {x: 10, y: 12.5, size: 0.1, shape: 'triangle-up'},
+    {x: 11, y: 12.5, size: 0.1, shape: 'triangle-up'},
+    {x: 12, y: 12.5, size: 0.1, shape: 'triangle-up'},
+    {x: 13, y: 12.5, size: 0.1, shape: 'triangle-up'},
+    {x: 14, y: 12.5, size: 0.1, shape: 'triangle-up'},
+    {x: 15, y: 12.5, size: 0.1, shape: 'triangle-up'},
+    {x: 16, y: 12.5, size: 0.1, shape: 'triangle-up'},
+    {x: 17, y: 12.5, size: 0.1, shape: 'triangle-up'},
+    {x: 18, y: 12.5, size: 0.1, shape: 'triangle-up'},
+    {x: 19, y: 12.5, size: 0.1, shape: 'triangle-up'},
+    {x: 20, y: 12.5, size: 0.1, shape: 'triangle-up'},
+    {x: 21, y: 12.5, size: 0.1, shape: 'triangle-up'},
+    {x: 22, y: 12.5, size: 0.1, shape: 'triangle-up'},
+    {x: 23, y: 12.5, size: 0.1, shape: 'triangle-up'},
+    {x: 24, y: 12.5, size: 0.1, shape: 'triangle-up'},
+    {x: 25, y: 12.5, size: 0.1, shape: 'triangle-up'},
+    {x: 26, y: 12.5, size: 0.1, shape: 'triangle-up'},
+    {x: 27, y: 12.5, size: 0.1, shape: 'triangle-up'},
+    {x: 28, y: 12.5, size: 0.1, shape: 'triangle-up'},
+    {x: 29, y: 12.5, size: 0.1, shape: 'triangle-up'},
+    {x: 30, y: 12.5, size: 0.1, shape: 'triangle-up'},
+    {x: 31, y: 12.5, size: 0.1, shape: 'triangle-up'},
+    {x: 32, y: 12.5, size: 0.1, shape: 'triangle-up'},
+    {x: 33, y: 12.5, size: 0.1, shape: 'triangle-up'},
+    {x: 34, y: 12.5, size: 0.1, shape: 'triangle-up'},
+    {x: 35, y: 12.5, size: 0.1, shape: 'triangle-up'},
+    {x: 36, y: 12.5, size: 0.1, shape: 'triangle-up'},
+    {x: 37, y: 12.5, size: 0.1, shape: 'triangle-up'},
+    {x: 38, y: 12.5, size: 0.1, shape: 'triangle-up'},
+    {x: 39, y: 12.5, size: 0.1, shape: 'triangle-up'},
+    {x: 40, y: 12.5, size: 0.1, shape: 'triangle-up'},
+    {x: 41, y: 12.5, size: 0.1, shape: 'triangle-up'},
+    {x: 42, y: 12.5, size: 0.1, shape: 'triangle-up'},
+    {x: 43, y: 12.5, size: 0.1, shape: 'triangle-up'},
+    {x: 44, y: 12.5, size: 0.1, shape: 'triangle-up'},
+    {x: 45, y: 12.5, size: 0.1, shape: 'triangle-up'},
+    {x: 46, y: 12.5, size: 0.1, shape: 'triangle-up'},
+    {x: 47, y: 12.5, size: 0.1, shape: 'triangle-up'},
+    {x: 48, y: 12.5, size: 0.1, shape: 'triangle-up'},
+    {x: 49, y: 12.5, size: 0.1, shape: 'triangle-up'},
+    {x: 50, y: 12.5, size: 0.1, shape: 'triangle-up'},
+    {x: 51, y: 12.5, size: 0.1, shape: 'triangle-up'},
+    {x: 52, y: 12.5, size: 0.1, shape: 'triangle-up'},
+    {x: 53, y: 12.5, size: 0.1, shape: 'triangle-up'},
+    {x: 54, y: 12.5, size: 0.1, shape: 'triangle-up'},
+    {x: 55, y: 12.5, size: 0.1, shape: 'triangle-up'},
+    {x: 56, y: 12.5, size: 0.1, shape: 'triangle-up'},
+    {x: 57, y: 12.5, size: 0.1, shape: 'triangle-up'},
+    {x: 58, y: 12.5, size: 0.1, shape: 'triangle-up'},
+    {x: 59, y: 12.5, size: 0.1, shape: 'triangle-up'},
+    {x: 60, y: 12.5, size: 0.1, shape: 'triangle-up'}
+  ];
+
+  var muacRed = [
+    {x: 5, y: 11.5, size: 0.1, shape: 'triangle-down'},
+    {x: 6, y: 11.5, size: 0.1, shape: 'triangle-down'},
+    {x: 7, y: 11.5, size: 0.1, shape: 'triangle-down'},
+    {x: 8, y: 11.5, size: 0.1, shape: 'triangle-down'},
+    {x: 9, y: 11.5, size: 0.1, shape: 'triangle-down'},
+    {x: 10, y: 11.5, size: 0.1, shape: 'triangle-down'},
+    {x: 11, y: 11.5, size: 0.1, shape: 'triangle-down'},
+    {x: 12, y: 11.5, size: 0.1, shape: 'triangle-down'},
+    {x: 13, y: 11.5, size: 0.1, shape: 'triangle-down'},
+    {x: 14, y: 11.5, size: 0.1, shape: 'triangle-down'},
+    {x: 15, y: 11.5, size: 0.1, shape: 'triangle-down'},
+    {x: 16, y: 11.5, size: 0.1, shape: 'triangle-down'},
+    {x: 17, y: 11.5, size: 0.1, shape: 'triangle-down'},
+    {x: 18, y: 11.5, size: 0.1, shape: 'triangle-down'},
+    {x: 19, y: 11.5, size: 0.1, shape: 'triangle-down'},
+    {x: 20, y: 11.5, size: 0.1, shape: 'triangle-down'},
+    {x: 21, y: 11.5, size: 0.1, shape: 'triangle-down'},
+    {x: 22, y: 11.5, size: 0.1, shape: 'triangle-down'},
+    {x: 23, y: 11.5, size: 0.1, shape: 'triangle-down'},
+    {x: 24, y: 11.5, size: 0.1, shape: 'triangle-down'},
+    {x: 25, y: 11.5, size: 0.1, shape: 'triangle-down'},
+    {x: 26, y: 11.5, size: 0.1, shape: 'triangle-down'},
+    {x: 27, y: 11.5, size: 0.1, shape: 'triangle-down'},
+    {x: 28, y: 11.5, size: 0.1, shape: 'triangle-down'},
+    {x: 29, y: 11.5, size: 0.1, shape: 'triangle-down'},
+    {x: 30, y: 11.5, size: 0.1, shape: 'triangle-down'},
+    {x: 31, y: 11.5, size: 0.1, shape: 'triangle-down'},
+    {x: 32, y: 11.5, size: 0.1, shape: 'triangle-down'},
+    {x: 33, y: 11.5, size: 0.1, shape: 'triangle-down'},
+    {x: 34, y: 11.5, size: 0.1, shape: 'triangle-down'},
+    {x: 35, y: 11.5, size: 0.1, shape: 'triangle-down'},
+    {x: 36, y: 11.5, size: 0.1, shape: 'triangle-down'},
+    {x: 37, y: 11.5, size: 0.1, shape: 'triangle-down'},
+    {x: 38, y: 11.5, size: 0.1, shape: 'triangle-down'},
+    {x: 39, y: 11.5, size: 0.1, shape: 'triangle-down'},
+    {x: 40, y: 11.5, size: 0.1, shape: 'triangle-down'},
+    {x: 41, y: 11.5, size: 0.1, shape: 'triangle-down'},
+    {x: 42, y: 11.5, size: 0.1, shape: 'triangle-down'},
+    {x: 43, y: 11.5, size: 0.1, shape: 'triangle-down'},
+    {x: 44, y: 11.5, size: 0.1, shape: 'triangle-down'},
+    {x: 45, y: 11.5, size: 0.1, shape: 'triangle-down'},
+    {x: 46, y: 11.5, size: 0.1, shape: 'triangle-down'},
+    {x: 47, y: 11.5, size: 0.1, shape: 'triangle-down'},
+    {x: 48, y: 11.5, size: 0.1, shape: 'triangle-down'},
+    {x: 49, y: 11.5, size: 0.1, shape: 'triangle-down'},
+    {x: 50, y: 11.5, size: 0.1, shape: 'triangle-down'},
+    {x: 51, y: 11.5, size: 0.1, shape: 'triangle-down'},
+    {x: 52, y: 11.5, size: 0.1, shape: 'triangle-down'},
+    {x: 53, y: 11.5, size: 0.1, shape: 'triangle-down'},
+    {x: 54, y: 11.5, size: 0.1, shape: 'triangle-down'},
+    {x: 55, y: 11.5, size: 0.1, shape: 'triangle-down'},
+    {x: 56, y: 11.5, size: 0.1, shape: 'triangle-down'},
+    {x: 57, y: 11.5, size: 0.1, shape: 'triangle-down'},
+    {x: 58, y: 11.5, size: 0.1, shape: 'triangle-down'},
+    {x: 59, y: 11.5, size: 0.1, shape: 'triangle-down'},
+    {x: 60, y: 11.5, size: 0.1, shape: 'triangle-down'}
+  ];
+
   angular
     .module('children.graphService')
     .factory('GraphService', GraphService);
@@ -609,6 +727,85 @@
       };
     };
 
+    factory.setupMUACChart = function(muac, age){
+      return {
+        chart: {
+          type: 'scatterChart',
+          height: 400,
+          width: 400,
+          margin: {
+            top: 20,
+            right: 20,
+            bottom: 40,
+            left: 55
+          },
+          x: function (d) {
+            return d.x;
+          },
+          y: function (d) {
+            return d.y;
+          },
+          useInteractiveGuideline: true,
+          dispatch: {
+            stateChange: function (e) {
+              console.log('stateChange');
+            },
+            changeState: function (e) {
+              console.log('changeState');
+            },
+            tooltipShow: function (e) {
+              console.log('tooltipShow');
+            },
+            tooltipHide: function (e) {
+              console.log('tooltipHide');
+            }
+          },
+          yDomain: [7,20],
+          xAxis: {
+            axisLabel: (age),
+            tickFormat: function (d) {
+              return d3.format('s')(d);
+            },
+            tickValues:([12,24,36,48,60]),
+            axisLabelDistance: -10
+          },
+          yAxis: {
+            axisLabel: (muac),
+            tickFormat: function (d) {
+              return d3.format('s')(d);
+            },
+            tickValues:([7, 10, 11.5, 12.5, 15, 20]),
+            ticks:(6),
+            axisLabelDistance: -10
+          },
+          callback: function (chart) {
+            console.log('!!! lineChart callback !!!');
+          }
+        },
+        title: {
+          enable: true,
+          text: ('MUAC')
+          // color: 'Purple'
+        },
+        subtitle: {
+          enable: false,
+          // text: 'Subtitle for simple line chart. Lorem ipsum dolor sit amet, at eam blandit sadipscing, vim adhuc sanctus disputando ex, cu usu affert alienum urbanitas.',
+          css: {
+            'text-align': 'center',
+            'margin': '10px 13px 0px 7px'
+          }
+        },
+        caption: {
+          enable: false,
+          html: '<b>Figure 1.</b> Lorem ipsum dolor sit amet, at eam blandit sadipscing, <span style="text-decoration: underline;">vim adhuc sanctus disputando ex</span>, cu usu affert alienum urbanitas. <i>Cum in purto erat, mea ne nominavi persecuti reformidans.</i> Docendi blandit abhorreant ea has, minim tantas alterum pro eu. <span style="color: darkred;">Exerci graeci ad vix, elit tacimates ea duo</span>. Id mel eruditi fuisset. Stet vidit patrioque in pro, eum ex veri verterem abhorreant, id unum oportere intellegam nec<sup>[1, <a href="https://github.com/krispo/angular-nvd3" target="_blank">2</a>, 3]</sup>.',
+          css: {
+            'text-align': 'justify',
+            'margin': '10px 13px 0px 7px'
+          }
+        }
+      };
+    };
+
     factory.getChartDataHeight = function(zscoreData, gender, ageC, age) {
       return [
         {
@@ -669,6 +866,36 @@
       ];
     };
 
+    factory.getChartDataMUAC = function(redMuac, yellowMuac, greenMuac, greenLine, redLine) {
+      return [
+          {
+            values: redMuac,
+            key: 'Red MUAC',
+            color: 'Red'
+          },
+          {
+            values: yellowMuac,
+            key: 'Yellow MUAC',
+            color: '#FFD700'
+          },
+          {
+            values: greenMuac,
+            key: 'Green MUAC',
+            color: 'Green'
+          },
+          {
+            values: greenLine = getMUACGreen(),
+            key: 'Upper',
+            color: 'Blue'
+          },
+          {
+            values: redLine = getMUACRed(),
+            key: 'Low',
+            color: 'Black'
+          }
+        ]
+    };
+
     function getGirlsHeight(survey) {
       var startHa = survey[0].x - 5;
       var endHa = survey[0].x + 5;
@@ -704,7 +931,12 @@
       var endWH = survey[survey.length - 1].x + 5;
       return weightPerHeightBoys; // .slice(startWH, endWH)
     }
-
+    function getMUACGreen() {
+      return muacGreen;
+    }
+    function getMUACRed() {
+      return muacRed;
+    }
     return factory;
   }
 }());

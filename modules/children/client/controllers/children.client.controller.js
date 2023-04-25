@@ -17,6 +17,9 @@
     vm.zscoreHa = [];
     vm.zscoreWa = [];
     vm.zscoreWH = [];
+    vm.muacGraphRed = [];
+    vm.muacGraphYellow = [];
+    vm.muacGraphGreen = [];
     vm.callback = callback;
 
     vm.supInfo = screens.sup;
@@ -184,9 +187,11 @@
         vm.optionsHeight = GraphService.setupHeightChart(vm.minHealthH, vm.childHeightH, vm.childAge);
         vm.optionsWeight = GraphService.setupWeightChart(vm.minHealthW, vm.childWeightW, vm.childAge);
         vm.optionsWeightPerHeight = GraphService.setupWeightPerHeightChart(vm.minHealthWH, vm.childWeightW, vm.childHeightH);
+        vm.optionsMUAC = GraphService.setupMUACChart('Muac','Age');
         vm.dataHeight = GraphService.getChartDataHeight(vm.zscoreHa, vm.child.gender, vm.heightAgeC, vm.heightAgeH);
         vm.dataWeight = GraphService.getChartDataWeight(vm.zscoreWa, vm.child.gender, vm.weightC, vm.weightKey);
         vm.dataWeightPerHeight = GraphService.getChartDataWeightPerHeight(vm.zscoreWH, vm.child.gender, vm.heightWeightC);
+        vm.dataMUAC = GraphService.getChartDataMUAC(vm.muacGraphRed, vm.muacGraphYellow, vm.muacGraphGreen);
       });
     }
 
@@ -246,22 +251,43 @@
 
     function setSurveyList(child, surveys) {
       // vm.stopSpin();
+
       if (surveys.length === 1) {
         vm.initialScreening = true;
       }
       surveys.forEach(function(survey) {
-        survey.colorStatus = PouchService.calcSurveyStatus(survey);
-        vm.zscoreHa.push({
-          x: survey.monthAge, y: survey.height, size: 1, shape: 'diamond'
-        });
-        vm.zscoreWa.push({
-          x: survey.monthAge, y: survey.weight, size: 1, shape: 'diamond'
-        });
-        vm.zscoreWH.push({
-          x: survey.height, y: survey.weight, size: 1, shape: 'diamond'
-        });
+        //survey.colorStatus = PouchService.calcSurveyStatus(survey);  For background color for screenings Not needed at this point.
+        if (survey.height != "") {
+          vm.zscoreHa.push({
+            x: survey.monthAge, y: survey.height, size: 1, shape: 'diamond'
+          });
+        }
+        if (survey.weight != "") {
+          vm.zscoreWa.push({
+            x: survey.monthAge, y: survey.weight, size: 1, shape: 'diamond'
+          });
+        }
+        if (survey.height != "" && survey.weight != "") {
+          vm.zscoreWH.push({
+            x: survey.height, y: survey.weight, size: 1, shape: 'diamond'
+          });
+        }
+        if (survey.muac != "" && survey.muac >= 7){
+          if (survey.muac < 11.5) {
+            vm.muacGraphRed.push({
+              x: survey.monthAge, y: survey.muac, size: 0.1, shape: 'diamond'
+            });
+          } else if (survey.muac >= 11.5 && survey.muac < 12.5) {
+            vm.muacGraphYellow.push({
+              x: survey.monthAge, y: survey.muac, size: 0.1, shape: 'diamond'
+            });
+          } else if (survey.muac > 12.5) {
+            vm.muacGraphGreen.push({
+              x: survey.monthAge, y: survey.muac, size: 0.1, shape: 'diamond'
+            });
+          }
+        }
       });
-      // vm.screenStatus = ZScores.getStatus(vm.child, surveys);
       vm.surveys = surveys;
     }
 
