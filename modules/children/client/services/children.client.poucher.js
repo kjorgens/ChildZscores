@@ -461,24 +461,24 @@
       });
     }
 
-    factory.calcSurveyStatus = function(screeningObj) {
-      var zscoreStatus = '';
-
-      if (screeningObj.zScore.wl < -2) {
-        zscoreStatus = 'redZoneZscoreBackground';
-      } else if ((screeningObj.zScore.ha < -2 || screeningObj.zScore.wa < -2) && screeningObj.monthAge > 6 && screeningObj.monthAge < 36) {
-        zscoreStatus = 'redZoneZscoreBackground';
-      } else if ((screeningObj.zScore.ha < -2 || screeningObj.zScore.wa < -2) && screeningObj.monthAge > 36 && screeningObj.monthAge < 48) {
-        zscoreStatus = 'redZoneZscoreBackground';
-      } else if (screeningObj.zScore.ha < -1
-          || screeningObj.zScore.wa < -1
-          || screeningObj.zScore.wl < -1) {
-        zscoreStatus = 'marginalZscoreBackground';
-      } else {
-        zscoreStatus = 'normalZscoreBackground';
-      }
-      return zscoreStatus;
-    };
+    // factory.calcSurveyStatus = function(screeningObj) {    For background color for screenings Not needed at this moment
+    //   var zscoreStatus = '';
+    //   debugger;
+    //   if (screeningObj.zScore.wl < -2) {
+    //     zscoreStatus = 'redZoneZscoreBackground';
+    //   } else if ((screeningObj.zScore.ha < -2 || screeningObj.zScore.wa < -2) && screeningObj.monthAge > 6 && screeningObj.monthAge < 36) {
+    //     zscoreStatus = 'redZoneZscoreBackground';
+    //   } else if ((screeningObj.zScore.ha < -2 || screeningObj.zScore.wa < -2) && screeningObj.monthAge > 36 && screeningObj.monthAge < 48) {
+    //     zscoreStatus = 'redZoneZscoreBackground';
+    //   } else if (screeningObj.zScore.ha < -1
+    //       || screeningObj.zScore.wa < -1
+    //       || screeningObj.zScore.wl < -1) {
+    //     zscoreStatus = 'marginalZscoreBackground';
+    //   } else {
+    //     zscoreStatus = 'normalZscoreBackground';
+    //   }
+    //   return zscoreStatus;
+    // };
 
     factory.statusColor = function(status) {
       return statusColor(status);

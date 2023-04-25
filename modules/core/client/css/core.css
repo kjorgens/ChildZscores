@@ -119,6 +119,22 @@ a:hover .header-profile-image {
 }
 .required input:after { content:"*"; }
 
+.whiteBackground {
+  background-color: white;
+}
+
+.greenMUAC {
+  color: green;
+}
+
+.yellowMUAC {
+  color: #ffcc00;
+}
+
+.redMUAC {
+  color: red;
+}
+
 .normalZscore {
   color: green;
 }
