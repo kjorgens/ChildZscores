@@ -419,7 +419,6 @@
     }
 
     function statusColor(status) {
-      debugger;
       if (~status.indexOf('Acute')) {
         return 'redZoneZscore';
       } else if (~status.indexOf('Micro')) {
