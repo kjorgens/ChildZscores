@@ -612,7 +612,7 @@ function summaryReport(sortedScreenList, currentAge, stakeName) {
   return summaryAddOns;
 }
 
-function listAllChildren(childScreenList, screenType) {
+function listAllChildren(childScreenList, screenType, cCode) {
   var childCount = 0;
   var sortedScreenList = [];
   var noScreenings = 0;
@@ -778,43 +778,43 @@ function listAllChildren(childScreenList, screenType) {
                 );
               }
             }
-          }
-        } else if (screenType === "chronicSup") {
-          if (
-            currentAge < 60 &&
-            currentAge >= 36 &&
-            ~childEntry.id.indexOf("chld")
-          ) {
-            sortedScreenList = getScreeningsList(
-              childEntry.id,
-              childScreenList[1].data.rows
-            );
+          } if (cCode === 'GTM' || cCode === 'SLV' || cCode === 'HND' || cCode === 'NIC') {
             if (
-              (sortedScreenList[0].zScore.ha < -2 ||
-                sortedScreenList[0].zScore.wa < -2) &&
-              sortedScreenList[0].zScore.wl > -2
+              currentAge < 60 &&
+              currentAge >= 36 &&
+              ~childEntry.id.indexOf("chld")
             ) {
-              timeSinceLastScreen = moment().diff(
-                moment(new Date(sortedScreenList[0].surveyDate)),
-                "months"
+              sortedScreenList = getScreeningsList(
+                childEntry.id,
+                childScreenList[1].data.rows
               );
-              if (screenType === "chronicSup") {
-                lineAccumulator.push(
-                  addChildToLine(
-                    screenType,
-                    childEntry.key,
-                    sortedScreenList[0],
-                    childScreenList[0].parms.sortField,
-                    childScreenList[0].parms.stakeDB,
-                    childScreenList[0].parms.filter,
-                    " ",
-                    100,
-                    "no",
-                    childScreenList[0].language,
-                    childScreenList[0].parms.stakeName,
-                    childScreenList[0].parms.cCode
-                  )
+              if (
+                (sortedScreenList[0].zScore.ha < -2 ||
+                  sortedScreenList[0].zScore.wa < -2) &&
+                sortedScreenList[0].zScore.wl > -2
+              ) {
+                timeSinceLastScreen = moment().diff(
+                  moment(new Date(sortedScreenList[0].surveyDate)),
+                  "months"
                 );
+                if (screenType === "chronicSup") {
+                  lineAccumulator.push(
+                    addChildToLine(
+                      screenType,
+                      childEntry.key,
+                      sortedScreenList[0],
+                      childScreenList[0].parms.sortField,
+                      childScreenList[0].parms.stakeDB,
+                      childScreenList[0].parms.filter,
+                      " ",
+                      100,
+                      "no",
+                      childScreenList[0].language,
+                      childScreenList[0].parms.stakeName,
+                      childScreenList[0].parms.cCode
+                    )
+                  );
+                }
               }
             }
           }
@@ -1745,7 +1745,7 @@ async function saveStake(stakeInfo, timeOutMultiplier) {
     const screeningData = await getChildAndData(stakeInfo, timeOutMultiplier);
     if (stakeInfo.csvType === "sup") {
       childData = buildOutputData(
-        splitSups(sortList(listAllChildren(screeningData, stakeInfo.csvType)))
+        splitSups(sortList(listAllChildren(screeningData, stakeInfo.csvType, stakeInfo.cCode)))
       );
     } else if (stakeInfo.csvType === "summary") {
       childData = buildOutputData(
