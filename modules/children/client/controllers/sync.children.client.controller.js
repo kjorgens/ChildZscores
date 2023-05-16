@@ -449,6 +449,9 @@
       if (stakeName === 'admin') {
         stakeName = vm.selectedStake;
       }
+      if (monthSelect === undefined) {
+        monthSelect = 6;
+      }
       var reportParams = {
         monthSelect: monthSelect,
         csvType: csvType,
