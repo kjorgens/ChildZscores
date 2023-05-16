@@ -18,8 +18,10 @@ module.exports = function (app) {
 
   // create .csv report file
   router.route('/report/:stakeDB/:cCode/:scopeType/:sortField/:language/:csvType')
-    .get(children.createCSVFromDB);
+    .get(children.createCSVFromDB);  
   // .get(passport.authenticate('jwt', { session: false }), childrenPolicy.isAllowed, children.createCSVFromDB);
+  router.route('/report/:stakeDB/:cCode/:scopeType/:sortField/:language/:csvType/:monthSelect')
+    .get(children.createCSVFromDB);
 
   // retrieve stakes route
   router.route('/stakes')

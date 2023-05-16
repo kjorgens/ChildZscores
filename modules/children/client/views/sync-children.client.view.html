@@ -118,12 +118,25 @@
                 <option value="lastName">{{'LAST_NAME' | translate}}</option>
                 <option value="memberStatus">{{'LDS_MEMBER' | translate}}</option>
             </select><br>
-          <!--<br><br>-->
+          <!--<br><br>--> 
             <a ng-click="vm.createReport('stake', vm.countryCode, vm.sortSelect, 'sup')">
                 <span>{{'GENERATE_SUPPLEMENT_REPORT' | translate}} </span>
                 <i class="glyphicon glyphicon-share"></i>
             </a><br><br>
-            <a ng-click="vm.createReport('stake', vm.countryCode, vm.sortSelect, 'summary')">
+            <select id="monthSelect" ng-model="vm.monthSelect">
+              <option value="">{{'MONTH_SELECT_SUMMARY_REPORT' | translate}}</option>
+              <option value="6">6</option>
+              <option value="12">12</option>
+              <option value="18">18</option>
+              <option value="24">24</option>
+              <option value="30">30</option>
+              <option value="36">36</option>
+              <option value="42">42</option>
+              <option value="48">48</option>
+              <option value="54">54</option>
+              <option value="60">60</option>
+            </select><br>
+            <a ng-click="vm.createReport('stake', vm.countryCode, vm.sortSelect, 'summary', vm.monthSelect)">
               <span>{{'GENERATE_SUMMARY_REPORT' | translate}} </span>
               <i class="glyphicon glyphicon-share"></i>
           </a><br><br>

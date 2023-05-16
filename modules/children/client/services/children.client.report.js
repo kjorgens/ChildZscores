@@ -13,7 +13,7 @@
         method: 'GET',
         headers: { authorization: `JWT ${ Authentication.token || localStorage.getItem('token') }` },
         // headers: { authorization: `JWT ${ Authentication.token }` },
-        url: '/api/children/report/:stakeDB/:cCode/:scopeType/:sortField/:language/:csvType',
+        url: '/api/children/report/:stakeDB/:cCode/:scopeType/:sortField/:language/:csvType/:monthSelect',
         interceptor: {
           response: response => {
             var result = response.resource;

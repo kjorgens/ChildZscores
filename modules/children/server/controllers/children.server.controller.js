@@ -666,7 +666,7 @@ function summaryReport(sortedScreenList, currentAge, stakeName){
   return summaryAddOns;
 }
 
-function listAllChildren(childScreenList, screenType) {
+function listAllChildren(childScreenList, screenType, monthSelect) {
   var childCount = 0;
   var sortedScreenList = [];
   var noScreenings = 0;
@@ -676,33 +676,38 @@ function listAllChildren(childScreenList, screenType) {
   var priorMalnurished = 'no';
   var lineAccumulator = [];
   var summaryAddOns = [];
+  var monthSelect = parseInt(monthSelect);
 
   if (childScreenList[0].data.total_rows > 0) {
     childScreenList[0].data.rows.forEach(async (childEntry, childIndex) => {
       var currentAge = moment().diff(moment(new Date(childEntry.key.birthDate)), 'months');
       if (!~childEntry.id.indexOf('mthr')) {
         if (screenType === 'summary'){
-          sortedScreenList = getScreeningsList(childEntry.id, childScreenList[1].data.rows);
+          var sortedScreenList = getScreeningsList(childEntry.id, childScreenList[1].data.rows);
 
           var familyHealthPlan = sortedScreenList[0].familyHealthPlan; 
           var followFamilyHealthPlan  = sortedScreenList[0].followFamilyHealthPlan; 
           var visitedDoctor = sortedScreenList[0].visitedDoctor;
 
-          summaryAddOns = summaryReport(sortedScreenList, currentAge, childScreenList[0].parms.stakeName);
-          lineAccumulator.push(addSummaryLineToStack(
-            screenType, 
-            sortedScreenList[0],
-            childEntry.key, 
-            childScreenList[0].parms.sortField, 
-            childScreenList[0].stake, 
-            childScreenList[0].parms.stakeName, 
-            childScreenList[0].parms.language, 
-            childScreenList[0].parms.cCode,
-            summaryAddOns, 
-            familyHealthPlan,
-            followFamilyHealthPlan,
-            visitedDoctor
-            ));
+          var diffTime = moment().diff(moment(new Date(sortedScreenList[0].surveyDate)), 'months');
+
+            if (monthSelect >= diffTime) {
+              summaryAddOns = summaryReport(sortedScreenList, currentAge, childScreenList[0].parms.stakeName);
+              lineAccumulator.push(addSummaryLineToStack(
+                screenType, 
+                sortedScreenList[0],
+                childEntry.key, 
+                childScreenList[0].parms.sortField, 
+                childScreenList[0].stake, 
+                childScreenList[0].parms.stakeName, 
+                childScreenList[0].parms.language, 
+                childScreenList[0].parms.cCode,
+                summaryAddOns, 
+                familyHealthPlan,
+                followFamilyHealthPlan,
+                visitedDoctor
+                ));
+            }
           } else if (screenType === 'sup') {
             if (currentAge < 60 && ~childEntry.id.indexOf('chld')) {
             // if (childEntry.key.firstName === 'HAILIE YHAL') {
@@ -1367,7 +1372,7 @@ async function saveStake(stakeInfo, timeOutMultiplier) {
     if (stakeInfo.csvType === 'sup') {
       childData = buildOutputData(splitSups(sortList(listAllChildren(screeningData, stakeInfo.csvType))));
     } else if (stakeInfo.csvType === 'summary') {
-      childData = buildOutputData(sortList(listAllChildren(screeningData, stakeInfo.csvType)));
+      childData = buildOutputData(sortList(listAllChildren(screeningData, stakeInfo.csvType, stakeInfo.monthSelect)));
     } else {
       childData = buildOutputData(sortList(listAllChildren(screeningData, stakeInfo.csvType)));
     }
@@ -1565,6 +1570,7 @@ exports.createCSVFromDB = async function (req, res) {
       fileToSave: `${ req.params.stakeDB }_${tokenInfo.iat}_dbDump.csv`,
       socketRoom: req.query.socketRoomId,
       socketObj: socketClient,
+      monthSelect: req.params.monthSelect,
 
       updateProcess: saveStake
     };
