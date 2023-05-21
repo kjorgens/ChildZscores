@@ -612,7 +612,7 @@ function summaryReport(sortedScreenList, currentAge, stakeName) {
   return summaryAddOns;
 }
 
-function listAllChildren(childScreenList, screenType, monthSelect) {
+function listAllChildren(childScreenList, screenType, cCode, monthSelect) {
   var childCount = 0;
   var sortedScreenList = [];
   var noScreenings = 0;
@@ -1737,7 +1737,7 @@ async function saveStake(stakeInfo, timeOutMultiplier) {
     );
     const screeningData = await getChildAndData(stakeInfo, timeOutMultiplier);
     if (stakeInfo.csvType === 'sup') {
-      childData = buildOutputData(splitSups(sortList(listAllChildren(screeningData, stakeInfo.csvType))));
+      childData = buildOutputData(splitSups(sortList(listAllChildren(screeningData, stakeInfo.csvType, stakeInfo.cCode))));
     } else if (stakeInfo.csvType === 'summary') {
       childData = buildOutputData(sortList(listAllChildren(screeningData, stakeInfo.csvType, stakeInfo.monthSelect)));
     } else {
