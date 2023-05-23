@@ -612,7 +612,7 @@ function summaryReport(sortedScreenList, currentAge, stakeName) {
   return summaryAddOns;
 }
 
-function listAllChildren(childScreenList, screenType, cCode, monthSelect) {
+function listAllChildren(childScreenList, screenType, monthSelect, cCode) {
   var childCount = 0;
   var sortedScreenList = [];
   var noScreenings = 0;
