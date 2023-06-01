@@ -1331,6 +1331,10 @@
             stakeDB: 'harare_stake_zwe'
           },
           {
+            stakeName: 'Harare South Stake',
+            stakeDB: 'harare_south_stake_zwe'
+          },
+          {
             stakeName: 'Marimba Park Stake',
             stakeDB: 'marimba_park_stake_zwe'
           },
