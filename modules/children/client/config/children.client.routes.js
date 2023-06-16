@@ -51,7 +51,7 @@
         }
       })
       .state('children.report', {
-        url: '/report/:stakeDB/:cCode/:scopeType/:sortField/:language/:csvType',
+        url: '/report/:stakeDB/:cCode/:scopeType/:sortField/:language/:csvType/:monthSelect',
         templateUrl: '/modules/children/client/views/sync-children.client.view.html',
         controller: 'ChildrenSyncController',
         controllerAs: 'vm',

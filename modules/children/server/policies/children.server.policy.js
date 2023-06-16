@@ -44,7 +44,8 @@ exports.invokeRolesPolicies = function () {
     }, {
       resources: '/report/:stakeDB/:cCode/:scopeType/:sortField/:language/:csvType',
       permissions: ['*']
-    }, {
+    }, 
+    {
       resources: '/update/:stakeDB/:stakeName/:cCode/:scopeType',
       permissions: ['get']
     }]
@@ -107,7 +108,7 @@ exports.invokeRolesPolicies = function () {
     }, {
       resources: '/report/:stakeDB/:cCode/:scopeType/:sortField/:language/:csvType',
       permissions: ['get']
-    },
+    }, 
     {
       resources: '/files/:csvFile',
       permissions: ['get']
