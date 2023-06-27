@@ -612,7 +612,7 @@ function summaryReport(sortedScreenList, currentAge, stakeName) {
   return summaryAddOns;
 }
 
-function listAllChildren(childScreenList, screenType, monthSelect, cCode) {
+function listAllChildren(childScreenList, screenType, cCode) {
   var childCount = 0;
   var sortedScreenList = [];
   var noScreenings = 0;
@@ -622,41 +622,56 @@ function listAllChildren(childScreenList, screenType, monthSelect, cCode) {
   var priorMalnurished = "no";
   var lineAccumulator = [];
   var summaryAddOns = [];
-  var monthSelect = parseInt(monthSelect);
+  var monthSelect = parseInt(childScreenList[0].parms.monthSelect);
 
   if (childScreenList[0].data.total_rows > 0) {
     childScreenList[0].data.rows.forEach(async (childEntry, childIndex) => {
-      var currentAge = moment().diff(moment(new Date(childEntry.key.birthDate)), 'months');
-      if (!~childEntry.id.indexOf('mthr')) {
-        if (screenType === 'summary'){
-          var sortedScreenList = getScreeningsList(childEntry.id, childScreenList[1].data.rows);
+      var currentAge = moment().diff(
+        moment(new Date(childEntry.key.birthDate)),
+        "months"
+      );
+      if (!~childEntry.id.indexOf("mthr")) {
+        if (screenType === "summary") {
+          var sortedScreenList = getScreeningsList(
+            childEntry.id,
+            childScreenList[1].data.rows
+          );
 
           var familyHealthPlan = sortedScreenList[0].familyHealthPlan;
           var followFamilyHealthPlan =
             sortedScreenList[0].followFamilyHealthPlan;
           var visitedDoctor = sortedScreenList[0].visitedDoctor;
 
-          var diffTime = moment().diff(moment(new Date(sortedScreenList[0].surveyDate)), 'months');
+          var diffTime = moment().diff(
+            moment(new Date(sortedScreenList[0].surveyDate)),
+            "months"
+          );
 
-            if (monthSelect >= diffTime) {
-              summaryAddOns = summaryReport(sortedScreenList, currentAge, childScreenList[0].parms.stakeName);
-              lineAccumulator.push(addSummaryLineToStack(
-                screenType, 
+          if (monthSelect >= diffTime) {
+            summaryAddOns = summaryReport(
+              sortedScreenList,
+              currentAge,
+              childScreenList[0].parms.stakeName
+            );
+            lineAccumulator.push(
+              addSummaryLineToStack(
+                screenType,
                 sortedScreenList[0],
-                childEntry.key, 
-                childScreenList[0].parms.sortField, 
-                childScreenList[0].stake, 
-                childScreenList[0].parms.stakeName, 
-                childScreenList[0].parms.language, 
+                childEntry.key,
+                childScreenList[0].parms.sortField,
+                childScreenList[0].stake,
+                childScreenList[0].parms.stakeName,
+                childScreenList[0].parms.language,
                 childScreenList[0].parms.cCode,
-                summaryAddOns, 
+                summaryAddOns,
                 familyHealthPlan,
                 followFamilyHealthPlan,
                 visitedDoctor
-                ));
-            }
-          } else if (screenType === 'sup') {
-            if (currentAge < 60 && ~childEntry.id.indexOf('chld')) {
+              )
+            );
+          }
+        } else if (screenType === "sup") {
+          if (currentAge < 60 && ~childEntry.id.indexOf("chld")) {
             // if (childEntry.key.firstName === 'HAILIE YHAL') {
             //   childEntry.zscoreStatus = calculateStatus(sortedScreenList[0]).zscoreStatus;
             //   console.log('stop');
@@ -771,17 +786,22 @@ function listAllChildren(childScreenList, screenType, monthSelect, cCode) {
                 );
               }
             }
-          } if (cCode === 'GTM' || cCode === 'SLV' || cCode === 'HND' || cCode === 'NIC') {
-            if (
-              currentAge < 60 &&
-              currentAge >= 36 &&
-              ~childEntry.id.indexOf("chld")
-            ) {
+          }
+          if (
+            cCode === "GTM" ||
+            cCode === "SLV" ||
+            cCode === "HND" ||
+            cCode === "NIC"
+          ) {
+            if (currentAge < 60) {
               sortedScreenList = getScreeningsList(
                 childEntry.id,
                 childScreenList[1].data.rows
               );
               if (
+                currentAge < 60 &&
+                currentAge >= 36 &&
+                ~childEntry.id.indexOf("chld") &&
                 (sortedScreenList[0].zScore.ha < -2 ||
                   sortedScreenList[0].zScore.wa < -2) &&
                 sortedScreenList[0].zScore.wl > -2
@@ -790,24 +810,48 @@ function listAllChildren(childScreenList, screenType, monthSelect, cCode) {
                   moment(new Date(sortedScreenList[0].surveyDate)),
                   "months"
                 );
-                if (screenType === "chronicSup") {
-                  lineAccumulator.push(
-                    addChildToLine(
-                      screenType,
-                      childEntry.key,
-                      sortedScreenList[0],
-                      childScreenList[0].parms.sortField,
-                      childScreenList[0].parms.stakeDB,
-                      childScreenList[0].parms.filter,
-                      " ",
-                      100,
-                      "no",
-                      childScreenList[0].language,
-                      childScreenList[0].parms.stakeName,
-                      childScreenList[0].parms.cCode
-                    )
-                  );
-                }
+                lineAccumulator.push(
+                  addChildToLine(
+                    screenType,
+                    childEntry.key,
+                    sortedScreenList[0],
+                    childScreenList[0].parms.sortField,
+                    childScreenList[0].parms.stakeDB,
+                    childScreenList[0].parms.filter,
+                    currentSupType,
+                    timeSinceLastScreen,
+                    priorMalnurished,
+                    childScreenList[0].parms.language,
+                    childScreenList[0].parms.cCode,
+                    childScreenList[0].parms.stakeName
+                  )
+                );
+              } else if (
+                (sortedScreenList[0].zScore.wl > -2 &&
+                  sortedScreenList[0].zScore.wl < -1) ||
+                (sortedScreenList[0].zScore.ha > -2 &&
+                  sortedScreenList[0].zScore.ha < -1)
+              ) {
+                timeSinceLastScreen = moment().diff(
+                  moment(new Date(sortedScreenList[0].surveyDate)),
+                  "months"
+                );
+                lineAccumulator.push(
+                  addChildToLine(
+                    screenType,
+                    childEntry.key,
+                    sortedScreenList[0],
+                    childScreenList[0].parms.sortField,
+                    childScreenList[0].parms.stakeDB,
+                    childScreenList[0].parms.filter,
+                    currentSupType,
+                    timeSinceLastScreen,
+                    priorMalnurished,
+                    childScreenList[0].parms.language,
+                    childScreenList[0].parms.cCode,
+                    childScreenList[0].parms.stakeName
+                  )
+                );
               }
             }
           }
@@ -1736,10 +1780,24 @@ async function saveStake(stakeInfo, timeOutMultiplier) {
       `calling getChildAndData from saveStake ${stakeInfo.stakeName}`
     );
     const screeningData = await getChildAndData(stakeInfo, timeOutMultiplier);
-    if (stakeInfo.csvType === 'sup') {
-      childData = buildOutputData(splitSups(sortList(listAllChildren(screeningData, stakeInfo.csvType, stakeInfo.cCode))));
-    } else if (stakeInfo.csvType === 'summary') {
-      childData = buildOutputData(sortList(listAllChildren(screeningData, stakeInfo.csvType, stakeInfo.monthSelect)));
+    if (stakeInfo.csvType === "sup") {
+      childData = buildOutputData(
+        splitSups(
+          sortList(
+            listAllChildren(screeningData, stakeInfo.csvType, stakeInfo.cCode)
+          )
+        )
+      );
+    } else if (stakeInfo.csvType === "summary") {
+      childData = buildOutputData(
+        sortList(
+          listAllChildren(
+            screeningData,
+            stakeInfo.csvType,
+            stakeInfo.monthSelect
+          )
+        )
+      );
     } else {
       childData = buildOutputData(
         sortList(listAllChildren(screeningData, stakeInfo.csvType))
