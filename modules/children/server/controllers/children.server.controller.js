@@ -806,7 +806,7 @@ function listAllChildren(childScreenList, screenType, cCode) {
                   sortedScreenList[0].zScore.wa < -2) &&
                 sortedScreenList[0].zScore.wl > -2
               ) {
-                currentSupType = 'chronic';
+                currentSupType = 'SUP';
                 timeSinceLastScreen = moment().diff(
                   moment(new Date(sortedScreenList[0].surveyDate)),
                   "months"
