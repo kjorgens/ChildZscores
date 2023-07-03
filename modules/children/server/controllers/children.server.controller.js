@@ -1022,7 +1022,7 @@ function newDBRequest(stake, stakeName, parmObj, view) {
 function getWomen(parmObj) {
   var newObj = Object.assign({}, parmObj);
   var stake = parmObj.stakeDB;
-  return Promise.join(
+  return Promise.all(
     newDBRequest(stake, parmObj.stakename, newObj, "pregnant_women"),
     newDBRequest(stake, parmObj.stakename, newObj, "nursing_mothers")
   );
@@ -2044,7 +2044,8 @@ exports.createCSVFromDB = async function (req, res) {
     res
       .status(202)
       .send({ message: "Request has been received ", nsp: req.query.socketId });
-    if (parmObj.csvType === "women") {
+    if (parmObj.csvType === "mother") {
+      parmObj.fileToSave = `mother_${req.params.stakeDB}_${tokenInfo.iat}_dbDump.csv`;
       const headerLine =
         parmObj.language === "en"
           ? "country,stakeName,id,firstName,lastName,idGroup,phone,address,city,ward,lds,screenDate,other date\n"
