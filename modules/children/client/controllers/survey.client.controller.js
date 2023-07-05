@@ -350,13 +350,17 @@
             longitude: vm.longitude
           };
 
-          PouchService.insert(surveyObject, surveyAdded, addedError);
-          vm.survey.weight = '';
-          vm.survey.height = '';
-          vm.survey.muac = '';
-          vm.survey.familyHealthPlan = false;
-          vm.survey.followFamilyHealthPlan = false;
-          vm.survey.visitedDoctor = false;
+          if ((zScore.ha > 5 || zScore.ha < -5) && (zScore.wa > 5 || zScore.wa < -5)) {
+            alert('Extreme valuse please check inputs');
+          } else {
+            PouchService.insert(surveyObject, surveyAdded, addedError);
+            vm.survey.weight = '';
+            vm.survey.height = '';
+            vm.survey.muac = '';
+            vm.survey.familyHealthPlan = false;
+            vm.survey.followFamilyHealthPlan = false;
+            vm.survey.visitedDoctor = false;
+          } 
         }
       }
     }
