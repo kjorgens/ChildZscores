@@ -75,7 +75,20 @@
           <i class="glyphicon glyphicon-share"></i>
         </h3>
       </a>
-      <a ng-click="vm.createReport('country', vm.countryCode, vm.sortSelect, 'summary', 'admin')">
+      <select id="monthSelect" ng-model="vm.monthSelectCountry">
+        <option value="">{{'MONTH_SELECT_SUMMARY_REPORT' | translate}}</option>
+        <option value="6">6</option>
+        <option value="12">12</option>
+        <option value="18">18</option>
+        <option value="24">24</option>
+        <option value="30">30</option>
+        <option value="36">36</option>
+        <option value="42">42</option>
+        <option value="48">48</option>
+        <option value="54">54</option>
+        <option value="60">60</option>
+      </select><br>
+      <a ng-click="vm.createReport('country', vm.countryCode, vm.sortSelect, 'summary', 'admin', vm.monthSelectCountry)">
         <h3><span> Summary report for {{vm.selectedCountry}}</span>
           <i class="glyphicon glyphicon-share"></i>
         </h3>
@@ -119,7 +132,7 @@
                 <option value="memberStatus">{{'LDS_MEMBER' | translate}}</option>
             </select><br>
           <!--<br><br>--> 
-            <a ng-click="vm.createReport('stake', vm.countryCode, vm.sortSelect, 'sup')">
+            <a ng-click="vm.createReport('stake', vm.countryCode, vm.sortSelect, 'sup', 'sync')">
                 <span>{{'GENERATE_SUPPLEMENT_REPORT' | translate}} </span>
                 <i class="glyphicon glyphicon-share"></i>
             </a><br><br>
@@ -136,11 +149,11 @@
               <option value="54">54</option>
               <option value="60">60</option>
             </select><br>
-            <a ng-click="vm.createReport('stake', vm.countryCode, vm.sortSelect, 'summary', vm.monthSelect)">
+            <a ng-click="vm.createReport('stake', vm.countryCode, vm.sortSelect, 'summary', 'sync', vm.monthSelect)">
               <span>{{'GENERATE_SUMMARY_REPORT' | translate}} </span>
               <i class="glyphicon glyphicon-share"></i>
             </a><br><br>
-          <a ng-click="vm.createReport('women', vm.countryCode, vm.sortSelect, 'mother')">
+          <a ng-click="vm.createReport('women', vm.countryCode, vm.sortSelect, 'mother', 'sync')">
             <span>{{'GENERATE_WOMEN_REPORT' | translate}} </span>
             <i class="glyphicon glyphicon-share"></i>
           </a>

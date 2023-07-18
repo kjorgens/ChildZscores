@@ -649,7 +649,7 @@ function listAllChildren(childScreenList, screenType, cCode) {
 
           if (monthSelect >= diffTime) {
             summaryAddOns = summaryReport(
-              sortedScreenList,
+              sortedScreenList, 
               currentAge,
               childScreenList[0].parms.stakeName
             );
@@ -1796,7 +1796,7 @@ async function saveStake(stakeInfo, timeOutMultiplier) {
           listAllChildren(
             screeningData,
             stakeInfo.csvType,
-            stakeInfo.monthSelect
+            stakeInfo.cCode
           )
         )
       );
