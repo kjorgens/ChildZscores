@@ -504,7 +504,7 @@
             stakeDB: 'patzicia_stake_gtm'
           },
           {
-            stakeName: 'Peten Stake',
+            stakeName: 'San Benito Stake',
             stakeDB: 'peten_stake_gtm'
           },
           {
@@ -658,6 +658,10 @@
             stakeDB: 'el_merendon_stake_hnd'
           },
           {
+            stakeName: 'La Ceiba Stake',
+            stakeDB: 'la_ceiba_stake_hnd'
+          },
+          {
             stakeName: 'Monjaras District',
             stakeDB: 'monjaras_district_hnd'
           },
@@ -670,7 +674,7 @@
             stakeDB: 'valle_verde_district_hnd'
           },
           {
-            stakeName: 'PotrerillosStake',
+            stakeName: 'Potrerillos Stake',
             stakeDB: 'villa_nueva_stake_hnd'
           },
           {
