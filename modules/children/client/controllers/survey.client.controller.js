@@ -313,7 +313,12 @@
 
     function addSurvey() {
       calculateAge();
-     
+
+      zScore = vm.zScoreGetter(vm.child.gender, vm.survey.monthAge, vm.survey.height, vm.survey.weight, vm.initialSurvey);
+      if ((zScore.ha > 5 || zScore.ha < -5) || (zScore.wa > 5 || zScore.wa < -5)){
+        vm.reportError("{{'ZSCORE_OUT_OF_RANGE' | translate}}", "{{'RECHECK_HEIGHT_WEIGHT' | translate}}", false);  
+        return false;
+      }
       if (vm.invalidFields === true || vm.invalidFields === undefined) {
         undefinedTurnFalse();
         return false;
@@ -328,7 +333,6 @@
         } else {
           vm.survey._id = undefined;
           var bday = new Date(vm.child.birthDate);
-
           zScore = vm.zScoreGetter(vm.child.gender, vm.survey.monthAge, vm.survey.height, vm.survey.weight, vm.survey.muac, 
             vm.survey.familyHealthPlan, vm.survey.followFamilyHealthPlan, vm.survey.visitedDoctor, vm.initialSurvey);
           var surveyObject = {
