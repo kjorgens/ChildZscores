@@ -438,15 +438,16 @@
       vm.reportError('CSV creation error', `${ error.status } ${ error.statusText }`, false);
     }
 
-    function createReport(scope, scopeID, sortField, csvType, monthSelect, stakeName) {
+    function createReport(scope, cCode, sortField, csvType, role, monthSelect) {
       vm.startSpin();
+      var stakeName;
       if (scope === undefined) {
         scope = 'stake';
       }
       if (sortField === undefined) {
         sortField = 'firstName';
       }
-      if (stakeName === 'admin') {
+      if (role === 'admin') {
         stakeName = vm.selectedStake;
       }
       if (monthSelect === undefined) {

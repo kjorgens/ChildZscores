@@ -78,12 +78,16 @@ var coordinatingCounsels = [
     name: "Guatemala Quetzaltenango Area Coordinating Council",
     stakes: [
       "Totonicapán Stake",
+      "Quetzaltenango Cantel",
       "Quetzaltenango el Bosque Stake",
-      "Momostenango West District",
+      "Quetzaltenango Oeste Stake",
+      "Quiche District",
       "Huehuetenango Zaculeu Stake",
-      "Momostenango Stake",
       "Huehuetenango Calvario Stake",
       "Huehuetenango Centro Stake",
+      "Momostenango Paxajtup District",
+      "Momostenango Stake",
+      "Momostenango West District",
     ],
   },
   {
@@ -97,8 +101,37 @@ var coordinatingCounsels = [
       "San Felipe Stake",
       "Coatepeque",
       "Mazatenango",
-      "San Marcos",
       "San Pedro",
+    ],
+  },
+  {
+    name: "Honduras Comayaguela Area Coordinating Council",
+    stakes: ["Juticalpa District"],
+  },
+  {
+    name: "Honduras San Pedro Sula East Area Coordinating Council",
+    stakes: [
+      "El Progreso Stake",
+      "La Ceiba Stake",
+      "Miramar",
+    ],
+  },
+  {
+    name: "Honduras San Pedro Sula West Area Coordinating Council",
+    stakes: [
+      "El Merendón Stake",
+      "Fesitran Stake",
+      "Potrerillos Stake",  
+    ],
+  },
+  {
+    name: "Honduras Tegucigalpa Area Coordinating Council",
+    stakes: [
+      "Choluteca El Porvenir Stake",
+      "Choluteca Stake",
+      "Danli Stake",
+      "Monjaras District",
+      "Valle Verde (San Francisco) District",
     ],
   },
 ];
@@ -649,7 +682,7 @@ function listAllChildren(childScreenList, screenType, cCode) {
 
           if (monthSelect >= diffTime) {
             summaryAddOns = summaryReport(
-              sortedScreenList,
+              sortedScreenList, 
               currentAge,
               childScreenList[0].parms.stakeName
             );
@@ -1796,7 +1829,7 @@ async function saveStake(stakeInfo, timeOutMultiplier) {
           listAllChildren(
             screeningData,
             stakeInfo.csvType,
-            stakeInfo.monthSelect
+            stakeInfo.cCode
           )
         )
       );
