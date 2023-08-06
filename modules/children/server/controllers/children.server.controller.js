@@ -958,38 +958,16 @@ function listAllChildren(childScreenList, screenType, cCode) {
 }
 
 function listWomen(womanScreenList) {
-  var count = 0;
   var linesToAdd = [];
 
   womanScreenList.forEach(function (dataSet) {
-    if (dataSet[0].data.total_rows > 0) {
-      dataSet[0].data.rows.forEach(function (childEntry) {
+      dataSet.data.rows.forEach(function (womanEntry) {
         linesToAdd.push(
           addWomenToStack(
-            childEntry.key,
-            dataSet[0].stake,
-            dataSet[0].parms.sortField,
-            dataSet[0].parms.filter,
-            dataSet[0].parms.language
+            womanEntry.key
           )
         );
-        count += 1;
       });
-    }
-    if (dataSet[1].data.total_rows > 0) {
-      dataSet[1].data.rows.forEach(function (childEntry) {
-        linesToAdd.push(
-          addWomenToStack(
-            childEntry.key,
-            dataSet[1].stake,
-            dataSet[1].parms.sortField,
-            dataSet[1].parms.filter,
-            dataSet[1].parms.language
-          )
-        );
-        count += 1;
-      });
-    }
   });
   return linesToAdd;
 }
@@ -1052,13 +1030,27 @@ function newDBRequest(stake, stakeName, parmObj, view) {
   });
 }
 
-function getWomen(parmObj) {
-  var newObj = Object.assign({}, parmObj);
-  var stake = parmObj.stakeDB;
-  return Promise.join(
-    newDBRequest(stake, parmObj.stakename, newObj, "pregnant_women"),
-    newDBRequest(stake, parmObj.stakename, newObj, "nursing_mothers")
-  );
+async function getWomen(parmObj, multiplier) { // Deal with Multipler
+  return new Promise((resolve) => {
+    function accessDB(parmObj) {
+      console.log(`emit CSV_progress ${parmObj.stakeName}from getWomen`);
+      parmObj.socketObj.emit("CSV_progress", {
+        room: parmObj.socketRoom,
+        text: `${parmObj.stakeName} being processed`,
+        count: multiplier,
+    });
+
+    var newObj = Object.assign({}, parmObj);
+    var stake = parmObj.stakeDB;
+    return resolve(
+      Promise.join(
+        newDBRequest(stake, parmObj.stakename, newObj, "pregnant_women"),
+        newDBRequest(stake, parmObj.stakename, newObj, "nursing_mothers")
+      )
+    );
+  }
+    return setTimeout(accessDB, 750 * multiplier, parmObj);
+  });
 }
 
 async function getChildAndData(parmObj, multiplier) {
@@ -1703,7 +1695,6 @@ function addWomenToStack(input, stakeDB, sortField, filter, language) {
     parmObj.lastName = parmObj.lastName.replace(/,/g, " ");
   }
   var dataObj = {
-    childId: parmObj._id,
     firstName: parmObj.firstName,
     lastName: parmObj.lastName,
     city: parmObj.city || "",
@@ -1721,12 +1712,9 @@ function addWomenToStack(input, stakeDB, sortField, filter, language) {
   }
 
   var dataLine =
-    dataObj.childId +
-    "," +
     dataObj.firstName +
     "," +
     dataObj.lastName +
-    "," +
     "," +
     dataObj.phone +
     "," +
@@ -1738,7 +1726,7 @@ function addWomenToStack(input, stakeDB, sortField, filter, language) {
     "," +
     dataObj.memberStatus +
     "," +
-    dataObj.surveyDate;
+    dataObj.created;
   if (parmObj.childsBirthDate) {
     dataLine = dataLine + "," + dataObj.childsBirthDate + "\n";
   } else {
@@ -1815,7 +1803,11 @@ async function saveStake(stakeInfo, timeOutMultiplier) {
       `calling getChildAndData from saveStake ${stakeInfo.stakeName}`
     );
     const screeningData = await getChildAndData(stakeInfo, timeOutMultiplier);
-    if (stakeInfo.csvType === "sup") {
+    if (stakeInfo.csvType === "women") {
+      const motherData = await getWomen(stakeInfo, timeOutMultiplier);
+      const womenData = buildOutputData(sortList(listWomen(motherData)));
+      return appendStake(stakeInfo.fileToSave, womenData);
+    } else if (stakeInfo.csvType === "sup") {
       childData = buildOutputData(
         splitSups(
           sortList(
@@ -1841,24 +1833,12 @@ async function saveStake(stakeInfo, timeOutMultiplier) {
     console.log(
       `saving stake ${stakeInfo.stakeName} and multiplier ${timeOutMultiplier}`
     );
-    return appendStake(stakeInfo.fileToSave, childData);
+    if (stakeInfo.csvType != "women") {
+      return appendStake(stakeInfo.fileToSave, childData);
+    }
   } catch (err) {
     return stakeInfo;
   }
-}
-
-async function saveWomenInfo(stakeInfo, type) {
-  const screeningData = await getWomen(stakeInfo);
-  const childData = buildOutputData(sortList(listWomen(screeningData)));
-  return appendStake(stakeInfo.fileToSave, childData);
-}
-
-function oneStakeWomen(parmObj) {
-  var newObj = Object.assign({}, parmObj);
-  // newObj.stakeDB = parmObj.stakeDB;
-  newObj.stakename = "Current";
-  newObj.csvType = "womenInfo";
-  return saveWomenInfo(newObj);
 }
 
 function parseJwt(token) {
@@ -2077,23 +2057,14 @@ exports.createCSVFromDB = async function (req, res) {
     res
       .status(202)
       .send({ message: "Request has been received ", nsp: req.query.socketId });
-    if (parmObj.csvType === "women") {
-      const headerLine =
-        parmObj.language === "en"
-          ? "country,stakeName,id,firstName,lastName,idGroup,phone,address,city,ward,lds,screenDate,other date\n"
-          : "País,Estaca,carné de identidad,nombre de pila,apellido,grupo de identificación,teléfono,dirección,ciudad,sala,miembro lds,fecha de la pantalla, otra fecha\n";
-      await writeHeader(parmObj.fileToSave, headerLine);
-      oneStakeWomen(parmObj)
-        .then(reportCSVComplete)
-        .catch(function (error) {
-          socketClient.emit("CSV_error", {
-            room: parmObj.socketRoom,
-            text: errorHandler.getErrorMessage(error),
-          });
-          socketClient.removeAllListeners();
-          socketClient.close();
-        });
-    } else {
+    // if (parmObj.csvType === "women") {
+    //   parmObj.fileToSave = `mother_${req.params.stakeDB}_${tokenInfo.iat}_dbDump.csv`;
+    //   const headerLine =
+    //     parmObj.language === "en"
+    //       ? "country,stakeName,id,firstName,lastName,idGroup,phone,address,city,ward,lds,screenDate,other date\n"
+    //       : "País,Estaca,carné de identidad,nombre de pila,apellido,grupo de identificación,teléfono,dirección,ciudad,sala,miembro lds,fecha de la pantalla, otra fecha\n";
+
+    // } else {
       parmObj.fileToSave = `sup_list_${req.params.stakeDB}_${tokenInfo.iat}_dbDump.csv`;
       let headerLine =
         parmObj.language === "en"
@@ -2103,8 +2074,13 @@ exports.createCSVFromDB = async function (req, res) {
         headerLine =
           "1,2,3,4,5,6,Sup,age,Prior Sup,firstName,lastName,ward,mother,months since last screening,country,stake\n";
       }
-
-      if (parmObj.csvType === "chronicSup") {
+      if (parmObj.csvType === "women") {
+        parmObj.fileToSave = `mother_${req.params.stakeDB}_${tokenInfo.iat}_dbDump.csv`;
+        headerLine =
+          parmObj.language === "en"
+            ? "firstName,lastName,phone,address,city,ward,lds,screenDate,deliveryDate\n"
+            : "nombre de pila,apellido,teléfono,dirección,ciudad,sala,miembro lds,fecha de la pantalla,fecha de entrega\n";
+      } else if (parmObj.csvType === "chronicSup") {
         parmObj.fileToSave = `chronic_sup_list_${req.params.stakeDB}_${tokenInfo.iat}_dbDump.csv`;
         headerLine =
           "1,2,3,4,5,6,Sup,age,Prior Sup,firstName,lastName,ward,mother,months since last screening,country,stake\n";
@@ -2155,7 +2131,6 @@ exports.createCSVFromDB = async function (req, res) {
           });
           socketClient.close();
         });
-    }
     serverReady = true;
   });
 
