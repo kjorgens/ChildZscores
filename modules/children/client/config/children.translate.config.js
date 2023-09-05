@@ -189,6 +189,9 @@
       CORRECT_CHILD_BDATE: 'Must be 0 to 6 months',
       ZSCORE_OUT_OF_RANGE: 'Zscore is out of range',
       RECHECK_HEIGHT_WEIGHT: 'Please recheck height and weight',
+      REQUIRED_HEIGHT_WEIGHT: 'You must have a height and a weight',
+      ADD_HEIGHT: 'Please add height',
+      ADD_WEIGHT: 'Please add weight',
       NEW_FEATURES: ' New search and filter features: You can now search by typing the name in the search window.' +
       'If you type the name of an existing child, you will be taken to the screen where you enter a new screening.' +
       'Search is also performed after you enter first and last names in the new child form.' +
@@ -376,6 +379,9 @@
       CORRECT_CHILD_BDATE: 'Debe ser de 0 a 6 meses',
       ZSCORE_OUT_OF_RANGE: 'Zscore está fuera de rango',
       RECHECK_HEIGHT_WEIGHT: 'Vuelva a comprobar la altura y el peso',
+      REQUIRED_HEIGHT_WEIGHT: 'Debes tener una altura y un peso',
+      ADD_HEIGHT: 'Por favor agregue altura',
+      ADD_WEIGHT: 'Por favor agregue peso',
       NEW_FEATURES: ' Nuevas funciones de búsqueda y filtro: Ahora puede buscar escribiendo el nombre en la ventana de búsqueda.' +
       'Si escribe el nombre de un niño existente, se le llevará a la pantalla para ingresar a una nueva proyección.' +
       'La búsqueda también se realiza, después de introducir los nombres y apellidos en el formulario nuevo hijo.' +
