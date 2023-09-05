@@ -16,27 +16,17 @@
     vm.survey = survey;
 
     function checkAllFieldsValid() {
-      if (((vm.survey.height === '' || vm.survey.height === undefined) && (vm.childWeightIsValid === true))){
-        vm.invalidFields = true;
-      } else if (((vm.survey.weight === '' || vm.survey.weight === undefined) && (vm.childHeightIsValid === true))){
-        vm.invalidFields = true;
-      } 
 
       if (vm.childHeightIsValid === false || vm.childWeightIsValid === false || vm.muacIsValid === false){
         vm.invalidFields = true;
       } else {
-        if ((vm.childHeightIsValid === true && vm.childWeightIsValid === true && vm.ageIsValid === true 
-          && vm.blankWeight === false && vm.blankHeight === false) 
-          || (vm.muacIsValid === true && vm.ageIsValid === true && vm.blankMUAC === false)) {
+        if ((vm.childHeightIsValid === true && vm.childWeightIsValid === true && vm.ageIsValid === true && vm.survey.weight != "" && vm.survey.height != "") 
+          || (vm.muacIsValid === true && vm.ageIsValid === true)) {
             vm.allFieldsValid = true;
             vm.invalidFields = false;
-          } else if (vm.muacIsValid === true && vm.ageIsValid === true){
+          } else {
             vm.invalidFields = false;
-          } else if (vm.childHeightIsValid === false || vm.childWeightIsValid === false || vm.ageIsValid === false 
-          || vm.muacIsValid === false) {
-            vm.allFieldsValid = false;
-            vm.invalidFields = true;
-          } 
+          }
       }
     }
 
@@ -171,17 +161,12 @@
           vm.childHeightIsValid = false;
         } else {
           vm.childHeightIsValid = true;
-          vm.blankHeight = false;
           if (vm.ageIsValid && vm.weightIsValid) {
             vm.survey.zScore = vm.zScoreGetter(vm.survey.gender, vm.ageInMonths || vm.monthAge, vm.survey.height, vm.survey.weight, vm.initialSurvey);
           }
         }
       } else {
-        vm.childHeightIsValid = false;
-        if (vm.survey.height === '' || vm.survey.height === undefined){
-          vm.childHeightIsValid = true;
-          vm.blankHeight = true;
-        }
+        vm.childHeightIsValid = undefined;
       }
       vm.checkAllFieldsValid();
     }
@@ -207,31 +192,25 @@
           vm.childWeightIsValid = false;
         } else {
           vm.childWeightIsValid = true;
-          vm.blankWeight = false;
           if (vm.ageIsValid && vm.heightIsValid) {
             vm.zscore = vm.zScoreGetter(vm.survey.gender, vm.ageInMonths || vm.monthAge, vm.survey.height, vm.survey.weight, vm.initialSurvey);
           }
         }
       } else {
-        vm.childWeightIsValid = false;
-        if (vm.survey.weight === '' || vm.survey.weight === undefined){
-          vm.childWeightIsValid = true;
-          vm.blankWeight = true;
-        }
+        vm.childWeightIsValid = undefined;
       }
       vm.checkAllFieldsValid();
     }
 
     function checkMUACIsValid(){
-      if (vm.survey.muac >= 5.5 && vm.survey.muac <= 26.5){
-        vm.muacIsValid = true;
-        vm.blankMUAC = false;
-      } else {
-        vm.muacIsValid = false;
-        if (vm.survey.muac === '' || vm.survey.muac === undefined){
+      if (vm.survey.muac) {
+        if (vm.survey.muac >= 5.5 && vm.survey.muac <= 26.5){
           vm.muacIsValid = true;
-          vm.blankMUAC = true;
+        } else {
+          vm.muacIsValid = false;
         }
+      } else {
+        vm.muacIsValid = undefined;
       }
       vm.checkAllFieldsValid();
     }
@@ -315,14 +294,25 @@
       calculateAge();
 
       zScore = vm.zScoreGetter(vm.child.gender, vm.survey.monthAge, vm.survey.height, vm.survey.weight, vm.initialSurvey);
-      if ((zScore.ha > 5 || zScore.ha < -5) || (zScore.wa > 5 || zScore.wa < -5)){
-        vm.reportError("{{'ZSCORE_OUT_OF_RANGE' | translate}}", "{{'RECHECK_HEIGHT_WEIGHT' | translate}}", false);  
-        return false;
-      }
+
       if (vm.invalidFields === true || vm.invalidFields === undefined) {
         undefinedTurnFalse();
         return false;
       } else {
+
+        if (((vm.survey.height === '' || vm.survey.height === undefined) && (vm.childWeightIsValid === true))){
+          vm.reportError("{{'REQUIRED_HEIGHT_WEIGHT' | translate}}", "{{'ADD_HEIGHT' | translate}}", false); 
+          return false;
+        } else if (((vm.survey.weight === '' || vm.survey.weight === undefined) && (vm.childHeightIsValid === true))){
+          vm.reportError("{{'REQUIRED_HEIGHT_WEIGHT' | translate}}", "{{'ADD_WEIGHT' | translate}}", false); 
+          return false;
+        } 
+        if (vm.survey.height != '' && vm.survey.weight != '') {
+          if ((zScore.ha > 5 || zScore.ha < -5) || (zScore.wa > 5 || zScore.wa < -5)){
+            vm.reportError("{{'ZSCORE_OUT_OF_RANGE' | translate}}", "{{'RECHECK_HEIGHT_WEIGHT' | translate}}", false);  
+          }
+        }
+       
 
         var zScore = {};
         if (vm.survey._id) {
