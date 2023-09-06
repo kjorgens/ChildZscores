@@ -300,6 +300,11 @@
         return false;
       } else {
 
+        if (vm.survey.height === '' && vm.survey.weight === '' && vm.survey.muac === ''){
+          vm.reportError("{{'ADD_DATA' | translate}}", "{{'MUAC_OR_HEIGHT_WEIGHT' | translate}}", false); 
+          return false;
+        }
+
         if (((vm.survey.height === '' || vm.survey.height === undefined) && (vm.childWeightIsValid === true))){
           vm.reportError("{{'REQUIRED_HEIGHT_WEIGHT' | translate}}", "{{'ADD_HEIGHT' | translate}}", false); 
           return false;
@@ -307,6 +312,7 @@
           vm.reportError("{{'REQUIRED_HEIGHT_WEIGHT' | translate}}", "{{'ADD_WEIGHT' | translate}}", false); 
           return false;
         } 
+
         if (vm.survey.height != '' && vm.survey.weight != '') {
           if ((zScore.ha > 5 || zScore.ha < -5) || (zScore.wa > 5 || zScore.wa < -5)){
             vm.reportError("{{'ZSCORE_OUT_OF_RANGE' | translate}}", "{{'RECHECK_HEIGHT_WEIGHT' | translate}}", false);  
