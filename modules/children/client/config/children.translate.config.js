@@ -192,6 +192,8 @@
       REQUIRED_HEIGHT_WEIGHT: 'You must have a height and a weight',
       ADD_HEIGHT: 'Please add height',
       ADD_WEIGHT: 'Please add weight',
+      ADD_DATA: 'Weight and Height or MUAC required',
+      MUAC_OR_HEIGHT_WEIGHT: 'Please add a MUAC, or a Weight and Height',
       NEW_FEATURES: ' New search and filter features: You can now search by typing the name in the search window.' +
       'If you type the name of an existing child, you will be taken to the screen where you enter a new screening.' +
       'Search is also performed after you enter first and last names in the new child form.' +
@@ -382,6 +384,8 @@
       REQUIRED_HEIGHT_WEIGHT: 'Debes tener una altura y un peso',
       ADD_HEIGHT: 'Por favor agregue altura',
       ADD_WEIGHT: 'Por favor agregue peso',
+      ADD_DATA: 'Se requiere peso y altura o MUAC',
+      MUAC_OR_HEIGHT_WEIGHT: 'Por favor agregue un MUAC, o un Peso y Altura',
       NEW_FEATURES: ' Nuevas funciones de búsqueda y filtro: Ahora puede buscar escribiendo el nombre en la ventana de búsqueda.' +
       'Si escribe el nombre de un niño existente, se le llevará a la pantalla para ingresar a una nueva proyección.' +
       'La búsqueda también se realiza, después de introducir los nombres y apellidos en el formulario nuevo hijo.' +
