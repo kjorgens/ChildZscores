@@ -500,6 +500,10 @@
             stakeDB: 'mazatenango_gtm'
           },
           {
+            stakeName: 'Mazatenango Las Flores',
+            stakeDB: 'mazatenango_las_flores_gtm'
+          },
+          {
             stakeName: 'Patzicia Stake',
             stakeDB: 'patzicia_stake_gtm'
           },
