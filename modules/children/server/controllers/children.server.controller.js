@@ -746,11 +746,18 @@ function listAllChildren(childScreenList, screenType, cCode) {
               priorMalnurished = "no";
               currentSupType = "none";
               sortedScreenList.forEach(async (screening, screenIndex) => {
-                if (screening.zScore.ha < -2 || screening.zScore.wa < -2) {
+                if (screening.zScore.wa < -2) {
                   priorMalnurished = "yes";
                   if (currentAge < 36) {
                     supType = "sup";
                   }
+                  if (currentAge < 24) {
+                    supType = "MAM";
+                  }
+                }
+
+                if (screening.zScore.ha < -2) {
+                  priorMalnurished = "yes";
                   if (currentAge < 24) {
                     supType = "MAM";
                   }
