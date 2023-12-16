@@ -656,6 +656,7 @@ function listAllChildren(childScreenList, screenType, cCode) {
   var lineAccumulator = [];
   var summaryAddOns = [];
   var monthSelect = parseInt(childScreenList[0].parms.monthSelect);
+  var addedChild = 0;
 
   if (childScreenList[0].data.total_rows > 0) {
     childScreenList[0].data.rows.forEach(async (childEntry, childIndex) => {
@@ -740,6 +741,7 @@ function listAllChildren(childScreenList, screenType, cCode) {
                     childScreenList[0].parms.cCode
                   )
                 );
+                addedChild += 1;
               }
             } else {
               supType = "none";
@@ -824,6 +826,7 @@ function listAllChildren(childScreenList, screenType, cCode) {
                     childScreenList[0].parms.stakeName
                   )
                 );
+                addedChild += 1;
               }
             }
           }
@@ -833,7 +836,7 @@ function listAllChildren(childScreenList, screenType, cCode) {
             cCode === "HND" ||
             cCode === "NIC"
           ) {
-            if (currentAge < 60) {
+            if (currentAge < 60 && addedChild === 0) {
               sortedScreenList = getScreeningsList(
                 childEntry.id,
                 childScreenList[1].data.rows
@@ -897,6 +900,7 @@ function listAllChildren(childScreenList, screenType, cCode) {
               }
             }
           }
+          addedChild = 0;
         } else if (screenType === "all") {
           try {
             if (childScreenList[1].data.total_rows > 0) {
