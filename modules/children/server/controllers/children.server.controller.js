@@ -656,6 +656,7 @@ function listAllChildren(childScreenList, screenType, cCode) {
   var lineAccumulator = [];
   var summaryAddOns = [];
   var monthSelect = parseInt(childScreenList[0].parms.monthSelect);
+  var addedChild = 0;
 
   if (childScreenList[0].data.total_rows > 0) {
     childScreenList[0].data.rows.forEach(async (childEntry, childIndex) => {
@@ -740,17 +741,22 @@ function listAllChildren(childScreenList, screenType, cCode) {
                     childScreenList[0].parms.cCode
                   )
                 );
+                addedChild += 1;
               }
             } else {
               supType = "none";
               priorMalnurished = "no";
               currentSupType = "none";
               sortedScreenList.forEach(async (screening, screenIndex) => {
-                if (screening.zScore.ha < -2 || screening.zScore.wa < -2) {
+                if (screening.zScore.wa < -2) {
                   priorMalnurished = "yes";
-                  if (currentAge < 36) {
-                    supType = "sup";
+                  if (currentAge < 24) {
+                    supType = "MAM";
                   }
+                }
+
+                if (screening.zScore.ha < -2) {
+                  priorMalnurished = "yes";
                   if (currentAge < 24) {
                     supType = "MAM";
                   }
@@ -817,6 +823,7 @@ function listAllChildren(childScreenList, screenType, cCode) {
                     childScreenList[0].parms.stakeName
                   )
                 );
+                addedChild += 1;
               }
             }
           }
@@ -826,12 +833,40 @@ function listAllChildren(childScreenList, screenType, cCode) {
             cCode === "HND" ||
             cCode === "NIC"
           ) {
-            if (currentAge < 60) {
+            if (currentAge < 60 && addedChild === 0) {
               sortedScreenList = getScreeningsList(
                 childEntry.id,
                 childScreenList[1].data.rows
               );
               if (
+                currentAge < 36 &&
+                currentAge >= 24 &&
+                ~childEntry.id.indexOf("chld") &&
+                (sortedScreenList[0].zScore.ha < -2 ||
+                  sortedScreenList[0].zScore.wa < -2) 
+              ) {
+                currentSupType = 'sup';
+                timeSinceLastScreen = moment().diff(
+                  moment(new Date(sortedScreenList[0].surveyDate)),
+                  "months"
+                );
+                lineAccumulator.push(
+                  addChildToLine(
+                    screenType,
+                    childEntry.key,
+                    sortedScreenList[0],
+                    childScreenList[0].parms.sortField,
+                    childScreenList[0].parms.stakeDB,
+                    childScreenList[0].parms.filter,
+                    currentSupType,
+                    timeSinceLastScreen,
+                    priorMalnurished,
+                    childScreenList[0].parms.language,
+                    childScreenList[0].parms.cCode,
+                    childScreenList[0].parms.stakeName
+                  )
+                );
+              } else if (
                 currentAge < 60 &&
                 currentAge >= 36 &&
                 ~childEntry.id.indexOf("chld") &&
@@ -890,6 +925,7 @@ function listAllChildren(childScreenList, screenType, cCode) {
               }
             }
           }
+          addedChild = 0;
         } else if (screenType === "all") {
           try {
             if (childScreenList[1].data.total_rows > 0) {
