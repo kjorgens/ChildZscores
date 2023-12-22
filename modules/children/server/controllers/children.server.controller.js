@@ -750,9 +750,6 @@ function listAllChildren(childScreenList, screenType, cCode) {
               sortedScreenList.forEach(async (screening, screenIndex) => {
                 if (screening.zScore.wa < -2) {
                   priorMalnurished = "yes";
-                  if (currentAge < 36) {
-                    supType = "sup";
-                  }
                   if (currentAge < 24) {
                     supType = "MAM";
                   }
@@ -842,6 +839,34 @@ function listAllChildren(childScreenList, screenType, cCode) {
                 childScreenList[1].data.rows
               );
               if (
+                currentAge < 36 &&
+                currentAge >= 24 &&
+                ~childEntry.id.indexOf("chld") &&
+                (sortedScreenList[0].zScore.ha < -2 ||
+                  sortedScreenList[0].zScore.wa < -2) 
+              ) {
+                currentSupType = 'sup';
+                timeSinceLastScreen = moment().diff(
+                  moment(new Date(sortedScreenList[0].surveyDate)),
+                  "months"
+                );
+                lineAccumulator.push(
+                  addChildToLine(
+                    screenType,
+                    childEntry.key,
+                    sortedScreenList[0],
+                    childScreenList[0].parms.sortField,
+                    childScreenList[0].parms.stakeDB,
+                    childScreenList[0].parms.filter,
+                    currentSupType,
+                    timeSinceLastScreen,
+                    priorMalnurished,
+                    childScreenList[0].parms.language,
+                    childScreenList[0].parms.cCode,
+                    childScreenList[0].parms.stakeName
+                  )
+                );
+              } else if (
                 currentAge < 60 &&
                 currentAge >= 36 &&
                 ~childEntry.id.indexOf("chld") &&
