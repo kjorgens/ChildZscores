@@ -149,8 +149,12 @@
               <option value="54">54</option>
               <option value="60">60</option>
             </select><br>
-            <a ng-click="vm.createReport('stake', vm.countryCode, vm.sortSelect, 'summary', 'sync', vm.monthSelect)">
-              <span>{{'GENERATE_SUMMARY_REPORT' | translate}} </span>
+            <a ng-click="vm.createReport('stake', vm.countryCode, vm.sortSelect, 'sup', 'sync')">
+              <span>{{'GENERATE_SUPPLEMENT_REPORT' | translate}} </span>
+              <i class="glyphicon glyphicon-share"></i>
+            </a><br><br>
+            <a ng-click="vm.createReport('stake', vm.countryCode, vm.sortSelect, 'missedScreening', 'sync')">
+              <span>{{'GENERATE_MISSED_SCREENING_REPORT' | translate}} </span>
               <i class="glyphicon glyphicon-share"></i>
             </a><br><br>
           <a ng-click="vm.createReport('stake', vm.countryCode, vm.sortSelect, 'women', 'sync')">
