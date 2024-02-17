@@ -704,6 +704,57 @@ function listAllChildren(childScreenList, screenType, cCode) {
               )
             );
           }
+        } else if (screenType === "missedScreening") {
+          if (currentAge < 60 && ~childEntry.id.indexOf("chld")) {
+           var sortedScreenList = getScreeningsList(
+             childEntry.id,
+             childScreenList[1].data.rows
+           );
+           timeSinceLastScreen = moment().diff(
+             moment(new Date(sortedScreenList[0].surveyDate)),
+             "months"
+           );
+           if (timeSinceLastScreen > 6 && timeSinceLastScreen < 13) {
+            //let stuff = {};
+            summaryAddOns = summaryReport(sortedScreenList, currentAge, childScreenList[0].parms.stakeName);
+            //console.log(summaryAddOns);
+            if (currentAge >= 24 && (summaryAddOns.childStatus === 'SAM' || summaryAddOns.childStatus === 'MAM')) {
+              lineAccumulator.push(
+                addChildToLine(
+                 screenType,
+                 childEntry.key,
+                 sortedScreenList[0],
+                 childScreenList[0].parms.sortField,
+                 childScreenList[0].parms.stakeDB,
+                 childScreenList[0].parms.filter,
+                 currentSupType,
+                 timeSinceLastScreen,
+                 priorMalnurished,
+                 childScreenList[0].parms.language,
+                 childScreenList[0].parms.cCode,
+                 childScreenList[0].parms.stakeName
+               )
+             );
+            } else if ((currentAge >= 6 && currentAge <= 24) && (summaryAddOns.childStatus === 'SAM' || summaryAddOns.childStatus === 'MAM' || summaryAddOns.childStatus === 'Chronic')) {
+              lineAccumulator.push(
+                addChildToLine(
+                 screenType,
+                 childEntry.key,
+                 sortedScreenList[0],
+                 childScreenList[0].parms.sortField,
+                 childScreenList[0].parms.stakeDB,
+                 childScreenList[0].parms.filter,
+                 currentSupType,
+                 timeSinceLastScreen,
+                 priorMalnurished,
+                 childScreenList[0].parms.language,
+                 childScreenList[0].parms.cCode,
+                 childScreenList[0].parms.stakeName
+               )
+             );
+            }
+          }
+         }
         } else if (screenType === "sup") {
           if (currentAge < 60 && ~childEntry.id.indexOf("chld")) {
             // if (childEntry.key.firstName === 'HAILIE YHAL') {
@@ -956,7 +1007,7 @@ function listAllChildren(childScreenList, screenType, cCode) {
           } catch (err) {
             console.log(err.message);
           }
-        }
+        } 
       } else {
         try {
           if (childScreenList[1].data.total_rows > 0) {
@@ -1207,6 +1258,23 @@ function addChildToLine(
 
   if (screenType === "chronicSup") {
     dataLine = `,,,,,,${supType},${currentAge},${priorMessage},${ownerInfo.firstName},${ownerInfo.lastName},${ownerInfo.ward},${ownerInfo.mother},${timeSinceLastScreen}`;
+    if (stakeName) {
+      dataLine += "," + ccode + "," + stakeName;
+    }
+    dataLine += "\n";
+
+    return {
+      data: ownerInfo,
+      dataLine: dataLine,
+      stakeDB: stakeDB,
+      sortField: sortField,
+      filter: filter,
+      language: language,
+    };
+  }
+
+  if (screenType === "missedScreening") {
+    dataLine = `${currentAge},${ownerInfo.firstName},${ownerInfo.lastName},${ownerInfo.ward},${ownerInfo.mother},${timeSinceLastScreen}`;
     if (stakeName) {
       dataLine += "," + ccode + "," + stakeName;
     }
@@ -1861,6 +1929,16 @@ async function saveStake(stakeInfo, timeOutMultiplier) {
           )
         )
       );
+    } else if (stakeInfo.csvType === "missedScreening") {
+      childData = buildOutputData(
+        sortList(
+          listAllChildren(
+            screeningData,
+            stakeInfo.csvType,
+            stakeInfo.cCode
+          )
+        )
+      );
     } else {
       childData = buildOutputData(
         sortList(listAllChildren(screeningData, stakeInfo.csvType))
@@ -2126,6 +2204,10 @@ exports.createCSVFromDB = async function (req, res) {
         }_${moment().format()}_dbDump.csv`;
         headerLine =
           "mothersName, firstName,lastName,age,LDS,ward,status,stake,Counsel,country,Leaving,LastScreeningDate,phone,address,ImprovementFromLastScreening,CoordinatingCounsel,FamilyHealthPlan,FollowFamilyHealthPlan,VisitedDoctorOrHealthClinic\n";
+      } else if (parmObj.csvType === "missedScreening") {
+        parmObj.fileToSave = `missed_screening_list_${req.params.stakeDB}_${tokenInfo.iat}_dbDump.csv`;
+        headerLine =
+          "age,firstName,lastName,ward,mother,months since last screening,country,stake\n";
       } else if (parmObj.csvType !== "sup") {
         parmObj.fileToSave = `${tokenInfo.iat}_${req.params.cCode}_${req.params.csvType}_dbDump.csv`;
         headerLine =
