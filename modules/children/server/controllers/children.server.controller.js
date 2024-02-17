@@ -715,22 +715,44 @@ function listAllChildren(childScreenList, screenType, cCode) {
              "months"
            );
            if (timeSinceLastScreen > 6 && timeSinceLastScreen < 13) {
-             lineAccumulator.push(
-               addChildToLine(
-                screenType,
-                childEntry.key,
-                sortedScreenList[0],
-                childScreenList[0].parms.sortField,
-                childScreenList[0].parms.stakeDB,
-                childScreenList[0].parms.filter,
-                currentSupType,
-                timeSinceLastScreen,
-                priorMalnurished,
-                childScreenList[0].parms.language,
-                childScreenList[0].parms.cCode,
-                childScreenList[0].parms.stakeName
-              )
-            );
+            //let stuff = {};
+            summaryAddOns = summaryReport(sortedScreenList, currentAge, childScreenList[0].parms.stakeName);
+            //console.log(summaryAddOns);
+            if (currentAge >= 24 && (summaryAddOns.childStatus === 'SAM' || summaryAddOns.childStatus === 'MAM')) {
+              lineAccumulator.push(
+                addChildToLine(
+                 screenType,
+                 childEntry.key,
+                 sortedScreenList[0],
+                 childScreenList[0].parms.sortField,
+                 childScreenList[0].parms.stakeDB,
+                 childScreenList[0].parms.filter,
+                 currentSupType,
+                 timeSinceLastScreen,
+                 priorMalnurished,
+                 childScreenList[0].parms.language,
+                 childScreenList[0].parms.cCode,
+                 childScreenList[0].parms.stakeName
+               )
+             );
+            } else if ((currentAge >= 6 && currentAge <= 24) && (summaryAddOns.childStatus === 'SAM' || summaryAddOns.childStatus === 'MAM' || summaryAddOns.childStatus === 'Chronic')) {
+              lineAccumulator.push(
+                addChildToLine(
+                 screenType,
+                 childEntry.key,
+                 sortedScreenList[0],
+                 childScreenList[0].parms.sortField,
+                 childScreenList[0].parms.stakeDB,
+                 childScreenList[0].parms.filter,
+                 currentSupType,
+                 timeSinceLastScreen,
+                 priorMalnurished,
+                 childScreenList[0].parms.language,
+                 childScreenList[0].parms.cCode,
+                 childScreenList[0].parms.stakeName
+               )
+             );
+            }
           }
          }
         } else if (screenType === "sup") {
