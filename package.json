@@ -23,14 +23,15 @@
     "serve": "webpack serve"
   },
   "engines": {
-    "node": "14.19.1",
+    "node": "18.19.0",
     "npm": "10.2.3"
   },
   "dependencies": {
-    "@aws-sdk/client-s3": "^3.0.0",
+    "@aws-sdk/abort-controller": "^3.374.0",
+    "@aws-sdk/client-s3": "^3.552.0",
     "acl": "~0.4.11",
     "amazon-s3-uri": "^0.1.1",
-    "aws-sdk": "^2.1238.0",
+    "aws-sdk": "^2.1560.0",
     "bluebird": "~3.7.2",
     "body-parser": "~1.19.0",
     "bower": "~1.8.12",
@@ -75,7 +76,6 @@
     "passport-local": "~1.0.0",
     "passport-twitter": "~1.0.4",
     "request": "~2.88.2",
-    "sass": "^1.70.0",
     "serve-favicon": "~2.5.0",
     "socket.io": "^2.3.0",
     "socket.io-client": "^2.3.0",
@@ -122,7 +122,7 @@
     "gulp-protractor": "~4.1.1",
     "gulp-rename": "~2.0.0",
     "gulp-rev": "^9.0.0",
-    "gulp-sass": "~4.0.2",
+    "gulp-sass": "^5.1.0",
     "gulp-terser": "^1.2.0",
     "gulp-uglify": "~3.0.2",
     "gulp-uglify-es": "^3.0.0",
@@ -145,6 +145,7 @@
     "pump": "^3.0.0",
     "range_check": "^1.2.0",
     "run-sequence": "~1.1.5",
+    "sass": "^1.77.0",
     "sass-loader": "^12.3.0",
     "should": "~13.2.3",
     "style-loader": "^3.3.1",
