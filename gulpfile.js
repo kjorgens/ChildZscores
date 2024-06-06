@@ -34,6 +34,7 @@ var _ = require('lodash'),
   semver = require('semver'),
   workboxBuild = require('workbox-build');
 
+  const sass = require('gulp-sass')(require('sass'));
 // Local settings
 var changedTestFiles = [];
 
@@ -209,7 +210,7 @@ gulp.task('cssmin', async() => {
 // Sass task
 gulp.task('sass', function () {
   return gulp.src(defaultAssets.client.sass)
-    .pipe(plugins.sass())
+    .pipe(sass())
     .pipe(plugins.autoprefixer())
     .pipe(gulp.dest('./modules/'));
 });
