@@ -1700,7 +1700,7 @@ function addSummaryLineToStack(
       var month = 1 + date.getMonth();
       var year = date.getFullYear();
 
-      cleanDate = day + "/" + month + "/" + year;
+      cleanDate = month + "/" + day + "/" + year;
     }
   }
 
