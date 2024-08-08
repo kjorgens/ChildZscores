@@ -5,10 +5,10 @@
     .module('children')
     .controller('ChildrenStakeController', ChildrenStakeController);
 
-  ChildrenStakeController.$inject = ['$rootScope', '$state', '$translate', 'FilterService', 'usSpinnerService',
+  ChildrenStakeController.$inject = ['$rootScope', '$state', '$translate', 'FilterService',
     'countryData', '$stateParams'];
 
-  function ChildrenStakeController($rootScope, $state, $translate, FilterService, usSpinnerService,
+  function ChildrenStakeController($rootScope, $state, $translate, FilterService,
     countryData, $stateParams) {
     var vm = this;
     vm.selectedCountry = countryData;
@@ -30,38 +30,16 @@
       return country.name === $stateParams.country;
     }
     // function returnFromPut(input) {
-    //   vm.stopSpin();
     //   console.log(input);
     // }
     function handleError(input) {
       console.log(input + ' attempt to retrieve info remote');
       // getStakesDB();
-      vm.stopSpin();
     }
-    vm.startSpin = function() {
-      if (!vm.spinneractive) {
-        usSpinnerService.spin('spinner-sync');
-      }
-    };
 
     vm.countryList = function() {
       $state.go('children.countries', { networkFirst: 'true' });
     };
-
-    vm.stopSpin = function() {
-      if (vm.spinneractive) {
-        usSpinnerService.stop('spinner-sync');
-      }
-    };
-    vm.spinneractive = false;
-
-    $rootScope.$on('us-spinner:spin', function(event, key) {
-      vm.spinneractive = true;
-    });
-
-    $rootScope.$on('us-spinner:stop', function(event, key) {
-      vm.spinneractive = false;
-    });
 
     function storeDbList(input) {
       // sessionStorage.setItem('liahonaStakesObject', input);
@@ -77,7 +55,6 @@
     }
 
     function screenChildren(stakeName, stakeDB) {
-      vm.startSpin();
       // document.body.scrollTop = document.documentElement.scrollTop = 0;
       $state.go('children.list', {
         countryName: vm.selectedCountry.name,
@@ -91,7 +68,6 @@
     }
 
     function screenPregnantWomen(stakeName, stakeDB) {
-      vm.startSpin();
       // document.body.scrollTop = document.documentElement.scrollTop = 0;
       $state.go('children.listMothers', {
         stakeDB: stakeDB,
@@ -103,7 +79,6 @@
     }
 
     function screenNursingMothers(stakeName, stakeDB) {
-      vm.startSpin();
       // document.body.scrollTop = document.documentElement.scrollTop = 0;
       $state.go('children.listMothers', {
         stakeDB: stakeDB,

@@ -17,6 +17,5 @@
   app.registerModule('children.obesityService');
   app.registerModule('children.graphService');
   app.registerModule('children.filterListService');
-  app.registerModule('children.spinner', ['angularSpinner']);
   app.registerModule('children.routes', ['ui.router', 'core.routes', 'children.services']);
 }(ApplicationConfiguration));
