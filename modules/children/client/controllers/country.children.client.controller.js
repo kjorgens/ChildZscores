@@ -5,9 +5,9 @@
     .module('children')
     .controller('ChildrenCountryController', ChildrenCountryController);
 
-  ChildrenCountryController.$inject = ['$state', '$rootScope', '$translate', 'usSpinnerService', 'countryResolve'];
+  ChildrenCountryController.$inject = ['$state', '$rootScope', '$translate', 'countryResolve'];
 
-  function ChildrenCountryController($state, $rootScope, $translate, usSpinnerService, countryResolve) {
+  function ChildrenCountryController($state, $rootScope, $translate, countryResolve) {
     var vm = this;
     vm.liahonaStakes = countryResolve.countries;
     // .map(country => {
@@ -49,26 +49,6 @@
       $state.go('children.countries', { networkFirst: 'true' });
     };
 
-    vm.startSpin = function() {
-      if (!vm.spinneractive) {
-        usSpinnerService.spin('spinner-sync');
-      }
-    };
-
-    vm.stopSpin = function() {
-      if (vm.spinneractive) {
-        usSpinnerService.stop('spinner-sync');
-      }
-    };
-    vm.spinneractive = false;
-
-    $rootScope.$on('us-spinner:spin', function(event, key) {
-      vm.spinneractive = true;
-    });
-
-    $rootScope.$on('us-spinner:stop', function(event, key) {
-      vm.spinneractive = false;
-    });
     // function refreshCountryList() {
     //   vm.startSpin();
     //   getStakesDB();

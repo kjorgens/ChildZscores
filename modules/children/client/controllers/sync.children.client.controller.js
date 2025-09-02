@@ -6,10 +6,10 @@
     .controller('ChildrenSyncController', ChildrenSyncController);
 
   ChildrenSyncController.$inject = ['$scope', '$rootScope', '$window', '$timeout', '$state', '$stateParams', '$http', 'ChildrenReport', 'FilterService',
-    'Authentication', 'ChildrenGetSync', 'usSpinnerService', 'PouchService', 'ModalService', 'ChildrenViews', 'Socket', 'Upload', 'Notification', 'moment'];
+    'Authentication', 'ChildrenGetSync', 'PouchService', 'ModalService', 'ChildrenViews', 'Socket', 'Upload', 'Notification', 'moment'];
 
   function ChildrenSyncController($scope, $rootScope, $window, $timeout, $state, $stateParams, $http, ChildrenReport, FilterService,
-    Authentication, ChildrenGetSync, usSpinnerService, PouchService, ModalService, ChildrenViews, Socket, Upload, Notification, moment) {
+    Authentication, ChildrenGetSync, PouchService, ModalService, ChildrenViews, Socket, Upload, Notification, moment) {
     var vm = this;
     vm.countryCode = $stateParams.cCode;
     vm.countryName = $stateParams.countryName;
@@ -180,27 +180,6 @@
       PouchService.destroyDatabase(dbName);
     };
 
-    vm.startSpin = function() {
-      if (!vm.spinneractive) {
-        usSpinnerService.spin('spinner-sync');
-      }
-    };
-
-    vm.stopSpin = function() {
-      if (vm.spinneractive) {
-        usSpinnerService.stop('spinner-sync');
-      }
-    };
-    vm.spinneractive = false;
-
-    $rootScope.$on('us-spinner:spin', function(event, key) {
-      vm.spinneractive = true;
-    });
-
-    $rootScope.$on('us-spinner:stop', function(event, key) {
-      vm.spinneractive = false;
-    });
-
     function whenDoneUp() {
       PouchService.newSyncFrom('https://' + vm.syncStuff.entity + '@'
         + vm.syncStuff.url + '/' + vm.stakeDB, replicateDown, replicateErrorDown, whenDoneDown);
@@ -229,7 +208,6 @@
 
     function replicateErrorUp(err) {
       vm.repError = err;
-      vm.stopSpin();
       // console.log('There was an error');
       console.log(err.message);
       vm.reportError('Replication Error Sync up', err.message, true);
@@ -237,14 +215,12 @@
 
     function replicateErrorDown(err) {
       vm.repError = err;
-      vm.stopSpin();
       // console.log('There was an error');
       // console.log(err.message);
       vm.reportError('Replication Error Sync Down', err.message, true);
     }
 
     function syncUpstream() {
-      vm.startSpin();
       // console.log('start sync for ' + vm.stakeDB);
       Notification.success({ message: '<i class="glyphicon glyphicon-ok"></i> Start sync', delay: 350 });
       ChildrenGetSync.syncDb()
@@ -264,7 +240,6 @@
     }
 
     function updateComplete() {
-      vm.stopSpin();
       syncUpstream();
     }
 
@@ -281,7 +256,6 @@
         function waitingForComplete(count) {
           if (count > stakeCount) {
             Notification.error({ message: '<i class="glyphicon glyphicon-remove"></i> Timeout waiting for csv completion' });
-            vm.stopSpin();
             return;
           }
           if (vm.reportReady) {
@@ -318,7 +292,6 @@
 
       Socket.on('CSV_complete', (message) => {
         vm.showProgress = false;
-        vm.stopSpin();
         vm.reportReady = true;
         vm.reportToDownload = '/files/' + message.fileName;
         vm.reportName = message.fileName;
@@ -361,7 +334,6 @@
     }
 
     function updateStakeChildStatus(stakeDB, stakeName, ccode, scopeType) {
-      vm.startSpin();
       var convertParams = {
         stakeDB: stakeDB,
         stakeName: stakeName,
@@ -389,7 +361,6 @@
 
       Socket.on('CSV_complete', (message) => {
         vm.showProgress = false;
-        vm.stopSpin();
         Notification.success({ message: `<i class="glyphicon glyphicon-ok"></i> ${ message.text }`, delay: 10000 });
         // console.log('remove the socket at the client');
         // Socket.emit('leaveRoom', input.socketRoomId);
@@ -434,12 +405,10 @@
     }
 
     function getCsvError(error) {
-      vm.stopSpin();
       vm.reportError('CSV creation error', `${ error.status } ${ error.statusText }`, false);
     }
 
     function createReport(scope, cCode, sortField, csvType, role, monthSelect) {
-      vm.startSpin();
       var stakeName;
       if (scope === undefined) {
         scope = 'stake';
@@ -487,13 +456,11 @@
     }
 
     function viewUpdateError(err) {
-      vm.stopSpin();
       // console.log('couch view update error');
       vm.reportError('couch view update error', err.data.message, true);
     }
 
     function uploadExcelCsv() {
-      vm.startSpin();
       ChildrenViews.updateViews(vm.stakeDB).then(viewUpdateComplete, viewUpdateError);
     }
 

@@ -28,7 +28,6 @@
     "moment": "^2.18.1",
     "angular-ui-router-uib-modal": "latest",
     "angular-ui-indeterminate": "latest",
-    "angular-spinner": "^1.0.1",
     "sw-toolbox": "^3.6.1",
     "pouchdb-all-dbs": "^1.0.2",
     "angular-translate": "^2.15.2",
@@ -59,5 +58,9 @@
     "public/lib",
     "test",
     "tests"
-  ]
+  ],
+  "resolutions": {
+    "angular": "1.5.11",
+    "pouchdb": "^7.0.0"
+  }
 }

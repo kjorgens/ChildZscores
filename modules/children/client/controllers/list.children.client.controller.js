@@ -9,10 +9,10 @@
     .controller('ChildrenListController', ChildrenListController);
 
   ChildrenListController.$inject = ['$rootScope', '$scope', '$state', '$stateParams', '$window', '$translate',
-    'FilterService', 'childResolve', 'usSpinnerService', 'PouchService'];
+    'FilterService', 'childResolve', 'PouchService'];
 
   function ChildrenListController($rootScope, $scope, $state, $stateParams, $window, $translate,
-    FilterService, childResolve, usSpinnerService, PouchService) {
+    FilterService, childResolve, PouchService) {
     var vm = this;
     vm.countryCode = $stateParams.countryCode;
     vm.countryName = $stateParams.countryName;
@@ -109,61 +109,31 @@
         + ' weight/height: ' + child.doc.zScore.wl.toFixed(2);
     }
 
-    vm.startSpin = function() {
-      if (!vm.spinneractive) {
-        usSpinnerService.spin('spinner-sync');
-      }
-    };
-
-    vm.stopSpin = function() {
-      if (vm.spinneractive) {
-        usSpinnerService.stop('spinner-sync');
-      }
-    };
-
-    vm.spinneractive = false;
-
-    $rootScope.$on('us-spinner:spin', function(event, key) {
-      vm.spinneractive = true;
-    });
-
-    $rootScope.$on('us-spinner:stop', function(event, key) {
-      vm.spinneractive = false;
-    });
-
     vm.filterDanger = function() {
-      vm.startSpin();
       vm.childList = FilterService.searchAndFilterRegex(vm.childList, FilterService.currentListFilter(), 'redZoneZscore', 'firstName');
       vm.childFilter = 'r';
       localStorage.setItem('childFilter', 'r');
-      vm.stopSpin();
       vm.focusSearch += 1;
     };
 
     vm.filterWarning = function() {
-      vm.startSpin();
       vm.childList = FilterService.searchAndFilterRegex(vm.childList, FilterService.currentListFilter(), 'marginalZscore', 'firstName');
       vm.childFilter = 'w';
       localStorage.setItem('childFilter', 'w');
-      vm.stopSpin();
       vm.focusSearch += 1;
     };
 
     vm.filterSuccess = function() {
-      vm.startSpin();
       vm.childList = FilterService.searchAndFilterRegex(vm.childList, FilterService.currentListFilter(), 'normalZscore', 'firstName');
       vm.childFilter = 'n';
       localStorage.setItem('childFilter', 'n');
-      vm.stopSpin();
       vm.focusSearch += 1;
     };
 
     vm.filterNone = function() {
-      vm.startSpin();
       vm.childList = FilterService.searchAndFilterRegex(vm.childList, FilterService.currentListFilter(), '', 'firstName');
       vm.childFilter = 'a';
       localStorage.setItem('childFilter', 'a');
-      vm.stopSpin();
       vm.focusSearch = true;
     };
 

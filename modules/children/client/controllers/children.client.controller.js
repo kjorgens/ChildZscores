@@ -6,10 +6,10 @@
     .controller('ChildrenController', ChildrenController);
 
   ChildrenController.$inject = ['$rootScope', '$scope', '$state', '$stateParams', '$translate', '$window', 'GraphService',
-    'FilterService', 'moment', 'screenResolve', 'Authentication', 'ZScores', 'Obesity', 'usSpinnerService', 'PouchService', 'ModalService'];
+    'FilterService', 'moment', 'screenResolve', 'Authentication', 'ZScores', 'Obesity', 'PouchService', 'ModalService'];
 
   function ChildrenController($rootScope, $scope, $state, $stateParams, $translate, $window, GraphService,
-    FilterService, moment, screens, Authentication, ZScores, Obesity, usSpinnerService, PouchService, ModalService) {
+    FilterService, moment, screens, Authentication, ZScores, Obesity, PouchService, ModalService) {
     var vm = this;
     let obeseInfo = {};
     vm.options = {};
@@ -55,27 +55,6 @@
     // getChildrenList();
     vm.genders = [{ value: 'Boy', translationId: 'TXT_MALE' }, { value: 'Girl', translationId: 'TXT_FEMALE' }];
     vm.yesNo = [{ value: 'Yes', translationId: 'YES' }, { value: 'No', translationId: 'NO' }, { value: 'Unknown', translationId: 'UNKNOWN' }];
-    vm.startSpin = function() {
-      if (!vm.spinneractive) {
-        usSpinnerService.spin('spinner-sync');
-      }
-    };
-
-    vm.stopSpin = function() {
-      if (vm.spinneractive) {
-        usSpinnerService.stop('spinner-sync');
-      }
-    };
-
-    vm.spinneractive = false;
-
-    $rootScope.$on('us-spinner:spin', function(event, key) {
-      vm.spinneractive = true;
-    });
-
-    $rootScope.$on('us-spinner:stop', function(event, key) {
-      vm.spinneractive = false;
-    });
 
     function goBack() {
       $state.go('children.list', {
@@ -250,7 +229,7 @@
     }
 
     function setSurveyList(child, surveys) {
-      // vm.stopSpin();
+  
 
       if (surveys.length === 1) {
         vm.initialScreening = true;
@@ -507,7 +486,6 @@
     }
 
     function childUpdated(child) {
-      vm.startSpin();
       $state.go('children.view', { childId: child.id });
     }
 
@@ -603,7 +581,6 @@
           PouchService.remove(toRemove, removeResponse, removeError);
         });
         PouchService.remove(child, removeResponse, removeError);
-        vm.startSpin();
         $state.go('children.list', {
           stakeDB: vm.selectedDB,
           stakeName: vm.selectedStake,

@@ -23,7 +23,7 @@
     "serve": "webpack serve"
   },
   "engines": {
-    "node": "18.19.0",
+    "node": "20.15.1",
     "npm": "10.2.3"
   },
   "dependencies": {
